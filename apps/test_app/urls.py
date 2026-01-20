@@ -6,5 +6,5 @@ from . import views
 
 
 
-urlpatterns = [path('',views.home_page,name='home_page'),
+urlpatterns = [path('test2',views.home_page,name='home_page'),
               path('test',views.test,name='test')]

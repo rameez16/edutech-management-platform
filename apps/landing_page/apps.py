@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class BdmConfig(AppConfig):
+class LandingPageConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.bdm'
+    name = 'landing_page'
