@@ -1,0 +1,85 @@
+{% extends 'bdm/layout/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - CRM Admin{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back admin! Here's what's happening with your crm today.{% endblock %}
+
+{% block breadcrumbs %}
+    <span>Dashboard</span>
+{% endblock %}
+
+{% block page_actions %}
+    <button class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add New
+    </button>
+    <button class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Search
+    </button>
+{% endblock %}
+
+{% block content %}
+    <!-- Your dashboard content here -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Courses</div>
+            <div class="stat-value">{{ course_count }}</div>
+            <div class="stat-change positive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                    <polyline points="17 6 23 6 23 12"/>
+                </svg>
+                +4 this month
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Active Students</div>
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-change positive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                    <polyline points="17 6 23 6 23 12"/>
+                </svg>
+                +12% vs last month
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Trainers</div>
+            <div class="stat-value">{{ trainer_count }}</div>
+            <div class="stat-change positive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                    <polyline points="17 6 23 6 23 12"/>
+                </svg>
+                +2 new
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pending Payments</div>
+            <div class="stat-value">5</div>
+            <div class="stat-change negative">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                    <polyline points="17 18 23 18 23 12"/>
+                </svg>
+                Need attention
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // Dashboard-specific JavaScript here
+        console.log('Dashboard loaded');
+    </script>
+{% endblock %}

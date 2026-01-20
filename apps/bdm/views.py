@@ -12,4 +12,4 @@ def dashboard(request):
         'total_leads': Lead.objects.count(),
         'total_courses': Course.objects.count(),
     }
-    return render(request, 'home.html', context)
+    return render(request, 'bdm/dashboard/dashboard.html', context)
