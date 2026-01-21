@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.student.apps.StudentConfig',
     'apps.bdm.apps.BdmConfig',
     'apps.accounts.apps.AccountsConfig',
     'apps.test_app.apps.TestAppConfig',
