@@ -1,9 +1,11 @@
+
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Student Sidebar</title>
-    <link rel="stylesheet" href="custom.css">
+    <link rel="stylesheet" href="{% ststic student/css/apps/student/static/student/css/templatemo-daynight-style.css}">
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -32,6 +34,9 @@
         <li><i class="fa fa-star"></i> Evaluation</li>
         <li class="logout"><i class="fa fa-sign-out-alt"></i> Logout</li>
     </ul>
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
