@@ -1,0 +1,87 @@
+{% extends 'layout/base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+
+                <div class="page-header-left">
+                 <h1 class="greeting" id="greeting">
+                    Good morning, Student Name
+                </h1>
+             
+                </div>
+
+                <div class="page-header-right">
+                    <img src="" alt="Student Photo" class="student-photo">
+                    <div class="student-meta">
+                        <span class="student-name">Student Name</span>
+                        <span class="student-id">ID: STU-001</span>
+                    </div>
+                </div>
+
+            </div>
+
+           <div class="cards">
+
+            <!-- Learning Progress -->
+                <div class="card">
+                    <h3>Learning Progress</h3>
+                    <div class="progress">
+                        <div class="covered">60%</div>
+                        <div class="pending">40%</div>
+                    </div>
+                    <p style="margin-top:8px;font-size:14px;">Covered / Pending</p>
+                </div>
+
+            <!-- Attendance -->
+                <div class="card">
+                    <h3>Attendance Rate</h3>
+                    <div class="circle">
+                        <span>80%</span>
+                    </div>
+                    <p style="text-align:center;margin-top:8px;">Monthly Attendance</p>
+                </div>
+
+            <!-- Payment Status -->
+                <div class="card">
+                    <h3>Payment Status</h3>
+                    <span class="payment">⚠ EMI Pending</span>
+                    <p style="margin-top:10px;font-size:14px;">Please clear dues to avoid interruption</p>
+                </div>
+
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="two-col">
+                <!-- Comparison Chart -->
+                <div class="card">
+                    <div class="box">
+                        <h3>Announcements</h3>
+                        <p>📢 Class Rescheduled – New Time : <b>3.00 PM</b></p>
+                        <p>💳 Payment overdue – please clear your dues</p>
+                    </div>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="card">
+                    <div class="box">
+                        <h3>Quick Links</h3>
+                        <button>Syllabus</button>
+                        <button>Attendance</button>
+                        <button>Submit Task</button>
+                        <button>Pay Now</button>
+                    </div>
+                </div>
+            </div>
+
+                    
+        </main>
+
+    
+    <script src="templatemo-daynight-script.js"></script>
+</body>
+</html>
+{% endblock %}
