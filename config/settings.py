@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'apps.bdm.apps.BdmConfig',
+    'apps.trainer.apps.TrainerConfig',
     'apps.accounts.apps.AccountsConfig',
     'apps.test_app.apps.TestAppConfig',
     'django.contrib.admin',

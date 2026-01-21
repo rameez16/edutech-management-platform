@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('apps.test_app.urls')),
     path('',include('apps.bdm.urls')),
+    path('trainer/',include('apps.trainer.urls')),
 ]
 
 
