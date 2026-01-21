@@ -1,27 +1,7 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - DayNight Admin</title>
-    <script>
-        // Prevent flash of white in dark mode - runs before CSS/page render
-        if (localStorage.getItem('daynight-theme') === 'carbon') {
-            document.documentElement.classList.add('carbon');
-        }
-    </script>
-    <link rel="stylesheet" href="{% static 'student/css/templatemo-daynight-style.css' %}">
-    <!--
+{% extends 'layout/base.html' %}
+{% block title %}Dashboard{% endblock %}
 
-TemplateMo 608 DayNight Admin
-
-https://templatemo.com/tm-608-daynight-admin
-
--->
-</head>
-<body>
-    
+{% block content %}
         <!-- Main Content -->
         <main class="main-content">
             <!-- Page Header -->
@@ -35,7 +15,7 @@ https://templatemo.com/tm-608-daynight-admin
                 </div>
 
                 <div class="page-header-right">
-                    <img src="{% static 'images/student-avatar.png' %}" alt="Student Photo" class="student-photo">
+                    <img src="" alt="Student Photo" class="student-photo">
                     <div class="student-meta">
                         <span class="student-name">Student Name</span>
                         <span class="student-id">ID: STU-001</span>
@@ -104,3 +84,4 @@ https://templatemo.com/tm-608-daynight-admin
     <script src="templatemo-daynight-script.js"></script>
 </body>
 </html>
+{% endblock %}
