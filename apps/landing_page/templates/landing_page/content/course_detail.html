@@ -1,0 +1,86 @@
+{% extends 'landing_page/layout/base.html' %}
+{% block title %}{{ course.name }} | EDUTECH{% endblock %}
+
+{% block content %}
+
+  <section class="course-detail">
+    <div class="section-container">
+
+      <!-- Back Button -->
+      <a href="/" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Courses
+      </a>
+
+      <!-- Course Header -->
+      <div class="course-header">
+        <div class="course-badge">Premium Course</div>
+        <h1>{{ course.name }}</h1>
+        <p>{{ course.description }}</p>
+      </div>
+
+      <!-- Course Meta Info -->
+      <div class="course-meta">
+        <div class="meta-card">
+          <div class="meta-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="meta-content">
+            <strong>Duration</strong>
+            <span>{{ course.duration }}</span>
+          </div>
+        </div>
+
+        <div class="meta-card">
+          <div class="meta-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <div class="meta-content">
+            <strong>Course Fee</strong>
+            <span>₹{{ course.course_fee }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technologies Covered -->
+      <div class="tech-section">
+        <h3>Technologies Covered</h3>
+        <div class="tech-stack-tags">
+           {% for tech in course.tech_stack_list %}
+          <span class="tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Syllabus Section (Optional) -->
+      <div class="syllabus-section">
+        <h3>Course Syllabus</h3>
+        <div class="syllabus-content">
+        {{ course.syllabus }}
+        </div>
+      </div>
+
+      <!-- CTA Section -->
+      <div class="cta-section">
+        <h3>Ready to Start Your Journey?</h3>
+        <p>Join thousands of students who have transformed their careers with our comprehensive courses</p>
+        <a href="/#contact" class="btn-primary">
+          Register Now →
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+
+{% endblock %}
+
