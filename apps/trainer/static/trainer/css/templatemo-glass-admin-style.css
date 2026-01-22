@@ -294,7 +294,7 @@ a {
 .logo-text {
     font-size: 22px;
     font-weight: 600;
-    background: #ffffff;
+    background: #1e4fd8;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -2246,6 +2246,7 @@ a {
 }
 
 
+/* custom.css */
 /* ===================================
    Footer stick-to-bottom fix
 =================================== */
@@ -2279,4 +2280,62 @@ html, body {
     margin-top: auto;
     padding: 16px 0;
     text-align: center;
+}
+
+/* trainer_profile */
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* my batches */
+
+.batch-card h4 {
+    margin-bottom: 0.8rem;
+}
+
+.batch-info {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+}
+
+.batch-info li {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+.progress-wrapper {
+    margin-top: 0.5rem;
+}
+
+.progress-label {
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+}
+
+.progress-bar {
+    background: rgba(255, 255, 255, 0.15);
+    height: 8px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    height: 100%;
+    border-radius: 6px;
 }
