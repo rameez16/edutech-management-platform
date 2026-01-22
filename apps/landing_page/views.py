@@ -17,7 +17,7 @@ def landing(request):
             mode=request.POST.get('mode'),
         )
         messages.success(request, "Thank you! Your enquiry has been submitted successfully.")
-        return redirect('/')
+    
     
     return render(request, 'landing_page/content/landing.html', {
         'courses': courses

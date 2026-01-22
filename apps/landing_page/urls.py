@@ -7,5 +7,5 @@ from . import views
 
 
 urlpatterns = [
-               path('',views.landing,name='landing'),
+               path('landing_page/',views.landing,name='landing'),
                path('course/<int:course_id>/', views.course_detail, name='course_detail'),]
