@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}GlassAdmin{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'trainer/css/templatemo-glass-admin-style.css' %}">
+</head>
+<body>
+
+<!-- Background Effects -->
+<div class="background"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="dashboard">
+
+    {% include "trainer/partials/_sidebar.html" %}
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        {% include "trainer/partials/_header.html" %}
+
+        <!-- PAGE CONTENT -->
+        <div class="page-content">
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- FOOTER ALWAYS AT END -->
+        {% include "trainer/partials/_footer.html" %}
+
+    </main>
+
+</div>
+
+<button class="mobile-menu-toggle">☰</button>
+
+<script src="{% static 'trainer/js/templatemo-glass-admin-script.js' %}"></script>
+</body>
+</html>
