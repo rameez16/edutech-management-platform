@@ -1,4 +1,6 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
@@ -38,7 +40,6 @@
                 </div>
             </nav>
             
-
 
    <!-- TOP STATS GRID (ALL CARDS IN ONE ROW) -->
 <section class="stats-grid">
@@ -82,6 +83,7 @@
             </div>
         </div>
     </div>
+    <!--Payment-->
     <div class="glass-card payment-ui">
             <div class="payment-header">
                 <h4>PAYMENT STATUS</h4>
@@ -96,7 +98,6 @@
                 </div>
             </div>
         </div>
-
 
     <!-- Announcements Card -->
     <div class="glass-card glass-card-3d stat-card">
@@ -126,8 +127,7 @@
 
 </section>
 
-
-    <!-- ================= RECENT ACTIVITY + QUICK LINKS ================= -->
+    <!-- ================= RECENT ACTIVITY ================= -->
     <section class="top-grid">
 
         <div class="glass-card overview-card activity-column-card">
@@ -185,28 +185,38 @@
 
 </div>
 <br>
+ 
+<div class="overview-row">
 
-  <div class="glass-card overview-card quick-links-card">
+    <!-- STUDENT PROGRESS -->
+    <div class="glass-card overview-card progress-glass-card">
+        <div class="progress-header">
+            <h4 class="card-label">STUDENT PROGRESS</h4>
+        </div>
 
-    <div class="quick-links-header">
-        <h4 class="card-label">QUICK LINKS</h4>
+        <div class="progress-bar-chart">
+            <canvas id="studentBarChart"></canvas>
+        </div>
     </div>
-    <br>
 
-    <div class="quick-links-body">
+    <!-- QUICK LINKS -->
+    <div class="glass-card overview-card quick-links-card">
+        <div class="quick-links-header">
+            <h4 class="card-label">QUICK LINKS</h4>
+        </div>
 
-        <a href="#" class="quick-link-btn blue">Syllabus</a>
-        <a href="#" class="quick-link-btn purple">Attendance</a>
-        <a href="#" class="quick-link-btn green">Submit Task</a>
-        <a href="#" class="quick-link-btn orange">Pay Now</a>
-
+        <div class="quick-links-body">
+            <a href="#" class="quick-link-btn blue">Syllabus</a>
+            <a href="#" class="quick-link-btn purple">Attendance</a>
+            <a href="#" class="quick-link-btn green">Submit Task</a>
+            <a href="#" class="quick-link-btn orange">Pay Now</a>
+        </div>
     </div>
 
 </div>
-
 <br>
 
-    <!-- ================= CALENDAR + ATTENDANCE + PROGRESS ================= -->
+<!-- ================= CALENDAR + ATTENDANCE + PROGRESS ================= -->
     <section class="bottom-grid">
 
         <!-- Calendar -->
@@ -281,7 +291,6 @@
     </div>
 </div>
 
-
                       <!-- Progress Card -->
                 <div class="glass-card progress-card">
                     <div class="card-header">
@@ -310,7 +319,7 @@
             <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
     </button>
-
+    
 
 </main>
 {% endblock %}
