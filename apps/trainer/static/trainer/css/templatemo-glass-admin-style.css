@@ -2339,3 +2339,19 @@ html, body {
     height: 100%;
     border-radius: 6px;
 }
+
+
+/* sidebar  */
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-link svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    flex-shrink: 0;
+}
