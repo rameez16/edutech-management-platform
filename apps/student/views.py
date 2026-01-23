@@ -9,10 +9,7 @@ def dashboard(request):
     
     return render(request, 'dashboard/dashboard.html')
 
-def index(request):
-    """index page"""
-    
-    return render(request, 'dashboard/index.html')
+
 
 
 
