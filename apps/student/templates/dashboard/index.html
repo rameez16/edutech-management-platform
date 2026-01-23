@@ -40,73 +40,92 @@
             
 
 
-    <!-- ================= STUDENT / BATCH / ANNOUNCEMENTS ================= -->
-    <section class="stats-grid">
+   <!-- TOP STATS GRID (ALL CARDS IN ONE ROW) -->
+<section class="stats-grid">
 
-        <!-- Student -->
-        <!-- Student -->
-<div class="glass-card">
-
-    <div class="student-header">
-        <!-- Small student icon -->
-        <div class="student-icon-sm">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="7" r="4"/>
-                <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
-            </svg>
-        </div>
-
-        <!-- Student details -->
-        <div>
-            <h3>Student</h3>
-            <p><strong>ID:</strong> STU12345</p>
-            <p><strong>Name:</strong> John Doe</p>
-            <span class="status-btn active">Active Student</span>
-
+    <!-- Student Profile Card -->
+    <div class="glass-card glass-card-3d stat-card">
+        <div class="stat-card-inner">
+            <div class="stat-info">
+                <h3>Student ID: STU12345</h3>
+                <div class="stat-value">John Doe</div>
+                <span class="stat-change positive">Active Student</span>
+            </div>
+            <div class="stat-icon cyan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--emerald-light)" stroke-width="2">
+                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
+                </svg>
+            </div>
         </div>
     </div>
 
-</div>
-
-
-        <!-- Batch -->
-        <div class="glass-card">
-            <h3>Batch Info</h3>
-            <p><strong>Batch:</strong> BATCH101</p>
-            <p><strong>Course:</strong> Web Development</p>
-            <p><strong>Trainer:</strong> Mr. Smith</p>
-        </div>
-
-        <!-- Announcements -->
-        <div class="glass-card">
-            <h3>Announcements</h3>
-            <p class="danger">❗ Class Rescheduled – 3 PM</p>
-            <p class="warning">⚠️ Payment Overdue</p>
-        </div>
-
-    
-
-    <!-- ================= PAYMENT STATUS ================= -->
-   <div class="glass-card payment-ui">
-
-    <!-- Header -->
-    <div class="payment-header">
-        <h3>Payment Status</h3>
-        <div class="payment-action-btn">₹</div>
-    </div>
-    <!-- Status Row -->
-    <div class="payment-row">
-        <div class="payment-icon">⚠️</div>
-        <div class="payment-text">
-            <div class="payment-title">EMI Pending</div>
-            <div class="payment-subtitle">Action Required</div>
+    <!-- Batch Info Card -->
+    <div class="glass-card glass-card-3d stat-card">
+        <div class="stat-card-inner">
+            <div class="stat-info">
+                <h3>Batch Info</h3>
+                <div class="stat-value" style="font-size:18px;">
+                    Batch ID-BATCH101
+                </div>
+                <div class="batch-mini">
+                    <p><strong>📘 Course:</strong> Web Development</p>
+                    <p><strong>👤 Trainer:</strong> Mr. Smith (TR456)</p>
+                </div>
+            </div>
+            <div class="stat-icon magenta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2">
+                    <path d="M4 4h16v12H4z"/>
+                    <path d="M4 16h16"/>
+                    <path d="M9 20h6"/>
+                </svg>
+            </div>
         </div>
     </div>
+    <div class="glass-card payment-ui">
+            <div class="payment-header">
+                <h4>PAYMENT STATUS</h4>
+                <button class="payment-action-btn">₹</button>
+            </div>
 
-</div>
+            <div class="payment-row danger">
+                <span class="payment-icon">⚠️</span>
+                <div class="payment-text">
+                    <strong>EMI Pending</strong>
+                    <span>Action Required</span>
+                </div>
+            </div>
+        </div>
+
+
+    <!-- Announcements Card -->
+    <div class="glass-card glass-card-3d stat-card">
+        <div class="stat-card-inner">
+            <div class="stat-info">
+                <h3>Announcements</h3>
+                <div class="announcement-mini">
+                    <p class="announcement danger">
+                        ❗ <strong>Class Rescheduled</strong><br>
+                        <span>New time: 3 PM Today</span>
+                    </p>
+                    <p class="announcement warning">
+                        ⚠️ <strong>Payment Overdue</strong><br>
+                        <span>Please clear your dues</span>
+                    </p>
+                </div>
+            </div>
+            <div class="stat-icon purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2">
+                    <path d="M12 2v20"/>
+                    <path d="M5 8h14"/>
+                    <path d="M5 16h14"/>
+                </svg>
+            </div>
+        </div>
+    </div>
 
 </section>
-<br>
+
 
     <!-- ================= RECENT ACTIVITY + QUICK LINKS ================= -->
     <section class="top-grid">
