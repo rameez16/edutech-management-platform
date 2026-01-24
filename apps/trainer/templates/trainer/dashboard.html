@@ -7,14 +7,42 @@
 
 <section class="stats-grid">
 
+    <!-- Quick Actions -->
+    <div class="glass-card quick-links">
+        <h4 class="card-title">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+            </svg>
+            Quick Actions
+        </h4>
+
+        <div class="quick-actions">
+            <a href="" class="btn btn-outline-primary btn-sm">Upload Attendance</a>
+            <a href="" class="btn btn-outline-primary btn-sm">Upload Class Recording</a>
+            <a href="" class="btn btn-outline-secondary btn-sm">View Schedule</a>
+            <a href="" class="btn btn-outline-secondary btn-sm">Submit Reports</a>
+        </div>
+    </div>
+
     <!-- Batch Progress -->
     <div class="glass-card">
-        <h4>Batch Progress</h4>
+        <h4 class="card-title">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"></path>
+                <path d="M18 17V9"></path>
+                <path d="M13 17V5"></path>
+                <path d="M8 17v-3"></path>
+            </svg>
+            Batch Progress
+        </h4>
+
         <p><strong>Active Batches:</strong> 3</p>
         <p><strong>Total Students:</strong> 68</p>
 
         <div class="progress-wrapper">
-            <div class="progress-label"></div>
             <div class="progress-bar">
                 <div class="progress-fill" style="width: 55%;"></div>
             </div>
@@ -24,50 +52,101 @@
 
     <!-- Today's Class Schedule -->
     <div class="glass-card">
-        <h4>Today's Class Schedule</h4>
+        <h4 class="card-title">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Today's Class Schedule
+        </h4>
+
         <ul class="simple-list">
-            <li><strong>07:00 – 08:00 AM</strong> → Data Science (DS-433)</li>
-            <li><strong>10:00 – 11:30 AM</strong> → Web Development (WD-221)</li>
-            <li><strong>05:00 – 06:00 PM</strong> → Python Basics (PY-109)</li>
+            <li><strong>07:00 – 08:00 AM</strong> — Data Science (DS-433)</li>
+            <li><strong>10:00 – 11:30 AM</strong> — Web Development (WD-221)</li>
+            <li><strong>05:00 – 06:00 PM</strong> — Python Basics (PY-109)</li>
         </ul>
     </div>
 
     <!-- Newly Assigned Batches -->
     <div class="glass-card">
-        <h4>Newly Assigned Batches</h4>
+        <h4 class="card-title">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20"></path>
+                <path d="M2 12h20"></path>
+            </svg>
+            Newly Assigned Batches
+        </h4>
+
         <ul class="simple-list">
-            <li>AI Fundamentals – Starts 01/02/2025</li>
-            <li>React JS Bootcamp – Starts 05/02/2025</li>
+            <li>AI Fundamentals — Starts 01 Feb 2025</li>
+            <li>React JS Bootcamp — Starts 05 Feb 2025</li>
         </ul>
         <span class="badge badge-success">2 New</span>
     </div>
 
     <!-- Notifications -->
     <div class="glass-card">
-        <h4>Notifications from BDM</h4>
+        <h4 class="card-title">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            Notifications
+        </h4>
+
         <ul class="simple-list">
-            <li> Upload last week’s attendance</li>
-            <li> Submit student evaluation reports</li>
-            <li> New batch allocation coming soon</li>
+            <li>Upload last week’s attendance</li>
+            <li>Submit student evaluation reports</li>
+            <li>New batch allocation coming soon</li>
+            <li>Check student feedback submissions</li>
         </ul>
     </div>
 
     <!-- Attendance Summary -->
     <div class="glass-card">
-        <h4>Attendance Summary</h4>
+        <h4 class="card-title">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"></path>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            Attendance Summary
+        </h4>
+
         <p><strong>Classes Conducted:</strong> 42</p>
         <p><strong>Pending Attendance:</strong> 3 Days</p>
         <p><strong>Last Updated:</strong> 20 Jan 2025</p>
+
+        <a href="" class="btn btn-bordered">
+            Complete Pending Attendance
+        </a>
     </div>
 
-    <!-- Upload Classes -->
+    <!-- Class Uploads -->
     <div class="glass-card">
-        <h4>Upload Classes</h4>
+        <h4 class="card-title">
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Class Uploads
+        </h4>
+
         <ul class="simple-list">
             <li>Recorded Sessions Uploaded: <strong>36</strong></li>
             <li>Pending Uploads: <strong>2</strong></li>
         </ul>
-        <button class="btn btn-primary btn-sm">Upload New Class</button>
+
+        <a href="" class="btn btn-bordered">
+            Upload New Class
+        </a>
     </div>
 
 </section>

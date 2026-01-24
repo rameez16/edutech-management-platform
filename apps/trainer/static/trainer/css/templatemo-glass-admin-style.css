@@ -9,22 +9,22 @@
 ============================================ */
 :root {
     /* Primary Brand */
-    --primary: #0f2a44;          /* Navy blue */
-    --primary-hover: #143a5e;
-    --primary-soft: rgba(15, 42, 68, 0.15);
+    --primary: #1e3a8a;          /* Navy blue */
+    --primary-hover: #1e40af;
+    --primary-soft: rgba(30, 58, 138, 0.15);
 
     /* Accent (minimal) */
-    --accent: #1e4fd8;           /* subtle blue accent */
+    --accent: #3b82f6;           /* subtle blue accent */
 
     /* Neutrals */
-    --bg-dark: #0b1220;          /* deep navy background */
-    --bg-surface: #0f172a;       /* panels */
+    --bg-dark: #0f172a;          /* Deep navy background */
+    --bg-surface: #1e293b;       /* panels */
     
     /* Glass */
-    --glass-bg: rgba(255, 255, 255, 0.04);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: rgba(0, 0, 0, 0.35);
-    --glass-hover: rgba(255, 255, 255, 0.07);
+    --glass-bg: rgba(30, 41, 59, 0.5);
+    --glass-border: rgba(148, 163, 184, 0.1);
+    --glass-shadow: rgba(0, 0, 0, 0.3);
+    --glass-hover: rgba(51, 65, 85, 0.6);
 
     /* Text */
     --text-primary: #f8fafc;     /* near white */
@@ -51,52 +51,47 @@
 
 [data-theme="light"] {
     /* Brand */
-    --primary: #1f2a44;
-    --primary-hover: #263a5f;
+    --primary: #1e3a8a;          /* Navy blue */
+    --primary-hover: #1e40af;
 
     /* Eye-friendly backgrounds */
-    --bg-dark: #f6f8fb;          /* soft off-white */
-    --bg-surface: #ffffff;      /* cards stay white */
+    --bg-dark: #faf9f6;        /* Soft off-white (easy on eyes) */
+    --bg-surface: #ffffff;       /* Cards stay white for contrast */
 
     /* Borders & elevation */
-    --glass-border: rgba(31, 42, 68, 0.12);
-    --glass-bg: rgba(255, 255, 255, 0.92);
-    --glass-hover: rgba(31, 42, 68, 0.035);
-    --glass-shadow: rgba(15, 23, 42, 0.04);
+    --glass-border: rgba(30, 58, 138, 0.15);
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --glass-hover: rgba(248, 250, 252, 0.95);
+    --glass-shadow: rgba(15, 23, 42, 0.05);
 
     /* Text */
-    --text-primary: #0b1220;
+    --text-primary: #0f172a;
     --text-secondary: #334155;
-    --text-muted: #6b7280;
+    --text-muted: #64748b;
 }
-
 
 
 [data-theme="light"] {
-    /* Brand (single corporate navy) */
-    --primary: #1f2a44;              /* refined navy */
-    --primary-hover: #263a5f;
+    /* Brand */
+    --primary: #1e3a8a;          /* Navy blue */
+    --primary-hover: #1e40af;
 
-    /* Backgrounds */
-    --bg-dark: #ffffff;              /* page */
-    --bg-surface: #ffffff;           /* cards, panels */
+    /* Eye-friendly backgrounds */
+    --bg-dark: #f5f5f5;          /* Pure neutral gray */
+    --bg-surface: #ffffff;       /* Cards stay white for contrast */
 
-    /* Borders & separators (very important) */
-    --glass-border: rgba(31, 42, 68, 0.14);
+    /* Borders & elevation */
+    --glass-border: rgba(30, 58, 138, 0.15);
+    --glass-bg: rgba(255, 255, 255, 0.95);      /* All cards white */
+    --glass-hover: rgba(248, 250, 252, 0.95);   /* Slightly gray on hover */
+    --glass-shadow: rgba(30, 58, 138, 0.08);
 
-    /* Subtle elevation (flat, not 3D) */
-    --glass-bg: rgba(255, 255, 255, 0.9);
-    --glass-hover: rgba(31, 42, 68, 0.035);
-    --glass-shadow: rgba(15, 23, 42, 0.03);
-
-    /* Text hierarchy */
-    --text-primary: #0b1220;         /* headings */
-    --text-secondary: #334155;       /* body */
-    --text-muted: #6b7280;           /* meta / hints */
+    
+    /* Text */
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
 }
-
-
-
 
 /* ===============================
    Light Mode – Enterprise Flat UI
@@ -118,11 +113,11 @@
 /* Scrollbars – clean & neutral */
 [data-theme="light"] .table-wrapper::-webkit-scrollbar-track,
 [data-theme="light"] .chart-wrapper::-webkit-scrollbar-track {
-    background: #263a5f;
+    background: #f5f5f5;
 }
 
 [data-theme="light"] .activity-list::-webkit-scrollbar-thumb {
-    background: rgba(31, 42, 68, 0.25);
+    background: rgba(30, 58, 138, 0.25);
     border-radius: 6px;
 }
 
@@ -164,7 +159,7 @@ a {
     width: 100%;
     height: 100%;
     z-index: -2;
-    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+    background: var(--bg-dark);
 }
 
 .background::before {
@@ -174,10 +169,7 @@ a {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
-        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(0, 200, 255, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(255, 0, 200, 0.1) 0%, transparent 50%);
+    display: none;
 }
 
 /* Floating Orbs */
@@ -699,10 +691,6 @@ a {
     margin-bottom: 24px;
 }
 
-.card-title {
-    font-size: 18px;
-    font-weight: 600;
-}
 
 .card-subtitle {
     font-size: 13px;
@@ -2226,6 +2214,7 @@ a {
 
 .glass-card {
     animation: fadeInUp 0.6s ease-out backwards;
+    padding: 1.5rem;
 }
 
 .stats-grid .glass-card:nth-child(1) { animation-delay: 0.1s; }
@@ -2327,18 +2316,6 @@ html, body {
     margin-bottom: 4px;
 }
 
-.progress-bar {
-    background: rgba(255, 255, 255, 0.15);
-    height: 8px;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    background: linear-gradient(90deg, #22c55e, #16a34a);
-    height: 100%;
-    border-radius: 6px;
-}
 
 
 /* sidebar  */
@@ -2355,3 +2332,190 @@ html, body {
     stroke: currentColor;
     flex-shrink: 0;
 }
+
+/* dashboard  */
+
+/* ==============================
+   QUICK ACTIONS (ADDITIVE ONLY)
+   ============================== */
+
+.quick-links h4 {
+    margin-bottom: 0.75rem;
+}
+
+/* Button container */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.6rem;
+}
+
+/* Buttons inside quick actions */
+/* Buttons inside quick actions */
+.quick-actions .btn {
+    text-align: center;
+    font-weight: 500;
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(79, 156, 255, 0.45); /* 👈 visible border */
+    background-color: transparent;            /* keeps glass feel */
+    transition: all 0.2s ease;
+}
+
+
+/* Subtle hover (no redesign) */
+.quick-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* ==============================
+   SMALL DASHBOARD POLISH
+   ============================== */
+
+/* Keep cards consistent */
+.glass-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Simple list spacing */
+.simple-list li {
+    margin-bottom: 0.4rem;
+}
+
+/* Progress bar polish (if not already styled) */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f9cff, #6fd6ff);
+    border-radius: 6px;
+}
+
+/* Desktop/default styles */
+
+/* ==============================
+   CARD HEADINGS (Professional)
+   ============================== */
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;          /* small gap between icon & text */
+    font-size: 1.25rem;    /* larger, professional heading size */
+    font-weight: 700;      /* bold for hierarchy */
+    margin-bottom: 1rem;   /* space between heading & content */
+}
+
+/* Icon sizing */
+.card-icon {
+    width: 20px;           /* proportional to larger heading */
+    height: 20px;
+    opacity: 0.7;
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .card-title {
+        font-size: 1.1rem;  /* slightly smaller for small screens */
+        gap: 0.35rem;
+        margin-bottom: 0.8rem; /* maintain spacing on mobile */
+    }
+
+    .card-icon {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+.glass-card .btn {
+    margin-top: 0.35rem;
+}
+
+.btn-bordered {
+    border: 2px solid #2C3E50;       /* professional dark blue-gray */
+    color: #2C3E50;                  /* matching text color */
+    background-color: #F5F5F5;       /* soft gray, not too white */
+    border-radius: 6px;               /* subtle rounded corners */
+    padding: 0.35rem 0.75rem;         /* comfortable spacing */
+    font-weight: 500;                 /* slightly bold */
+    transition: all 0.3s ease;       /* smooth hover effect */
+    text-decoration: none;            /* remove underline */
+}
+
+.btn-bordered:hover {
+    background-color: #2C3E50;       /* professional dark hover */
+    color: #fff;                      /* readable text */
+    border-color: #1A252F;            /* slightly darker border  end*/
+}
+
+
+/* ============================================
+   DASHBOARD ONLY – NAVY GLASS CARDS
+============================================ */
+
+/* ============================================
+   TRAINER DASHBOARD – PROFESSIONAL NAVY THEME
+============================================ */
+
+/* .stats-grid .glass-card {
+    background: linear-gradient(
+        180deg,
+        rgba(30, 58, 138, 0.28),
+        rgba(15, 23, 42, 0.60)
+    );
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.35);
+}
+
+.stats-grid .glass-card:hover {
+    background: linear-gradient(
+        180deg,
+        rgba(30, 58, 138, 0.35),
+        rgba(15, 23, 42, 0.68)
+    );
+    box-shadow:
+        0 14px 28px rgba(15, 23, 42, 0.45);
+} */
+
+/* ============================================
+   BUTTONS – CALM NAVY
+============================================ */
+
+/* .stats-grid .btn-outline-primary {
+    color: #1e3a8a;
+    border-color: rgba(30, 58, 138, 0.45);
+}
+
+.stats-grid .btn-outline-primary:hover {
+    background: #1e3a8a;
+    color: #ffffff;
+}
+
+.stats-grid .btn-bordered {
+    border: 1px solid rgba(30, 58, 138, 0.45);
+    color: #1e3a8a;
+}
+
+.stats-grid .btn-bordered:hover {
+    background: #1e3a8a;
+    color: #ffffff;
+} */
+
+/* ============================================
+   PROGRESS BAR – SUBTLE, NO GLOW
+============================================ */
+
+/* .stats-grid .progress-bar {
+    background: rgba(148, 163, 184, 0.12);
+} */
+
+
+
