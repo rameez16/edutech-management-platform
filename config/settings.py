@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'apps.student.apps.StudentConfig',
+    'apps.landing_page.apps.LandingPageConfig',
     'apps.bdm.apps.BdmConfig',
     'apps.accounts.apps.AccountsConfig',
     'apps.test_app.apps.TestAppConfig',

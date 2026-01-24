@@ -1,85 +1,1461 @@
 {% extends 'bdm/layout/base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - CRM Admin{% endblock %}
-
+{% block title %}Dashboard - Training Management{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
-{% block page_subtitle %}Welcome back admin! Here's what's happening with your crm today.{% endblock %}
+{% block page_subtitle %}Welcome back! Here's what's happening today.{% endblock %}
 
-{% block breadcrumbs %}
-    <span>Dashboard</span>
+{% block breadcrumbs %}<span>Dashboard</span>{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: var(--bg-primary);
+        min-width: 200px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        z-index: 1000;
+        margin-top: 8px;
+    }
+
+    .dropdown.active .dropdown-content {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 12px 16px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text-primary);
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .dropdown-item:hover {
+        background: var(--bg-surface);
+    }
+
+    .dropdown-item svg {
+        width: 18px;
+        height: 18px;
+        color: var(--text-secondary);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: var(--bg-primary);
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stat-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .stat-icon.blue {
+        background: var(--accent-light);
+        color: var(--accent);
+    }
+
+    .stat-icon.green {
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--success);
+    }
+
+    .stat-icon.purple {
+        background: rgba(168, 85, 247, 0.1);
+        color: #A855F7;
+    }
+
+    .stat-icon.orange {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .stat-change {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .stat-change.positive {
+        color: var(--success);
+    }
+
+    .stat-change.negative {
+        color: var(--danger);
+    }
+
+    .stat-change svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        
+    }
+
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .dashboard-card {
+        background: var(--bg-primary);
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .card-action {
+        color: var(--accent);
+        font-size: 14px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .card-action:hover {
+        color: var(--accent-hover);
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .quick-action-btn {
+        padding: 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-primary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        color: var(--text-primary);
+    }
+
+    .quick-action-btn:hover {
+        border-color: var(--accent);
+        background: var(--accent-light);
+    }
+
+    .quick-action-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-surface);
+    }
+
+    .quick-action-icon svg {
+        width: 20px;
+        height: 20px;
+        color: var(--accent);
+    }
+
+    .quick-action-text {
+        flex: 1;
+    }
+
+    .quick-action-title {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 2px;
+        color: var(--text-primary);
+    }
+
+    .quick-action-subtitle {
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    .pending-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        background: var(--accent-light);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    .pending-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .pending-info {
+        flex: 1;
+    }
+
+    .pending-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .pending-subtitle {
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    .pending-action {
+        padding: 6px 16px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .pending-action:hover {
+        background: var(--accent-hover);
+    }
+
+    /* Table Styles with Theme Support */
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+
+    .leads-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .leads-table thead {
+        background: var(--bg-surface);
+    }
+
+    .leads-table th {
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .leads-table td {
+        padding: 12px 16px;
+        font-size: 14px;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .leads-table tbody tr {
+        transition: var(--transition);
+    }
+
+    .leads-table tbody tr:hover {
+        background: var(--bg-surface);
+    }
+
+    .leads-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-badge.new {
+        background: var(--accent-light);
+        color: var(--accent);
+    }
+
+    .status-badge.assigned {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .status-badge.converted {
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--success);
+    }
+
+    .status-badge.idle {
+        background: var(--bg-surface);
+        color: var(--text-secondary);
+    }
+
+    .status-badge.dropped {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .mode-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+
+    .mode-badge svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .table-action-btn {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        transition: var(--transition);
+    }
+
+    .table-action-btn:hover {
+        color: var(--accent);
+        background: var(--accent-light);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-secondary);
+    }
+
+    .empty-state svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .batch-info {
+        padding: 12px;
+        background: var(--bg-surface);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    .batch-name {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text-primary);
+    }
+
+    .batch-details {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .batch-enrollment {
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    
+    /* from tst */
+    .activity-item {
+        display: flex;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid #f0f0f0
+    }
+
+    .activity-item:last-child {
+        border-bottom: none
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0
+    }
+
+    .activity-icon svg {
+        width: 20px;
+        height: 20px
+    }
+
+    .activity-icon.enrollment {
+        background: #e3f2fd;
+        color: #1976d2
+    }
+
+    .activity-icon.completion {
+        background: #e8f5e9;
+        color: #388e3c
+    }
+
+    .activity-icon.payment {
+        background: #fff3e0;
+        color: #f57c00
+    }
+
+    .activity-icon.course {
+        background: #f3e5f5;
+        color: #7b1fa2
+    }
+
+    .activity-content {
+        flex: 1
+    }
+
+    .activity-title {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+        font-size: 14px
+    }
+
+    .activity-description {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 4px
+    }
+
+    .activity-time {
+        color: #999;
+        font-size: 12px
+    }
+
+    .course-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #f0f0f0
+    }
+
+    .course-item:last-child {
+        border-bottom: none
+    }
+
+    .course-info {
+        flex: 1
+    }
+
+    .course-name {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 6px;
+        font-size: 14px
+    }
+
+    .course-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 13px;
+        color: #666
+    }
+
+    .course-meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px
+    }
+
+    .course-meta svg {
+        width: 14px;
+        height: 14px
+    }
+
+    .course-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600
+    }
+
+    .course-status.active {
+        background: #e8f5e9;
+        color: #388e3c
+    }
+
+    .course-status.upcoming {
+        background: #fff3e0;
+        color: #f57c00
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 30px
+    }
+
+    .quick-action-btn {
+        padding: 16px;
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all .2s;
+        text-decoration: none;
+        color: #1a1a1a
+    }
+
+    .quick-action-btn:hover {
+        border-color: #1976d2;
+        background: #f5f9ff
+    }
+
+    .quick-action-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f5f5
+    }
+
+    .quick-action-icon svg {
+        width: 20px;
+        height: 20px
+    }
+
+    .quick-action-text {
+        flex: 1
+    }
+
+    .quick-action-title {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 2px
+    }
+
+    .quick-action-subtitle {
+        font-size: 12px;
+        color: #666
+    }
+
+    .pending-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+       
+        border-radius: 8px;
+        margin-bottom: 12px
+    }
+
+    .pending-item:last-child {
+        margin-bottom: 0
+    }
+
+    .pending-info {
+        flex: 1
+    }
+
+    .pending-title {
+        font-weight: 600;
+        color: #1a1a1a;
+        font-size: 14px;
+        margin-bottom: 4px
+    }
+
+    .pending-subtitle {
+        font-size: 12px;
+        color: #666
+    }
+
+    .pending-action {
+        padding: 6px 16px;
+    
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer
+    }
+
+    .pending-action:hover {
+        background: #ef6c00
+    }
+
+    /* Top Performers Grid */
+.top-performers-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+/* Performer Card */
+.performer-card {
+    padding-top: 8px;
+}
+
+/* Header */
+.performer-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+/* Avatar */
+.performer-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 18px;
+    color: #fff;
+}
+
+.performer-avatar.counselor {
+    background: linear-gradient(135deg, #6366f1, #4338ca);
+}
+
+.performer-avatar.trainer {
+    background: linear-gradient(135deg, #10b981, #047857);
+}
+
+/* Name & Role */
+.performer-name {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.performer-role {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Metrics Grid */
+.performer-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+/* Metric Item */
+.metric-item {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.metric-value {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Highlight Metric */
+.metric-item.highlight {
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.metric-item.highlight .metric-value {
+    color: #4338ca;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .top-performers-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* Account Summary Card */
+.account-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Main Balance */
+.account-main {
+    background: linear-gradient(135deg, #334155, #1e293b);
+    border-radius: 14px;
+    padding: 18px;
+    color: #fff;
+}
+
+.account-label {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.account-value {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 6px 0;
+}
+
+.account-value.positive {
+    color: #4ade80;
+}
+
+.account-subtext {
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+/* Breakdown Section */
+.account-breakdown {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+/* Item */
+.account-item {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.item-value {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Status Colors */
+.item-value.success {
+    color: #16a34a;
+}
+
+.item-value.warning {
+    color: #f59e0b;
+}
+
+.item-value.danger {
+    color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .account-breakdown {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+</style>
 {% endblock %}
 
 {% block page_actions %}
-    <button class="btn btn-primary">
+<div class="dropdown" id="addNewDropdown">
+    <button class="btn btn-primary" onclick="toggleDropdown()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
         Add New
-    </button>
-    <button class="btn btn-ghost">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
+            <polyline points="6 9 12 15 18 9" />
         </svg>
-        Search
     </button>
+    <div class="dropdown-content">
+        <a href="#" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="8.5" cy="7" r="4" />
+                <polyline points="17 11 19 13 23 9" />
+            </svg>
+            Add new New Lead
+        </a>
+        <a href="#" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+            New Admission
+        </a>
+        <a href="#" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Trainer Onboarding
+        </a>
+        <a href="#" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+            Add a Course
+        </a>
+        <a href="#" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Create Batch
+        </a>
+    </div>
+</div>
+<button class="btn btn-ghost">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+    Search
+</button>
 {% endblock %}
 
 {% block content %}
-    <!-- Your dashboard content here -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-label">Total Courses</div>
-            <div class="stat-value">{{ course_count }}</div>
-            <div class="stat-change positive">
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-label">Total Leads Converted This Month</div>
+            <div class="stat-icon blue">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                    <polyline points="17 6 23 6 23 12"/>
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
-                +4 this month
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-label">Active Students</div>
-            <div class="stat-value">{{ total_students }}</div>
-            <div class="stat-change positive">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                    <polyline points="17 6 23 6 23 12"/>
-                </svg>
-                +12% vs last month
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Total Trainers</div>
-            <div class="stat-value">{{ trainer_count }}</div>
-            <div class="stat-change positive">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                    <polyline points="17 6 23 6 23 12"/>
-                </svg>
-                +2 new
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Pending Payments</div>
-            <div class="stat-value">5</div>
-            <div class="stat-change negative">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-                    <polyline points="17 18 23 18 23 12"/>
-                </svg>
-                Need attention
-            </div>
+        <div class="stat-value">{{ total_leads|default:0 }}</div>
+        <div class="stat-change positive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            </svg>
+            +{{ new_leads_count|default:0 }} new this week
         </div>
     </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-label">Admission This Month</div>
+            <div class="stat-icon green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                </svg>
+            </div>
+        </div>
+        <div class="stat-value">{{ total_students|default:0 }}</div>
+        <div class="stat-change positive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            </svg>
+            {{ active_students|default:0 }} active
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-label">Total Trainers</div>
+            <div class="stat-icon purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+            </div>
+        </div>
+        <div class="stat-value">{{ trainer_count|default:0 }}</div>
+        <div class="stat-change positive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            </svg>
+            {{ active_trainers|default:0 }} active
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-label">Active Batches</div>
+            <div class="stat-icon orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                </svg>
+            </div>
+        </div>
+        <div class="stat-value">{{ batch_count|default:0 }}</div>
+        <div class="stat-change positive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            </svg>
+            {{ course_count|default:0 }} courses
+        </div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <a href="#" class="quick-action-btn">
+        <div class="quick-action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="8.5" cy="7" r="4" />
+                <polyline points="17 11 19 13 23 9" />
+            </svg>
+        </div>
+        <div class="quick-action-text">
+            <div class="quick-action-title">Manage Leads</div>
+            <div class="quick-action-subtitle">{{ pending_leads|default:0 }} pending assignment</div>
+        </div>
+    </a>
+    <a href="#" class="quick-action-btn">
+        <div class="quick-action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+        </div>
+        <div class="quick-action-text">
+            <div class="quick-action-title">Attendance & Leave</div>
+            <div class="quick-action-subtitle">{{ classes_today|default:0 }} classes scheduled</div>
+        </div>
+    </a>
+    <a href="#" class="quick-action-btn">
+        <div class="quick-action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+        </div>
+        <div class="quick-action-text">
+            <div class="quick-action-title">Track Payment</div>
+            <div class="quick-action-subtitle">{{ pending_payments|default:0 }} pending</div>
+        </div>
+    </a>
+    <a href="#" class="quick-action-btn">
+        <div class="quick-action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+        </div>
+        <div class="quick-action-text">
+            <div class="quick-action-title">Generate Reports</div>
+            <div class="quick-action-subtitle">Analytics & insights</div>
+        </div>
+    </a>
+</div>
+
+<div class="content-grid">
+    <div>
+        <div class="dashboard-card" style="margin-bottom:35px;">
+            <div class="card-header">
+                <h3 class="card-title">Latest Leads</h3>
+                <a href="#" class="card-action">View All</a>
+            </div>
+            
+            {% if latest_leads %}
+            <div class="table-wrapper">
+                <table class="leads-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Course</th>
+                            <th>Mode</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in latest_leads %}
+                        <tr>
+                            <td>
+                                <div style="font-weight: 500;">{{ lead.name }}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">{{ lead.email }}</div>
+                            </td>
+                            <td>{{ lead.phone }}</td>
+                            <td>{{ lead.preferred_course.name|default:"Not specified" }}</td>
+                            <td>
+                                <span class="mode-badge">
+                                    {% if lead.mode == 'remote' %}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="3" width="20" height="14" rx="2" />
+                                        <line x1="8" y1="21" x2="16" y2="21" />
+                                        <line x1="12" y1="17" x2="12" y2="21" />
+                                    </svg>
+                                    Remote
+                                    {% else %}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                    </svg>
+                                    Offline
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge {{ lead.status }}">
+                                    {{ lead.get_status_display }}
+                                </span>
+                            </td>
+                            <td style="font-size: 13px; color: var(--text-secondary);">
+                                {{ lead.enquiry_date|date:"M d, Y" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <p>No leads available yet</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">Active Batches</h3><a href="#" class="card-action">View All</a>
+            </div>
+            <div class="course-item">
+                <div class="course-info">
+                    <div class="course-name">Python Full Stack Development</div>
+                    <div class="course-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>124 Students</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>6 Months</span></div>
+                </div>
+                <div class="course-status active">Active</div>
+            </div>
+            <div class="course-item">
+                <div class="course-info">
+                    <div class="course-name">Data Science with Python</div>
+                    <div class="course-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>89 Students</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>4 Months</span></div>
+                </div>
+                <div class="course-status active">Active</div>
+            </div>
+            <div class="course-item">
+                <div class="course-info">
+                    <div class="course-name">Machine Learning Advanced</div>
+                    <div class="course-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>45 Students</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>5 Months</span></div>
+                </div>
+                <div class="course-status upcoming">Upcoming</div>
+            </div>
+        </div>
+
+        <div class="dashboard-card account-summary-card" style="margin-top: 25px;">
+            <div class="card-header">
+                <h3 class="card-title">Account Summary For This Month</h3>
+                <a href="#" class="card-action">View Ledger</a>
+            </div>
+        
+            <div class="account-summary">
+        
+                <div class="account-main">
+                    <div class="account-label">Net Balance</div>
+                    <div class="account-value positive">
+                        ₹{{ net_balance|default:"0" }}
+                    </div>
+                    <div class="account-subtext">
+                        This month overview
+                    </div>
+                </div>
+        
+                <div class="account-breakdown">
+                    <div class="account-item">
+                        <span class="item-label">Total Revenue</span>
+                        <span class="item-value">
+                            ₹{{ total_revenue|default:"0" }}
+                        </span>
+                    </div>
+        
+                    <div class="account-item">
+                        <span class="item-label">Collected</span>
+                        <span class="item-value success">
+                            ₹{{ collected_amount|default:"0" }}
+                        </span>
+                    </div>
+        
+                    <div class="account-item">
+                        <span class="item-label">Pending</span>
+                        <span class="item-value warning">
+                            ₹{{ pending_amount|default:"0" }}
+                        </span>
+                    </div>
+        
+                    <div class="account-item">
+                        <span class="item-label">Expenses</span>
+                        <span class="item-value danger">
+                            ₹{{ total_expenses|default:"0" }}
+                        </span>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+        
+       
+    </div>
+
+    <div>
+        <div class="dashboard-card" style="margin-bottom:24px">
+            <div class="card-header">
+                <h3 class="card-title">Pending Actions</h3>
+            </div>
+            <div class="pending-item">
+                <div class="pending-info">
+                    <div class="pending-title">Lead Assignments</div>
+                    <div class="pending-subtitle">{{ pending_leads|default:0 }} leads waiting</div>
+                </div>
+                <button class="pending-action">Assign</button>
+            </div>
+            <div class="pending-item">
+                <div class="pending-info">
+                    <div class="pending-title">New Student Onboarding</div>
+                    <div class="pending-subtitle">{{ pending_payments|default:0 }} converted leads</div>
+                </div>
+                <button class="pending-action">Process</button>
+            </div>
+            <div class="pending-item">
+                <div class="pending-info">
+                    <div class="pending-title">New Trainer Onboarding</div>
+                    <div class="pending-subtitle">{{ certificate_requests|default:0 }} trainer hired </div>
+                </div>
+                <button class="pending-action">Process</button>
+            </div>
+        </div>
+
+        <div class="dashboard-card" style="margin-bottom:24px">
+            <div class="card-header">
+                <h3 class="card-title">Recent Activity</h3><a href="#" class="card-action">View All</a>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon enrollment"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="8.5" cy="7" r="4" />
+                        <line x1="20" y1="8" x2="20" y2="14" />
+                        <line x1="23" y1="11" x2="17" y2="11" />
+                    </svg></div>
+                <div class="activity-content">
+                    <div class="activity-title">New Student Enrolled</div>
+                    <div class="activity-description">Rahul Kumar enrolled in Python Full Stack</div>
+                    <div class="activity-time">2 hours ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon completion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg></div>
+                <div class="activity-content">
+                    <div class="activity-title">Course Completed</div>
+                    <div class="activity-description">Priya Sharma completed Data Science Fundamentals</div>
+                    <div class="activity-time">5 hours ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon payment"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <rect x="1" y="4" width="22" height="16" rx="2" />
+                        <line x1="1" y1="10" x2="23" y2="10" />
+                    </svg></div>
+                <div class="activity-content">
+                    <div class="activity-title">Payment Received</div>
+                    <div class="activity-description">₹25,000 from Amit Verma</div>
+                    <div class="activity-time">Yesterday</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">Upcoming Batches</h3>
+                <a href="#" class="card-action">View All</a>
+            </div>
+            {% if upcoming_batches %}
+                {% for batch in upcoming_batches %}
+                <div class="batch-info">
+                    <div class="batch-name">{{ batch.name }}</div>
+                    <div class="batch-details">
+                        Starts: {{ batch.start_date|date:"M d, Y" }} | Duration: {{ batch.duration_months }} months
+                    </div>
+                    <div class="batch-enrollment">
+                        Enrolled: {{ batch.total_students }}/{{ batch.expected_students|default:"30" }} students
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    <p>No upcoming batches scheduled</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+</div>
+
+
+<div class="content-grid top-performers-grid" style="margin-top: 25px;">
+
+    <!-- Top Counselor -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h3 class="card-title">Top Counselor</h3>
+            <a href="#" class="card-action">View Report</a>
+        </div>
+
+        {% if top_counselor %}
+        <div class="performer-card">
+            <div class="performer-header">
+                <div class="performer-avatar counselor">
+                    {{ top_counselor.name|slice:":1" }}
+                </div>
+                <div>
+                    <div class="performer-name">{{ top_counselor.name }}</div>
+                    <div class="performer-role">Admissions Counselor</div>
+                </div>
+            </div>
+
+            <div class="performer-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Enquiries</span>
+                    <span class="metric-value">{{ top_counselor.total_enquiries }}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Admissions</span>
+                    <span class="metric-value">{{ top_counselor.total_admissions }}</span>
+                </div>
+                <div class="metric-item highlight">
+                    <span class="metric-label">Conversion</span>
+                    <span class="metric-value">
+                        {{ top_counselor.conversion_rate }}%
+                    </span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Revenue</span>
+                    <span class="metric-value">
+                        ₹{{ top_counselor.revenue_generated }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No counselor data available</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Top Trainer -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h3 class="card-title">Top Trainer</h3>
+            <a href="#" class="card-action">View Report</a>
+        </div>
+
+        {% if top_trainer %}
+        <div class="performer-card">
+            <div class="performer-header">
+                <div class="performer-avatar trainer">
+                    {{ top_trainer.name|slice:":1" }}
+                </div>
+                <div>
+                    <div class="performer-name">{{ top_trainer.name }}</div>
+                    <div class="performer-role">{{ top_trainer.course.name }}</div>
+                </div>
+            </div>
+
+            <div class="performer-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Batches</span>
+                    <span class="metric-value">{{ top_trainer.batches_handled }}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Students</span>
+                    <span class="metric-value">{{ top_trainer.total_students }}</span>
+                </div>
+                <div class="metric-item highlight">
+                    <span class="metric-label">Feedback</span>
+                    <span class="metric-value">
+                        {{ top_trainer.avg_feedback }}/5
+                    </span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Attendance</span>
+                    <span class="metric-value">
+                        {{ top_trainer.attendance_rate }}%
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No trainer data available</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+
+</div>
 {% endblock %}
 
 {% block extra_js %}
-    <script>
-        // Dashboard-specific JavaScript here
-        console.log('Dashboard loaded');
-    </script>
+<script>
+    function toggleDropdown() { document.getElementById('addNewDropdown').classList.toggle('active') }
+    document.addEventListener('click', function (e) { var d = document.getElementById('addNewDropdown'); if (!d.contains(e.target)) d.classList.remove('active') });
+    console.log('Dashboard loaded');
+</script>
 {% endblock %}
+

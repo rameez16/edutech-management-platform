@@ -25,6 +25,7 @@ urlpatterns = [
     path('',include('apps.test_app.urls')),
     path('',include('apps.bdm.urls')),
     path('',include('apps.student.urls')),
+    path('', include('apps.landing_page.urls')),
 ]
 
 
