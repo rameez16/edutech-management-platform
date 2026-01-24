@@ -228,6 +228,7 @@ footer {
 [data-theme="light"] .feature-card,
 [data-theme="light"] .meta-card,
 [data-theme="light"] .tech-section,
+[data-theme="light"] .course-detail,
 [data-theme="light"] .syllabus-section {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--border);
@@ -243,11 +244,25 @@ footer {
 [data-theme="light"] .courses{
   background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
 }
+/* Light mode course details */
+[data-theme="light"] .course-detail{
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+
 
 /* Light mode footer */
 [data-theme="light"] footer {
   background: #ffffff;
   border-top: 1px solid var(--border);
+}
+
+/* ===============================
+   COURSE DETAIL – LIGHT MODE
+================================ */
+
+[data-theme="light"] .course-detail {
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 
@@ -1383,6 +1398,65 @@ footer {
         justify-content: center;
       }
     }
+
+    /* ===============================
+   COURSE DETAIL – LIGHT MODE FIX
+================================ */
+
+[data-theme="light"] .course-detail {
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* Remove dark glowing blobs */
+[data-theme="light"] .course-detail::before,
+[data-theme="light"] .course-detail::after {
+  display: none;
+}
+
+/* Cards & sections */
+[data-theme="light"] .course-header,
+[data-theme="light"] .meta-card,
+[data-theme="light"] .tech-section,
+[data-theme="light"] .syllabus-section,
+[data-theme="light"] .cta-section {
+  background: #ffffff !important;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+/* Headings */
+[data-theme="light"] .course-header h1 {
+  background: none;
+  -webkit-text-fill-color: unset;
+  color: #212529;
+}
+
+[data-theme="light"] h3,
+[data-theme="light"] strong {
+  color: #212529;
+}
+
+/* Text */
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] .syllabus-content {
+  color: #495057;
+}
+
+/* Tech tags */
+[data-theme="light"] .tech-tag {
+  background: rgba(102, 126, 234, 0.12);
+  color: #3f51b5;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+/* Back button */
+[data-theme="light"] .back-btn {
+  background: #ffffff;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+
 
     /* message after form submission*/
     .popup {
