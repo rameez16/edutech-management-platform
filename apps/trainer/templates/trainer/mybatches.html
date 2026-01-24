@@ -1,0 +1,56 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}My Batches{% endblock %}
+{% block page_title %}Assigned Batches{% endblock %}
+
+{% block content %}
+
+<section class="stats-grid">
+
+    <!-- Batch Card -->
+    <div class="glass-card batch-card">
+        <h4>Batch ID: DS-433</h4>
+
+        <ul class="batch-info">
+            <li><strong>Course:</strong> Data Science</li>
+            <li><strong>Timing:</strong> 7:00 – 8:00 AM</li>
+            <li><strong>Duration:</strong> 60 Days</li>
+            <li><strong>Start Date:</strong> 24/12/2024</li>
+            <li><strong>Expected End:</strong> 24/02/2025</li>
+            <li><strong>Classes:</strong> 15 / 60 Completed</li>
+        </ul>
+
+        <!-- Progress -->
+        <div class="progress-wrapper">
+            <div class="progress-label">Progress</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 25%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Card -->
+    <div class="glass-card batch-card">
+        <h4>Batch ID: WD-221</h4>
+
+        <ul class="batch-info">
+            <li><strong>Course:</strong> Web Development</li>
+            <li><strong>Timing:</strong> 10:00 – 11:30 AM</li>
+            <li><strong>Duration:</strong> 45 Days</li>
+            <li><strong>Start Date:</strong> 10/01/2025</li>
+            <li><strong>Expected End:</strong> 25/02/2025</li>
+            <li><strong>Classes:</strong> 20 / 45 Completed</li>
+        </ul>
+
+        <div class="progress-wrapper">
+            <div class="progress-label">Progress</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 45%;"></div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
