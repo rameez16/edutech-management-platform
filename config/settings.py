@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'apps.student.apps.StudentConfig',
     'apps.landing_page.apps.LandingPageConfig',
     'apps.bdm.apps.BdmConfig',
+    'apps.trainer.apps.TrainerConfig',
     'apps.accounts.apps.AccountsConfig',
     'apps.test_app.apps.TestAppConfig',
     'django.contrib.admin',
