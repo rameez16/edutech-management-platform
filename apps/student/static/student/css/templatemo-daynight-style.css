@@ -11,7 +11,7 @@
     /* Primary Colors - Emerald & Gold Luxury */
     --emerald: #059669;
     --emerald-light: #34d399;
-    --gold: #d4a574;
+    --gold: #e58450;
     --gold-light: #e8c9a0;
     --amber: #b45309;
     --cream: #fef3e2;
@@ -576,27 +576,25 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 10px;
 }
 
 .stat-icon.cyan {
-    background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.05));
+    background: linear-gradient(135deg, rgba(117, 232, 190, 0.368), rgba(126, 230, 192, 0.303));
     box-shadow: 0 8px 32px rgba(52, 211, 153, 0.2);
 }
 
 .stat-icon.magenta {
-    background: linear-gradient(135deg, rgba(212, 165, 116, 0.2), rgba(212, 165, 116, 0.05));
-    box-shadow: 0 8px 32px rgba(212, 165, 116, 0.2);
+    background: linear-gradient(135deg, rgba(237, 198, 157, 0.329), rgba(222, 191, 158, 0.586));
+    box-shadow: 0 8px 32px rgba(212, 166, 116, 0.207);
 }
 
 .stat-icon.purple {
-    background: linear-gradient(135deg, rgba(224, 122, 95, 0.2), rgba(224, 122, 95, 0.05));
+    background: linear-gradient(135deg, rgba(248, 169, 147, 0.471), rgba(224, 123, 95, 0.252));
     box-shadow: 0 8px 32px rgba(224, 122, 95, 0.2);
 }
 
-.stat-icon.success {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05));
-    box-shadow: 0 8px 32px rgba(34, 197, 94, 0.2);
-}
+
 
 .stat-icon svg {
     width: 26px;
@@ -952,7 +950,7 @@ a {
 
 .progress-fill.magenta {
     background: linear-gradient(90deg, var(--gold-light), var(--gold));
-    box-shadow: 0 0 20px rgba(212, 165, 116, 0.4);
+    box-shadow: 0 0 20px rgba(222, 155, 111, 0.471);
 }
 
 .progress-fill.purple {
@@ -1704,12 +1702,14 @@ a {
     margin-top: 10px;
     font-size: 13px;
     line-height: 1.6;
+
 }
 
 .announcement {
     padding: 8px 10px;
     border-radius: 10px;
     margin-bottom: 6px;
+    width: 200px;
 }
 
 .announcement span {
@@ -1740,7 +1740,7 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
 }
 
 .payment-header h4 {
@@ -1752,18 +1752,17 @@ a {
 
 /* Action Button */
 .payment-action-btn {
-    width: 40px;
-    height: 40px;
+    width: 55px;
+    height: 55px;
     border-radius: 14px;
     border: none;
-    cursor: pointer;
     font-size: 18px;
     font-weight: 600;
     color: var(--gold);
     background: radial-gradient(
         circle at top left,
-        rgba(212, 165, 116, 0.35),
-        rgba(212, 165, 116, 0.15)
+        rgba(221, 179, 134, 0.432),
+        rgba(232, 188, 142, 0.332)
     );
     box-shadow: 0 0 25px rgba(212, 165, 116, 0.35);
 }
@@ -1772,24 +1771,24 @@ a {
 .payment-row {
     display: flex;
     gap: 12px;
-    padding: 10px 0;
+   
 }
 
 /* Icon */
 .payment-icon {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 /* Text */
 .payment-text strong {
     display: block;
-    font-size: 14px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 .payment-text span {
-    font-size: 13px;
+    font-size: 16px;
     color: var(--text-secondary);
 }
 
@@ -1921,8 +1920,9 @@ a {
 
 /* BUTTON BASE */
 .quick-link-btn {
-    width: 100%;              /* FULL WIDTH */
-    height: 48px;             /* BUTTON HEIGHT */
+    margin-left: 10%;
+    width: 80%;              /* FULL WIDTH */
+    height: 40px;             /* BUTTON HEIGHT */
     line-height: 48px;        /* CENTER TEXT VERTICALLY */
 
     border-radius: 14px;
@@ -1940,21 +1940,25 @@ a {
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.card-label2{
+    text-align: center;
+    margin-bottom: 20px;
+}
 /* COLORS (IMAGE STYLE) */
 .quick-link-btn.blue {
-    background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+    background: linear-gradient(180deg, #5f9cfea6, #1d4ed8);
 }
 
 .quick-link-btn.purple {
-    background: linear-gradient(180deg, #8b5cf6, #6d28d9);
+    background: linear-gradient(180deg, #a17bf9, #6c28d9cf);
 }
 
 .quick-link-btn.green {
-    background: linear-gradient(180deg, #22c55e, #15803d);
+    background: linear-gradient(180deg, #87f4af, #15803cc8);
 }
 
 .quick-link-btn.orange {
-    background: linear-gradient(180deg, #f59e0b, #ea580c);
+    background: linear-gradient(180deg, #f5bf61, #ea5a0cb4);
 }
 
 /* HOVER EFFECT */
