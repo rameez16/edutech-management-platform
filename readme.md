@@ -22,6 +22,10 @@ training_management_system/
 └── venv/
 
 
+Admin Database requirement
+
+
+
 
 Trainer Database Requirement
 ______________________________________
