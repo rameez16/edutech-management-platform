@@ -43,6 +43,7 @@ class LessonPlan(models.Model):
     Master lesson plan - Daily topics breakdown for each module
     This is the syllabus structure
     """
+    course = models.ForeignKey('bdm.Course', on_delete=models.CASCADE, related_name='lesson_plans', null=True, blank=True)
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     
     # Session details
@@ -56,11 +57,11 @@ class LessonPlan(models.Model):
     estimated_duration_hours = models.DecimalField(max_digits=3, decimal_places=1, default=2.0)
     
     # Resources
-    reference_materials = models.TextField(blank=True)
+    reference_materials = models.TextField(blank=True,)
     practice_exercises = models.TextField(blank=True)
     
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True)
     
     class Meta:
         ordering = ['module', 'session_number']
