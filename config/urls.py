@@ -27,6 +27,7 @@ urlpatterns = [
     path('trainer/',include('apps.trainer.urls')),
     path('',include('apps.student.urls')),
     path('', include('apps.landing_page.urls')),
+    path('', include('apps.accounts.urls')),
 ]
 
 

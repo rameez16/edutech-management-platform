@@ -1,8 +1,8 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 
-from django.contrib.auth.models import User
 from django.utils import timezone
 
 
@@ -29,7 +29,7 @@ class Lead(models.Model):
     status = models.CharField(max_length=10, choices=LeadStatus.choices, default=LeadStatus.NEW)
     
     # Assignment and Tracking
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, 
                                    limit_choices_to={'groups__name': 'TELE-CALLER'})
     enquiry_date = models.DateTimeField(auto_now_add=True)
     last_followup = models.DateTimeField(null=True, blank=True)
@@ -68,6 +68,8 @@ class Trainer(models.Model):
         FEMALE = 'F', 'Female'
         OTHER = 'O', 'Other'
     
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)    
+    
     # Personal Information
     name = models.CharField(max_length=100)
     gender = models.CharField(max_length=1, choices=GenderChoice.choices)
@@ -88,6 +90,8 @@ class Trainer(models.Model):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateField(auto_now_add=True)
     
+    profile_completed = models.BooleanField(default=False)
+    
     def __str__(self):
         return f"{self.name} - {self.experience} years"
     
@@ -102,6 +106,11 @@ class Trainer(models.Model):
 
 
 class Student(models.Model):
+    
+    
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)    
+    
+    
     class GenderChoice(models.TextChoices):
         MALE = 'M', 'Male'
         FEMALE = 'F', 'Female'
@@ -168,6 +177,8 @@ class Student(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     
+    profile_completed = models.BooleanField(default=False)
+    
     class Meta:
         ordering = ['-join_date']
     
@@ -233,7 +244,7 @@ class Batch(models.Model):
     
    
 class TeleCallerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
     department = models.CharField(max_length=100, default='Business Development')
     join_date = models.DateField(auto_now_add=True)
@@ -257,7 +268,7 @@ class Counselor(models.Model):
     Counselors who handle lead follow-ups
     Similar to TeleCallerProfile but with counseling focus
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
     department = models.CharField(max_length=100, default='Admissions & Counseling')
     join_date = models.DateField(auto_now_add=True)
@@ -303,7 +314,7 @@ class CallHistory(models.Model):
         CONVERTED = 'converted', 'Converted'
     
     lead = models.ForeignKey('Lead', on_delete=models.CASCADE, related_name='call_history')
-    caller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+    caller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                               related_name='calls_made')
     
     # Call details
@@ -351,7 +362,7 @@ class PaymentDocument(models.Model):
     document_file = models.FileField(upload_to='payment_documents/%Y/%m/')
     description = models.TextField(blank=True)
     
-    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -401,7 +412,7 @@ class PaymentReminder(models.Model):
     message_template = models.TextField()
     
     # Follow-up
-    sent_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    sent_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     notes = models.TextField(blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -439,7 +450,7 @@ class PDCCollection(models.Model):
     
     # Collection details
     collected_date = models.DateField()
-    collected_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+    collected_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                                     related_name='collected_cheques')
     
     # Status tracking
@@ -502,7 +513,7 @@ class OnboardingChecklist(models.Model):
     # Completion
     onboarding_completed = models.BooleanField(default=False)
     completed_date = models.DateField(null=True, blank=True)
-    completed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     
     # Tracking
     created_at = models.DateTimeField(auto_now_add=True)
@@ -567,7 +578,7 @@ class StudentIssue(models.Model):
     description = models.TextField()
     
     # Assignment
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='assigned_issues')
     
     # Status tracking
@@ -575,7 +586,7 @@ class StudentIssue(models.Model):
     
     # Resolution
     resolution_notes = models.TextField(blank=True)
-    resolved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='resolved_issues')
     resolved_at = models.DateTimeField(null=True, blank=True)
     
@@ -641,7 +652,7 @@ class Notification(models.Model):
         DOCUMENT_PENDING = 'document_pending', 'Document Pending'
         GENERAL = 'general', 'General Notification'
     
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE,
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                  related_name='notifications')
     
     # Notification details
@@ -675,7 +686,7 @@ class UserNotificationSettings(models.Model):
     """
     User preferences for notifications
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE,
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                related_name='notification_settings')
     
     # Email notifications
