@@ -1,0 +1,95 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Student Onboarding{% endblock %}
+
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'student/css/uploading.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="student-onboarding">
+        <div class="onboarding-card">
+            <h2>Student Onboarding</h2>
+            <p class="instruction">Please upload all the required documents for your admission verification</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Document Type</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            Photograph *<br>
+                            <span class="subtext">Passport size</span>
+                        </td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td>
+                            <input type="file" class="upload-btn" accept=".jpg,.png,.pdf">
+                            <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Educational Certificates *<br>
+                            <span class="subtext">Multiple files allowed</span>
+                        </td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td>
+                            <input type="file" class="upload-btn" accept=".jpg,.png,.pdf" multiple>
+                            <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Residence Proof *<br>
+                            <span class="subtext">Address verification</span>
+                        </td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td>
+                            <input type="file" class="upload-btn" accept=".jpg,.png,.pdf">
+                            <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Aadhaar *<br>
+                            <span class="subtext">Identity verification</span>
+                        </td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td>
+                            <input type="file" class="upload-btn" accept=".jpg,.png,.pdf">
+                            <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Other documents *<br>
+                            <span class="subtext">As defined by bdm</span>
+                        </td>
+                        <td><span class="status optional">Optional</span></td>
+                        <td>
+                            <input type="file" class="upload-btn" accept=".jpg,.png,.pdf">
+                            <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="buttons">
+                <button class="submit-btn">Submit Documents</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+
+            <p class="warning">
+                ⚠️ Incomplete or rejected documents will delay onboarding process.
+            </p>
+        </div>
+    </div>
+{% endblock %}
