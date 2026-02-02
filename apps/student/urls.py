@@ -11,4 +11,5 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('stud_upload/',views.upload,name='stud_upload'),
                
                
+               
 ]

@@ -17,5 +17,3 @@ def onboard(request):
 def upload(request):
     
     return render(request, 'dashboard/uploaddoc.html')
-
-

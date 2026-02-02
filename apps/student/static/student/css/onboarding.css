@@ -15,8 +15,8 @@
 
 /* Root wrapper must fill base.html content area */
 .student-onboarding {
-    width: 160vh;
-    max-width: 160vh;
+    width: 100%;
+    max-width: 100%;
     padding: 0;          /* base.html already has padding */
     margin: 0;
 }
@@ -188,23 +188,6 @@
     color: var(--text-secondary);
 }
 
-
-.site-footer {
-    text-align: center;
-    padding: 20px;
-    margin-left: var(--sidebar-width);
-    color: rgb(0, 0, 0);
-    font-size: 14px;
-}
-
-.site-footer a {
-    color: white;
-    transition: color var(--transition-fast);
-}
-
-.site-footer a:hover {
-    color: var(--gold);
-}
 
 /* RESPONSIVE */
 @media (max-width: 992px) {

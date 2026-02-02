@@ -90,30 +90,30 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-here')
 
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.tqwopngrndmxjdwalrjk',
-        'PASSWORD': 'm3Su5?eP+SgKtU9',  # Your decoded password
-        'HOST': 'aws-1-ap-northeast-1.pooler.supabase.com',  # Connection pooler
-        'PORT': '5432',  # Or 6543 for connection pooler
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-    }
-}
+#DATABASES = {
+ #   'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'postgres',
+#        'USER': 'postgres.tqwopngrndmxjdwalrjk',
+#        'PASSWORD': 'm3Su5?eP+SgKtU9',  # Your decoded password
+#        'HOST': 'aws-1-ap-northeast-1.pooler.supabase.com',  # Connection pooler
+#        'PORT': '5432',  # Or 6543 for connection pooler
+#        'OPTIONS': {
+#            'sslmode': 'require',
+#        },
+#    }
+#}
 
 
 
 # Fallback to SQLite for local development
-if not os.environ.get('DATABASE_URL'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+#if not os.environ.get('DATABASE_URL'):
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
 
 
 

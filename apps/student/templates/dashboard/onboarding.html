@@ -3,14 +3,11 @@
 
 {% block title %}Student Onboarding{% endblock %}
 
-
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'student/css/onboarding.css' %}">
+<link rel="stylesheet" href="{% static 'student/css/onboarding.css' %}">
 {% endblock %}
 
-
 {% block content %}
-
 <div class="student-onboarding">
 
     <!-- HEADER -->
@@ -20,16 +17,16 @@
         <div class="onboarding-progress">
             <div class="progress-text">
                 <span>Onboarding Progress :</span>
-                <strong>1 / 3 Completed</strong>
+                <strong>0 / 3 Completed</strong>
             </div>
 
             <div class="progress-track">
-                <div class="progress-fill onboarding-fill" style="width: 33%;"></div>
+                <div class="progress-fill onboarding-fill" style="width: 0%;"></div>
             </div>
 
             <div class="progress-status">
-                <span class="status completed">✔ Documents</span>
-                <span class="status pending">⦿ Enrollment Letter</span>
+                <span class="status pending">✔ Documents</span>
+                <span class="status locked">⦿ Enrollment Letter</span>
                 <span class="status locked">🔒 ID Card</span>
             </div>
         </div>
@@ -38,38 +35,36 @@
     <!-- STEPS -->
     <div class="onboarding-steps">
 
-        <!-- STEP 1 -->
-        <div class="glass-card step-card completed">
+        <!-- STEP 1: Document Upload -->
+        <div class="glass-card step-card pending">
             <div class="step-header">
                 <span>1. Document Upload</span>
-                <span class="badge success">Completed</span>
+                <span class="badge warning">Upload</span>
             </div>
 
             <p class="step-desc">
-                All documents submitted and verified.
+                Upload your required documents.
             </p>
 
-            <a href="#" class="btn primary">View Documents</a>
+            <a href="{% url 'stud_upload' %}" class="btn primary">Upload Documents</a>
+
         </div>
 
-        <!-- STEP 2 -->
-        <div class="glass-card step-card pending">
+        <!-- STEP 2: Enrollment Letter -->
+        <div class="glass-card step-card locked">
             <div class="step-header">
                 <span>2. Enrollment Letter</span>
-                <span class="badge warning">Pending</span>
+                <span class="badge locked">Locked</span>
             </div>
 
             <p class="step-desc">
                 Sign & upload your enrollment letter.
             </p>
 
-            <div class="btn-group-vertical">
-                <a href="#" class="btn secondary">Download Letter</a>
-                <a href="#" class="btn outline">Upload Signed Letter</a>
-            </div>
+            <button class="btn disabled" disabled>Locked</button>
         </div>
 
-        <!-- STEP 3 -->
+        <!-- STEP 3: Student ID Card -->
         <div class="glass-card step-card locked">
             <div class="step-header">
                 <span>3. Student ID Card</span>
@@ -87,12 +82,9 @@
 
     <!-- NEXT STEP -->
     <div class="glass-card next-step-card">
-        <h4>Next step : Sign your enrollment letter</h4>
-        <p>
-            Please download, sign, and upload your enrollment letter to proceed.
-        </p>
+        <h4>Next step: Upload your documents</h4>
+        <p>Please upload all required documents to proceed.</p>
     </div>
 
 </div>
-
 {% endblock %}

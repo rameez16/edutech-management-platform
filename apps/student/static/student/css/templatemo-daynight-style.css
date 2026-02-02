@@ -165,10 +165,7 @@ a {
 /* ============================================
    LAYOUT STRUCTURE
 ============================================ */
-.dashboard {
-    display: flex;
-    min-height: 100vh;
-}
+
 
 /* ============================================
    SIDEBAR
@@ -362,12 +359,7 @@ a {
 /* ============================================
    MAIN CONTENT
 ============================================ */
-.content {
-    flex: 1;
-    margin-left: var(--sidebar-width);
-    padding: 30px;
-    min-height: 100vh;
-}
+
 
 /* ============================================
    TOP NAVBAR
@@ -2032,3 +2024,15 @@ a {
 }
 
 
+/* =================================================
+   FIX CONTENT WIDTH – REQUIRED FOR ALL INNER PAGES
+   ================================================= */
+
+.content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    padding: 30px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}

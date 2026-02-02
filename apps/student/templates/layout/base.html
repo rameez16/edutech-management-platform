@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'student/css/templatemo-daynight-style.css' %}">
     <link rel="stylesheet" href="{% static 'student/css/custom.css' %}">
-    <link rel="stylesheet" href="{% static 'student/css/onboarding.css' %}">
+
 
 
     <!--
@@ -22,6 +22,7 @@ https://templatemo.com/tm-607-glass-admin
 
 -->
 {% block extra_css %}{% endblock %}
+
 </head>
 <body>
     <!-- Animated Background -->
@@ -43,7 +44,7 @@ https://templatemo.com/tm-607-glass-admin
                     <span class="nav-section-title">Main Menu</span>
                     <ul>
                         <li class="nav-item">
-                            <a href="index.html" class="nav-link active">
+                            <a href="{% url 'stud_dashboard' %}" class="nav-link active">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="3" width="7" height="7" rx="1"/>
                                     <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -187,7 +188,7 @@ https://templatemo.com/tm-607-glass-admin
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="onboarding.html" class="nav-link">
+                            <a href="{% url 'stud_onboard' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                     <polyline points="7 10 12 15 17 10"/>
