@@ -1,7 +1,9 @@
 from django.db import models
 
 # Create your models here.
+
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 
@@ -247,3 +249,452 @@ class TeleCallerProfile(models.Model):
     def update_conversion_rate(self):
         total = self.total_leads if self.total_leads > 0 else 1
         return (self.converted_leads / total) * 100 
+    
+    
+    
+class Counselor(models.Model):
+    """
+    Counselors who handle lead follow-ups
+    Similar to TeleCallerProfile but with counseling focus
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=15)
+    department = models.CharField(max_length=100, default='Admissions & Counseling')
+    join_date = models.DateField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    
+    # Specialization
+    specialization_courses = models.ManyToManyField('Course', blank=True,
+                                                    help_text="Courses this counselor specializes in")
+    
+    # Performance Metrics
+    total_leads_assigned = models.IntegerField(default=0)
+    total_conversions = models.IntegerField(default=0)
+    active_leads = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Counselor: {self.user.get_full_name()}"
+    
+    @property
+    def conversion_rate(self):
+        if self.total_leads_assigned > 0:
+            return (self.total_conversions / self.total_leads_assigned) * 100
+        return 0
+
+
+class CallHistory(models.Model):
+    """
+    Track all calls made to leads
+    """
+    class CallStatus(models.TextChoices):
+        ANSWERED = 'answered', 'Answered'
+        NO_ANSWER = 'no_answer', 'No Answer'
+        BUSY = 'busy', 'Busy'
+        CALLBACK = 'callback', 'Requested Callback'
+        VOICEMAIL = 'voicemail', 'Voicemail'
+    
+    class CallOutcome(models.TextChoices):
+        INTERESTED = 'interested', 'Interested'
+        NOT_INTERESTED = 'not_interested', 'Not Interested'
+        NEED_INFO = 'need_info', 'Need More Info'
+        FOLLOWUP = 'followup', 'Follow-up Required'
+        CONVERTED = 'converted', 'Converted'
+    
+    lead = models.ForeignKey('Lead', on_delete=models.CASCADE, related_name='call_history')
+    caller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+                              related_name='calls_made')
+    
+    # Call details
+    call_date = models.DateTimeField(default=timezone.now)
+    duration_minutes = models.IntegerField(default=0)
+    call_status = models.CharField(max_length=15, choices=CallStatus.choices)
+    call_outcome = models.CharField(max_length=20, choices=CallOutcome.choices, 
+                                   null=True, blank=True)
+    
+    # Notes
+    discussion_summary = models.TextField(blank=True)
+    concerns_raised = models.TextField(blank=True)
+    action_items = models.TextField(blank=True)
+    
+    # Follow-up
+    followup_required = models.BooleanField(default=False)
+    next_followup_date = models.DateField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-call_date']
+        verbose_name_plural = "Call Histories"
+    
+    def __str__(self):
+        return f"{self.lead.name} - {self.call_date.strftime('%Y-%m-%d %H:%M')}"
+
+
+class PaymentDocument(models.Model):
+    """
+    Upload payment receipts, transaction screenshots, etc.
+    Links to FeePayment from student portal models
+    """
+    class DocumentType(models.TextChoices):
+        RECEIPT = 'receipt', 'Payment Receipt'
+        SCREENSHOT = 'screenshot', 'Transaction Screenshot'
+        CHEQUE_COPY = 'cheque', 'Cheque Copy'
+        LOAN_APPROVAL = 'loan', 'Loan Approval Letter'
+        OTHER = 'other', 'Other'
+    
+    fee_payment = models.ForeignKey('student.FeePayment', on_delete=models.CASCADE,
+                                   related_name='documents')
+    
+    document_type = models.CharField(max_length=20, choices=DocumentType.choices)
+    document_file = models.FileField(upload_to='payment_documents/%Y/%m/')
+    description = models.TextField(blank=True)
+    
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.fee_payment.student.name} - {self.document_type}"
+
+
+class PaymentReminder(models.Model):
+    """
+    Automated and manual payment reminders
+    """
+    class ReminderType(models.TextChoices):
+        BOOKING_FEE = 'booking', 'Booking Fee Reminder'
+        INSTALLMENT = 'installment', 'Installment Due'
+        BALANCE_FEE = 'balance', 'Balance Fee Reminder'
+        OVERDUE = 'overdue', 'Overdue Payment'
+    
+    class ReminderStatus(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        SENT = 'sent', 'Sent'
+        ACKNOWLEDGED = 'acknowledged', 'Acknowledged'
+        PAID = 'paid', 'Paid'
+    
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, 
+                               related_name='payment_reminders')
+    fee_payment = models.ForeignKey('student.FeePayment', on_delete=models.CASCADE,
+                                   related_name='reminders', null=True, blank=True)
+    
+    # Reminder details
+    reminder_type = models.CharField(max_length=15, choices=ReminderType.choices)
+    amount_due = models.DecimalField(max_digits=10, decimal_places=2)
+    due_date = models.DateField()
+    
+    # Status
+    status = models.CharField(max_length=15, choices=ReminderStatus.choices, 
+                             default=ReminderStatus.PENDING)
+    
+    # Communication
+    reminder_sent_date = models.DateTimeField(null=True, blank=True)
+    reminder_method = models.CharField(max_length=20, choices=[
+        ('email', 'Email'),
+        ('sms', 'SMS'),
+        ('whatsapp', 'WhatsApp'),
+        ('call', 'Phone Call'),
+        ('in_app', 'In-App Notification')
+    ], default='email')
+    
+    message_template = models.TextField()
+    
+    # Follow-up
+    sent_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    notes = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['due_date', '-created_at']
+    
+    def __str__(self):
+        return f"{self.student.name} - {self.reminder_type} - ₹{self.amount_due}"
+
+
+class PDCCollection(models.Model):
+    """
+    Post-Dated Cheque collection and tracking
+    """
+    class ChequeStatus(models.TextChoices):
+        COLLECTED = 'collected', 'Collected'
+        DEPOSITED = 'deposited', 'Deposited'
+        CLEARED = 'cleared', 'Cleared'
+        BOUNCED = 'bounced', 'Bounced'
+        CANCELLED = 'cancelled', 'Cancelled'
+    
+    student = models.ForeignKey('Student', on_delete=models.CASCADE,
+                               related_name='pdc_cheques')
+    fee_payment = models.OneToOneField('student.FeePayment', on_delete=models.CASCADE,
+                                      related_name='pdc_details')
+    
+    # Cheque details
+    cheque_number = models.CharField(max_length=50)
+    bank_name = models.CharField(max_length=100)
+    branch_name = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    cheque_date = models.DateField()
+    
+    # Collection details
+    collected_date = models.DateField()
+    collected_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+                                    related_name='collected_cheques')
+    
+    # Status tracking
+    status = models.CharField(max_length=15, choices=ChequeStatus.choices, 
+                             default=ChequeStatus.COLLECTED)
+    deposit_date = models.DateField(null=True, blank=True)
+    clearance_date = models.DateField(null=True, blank=True)
+    
+    # If bounced
+    bounce_reason = models.TextField(blank=True)
+    bounce_charges = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    
+    # Scanned copy
+    cheque_image = models.FileField(upload_to='pdc_cheques/', null=True, blank=True)
+    
+    remarks = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['cheque_date']
+    
+    def __str__(self):
+        return f"{self.student.name} - Cheque {self.cheque_number} - ₹{self.amount}"
+
+
+class OnboardingChecklist(models.Model):
+    """
+    Track onboarding completion status for each student
+    """
+    student = models.OneToOneField('Student', on_delete=models.CASCADE,
+                                   related_name='onboarding_checklist')
+    
+    # Document Collection
+    documents_uploaded = models.BooleanField(default=False)
+    documents_verified = models.BooleanField(default=False)
+    
+    # Payment
+    booking_fee_paid = models.BooleanField(default=False)
+    payment_plan_created = models.BooleanField(default=False)
+    
+    # Enrollment
+    enrollment_letter_generated = models.BooleanField(default=False)
+    enrollment_letter_signed = models.BooleanField(default=False)
+    
+    # ID & Access
+    id_card_generated = models.BooleanField(default=False)
+    id_card_issued = models.BooleanField(default=False)
+    lms_access_created = models.BooleanField(default=False)
+    
+    # PDC (if applicable)
+    pdc_collected = models.BooleanField(default=False)
+    pdc_count = models.IntegerField(default=0)
+    
+    # Batch Assignment
+    batch_assigned = models.BooleanField(default=False)
+    orientation_completed = models.BooleanField(default=False)
+    
+    # Completion
+    onboarding_completed = models.BooleanField(default=False)
+    completed_date = models.DateField(null=True, blank=True)
+    completed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Tracking
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.student.name} - Onboarding Progress"
+    
+    @property
+    def completion_percentage(self):
+        """Calculate onboarding completion percentage"""
+        total_steps = 12
+        completed_steps = sum([
+            self.documents_uploaded,
+            self.documents_verified,
+            self.booking_fee_paid,
+            self.payment_plan_created,
+            self.enrollment_letter_generated,
+            self.enrollment_letter_signed,
+            self.id_card_generated,
+            self.id_card_issued,
+            self.lms_access_created,
+            self.pdc_collected if self.student.payment_option in ['pdc', 'emi'] else True,
+            self.batch_assigned,
+            self.orientation_completed
+        ])
+        return round((completed_steps / total_steps) * 100, 1)
+
+
+class StudentIssue(models.Model):
+    """
+    Track student issues and complaints
+    """
+    class IssueType(models.TextChoices):
+        ACADEMIC = 'academic', 'Academic Issue'
+        PAYMENT = 'payment', 'Payment Issue'
+        TECHNICAL = 'technical', 'Technical Issue'
+        FACILITY = 'facility', 'Facility Issue'
+        TRAINER = 'trainer', 'Trainer Related'
+        OTHER = 'other', 'Other'
+    
+    class Priority(models.TextChoices):
+        LOW = 'low', 'Low'
+        MEDIUM = 'medium', 'Medium'
+        HIGH = 'high', 'High'
+        URGENT = 'urgent', 'Urgent'
+    
+    class Status(models.TextChoices):
+        OPEN = 'open', 'Open'
+        IN_PROGRESS = 'in_progress', 'In Progress'
+        RESOLVED = 'resolved', 'Resolved'
+        CLOSED = 'closed', 'Closed'
+    
+    student = models.ForeignKey('Student', on_delete=models.CASCADE,
+                               related_name='issues')
+    
+    # Issue details
+    issue_type = models.CharField(max_length=15, choices=IssueType.choices)
+    priority = models.CharField(max_length=10, choices=Priority.choices, 
+                               default=Priority.MEDIUM)
+    subject = models.CharField(max_length=200)
+    description = models.TextField()
+    
+    # Assignment
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name='assigned_issues')
+    
+    # Status tracking
+    status = models.CharField(max_length=15, choices=Status.choices, default=Status.OPEN)
+    
+    # Resolution
+    resolution_notes = models.TextField(blank=True)
+    resolved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name='resolved_issues')
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    
+    # Satisfaction
+    student_satisfied = models.BooleanField(null=True, blank=True)
+    satisfaction_comments = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.student.name} - {self.issue_type} - {self.status}"
+
+
+class BatchSchedule(models.Model):
+    """
+    Detailed schedule for each batch
+    """
+    class DayOfWeek(models.TextChoices):
+        MONDAY = 'monday', 'Monday'
+        TUESDAY = 'tuesday', 'Tuesday'
+        WEDNESDAY = 'wednesday', 'Wednesday'
+        THURSDAY = 'thursday', 'Thursday'
+        FRIDAY = 'friday', 'Friday'
+        SATURDAY = 'saturday', 'Saturday'
+        SUNDAY = 'sunday', 'Sunday'
+    
+    batch = models.ForeignKey('Batch', on_delete=models.CASCADE,
+                             related_name='schedules')
+    
+    # Schedule details
+    day_of_week = models.CharField(max_length=10, choices=DayOfWeek.choices)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    
+    # Trainer assignment for this slot
+    trainer = models.ForeignKey('Trainer', on_delete=models.SET_NULL, null=True,
+                               related_name='scheduled_slots')
+    
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['day_of_week', 'start_time']
+        unique_together = ['batch', 'day_of_week', 'start_time']
+    
+    def __str__(self):
+        return f"{self.batch.name} - {self.day_of_week} {self.start_time}-{self.end_time}"
+
+
+class Notification(models.Model):
+    """
+    In-app notifications for BDM users
+    """
+    class NotificationType(models.TextChoices):
+        LEAD_ASSIGNED = 'lead_assigned', 'New Lead Assigned'
+        PAYMENT_REMINDER = 'payment_reminder', 'Payment Reminder'
+        PAYMENT_RECEIVED = 'payment_received', 'Payment Received'
+        ISSUE_ASSIGNED = 'issue_assigned', 'Issue Assigned'
+        FOLLOWUP_DUE = 'followup_due', 'Follow-up Due'
+        DOCUMENT_PENDING = 'document_pending', 'Document Pending'
+        GENERAL = 'general', 'General Notification'
+    
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE,
+                                 related_name='notifications')
+    
+    # Notification details
+    notification_type = models.CharField(max_length=20, choices=NotificationType.choices)
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    
+    # Link to related object (optional)
+    link_url = models.CharField(max_length=500, blank=True)
+    
+    # Status
+    is_read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.recipient.username} - {self.title}"
+    
+    def mark_as_read(self):
+        if not self.is_read:
+            self.is_read = True
+            self.read_at = timezone.now()
+            self.save()
+
+
+class UserNotificationSettings(models.Model):
+    """
+    User preferences for notifications
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
+                               related_name='notification_settings')
+    
+    # Email notifications
+    email_lead_assignment = models.BooleanField(default=True)
+    email_payment_reminders = models.BooleanField(default=True)
+    email_payment_received = models.BooleanField(default=True)
+    email_issue_assignment = models.BooleanField(default=True)
+    email_daily_summary = models.BooleanField(default=False)
+    
+    # In-app notifications
+    inapp_lead_assignment = models.BooleanField(default=True)
+    inapp_payment_updates = models.BooleanField(default=True)
+    inapp_issue_updates = models.BooleanField(default=True)
+    
+    # SMS notifications
+    sms_important_only = models.BooleanField(default=True)
+    sms_payment_received = models.BooleanField(default=False)
+    
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Notification Settings - {self.user.username}"
