@@ -1,0 +1,47 @@
+{% extends 'bdm/layout/base.html' %}
+{% load static %}
+{% load tz %}
+
+{% block content %}
+
+<div class="tabs">
+    <button class="tab-btn active" data-url="{% url 'students_tab' %}">
+        Document Verification
+    </button>
+    <button class="tab-btn" data-url="{% url 'trainers_tab' %}">
+        Generate Enrollment Letter
+    </button>
+        Generate ID card   
+    <button class="tab-btn" data-url="{% url 'trainers_tab' %}">
+        
+    </button>
+   
+</div>
+
+<div id="tab-content">
+    Loading...
+</div>
+
+<script>
+    const buttons = document.querySelectorAll(".tab-btn");
+    const content = document.getElementById("tab-content");
+
+    function loadTab(url) {
+        fetch(url)
+            .then(res => res.text())
+            .then(html => content.innerHTML = html);
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            buttons.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            loadTab(btn.dataset.url);
+        });
+    });
+
+    // load first tab
+    loadTab(buttons[0].dataset.url);
+</script>
+
+{% endblock %}

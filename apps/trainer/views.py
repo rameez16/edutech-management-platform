@@ -13,3 +13,5 @@ def trainer_profile(request):
 
 def my_batches(request):
     return render(request, "trainer/mybatches.html")
+
+
