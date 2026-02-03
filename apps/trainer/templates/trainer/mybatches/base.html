@@ -1,0 +1,32 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<h2 class="batch-title batch-header">
+    <a href="{% url 'trainer:my_batches' %}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+    Batch {{ batch.name }}
+</h2>
+
+
+<div class="batch-tabs">
+    <a href="{% url 'trainer:batch-overview' batch_id %}"
+       class="batch-tab {% if active_tab == 'overview' %}active{% endif %}">
+        Overview
+    </a>
+
+    <a href="{% url 'trainer:batch-students' batch_id %}"
+       class="batch-tab {% if active_tab == 'students' %}active{% endif %}">
+        Students
+    </a>
+</div>
+
+
+<div class="tab-content">
+    {% block tab_content %}{% endblock %}
+</div>
+
+{% endblock %}
