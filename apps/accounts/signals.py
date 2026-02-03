@@ -1,37 +1,51 @@
-# accounts/signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
-from .models import User
+from django.contrib.auth import get_user_model
+from django.utils.timezone import now
 
-# automatically assign group once a user is created
+User = get_user_model()
 
-@receiver(post_save, sender=User)
-def assign_group(sender, instance, created, **kwargs):
-    if created:
-        group_map = {
-            "trainer": "Trainer",
-            "student": "Student",
-            "telecaller": "TeleCaller",
-            "counselor": "Counselor",
-        }
-        if instance.role in group_map:
-            instance.groups.add(Group.objects.get(name=group_map[instance.role]))
-            
-            
-# trainers & students profile created automatically once user is created
+@receiver(post_save, sender=User, dispatch_uid="user_role_setup_signal")
+def setup_user_role(sender, instance, created, **kwargs):
+    role = getattr(instance, "role", None)
 
-from trainer.models import Trainer
-from student.models import Student
-
-@receiver(post_save, sender=User)
-def create_profile_for_role(sender, instance, created, **kwargs):
-    if not created:
+    if not role:
         return
 
-    if instance.role == "trainer":
-        Trainer.objects.create(user=instance)
+    # Prevent duplicate profile creation
+    if hasattr(instance, "_role_processed"):
+        return
 
-    elif instance.role == "student":
-        Student.objects.create(user=instance)
-            
+    instance._role_processed = True
+
+    # -------------------------
+    # GROUP ASSIGNMENT
+    # -------------------------
+    group_map = {
+        "trainer": "Trainer",
+        "student": "Student",
+        "telecaller": "TeleCaller",
+        "counselor": "Counselor",
+    }
+
+    group, _ = Group.objects.get_or_create(name=group_map[role])
+    instance.groups.add(group)
+
+    # -------------------------
+    # PROFILE CREATION
+    # -------------------------
+    if role == "trainer":
+        from apps.bdm.models import Trainer
+        Trainer.objects.get_or_create(
+            user=instance
+           
+        )
+
+    elif role == "student":
+        from apps.bdm.models import Student
+        Student.objects.get_or_create(
+            user=instance,
+        )
+
+    print("🔥 ROLE SETUP DONE FOR:", instance.username)

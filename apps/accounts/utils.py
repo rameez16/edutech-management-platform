@@ -5,9 +5,9 @@ def redirect_after_login(user):
         return redirect("bdm/dashboard/dashboard.html")
     
     if user.role == "trainer":
-        return redirect("trainer_dashboard")
+        return redirect("trainer:dashboard")
     
     if user.role == "student":
-        return redirect("student_dashboard")
+        return redirect("stud_dashboard")
     
     return redirect("/")
