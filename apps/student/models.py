@@ -149,7 +149,7 @@ class StudentDocument(models.Model):
         ordering = ['-uploaded_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.document_type} - {self.verification_status}"
+     return f"{self.student} - {self.document_type} ({self.verification_status})"
 
 
 class EnrollmentAgreement(models.Model):
