@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings
 
 # Import your existing models
 
@@ -301,7 +302,7 @@ class ExtensionRequest(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected')
     ], default='pending')
-    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='approved_extensions')
     approval_date = models.DateTimeField(null=True, blank=True)
     admin_comments = models.TextField(blank=True)
@@ -538,7 +539,7 @@ class Certificate(models.Model):
     
     # Issuance
     issued_by = models.ForeignKey('bdm.Trainer', on_delete=models.SET_NULL, null=True)
-    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='approved_certificates')
     certificate_file = models.FileField(upload_to='certificates/', null=True, blank=True)
     

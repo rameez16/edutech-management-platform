@@ -5,6 +5,13 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from django.contrib import messages
 
+from .form import  TrainerAdminProfileForm
+
+from django.contrib.auth import get_user_model
+from django.contrib import messages
+from django.utils import timezone
+from datetime import datetime
+
 # Create your views here.
 
 
@@ -42,18 +49,11 @@ def dashboard(request):
     
     # Student Statistics
     total_students = Student.objects.count()
-    active_students = Student.objects.filter(
-        is_active=True,
-        course_completion_status__in=[
-            Student.CourseStatus.PHASE1,
-            Student.CourseStatus.PHASE2,
-            Student.CourseStatus.PHASE3
-        ]
-    ).count()
+    active_students = Student.objects.count()
     
     # Trainer Statistics
     trainer_count = Trainer.objects.count()
-    active_trainers = Trainer.objects.filter(is_active=True).count()
+    active_trainers = Trainer.objects.filter(admin_profile__is_active=True).count()
     
     # Course Statistics
     course_count = Course.objects.filter(is_active=True).count()
@@ -69,16 +69,13 @@ def dashboard(request):
     ).select_related('course').prefetch_related('students')[:5]
     
     # Certificate requests (students who are eligible)
-    certificate_requests = Student.objects.filter(
-        certificate_eligible=True,
-        course_completion_status=Student.CourseStatus.COMPLETED
-    ).count()
+  
     
     # Pending payments (students who haven't paid booking fee)
-    pending_payments = Student.objects.filter(
-        booking_fee_received=False,
-        is_active=True
-    ).count()
+    # pending_payments = Student.objects.filter(
+    #     booking_fee_received=False,
+    #     is_active=True
+    # ).count()
     
     # Classes today (batches that are currently active)
     classes_today = Batch.objects.filter(
@@ -120,8 +117,8 @@ def dashboard(request):
         'upcoming_batches': upcoming_batches,
         
         # Pending Actions
-        'certificate_requests': certificate_requests,
-        'pending_payments': pending_payments,
+        # 'certificate_requests': certificate_requests,
+        # 'pending_payments': pending_payments,
         'classes_today': classes_today,
         
         # Analytics
@@ -347,3 +344,192 @@ def assign_lead(request):
         lead.save()
 
     return redirect('bdm:leads')
+    return render(request, 'bdm/assign_lead.html', context)
+
+
+
+User = get_user_model()
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.models import Group
+from .form import CreateUserForm
+
+def create_user(request):
+    if request.method == "POST":
+        form = CreateUserForm(request.POST)
+
+        if form.is_valid():
+            user = form.save()
+
+            # Assign role using Django Groups
+            role = form.cleaned_data["role"]
+            try:
+                group = Group.objects.get(name__iexact=role)
+                user.groups.add(group)
+            except Group.DoesNotExist:
+                pass
+
+            messages.success(request, f"User '{user.username}' created successfully")
+            return redirect("user_list")
+
+        messages.error(request, "Please correct the errors below")
+
+    else:
+        form = CreateUserForm()
+
+    return render(request, "bdm/user/create_user.html", {"form": form})
+
+
+@login_required
+def user_list(request):
+    users = User.objects.all().order_by("-date_joined")
+
+    return render(request, "bdm/user/user_list.html", {
+        "users": users
+    })
+    
+    
+def create_trainer_admin_profile(request):
+    if request.method == "POST":
+        form = TrainerAdminProfileForm(request.POST)
+
+        if form.is_valid():
+            admin_profile = form.save()
+            messages.success(
+                request,
+                f"Admin profile created for {admin_profile.trainer}"
+            )
+            return redirect("user_list")  # 👈 your target URL
+
+    else:
+        form = TrainerAdminProfileForm()
+
+    return render(
+        request,
+        "bdm/trainer/trainer_profile.html",
+        {"form": form}
+    )    
+    
+    
+
+# def create_user(request):
+#     if request.method == "POST":
+#         # Get form data
+#         username = request.POST.get("username", "").strip()
+#         email = request.POST.get("email", "").strip()
+#         password = request.POST.get("password")
+#         first_name = request.POST.get("first_name", "").strip()
+#         last_name = request.POST.get("last_name", "").strip()
+#         role = request.POST.get("role")
+        
+#         # Get checkbox values
+#         is_active = request.POST.get("is_active") == "on"
+#         is_staff = request.POST.get("is_staff") == "on"
+#         is_superuser = request.POST.get("is_superuser") == "on"
+        
+#         # Get date joined (optional - defaults to now)
+#         date_joined_str = request.POST.get("date_joined")
+        
+#         # Validation
+#         errors = []
+        
+#         if not username:
+#             errors.append("Username is required")
+#         elif len(username) > 150:
+#             errors.append("Username must be 150 characters or fewer")
+#         elif User.objects.filter(username=username).exists():
+#             errors.append("Username already exists")
+        
+#         if not email:
+#             errors.append("Email address is required")
+#         elif User.objects.filter(email=email).exists():
+#             errors.append("Email address already exists")
+        
+#         if not password:
+#             errors.append("Password is required")
+#         elif len(password) < 8:
+#             errors.append("Password must be at least 8 characters")
+        
+#         if not role:
+#             errors.append("User role is required")
+        
+#         # If there are validation errors, show them and return
+#         if errors:
+#             for error in errors:
+#                 messages.error(request, error)
+#             return render(request, "bdm/user/create_user.html", {
+#                 "form_data": request.POST  # Preserve form data
+#             })
+        
+#         try:
+#             # Create the user
+#             user = User.objects.create_user(
+#                 username=username,
+#                 email=email,
+#                 password=password,
+#                 first_name=first_name,
+#                 last_name=last_name
+#             )
+            
+#             # Set additional fields
+#             user.is_active = is_active
+#             user.is_staff = is_staff
+#             user.is_superuser = is_superuser
+            
+#             # Set date joined if provided
+#             if date_joined_str:
+#                 try:
+#                     # Parse the datetime-local input format
+#                     date_joined = datetime.strptime(date_joined_str, "%Y-%m-%dT%H:%M")
+#                     user.date_joined = timezone.make_aware(date_joined)
+#                 except ValueError:
+#                     pass  # Use default if parsing fails
+            
+#             # Save the user
+#             user.save()
+            
+#             # Handle role assignment (assuming you have a role field or group)
+#             # Option 1: If role is a field on your User model or profile
+#             if hasattr(user, 'role'):
+#                 user.role = role
+#                 user.save()
+            
+#             # Option 2: If using Django groups for roles
+#             from django.contrib.auth.models import Group
+#             try:
+#                 group = Group.objects.get(name__iexact=role)
+#                 user.groups.add(group)
+#             except Group.DoesNotExist:
+#                 pass  # Handle missing group
+            
+#             messages.success(request, f"User '{username}' created successfully")
+#             return redirect("/")  # or wherever you want to redirect
+            
+#         except Exception as e:
+#             messages.error(request, f"Error creating user: {str(e)}")
+#             return render(request, "bdm/user/create_user.html", {
+#                 "form_data": request.POST
+#             })
+    
+#     # GET request - show the form
+#     return render(request, "bdm/user/create_user.html")
+
+
+def onboarding_view(request):
+    
+    return render(request,"bdm/student_onboarding/tab_view.html")
+
+def students_tab(request):
+    students = Student.objects.all()
+    return render(request, "bdm/student_onboarding/students_tab.html", {
+        "students": students
+    })
+    
+def trainers_tab(request):
+    trainers = Trainer.objects.all()
+    return render(request, "bdm/student_onboarding/trainer_tab.html", {
+        "trainers": trainers
+    })   
