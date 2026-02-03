@@ -23,6 +23,7 @@ https://templatemo.com/tm-607-glass-admin
 -->
 {% block extra_css %}{% endblock %}
 
+
 </head>
 <body>
     <!-- Animated Background -->
@@ -253,7 +254,7 @@ https://templatemo.com/tm-607-glass-admin
 
         <script src="{% static 'student/js/templatemo-glass-admin-script.js' %}"></script>
     </div>
-        
+        {% block extra_js %}{% endblock %}
     </body>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'student/js/custom.js' %}"></script>

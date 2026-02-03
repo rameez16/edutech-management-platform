@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'student/css/uploading.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'student/js/upload.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 <div class="student-onboarding">
@@ -17,106 +21,224 @@
             Please upload all the required documents for your admission verification
         </p>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Document Type</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'stud_upload' %}">
+            {% csrf_token %}
 
-            <tbody>
-                <!-- Photograph -->
-                <tr>
-                    <td>
-                        Photograph *<br>
-                        <span class="subtext">Passport size</span>
-                    </td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td>
-                        <label class="file-upload">
-                            <input type="file" accept=".jpg,.png,.pdf">
-                            <span class="upload-btn">Upload</span>
-                        </label>
-                        <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
-                    </td>
-                </tr>
+            {% for message in messages %}
+                <p class="alert {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
 
-                <!-- Educational Certificates -->
-                <tr>
-                    <td>
-                        Educational Certificates *<br>
-                        <span class="subtext">Multiple files allowed</span>
-                    </td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td>
-                        <label class="file-upload">
-                            <input type="file" accept=".jpg,.png,.pdf" multiple>
-                            <span class="upload-btn">Upload</span>
-                        </label>
-                        <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
-                    </td>
-                </tr>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Document Type</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-                <!-- Residence Proof -->
-                <tr>
+                <tbody>
+
+                {% comment %} ===== PHOTO ===== {% endcomment %}
+                <tr data-status="{% if docs.photo %}{{ docs.photo.verification_status }}{% else %}not_uploaded{% endif %}">
+                    <td>Photograph *</td>
                     <td>
-                        Residence Proof *<br>
-                        <span class="subtext">Address verification</span>
+                        {% if not docs.photo %}
+                            <span class="status not-uploaded">Not Uploaded</span>
+                        {% elif docs.photo.verification_status == 'pending' %}
+                            <span class="status pending">Pending Verification</span>
+                        {% elif docs.photo.verification_status == 'verified' %}
+                            <span class="status verified">Verified</span>
+                        {% elif docs.photo.verification_status == 'rejected' %}
+                            <span class="status rejected">Rejected</span>
+                        {% endif %}
                     </td>
-                    <td><span class="status pending">Pending</span></td>
                     <td>
-                        <label class="file-upload">
-                            <input type="file" accept=".jpg,.png,.pdf">
-                            <span class="upload-btn">Upload</span>
-                        </label>
-                        <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
+                        {% if docs.photo and docs.photo.verification_status != 'rejected' %}
+                            <span class="upload-btn disabled">Upload</span>
+                        {% else %}
+                            <label class="file-upload">
+                                <input type="file" name="photo" accept=".jpg,.png,.pdf">
+                                <span class="upload-btn">Upload</span>
+                            </label>
+                        {% endif %}
+                        <span class="file-hint">Only JPG, PNG, or PDF files allowed</span>
+                        <span class="selected-files">
+                            {% if docs.photo %}
+                                {% if docs.photo.verification_status == 'rejected' %}
+                                    <span class="rejected-msg">
+                                        File rejected, please upload again
+                                    </span>
+                                {% elif docs.photo.verification_status != 'pending' %}
+                                    {{ docs.photo.document_file.name|cut:"uploads/" }}
+                                {% endif %}
+                            {% endif %}
+                        </span>
                     </td>
                 </tr>
 
-                <!-- Aadhaar -->
-                <tr>
+                {% comment %} ===== EDUCATIONAL CERTIFICATE (SINGLE FILE) ===== {% endcomment %}
+                <tr data-status="{% if docs.education %}{{ docs.education.verification_status }}{% else %}not_uploaded{% endif %}">
+                    <td>Educational Certificate *</td>
                     <td>
-                        Aadhaar *<br>
-                        <span class="subtext">Identity verification</span>
+                        {% if not docs.education %}
+                            <span class="status not-uploaded">Not Uploaded</span>
+                        {% elif docs.education.verification_status == 'pending' %}
+                            <span class="status pending">Pending Verification</span>
+                        {% elif docs.education.verification_status == 'verified' %}
+                            <span class="status verified">Verified</span>
+                        {% elif docs.education.verification_status == 'rejected' %}
+                            <span class="status rejected">Rejected</span>
+                        {% endif %}
                     </td>
-                    <td><span class="status pending">Pending</span></td>
                     <td>
-                        <label class="file-upload">
-                            <input type="file" accept=".jpg,.png,.pdf">
-                            <span class="upload-btn">Upload</span>
-                        </label>
-                        <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
+                        {% if docs.education and docs.education.verification_status != 'rejected' %}
+                            <span class="upload-btn disabled">Upload</span>
+                        {% else %}
+                            <label class="file-upload">
+                                <input type="file" name="education">
+                                <span class="upload-btn">Upload</span>
+                            </label>
+                        {% endif %}
+                        <span class="file-hint">Only JPG, PNG, or PDF files allowed</span>
+                        <span class="selected-files">
+                            {% if docs.education %}
+                                {% if docs.education.verification_status == 'rejected' %}
+                                    <span class="rejected-msg">
+                                        File rejected, please upload again
+                                    </span>
+                                {% elif docs.education.verification_status != 'pending' %}
+                                    {{ docs.education.document_file.name|cut:"uploads/" }}
+                                {% endif %}
+                            {% endif %}
+                        </span>
                     </td>
                 </tr>
 
-                <!-- Other Documents -->
-                <tr>
+                {% comment %} ===== RESIDENCE ===== {% endcomment %}
+                <tr data-status="{% if docs.residence %}{{ docs.residence.verification_status }}{% else %}not_uploaded{% endif %}">
+                    <td>Residence Proof *</td>
                     <td>
-                        Other documents<br>
-                        <span class="subtext">As defined by BDM</span>
+                        {% if not docs.residence %}
+                            <span class="status not-uploaded">Not Uploaded</span>
+                        {% elif docs.residence.verification_status == 'pending' %}
+                            <span class="status pending">Pending Verification</span>
+                        {% elif docs.residence.verification_status == 'verified' %}
+                            <span class="status verified">Verified</span>
+                        {% elif docs.residence.verification_status == 'rejected' %}
+                            <span class="status rejected">Rejected</span>
+                        {% endif %}
                     </td>
-                    <td><span class="status optional">Optional</span></td>
                     <td>
-                        <label class="file-upload">
-                            <input type="file" accept=".jpg,.png,.pdf">
-                            <span class="upload-btn">Upload</span>
-                        </label>
-                        <span class="file-info">JPG, PNG, or PDF | Max size: 5MB</span>
+                        {% if docs.residence and docs.residence.verification_status != 'rejected' %}
+                            <span class="upload-btn disabled">Upload</span>
+                        {% else %}
+                            <label class="file-upload">
+                                <input type="file" name="residence">
+                                <span class="upload-btn">Upload</span>
+                            </label>
+                        {% endif %}
+                        <span class="file-hint">Only JPG, PNG, or PDF files allowed</span>
+                        <span class="selected-files">
+                            {% if docs.residence %}
+                                {% if docs.residence.verification_status == 'rejected' %}
+                                    <span class="rejected-msg">
+                                        File rejected, please upload again
+                                    </span>
+                                {% elif docs.residence.verification_status != 'pending' %}
+                                    {{ docs.residence.document_file.name|cut:"uploads/" }}
+                                {% endif %}
+                            {% endif %}
+                        </span>
                     </td>
                 </tr>
-            </tbody>
-        </table>
 
-        <div class="buttons">
-            <button class="submit-btn">Submit Documents</button>
-            <button class="cancel-btn">Cancel</button>
-        </div>
+                {% comment %} ===== AADHAAR ===== {% endcomment %}
+                <tr data-status="{% if docs.aadhaar %}{{ docs.aadhaar.verification_status }}{% else %}not_uploaded{% endif %}">
+                    <td>Aadhaar *</td>
+                    <td>
+                        {% if not docs.aadhaar %}
+                            <span class="status not-uploaded">Not Uploaded</span>
+                        {% elif docs.aadhaar.verification_status == 'pending' %}
+                            <span class="status pending">Pending Verification</span>
+                        {% elif docs.aadhaar.verification_status == 'verified' %}
+                            <span class="status verified">Verified</span>
+                        {% elif docs.aadhaar.verification_status == 'rejected' %}
+                            <span class="status rejected">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if docs.aadhaar and docs.aadhaar.verification_status != 'rejected' %}
+                            <span class="upload-btn disabled">Upload</span>
+                        {% else %}
+                            <label class="file-upload">
+                                <input type="file" name="aadhaar">
+                                <span class="upload-btn">Upload</span>
+                            </label>
+                        {% endif %}
+                        <span class="file-hint">Only JPG, PNG, or PDF files allowed</span>
+                        <span class="selected-files">
+                            {% if docs.aadhaar %}
+                                {% if docs.aadhaar.verification_status == 'rejected' %}
+                                    <span class="rejected-msg">
+                                        File rejected, please upload again
+                                    </span>
+                                {% elif docs.aadhaar.verification_status != 'pending' %}
+                                    {{ docs.aadhaar.document_file.name|cut:"uploads/" }}
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                    </td>
+                </tr>
 
-        <p class="warning">
-            ⚠️ Incomplete or rejected documents will delay onboarding process.
-        </p>
+                {% comment %} ===== RESUME ===== {% endcomment %}
+                <tr data-status="{% if docs.resume %}{{ docs.resume.verification_status }}{% else %}not_uploaded{% endif %}">
+                    <td>Resume / CV</td>
+                    <td>
+                        {% if not docs.resume %}
+                            <span class="status not-uploaded">Not Uploaded</span>
+                        {% elif docs.resume.verification_status == 'pending' %}
+                            <span class="status pending">Pending Verification</span>
+                        {% elif docs.resume.verification_status == 'verified' %}
+                            <span class="status verified">Verified</span>
+                        {% elif docs.resume.verification_status == 'rejected' %}
+                            <span class="status rejected">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if docs.resume and docs.resume.verification_status != 'rejected' %}
+                            <span class="upload-btn disabled">Upload</span>
+                        {% else %}
+                            <label class="file-upload">
+                                <input type="file" name="resume">
+                                <span class="upload-btn">Upload</span>
+                            </label>
+                        {% endif %}
+                        <span class="file-hint">Only JPG, PNG, or PDF files allowed</span>
+                        <span class="selected-files">
+                            {% if docs.resume %}
+                                {% if docs.resume.verification_status == 'rejected' %}
+                                    <span class="rejected-msg">
+                                        File rejected, please upload again
+                                    </span>
+                                {% elif docs.resume.verification_status != 'pending' %}
+                                    {{ docs.resume.document_file.name|cut:"uploads/" }}
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+            <div class="buttons hidden" id="actionButtons">
+                <button type="submit" class="submit-btn">Submit Documents</button>
+                <button type="reset" class="cancel-btn">Cancel</button>
+            </div>
+
+
+        </form>
 
     </div>
 </div>
