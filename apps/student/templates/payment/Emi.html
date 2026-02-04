@@ -1,0 +1,116 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'student/css/payment.css' %}">
+
+<div class="payment-container glass-card">
+
+    <!-- HEADER -->
+    <div class="payment-header">
+        <h2>Student Admission & Fee Management</h2>
+
+        <div class="student-info">
+            <h3>John Smith</h3>
+            <p>john.smith@email.com</p>
+            <p><b>Student ID:</b> 202300456</p>
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="fee-summary">
+        <div class="fee-box">
+            <p>Due Amount</p>
+            <h3>₹50,000</h3>
+        </div>
+        <div class="fee-box">
+            <p>Paid Amount</p>
+            <h3>₹45,000</h3>
+        </div>
+        <div class="fee-box highlight">
+            <p>Pending Amount</p>
+            <h3>₹5,000</h3>
+        </div>
+    </div>
+    <center> <h1>EMI</h1></center>
+    <!-- PAYMENT MODE -->
+    <div class="payment-mode-switch">
+        <span class="label">Payment Mode:</span>
+
+        <div class="mode-tabs">
+            <a href="{% url 'payment' %}" class="mode-btn">One-Time Payment</a>
+            <a href="{% url 'pdc' %}" class="mode-btn">PDC</a>
+            <a href="{% url 'emi' %}" class="mode-btn active">EMI  </a>
+            <a href="{% url 'installments' %}" class="mode-btn">Installments</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="payment-row">
+
+        <!-- LEFT -->
+        <div class="left-column">
+            <div class="fee-summary-box">
+                <h4>Fee Details</h4>
+
+                <div class="fee-row">
+                    <span>Admission Fee</span>
+                    <strong>₹5000</strong>
+                </div>
+                <div class="fee-row">
+                    <span>Course Fee</span>
+                    <strong>₹45000</strong>
+                </div>
+                <div class="fee-row total">
+                    <span>Total Fee</span>
+                    <strong>₹50000</strong>
+                </div>
+            </div>
+
+            <a href="{% url 'emi_view' %}" class="mode-btn active">View Your Status</a>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right-column">
+
+            <!-- EMI PAYMENT MODE -->
+            <div class="emi-payment-box">
+               
+                <br>
+<li>
+                <p class="emi-info"><b>
+                    EMI facility is handled by authorized third-party financial partners
+                    such as Bajaj Finance</b>.
+                </p>
+</li>
+<li>
+                <p class="emi-info"><b>
+                    To proceed with EMI approval, your request will be transferred
+                    to the administration office,Wait for confirmation.</b>
+                </p>
+</li>
+                
+
+                <button class="transfer-btn">
+                    Transfer to Administration
+                </button>
+            </div>
+
+            <div class="reminder-box">
+                <h4>Reminders</h4>
+                <label><input type="checkbox" checked> Email reminder</label>
+                <label><input type="checkbox" checked> SMS reminder</label>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NOTE -->
+    <div class="note">
+        <h3><b>Note: EMI processing is subject to third-party financial approval.</b></h3>
+    </div>
+
+</div>
+
+
+{% endblock %}
