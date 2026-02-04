@@ -45,7 +45,7 @@ https://templatemo.com/tm-607-glass-admin
                     <span class="nav-section-title">Main Menu</span>
                     <ul>
                         <li class="nav-item">
-                            <a href="{% url 'stud_dashboard' %}" class="nav-link active">
+                            <a href="{% url 'student:stud_dashboard' %}" class="nav-link active">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="3" width="7" height="7" rx="1"/>
                                     <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -56,7 +56,7 @@ https://templatemo.com/tm-607-glass-admin
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'profile' %}" class="nav-link">
+                            <a href="{% url 'student:stud_profile' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                                     <circle cx="12" cy="7" r="4"/>
@@ -180,7 +180,7 @@ https://templatemo.com/tm-607-glass-admin
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'payment' %}" class="nav-link">
+                            <a href="{% url 'student:payment' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="1" y="4" width="22" height="16" rx="2"/>
                                     <line x1="1" y1="10" x2="23" y2="10"/>
@@ -189,7 +189,7 @@ https://templatemo.com/tm-607-glass-admin
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'stud_onboard' %}" class="nav-link">
+                            <a href="{% url 'student:stud_onboard' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                     <polyline points="7 10 12 15 17 10"/>
@@ -228,7 +228,7 @@ https://templatemo.com/tm-607-glass-admin
                     <span class="nav-section-title">Account</span>
                     <ul>
                         <li class="nav-item">
-                            <form method="post" action="{% url 'logout' %}">
+                            <form method="post" action="{% url 'accounts:logout' %}">
                                 {% csrf_token %}
                                 <button type="submit">Logout</button>
                             </form>

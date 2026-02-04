@@ -36,7 +36,7 @@ def payment(request):
 
     student = Student.objects.first()  # no login
 
-    course_fee = student.selected_course.course_fee
+    course_fee = 55000
 
     # 🔹 Check if ONE-TIME payment already exists
     existing_payment = FeePayment.objects.filter(
@@ -54,13 +54,13 @@ def payment(request):
                 request,
                 "One-time payment already submitted."
             )
-            return redirect('payment')
+            return redirect('student:payment')
 
         transaction_id = request.POST.get('transaction_id')
 
         if not transaction_id:
             messages.error(request, "Transaction ID is required")
-            return redirect('payment')
+            return redirect('student:payment')
 
         FeePayment.objects.create(
             student=student,
@@ -77,7 +77,7 @@ def payment(request):
             request,
             "Payment submitted successfully. Awaiting verification."
         )
-        return redirect('payment')
+        return redirect('student:payment')
 
     # -------------------------
     # 🔹 DISPLAY DATA (GET)
@@ -133,7 +133,7 @@ def pdc(request):
 
     # -------- COURSE FEE (DYNAMIC) --------
     admission_fee = Decimal('0.00')
-    course_fee = student.selected_course.course_fee
+    course_fee = 55000
     total_fee = admission_fee + course_fee
 
     # -------- PAID AMOUNT --------
@@ -184,7 +184,7 @@ def installments(request):
 
     # -------- COURSE FEE --------
     admission_fee = Decimal('0.00')
-    course_fee = student.selected_course.course_fee
+    course_fee = 55000
     total_fee = admission_fee + course_fee
 
     # -------- PAID AMOUNT --------
@@ -269,7 +269,7 @@ def QR_pay(request):
 
     if not pdc:
         messages.info(request, "No pending PDC payments")
-        return redirect('pdc')
+        return redirect('student:pdc')
 
     # Submit payment
     if request.method == "POST":
@@ -279,7 +279,7 @@ def QR_pay(request):
         pdc.save()
 
         messages.success(request, "Payment submitted successfully")
-        return redirect('pdc')
+        return redirect('student:pdc')
 
     context = {
         'pdc': pdc,
@@ -307,7 +307,7 @@ def installments_qr(request):
 
     if not installments.exists():
         messages.info(request, "No pending installments")
-        return redirect('installments')
+        return redirect('student:installments')
 
     # ---------------- SUBMIT PAYMENT ----------------
     if request.method == "POST":
@@ -318,7 +318,7 @@ def installments_qr(request):
             ins.save()
 
         messages.success(request, "Installment payment submitted successfully")
-        return redirect('installments')
+        return redirect('student:installments')
 
     context = {
         'student': student,
