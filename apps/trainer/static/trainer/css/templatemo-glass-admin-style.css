@@ -1430,6 +1430,19 @@ html, body {
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
+/* Dark mode */
+.quick-actions .btn {
+    color: var(--text-primary);
+}
+
+/* Light mode */
+[data-theme="light"] .quick-actions .btn {
+    color: var(--primary);
+}
+
+
+
+
 /* ==============================
    SMALL DASHBOARD POLISH
    ============================== */
