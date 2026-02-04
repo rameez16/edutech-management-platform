@@ -39,10 +39,10 @@
     <div class="payment-mode-switch">
         <span class="label">Payment Mode:</span>
         <div class="mode-tabs">
-            <a href="{% url 'payment' %}" class="mode-btn">One-Time Payment</a>
-            <a href="{% url 'pdc' %}" class="mode-btn">PDC</a>
-            <a href="{% url 'emi' %}" class="mode-btn">EMI</a>
-            <a href="{% url 'installments' %}" class="mode-btn active">Installments</a>
+            <a href="{% url 'student:payment' %}" class="mode-btn">One-Time Payment</a>
+            <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
+            <a href="{% url 'student:emi' %}" class="mode-btn">EMI</a>
+            <a href="{% url 'student:installments' %}" class="mode-btn active">Installments</a>
         </div>
     </div>
 
@@ -108,7 +108,7 @@
                         <!-- ACTION -->
                         <td>
                             {% if ins.payment_status == 'pending' %}
-                                <a href="{% url 'installments_qr' %}" class="pay-btn">
+                                <a href="{% url 'student:installments_qr' %}" class="pay-btn">
                                     Pay
                                 </a>
                             {% else %}

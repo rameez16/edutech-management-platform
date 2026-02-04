@@ -38,10 +38,10 @@
         <span class="label">Payment Mode:</span>
 
         <div class="mode-tabs">
-            <a href="{% url 'payment' %}" class="mode-btn">One-Time Payment</a>
-            <a href="{% url 'pdc' %}" class="mode-btn">PDC</a>
-            <a href="{% url 'emi' %}" class="mode-btn active">EMI  </a>
-            <a href="{% url 'installments' %}" class="mode-btn">Installments</a>
+            <a href="{% url 'student:payment' %}" class="mode-btn">One-Time Payment</a>
+            <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
+            <a href="{% url 'student:emi' %}" class="mode-btn active">EMI  </a>
+            <a href="{% url 'student:installments' %}" class="mode-btn">Installments</a>
         </div>
     </div>
 
@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            <a href="{% url 'emi_view' %}" class="mode-btn active">View Your Status</a>
+            <a href="{% url 'student:emi_view' %}" class="mode-btn active">View Your Status</a>
         </div>
 
         <!-- RIGHT -->

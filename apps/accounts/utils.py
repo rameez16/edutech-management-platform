@@ -8,6 +8,6 @@ def redirect_after_login(user):
         return redirect("trainer:dashboard")
     
     if user.role == "student":
-        return redirect("stud_dashboard")
+        return redirect("student:stud_dashboard")
     
     return redirect("/")
