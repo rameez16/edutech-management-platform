@@ -1,86 +1,1600 @@
 {% extends 'landing_page/layout/base.html' %}
-{% block title %}{{ course.name }} | EDUTECH{% endblock %}
+{% block title %}Home | EDUTECH{% endblock %}
 
 {% block content %}
 
-  <section class="course-detail">
-    <div class="section-container">
+<!-- Hero Section with Sophisticated Design -->
+<section class="hero-refined">
+  <div class="hero-ambient-effect"></div>
+  
+  <div class="hero-content-wrapper">
+    <!-- Announcement badge -->
+    <div class="announcement-badge">
+      <span class="pulse-dot"></span>
+      <span>AI-Powered Learning Platform · Launching 2026</span>
+    </div>
 
-      <!-- Back Button -->
-      <a href="{% url 'landing' %}#courses" class="back-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
+    <!-- Main heading with dramatic typography -->
+    <h1 class="hero-headline">
+      <span class="headline-primary">Craft Your Future</span>
+      <span class="headline-secondary">Through Excellence</span>
+    </h1>
+
+    <!-- Hero description -->
+    <p class="hero-description-text">
+      Immerse yourself in a transformative learning experience designed 
+      by industry veterans. Master cutting-edge skills at your own pace.
+    </p>
+
+    <!-- CTA buttons -->
+    <div class="hero-action-group">
+      <a href="#contact" class="btn-hero-primary">
+        <span>Begin Your Journey</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>
-        Back to Courses
       </a>
+      <a href="#courses" class="btn-hero-secondary">
+        <span>Explore Courses</span>
+      </a>
+    </div>
 
-      <!-- Course Header -->
-      <div class="course-header">
-        <div class="course-badge">Premium Course</div>
-        <h1>{{ course.name }}</h1>
-        <p>{{ course.description }}</p>
+    <!-- Stats with refined presentation -->
+    <div class="hero-stats-refined">
+      <div class="stat-item-refined">
+        <span class="stat-number-refined">50K+</span>
+        <span class="stat-label-refined">Active Learners</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item-refined">
+        <span class="stat-number-refined">200+</span>
+        <span class="stat-label-refined">Expert Courses</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item-refined">
+        <span class="stat-number-refined">4.9/5</span>
+        <span class="stat-label-refined">Satisfaction</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enquiry form with sophisticated design -->
+  <div class="enquiry-form-refined" id="contact">
+    <div class="form-ambient-glow"></div>
+    
+    <div class="form-header-refined">
+      <h3>Start Your Transformation</h3>
+      <p>Share your details and we'll guide you forward</p>
+    </div>
+
+    <form id="enquiryForm" method="POST" action="">
+      {% csrf_token %}
+
+      <div class="form-field-refined">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" required placeholder="John Doe">
       </div>
 
-      <!-- Course Meta Info -->
-      <div class="course-meta">
-        <div class="meta-card">
-          <div class="meta-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
-          <div class="meta-content">
-            <strong>Duration</strong>
-            <span>{{ course.duration }}</span>
-          </div>
-        </div>
-
-        <div class="meta-card">
-          <div class="meta-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-          </div>
-          <div class="meta-content">
-            <strong>Course Fee</strong>
-            <span>₹{{ course.course_fee }}</span>
-          </div>
-        </div>
+      <div class="form-field-refined">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" required placeholder="+91 98765 43210">
       </div>
 
-      <!-- Technologies Covered -->
-      <div class="tech-section">
-        <h3>Technologies Covered</h3>
-        <div class="tech-stack-tags">
-           {% for tech in course.tech_stack_list %}
-          <span class="tech-tag">{{ tech }}</span>
+      <div class="form-field-refined">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required placeholder="john@example.com">
+      </div>
+
+      <div class="form-field-refined">
+        <label for="preferred_course">Course Interest</label>
+        <select id="preferred_course" name="preferred_course" required>
+          <option value="">Select your path</option>
+          {% for course in courses %}
+            <option value="{{ course.id }}">{{ course.name }}</option>
           {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-field-refined">
+        <label for="mode">Learning Mode</label>
+        <select id="mode" name="mode" required>
+          <option value="offline">In-Person</option>
+          <option value="remote">Remote</option>
+        </select>
+      </div>
+
+      <button type="submit" class="form-submit-refined">
+        <span>Submit Application</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- Courses Section with Refined Design -->
+<section class="courses-refined" id="courses">
+  <div class="section-container-refined">
+    <div class="section-header-sophisticated">
+      <span class="section-eyebrow">Our Curriculum</span>
+      <h2 class="section-heading-large">Courses Designed for Impact</h2>
+      <p class="section-description-refined">
+        Each program is meticulously crafted to deliver real-world skills 
+        that accelerate your professional growth.
+      </p>
+    </div>
+
+    <div class="courses-grid-refined">
+      {% for course in courses %}
+      <a href="{% url 'course_detail' course.id %}" class="course-card-refined">
+        <div class="course-card-content">
+          <div class="course-card-header">
+            <div class="course-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <h3 class="course-card-title">{{ course.name }}</h3>
+          <p class="course-card-description">{{ course.description }}</p>
+
+          <div class="course-card-meta">
+            <div class="course-meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>{{ course.duration }}</span>
+            </div>
+            <div class="course-meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              <span>₹{{ course.course_fee|floatformat:0 }}</span>
+            </div>
+          </div>
+
+          <div class="course-card-arrow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      <div class="no-courses-message">
+        <p>New courses launching soon. Stay tuned.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- About Section with Sophisticated Layout -->
+<section class="about-refined" id="aboutus">
+  <div class="about-ambient"></div>
+  
+  <div class="section-container-refined">
+    <div class="about-content-grid">
+      <div class="about-text-content">
+        <span class="section-eyebrow">About EDUTECH</span>
+        <h2 class="about-headline">Shaping Tomorrow's Innovators</h2>
+        <div class="about-description">
+          <p>
+            We're transforming education through world-class programs in software development 
+            and emerging technologies. Our mission is to bridge the gap between traditional 
+            learning and industry demands.
+          </p>
+          <p>
+            Through innovative pedagogy, hands-on projects, and a supportive community, 
+            we're building the next generation of engineers and tech leaders who will 
+            define the future.
+          </p>
         </div>
       </div>
 
-      <!-- Syllabus Section (Optional) -->
-      <div class="syllabus-section">
-        <h3>Course Syllabus</h3>
-        <div class="syllabus-content">
-        {{ course.syllabus }}
+      <div class="about-stats-grid">
+        <div class="about-stat-card">
+          <span class="about-stat-number">75K+</span>
+          <span class="about-stat-label">Students Trained</span>
+        </div>
+        <div class="about-stat-card">
+          <span class="about-stat-number">200+</span>
+          <span class="about-stat-label">Expert Courses</span>
+        </div>
+        <div class="about-stat-card">
+          <span class="about-stat-number">50+</span>
+          <span class="about-stat-label">Career Tracks</span>
+        </div>
+        <div class="about-stat-card">
+          <span class="about-stat-number">85%</span>
+          <span class="about-stat-label">Placement Rate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us with Refined Cards -->
+<section class="why-choose-refined">
+  <div class="section-container-refined">
+    <div class="section-header-sophisticated">
+      <span class="section-eyebrow">Why Choose Us</span>
+      <h2 class="section-heading-large">What Sets Us Apart</h2>
+    </div>
+
+    <div class="features-grid-refined">
+      <div class="feature-card-sophisticated">
+        <div class="feature-icon-refined">
+          <span class="feature-emoji">💻</span>
+        </div>
+        <h3>Industry-Relevant Curriculum</h3>
+        <p>Master technologies used by leading tech companies. Our curriculum updates quarterly to reflect current industry standards.</p>
+      </div>
+
+      <div class="feature-card-sophisticated">
+        <div class="feature-icon-refined">
+          <span class="feature-emoji">🚀</span>
+        </div>
+        <h3>Project-Based Learning</h3>
+        <p>Build real applications from day one. Create a portfolio that demonstrates your capabilities to potential employers.</p>
+      </div>
+
+      <div class="feature-card-sophisticated">
+        <div class="feature-icon-refined">
+          <span class="feature-emoji">👨‍💻</span>
+        </div>
+        <h3>Expert Mentorship</h3>
+        <p>Receive personalized guidance and code reviews from experienced engineers who understand your journey.</p>
+      </div>
+
+      <div class="feature-card-sophisticated">
+        <div class="feature-icon-refined">
+          <span class="feature-emoji">🎯</span>
+        </div>
+        <h3>Career Support</h3>
+        <p>Access comprehensive career services including resume reviews, interview prep, and connections to 500+ hiring partners.</p>
+      </div>
+
+      <div class="feature-card-sophisticated">
+        <div class="feature-icon-refined">
+          <span class="feature-emoji">⚡</span>
+        </div>
+        <h3>Flexible Learning</h3>
+        <p>Choose your pace with self-guided courses, intensive bootcamps, or part-time programs. Lifetime access included.</p>
+      </div>
+
+      <div class="feature-card-sophisticated">
+        <div class="feature-icon-refined">
+          <span class="feature-emoji">🌍</span>
+        </div>
+        <h3>Global Community</h3>
+        <p>Join thousands of developers worldwide. Collaborate on projects, share knowledge, and grow your professional network.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials with Elegant Design -->
+<section class="testimonials-refined" id="testimonials">
+  <div class="section-container-refined">
+    <div class="section-header-sophisticated">
+      <span class="section-eyebrow">Testimonials</span>
+      <h2 class="section-heading-large">Success Stories</h2>
+    </div>
+
+    <div class="testimonials-grid-refined">
+      <div class="testimonial-card-sophisticated">
+        <div class="testimonial-quote-mark">"</div>
+        <p class="testimonial-text-refined">
+          EDUTECH transformed my career trajectory. The comprehensive curriculum and 
+          supportive instructors helped me land my dream role within three months.
+        </p>
+        <div class="testimonial-author-refined">
+          <div class="testimonial-avatar-refined">AT</div>
+          <div class="testimonial-author-info">
+            <span class="testimonial-name">Alex Thompson</span>
+            <span class="testimonial-role">Web Developer, Google</span>
+          </div>
+        </div>
+        <div class="testimonial-stars-refined">★★★★★</div>
+      </div>
+
+      <div class="testimonial-card-sophisticated">
+        <div class="testimonial-quote-mark">"</div>
+        <p class="testimonial-text-refined">
+          The project-based approach and AI-powered feedback accelerated my learning. 
+          The mentorship was invaluable for my transition into tech.
+        </p>
+        <div class="testimonial-author-refined">
+          <div class="testimonial-avatar-refined">MG</div>
+          <div class="testimonial-author-info">
+            <span class="testimonial-name">Maria Garcia</span>
+            <span class="testimonial-role">Data Scientist, Amazon</span>
+          </div>
+        </div>
+        <div class="testimonial-stars-refined">★★★★★</div>
+      </div>
+
+      <div class="testimonial-card-sophisticated">
+        <div class="testimonial-quote-mark">"</div>
+        <p class="testimonial-text-refined">
+          Exceptional value. The industry-relevant content and career support led to 
+          three job offers after completion. Highly recommended.
+        </p>
+        <div class="testimonial-author-refined">
+          <div class="testimonial-avatar-refined">DK</div>
+          <div class="testimonial-author-info">
+            <span class="testimonial-name">David Kim</span>
+            <span class="testimonial-role">Full Stack Developer, Microsoft</span>
+          </div>
+        </div>
+        <div class="testimonial-stars-refined">★★★★★</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section with Sophisticated Layout -->
+<section class="contact-refined" id="contactpage">
+  <div class="section-container-refined">
+    <div class="section-header-sophisticated">
+      <span class="section-eyebrow">Get In Touch</span>
+      <h2 class="section-heading-large">Connect With Us</h2>
+      <p class="section-description-refined">
+        Questions about our programs? Our dedicated team is here to support 
+        your learning journey and career aspirations.
+      </p>
+    </div>
+
+    <div class="contact-layout-refined">
+      <div class="contact-cards-refined">
+        <div class="contact-card-sophisticated">
+          <div class="contact-icon-refined">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+          </div>
+          <h3>Phone</h3>
+          <p class="contact-detail-refined">+91 98765 43210</p>
+          <p class="contact-subtext-refined">Mon-Fri, 9:00 AM - 6:00 PM IST</p>
+        </div>
+
+        <div class="contact-card-sophisticated">
+          <div class="contact-icon-refined">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+          <h3>Email</h3>
+          <p class="contact-detail-refined">support@edutech.com</p>
+          <p class="contact-subtext-refined">Response within 24 hours</p>
+        </div>
+
+        <div class="contact-card-sophisticated">
+          <div class="contact-icon-refined">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </div>
+          <h3>Location</h3>
+          <p class="contact-detail-refined">Kochi, Kerala, India</p>
+          <p class="contact-subtext-refined">By appointment only</p>
         </div>
       </div>
 
-      <!-- CTA Section -->
-      <div class="cta-section">
-        <h3>Ready to Start Your Journey?</h3>
-        <p>Join thousands of students who have transformed their careers with our comprehensive courses</p>
-        <a href="/#contact" class="btn-primary">
-          Register Now →
+      <div class="contact-cta-refined">
+        <h3>Ready to Begin?</h3>
+        <p>Complete our enquiry form and an education consultant will reach out to discuss your goals.</p>
+        <a href="#contact" class="btn-contact-cta">
+          <span>Submit Enquiry</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </a>
       </div>
-
     </div>
-  </section>
+  </div>
+</section>
 
+<!-- Final CTA with Dramatic Design -->
+<section class="final-cta-refined">
+  <div class="final-cta-ambient"></div>
+  
+  <div class="section-container-refined">
+    <div class="final-cta-content">
+      <h2 class="final-cta-headline">Begin Your Journey Today</h2>
+      <p class="final-cta-description">
+        Join 75,000+ students transforming their careers through world-class tech education.
+      </p>
+      <a href="#contact" class="btn-final-cta">
+        <span>Start Free Trial</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  /* CSS Variables with Orangish Theme */
+  :root {
+    --primary-orange: #FF6B35;
+    --secondary-orange: #FF8C42;
+    --accent-orange: #FFA559;
+    --deep-black: #0A0A0A;
+    --soft-black: #1A1A1A;
+    --warm-white: #FAF8F6;
+    --cream: #F5F1ED;
+    --border-subtle: rgba(255, 107, 53, 0.12);
+    --shadow-soft: rgba(255, 107, 53, 0.08);
+  }
+
+  /* Base typography */
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Hero Section - Sophisticated Layout */
+  .hero-refined {
+    min-height: 100vh;
+    padding: 8rem 2rem 6rem;
+    display: grid;
+    grid-template-columns: 1fr 450px;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    background: linear-gradient(165deg, #0A0A0A 0%, #1A1A1A 50%, #0F0F0F 100%);
+  }
+
+  .hero-ambient-effect {
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    animation: ambientFloat 20s ease-in-out infinite;
+  }
+
+  @keyframes ambientFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, 30px) scale(1.05); }
+  }
+
+  .hero-content-wrapper {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Announcement badge */
+  .announcement-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 140, 66, 0.05));
+    border: 1px solid var(--border-subtle);
+    padding: 0.625rem 1.25rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--accent-orange);
+    margin-bottom: 3rem;
+    backdrop-filter: blur(10px);
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--primary-orange);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+  }
+
+  /* Hero headline with dramatic typography */
+  .hero-headline {
+    margin: 0 0 2rem 0;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+  }
+
+  .headline-primary {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--warm-white);
+    margin-bottom: 0.5rem;
+  }
+
+  .headline-secondary {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--primary-orange), var(--accent-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Hero description */
+  .hero-description-text {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 600px;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+  }
+
+  /* Hero action buttons */
+  .hero-action-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 4rem;
+    animation: fadeInUp 0.8s ease-out 0.6s both;
+  }
+
+  .btn-hero-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2.5rem;
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    color: var(--deep-black);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 100px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 10px 40px rgba(255, 107, 53, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-hero-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--secondary-orange), var(--accent-orange));
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .btn-hero-primary span,
+  .btn-hero-primary svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-hero-primary:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4);
+  }
+
+  .btn-hero-primary:hover::before {
+    opacity: 1;
+  }
+
+  .btn-hero-primary:hover svg {
+    transform: translateX(4px);
+  }
+
+  .btn-hero-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 1.25rem 2.5rem;
+    background: transparent;
+    color: var(--warm-white);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 100px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .btn-hero-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 107, 53, 0.4);
+    transform: translateY(-4px);
+  }
+
+  /* Hero stats */
+  .hero-stats-refined {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    animation: fadeInUp 0.8s ease-out 0.8s both;
+  }
+
+  .stat-item-refined {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-number-refined {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--warm-white);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label-refined {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.02em;
+  }
+
+  .stat-divider {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(180deg, transparent, var(--border-subtle), transparent);
+  }
+
+  /* Enquiry Form - Sophisticated Design */
+  .enquiry-form-refined {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 2.5rem;
+    backdrop-filter: blur(20px);
+    position: relative;
+    animation: fadeInUp 0.8s ease-out 1s both;
+  }
+
+  .form-ambient-glow {
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .form-header-refined {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-header-refined h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--warm-white);
+  }
+
+  .form-header-refined p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .form-field-refined {
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-field-refined label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.02em;
+  }
+
+  .form-field-refined input,
+  .form-field-refined select {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    color: var(--warm-white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9375rem;
+    transition: all 0.3s;
+  }
+
+  .form-field-refined input:focus,
+  .form-field-refined select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 107, 53, 0.4);
+    box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+  }
+
+  .form-field-refined input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .form-submit-refined {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    color: var(--deep-black);
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .form-submit-refined::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--secondary-orange), var(--accent-orange));
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .form-submit-refined span,
+  .form-submit-refined svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-submit-refined:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(255, 107, 53, 0.4);
+  }
+
+  .form-submit-refined:hover::before {
+    opacity: 1;
+  }
+
+  .form-submit-refined:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* Section Containers */
+  .section-container-refined {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* Section Headers */
+  .section-header-sophisticated {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .section-eyebrow {
+    display: inline-block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent-orange);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .section-heading-large {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--warm-white);
+    margin: 0 0 1.5rem 0;
+  }
+
+  .section-description-refined {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Courses Section */
+  .courses-refined {
+    padding: 8rem 0;
+    background: linear-gradient(165deg, #0F0F0F 0%, #1A1A1A 100%);
+    position: relative;
+  }
+
+  .courses-refined::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+  }
+
+  .courses-grid-refined {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .course-card-refined {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 2.5rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .course-card-refined::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-orange), var(--secondary-orange));
+    transform: scaleX(0);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .course-card-refined:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 107, 53, 0.4);
+    transform: translateY(-8px);
+  }
+
+  .course-card-refined:hover::before {
+    transform: scaleX(1);
+  }
+
+  .course-card-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .course-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 140, 66, 0.1));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .course-card-refined:hover .course-icon-wrapper {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.25), rgba(255, 140, 66, 0.15));
+    transform: rotate(-8deg) scale(1.1);
+  }
+
+  .course-icon-wrapper svg {
+    color: var(--primary-orange);
+  }
+
+  .course-card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--warm-white);
+    letter-spacing: -0.01em;
+  }
+
+  .course-card-description {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1.5rem;
+  }
+
+  .course-card-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .course-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .course-meta-item svg {
+    color: var(--accent-orange);
+    flex-shrink: 0;
+  }
+
+  .course-card-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 107, 53, 0.1);
+    border-radius: 50%;
+    margin-left: auto;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .course-card-refined:hover .course-card-arrow {
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    transform: translateX(8px);
+  }
+
+  .course-card-arrow svg {
+    color: var(--primary-orange);
+    transition: color 0.4s;
+  }
+
+  .course-card-refined:hover .course-card-arrow svg {
+    color: var(--deep-black);
+  }
+
+  /* About Section */
+  .about-refined {
+    padding: 8rem 0;
+    background: var(--deep-black);
+    position: relative;
+  }
+
+  .about-ambient {
+    position: absolute;
+    top: 0;
+    left: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .about-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .about-text-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .about-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin: 1rem 0 2rem 0;
+    color: var(--warm-white);
+  }
+
+  .about-description p {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+  }
+
+  .about-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .about-stat-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .about-stat-card:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 107, 53, 0.3);
+    transform: translateY(-8px);
+  }
+
+  .about-stat-number {
+    display: block;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-orange);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .about-stat-label {
+    display: block;
+    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Why Choose Us Section */
+  .why-choose-refined {
+    padding: 8rem 0;
+    background: linear-gradient(165deg, #1A1A1A 0%, #0F0F0F 100%);
+  }
+
+  .features-grid-refined {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card-sophisticated {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 2.5rem;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+
+  .feature-card-sophisticated::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-orange), transparent);
+    transform: scaleX(0);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .feature-card-sophisticated:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 107, 53, 0.3);
+    transform: translateY(-8px);
+  }
+
+  .feature-card-sophisticated:hover::before {
+    transform: scaleX(1);
+  }
+
+  .feature-icon-refined {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 140, 66, 0.1));
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .feature-card-sophisticated:hover .feature-icon-refined {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.25), rgba(255, 140, 66, 0.15));
+    transform: rotate(-8deg) scale(1.1);
+  }
+
+  .feature-emoji {
+    font-size: 2rem;
+  }
+
+  .feature-card-sophisticated h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--warm-white);
+    letter-spacing: -0.01em;
+  }
+
+  .feature-card-sophisticated p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Testimonials Section */
+  .testimonials-refined {
+    padding: 8rem 0;
+    background: var(--deep-black);
+  }
+
+  .testimonials-grid-refined {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .testimonial-card-sophisticated {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 2.5rem;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .testimonial-card-sophisticated:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 107, 53, 0.3);
+    transform: translateY(-8px);
+  }
+
+  .testimonial-quote-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    line-height: 1;
+    color: var(--primary-orange);
+    opacity: 0.2;
+    position: absolute;
+    top: 1rem;
+    left: 1.5rem;
+  }
+
+  .testimonial-text-refined {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .testimonial-author-refined {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .testimonial-avatar-refined {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 140, 66, 0.1));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--primary-orange);
+    flex-shrink: 0;
+  }
+
+  .testimonial-author-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .testimonial-name {
+    font-weight: 600;
+    color: var(--warm-white);
+    margin-bottom: 0.25rem;
+  }
+
+  .testimonial-role {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .testimonial-stars-refined {
+    color: var(--primary-orange);
+    font-size: 1.125rem;
+    letter-spacing: 0.25rem;
+  }
+
+  /* Contact Section */
+  .contact-refined {
+    padding: 8rem 0;
+    background: linear-gradient(165deg, #1A1A1A 0%, #0F0F0F 100%);
+  }
+
+  .contact-layout-refined {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+    margin-top: 4rem;
+  }
+
+  .contact-cards-refined {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .contact-card-sophisticated {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .contact-card-sophisticated:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 107, 53, 0.3);
+    transform: translateX(8px);
+  }
+
+  .contact-icon-refined {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 140, 66, 0.1));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .contact-card-sophisticated:hover .contact-icon-refined {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.25), rgba(255, 140, 66, 0.15));
+    transform: rotate(-8deg) scale(1.1);
+  }
+
+  .contact-icon-refined svg {
+    color: var(--primary-orange);
+  }
+
+  .contact-card-sophisticated h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--warm-white);
+  }
+
+  .contact-detail-refined {
+    font-size: 1rem;
+    color: var(--warm-white);
+    margin-bottom: 0.25rem;
+  }
+
+  .contact-subtext-refined {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .contact-cta-refined {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 2.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .contact-cta-refined h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    color: var(--warm-white);
+  }
+
+  .contact-cta-refined p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 2rem;
+  }
+
+  .btn-contact-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.125rem 2rem;
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    color: var(--deep-black);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    border-radius: 100px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 30px rgba(255, 107, 53, 0.3);
+  }
+
+  .btn-contact-cta:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 50px rgba(255, 107, 53, 0.4);
+  }
+
+  .btn-contact-cta:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* Final CTA Section */
+  .final-cta-refined {
+    padding: 10rem 0;
+    background: linear-gradient(165deg, #0A0A0A 0%, #1A1A1A 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .final-cta-ambient {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1000px;
+    height: 1000px;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .final-cta-content {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .final-cta-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin: 0 0 1.5rem 0;
+    color: var(--warm-white);
+  }
+
+  .final-cta-description {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 700px;
+    margin: 0 auto 3rem auto;
+  }
+
+  .btn-final-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 3.5rem;
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    color: var(--deep-black);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.125rem;
+    border-radius: 100px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 15px 60px rgba(255, 107, 53, 0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-final-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--secondary-orange), var(--accent-orange));
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .btn-final-cta span,
+  .btn-final-cta svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-final-cta:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 80px rgba(255, 107, 53, 0.5);
+  }
+
+  .btn-final-cta:hover::before {
+    opacity: 1;
+  }
+
+  .btn-final-cta:hover svg {
+    transform: translateX(6px);
+  }
+
+  /* Keyframe Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .hero-refined {
+      grid-template-columns: 1fr;
+      padding: 6rem 2rem 4rem;
+    }
+
+    .enquiry-form-refined {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .about-content-grid {
+      grid-template-columns: 1fr;
+      gap: 4rem;
+    }
+
+    .contact-layout-refined {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-refined {
+      padding: 5rem 1.5rem 3rem;
+    }
+
+    .headline-primary {
+      font-size: 2.5rem;
+    }
+
+    .headline-secondary {
+      font-size: 2rem;
+    }
+
+    .hero-action-group {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .btn-hero-primary,
+    .btn-hero-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .hero-stats-refined {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+
+    .stat-divider {
+      display: none;
+    }
+
+    .courses-grid-refined,
+    .features-grid-refined,
+    .testimonials-grid-refined {
+      grid-template-columns: 1fr;
+    }
+
+    .about-stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .section-header-sophisticated {
+      margin-bottom: 3rem;
+    }
+  }
+
+  /* Light Mode Support */
+  [data-theme="light"] .hero-refined,
+  [data-theme="light"] .courses-refined,
+  [data-theme="light"] .about-refined,
+  [data-theme="light"] .why-choose-refined,
+  [data-theme="light"] .testimonials-refined,
+  [data-theme="light"] .contact-refined,
+  [data-theme="light"] .final-cta-refined {
+    background: var(--warm-white);
+    color: var(--deep-black);
+  }
+
+  [data-theme="light"] .hero-refined {
+    background: linear-gradient(165deg, #FAF8F6 0%, #F5F1ED 50%, #FAF8F6 100%);
+  }
+
+  [data-theme="light"] .courses-refined {
+    background: linear-gradient(165deg, #F5F1ED 0%, #FAF8F6 100%);
+  }
+
+  [data-theme="light"] .why-choose-refined {
+    background: linear-gradient(165deg, #FAF8F6 0%, #F5F1ED 100%);
+  }
+
+  [data-theme="light"] .contact-refined {
+    background: linear-gradient(165deg, #F5F1ED 0%, #FAF8F6 100%);
+  }
+
+  [data-theme="light"] .final-cta-refined {
+    background: linear-gradient(165deg, #FAF8F6 0%, #F5F1ED 100%);
+  }
+
+  [data-theme="light"] .headline-primary,
+  [data-theme="light"] .section-heading-large,
+  [data-theme="light"] .about-headline,
+  [data-theme="light"] .final-cta-headline,
+  [data-theme="light"] .course-card-title,
+  [data-theme="light"] .testimonial-name {
+    color: var(--deep-black);
+  }
+
+  [data-theme="light"] .hero-description-text,
+  [data-theme="light"] .section-description-refined,
+  [data-theme="light"] .about-description p,
+  [data-theme="light"] .course-card-description,
+  [data-theme="light"] .feature-card-sophisticated p,
+  [data-theme="light"] .testimonial-text-refined,
+  [data-theme="light"] .final-cta-description {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .stat-label-refined,
+  [data-theme="light"] .testimonial-role,
+  [data-theme="light"] .contact-subtext-refined {
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme="light"] .enquiry-form-refined,
+  [data-theme="light"] .course-card-refined,
+  [data-theme="light"] .feature-card-sophisticated,
+  [data-theme="light"] .testimonial-card-sophisticated,
+  [data-theme="light"] .contact-card-sophisticated,
+  [data-theme="light"] .contact-cta-refined,
+  [data-theme="light"] .about-stat-card {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(255, 107, 53, 0.15);
+  }
+
+  [data-theme="light"] .form-field-refined input,
+  [data-theme="light"] .form-field-refined select {
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--deep-black);
+  }
+
+  [data-theme="light"] .form-field-refined input::placeholder {
+    color: rgba(0, 0, 0, 0.3);
+  }
+</style>
 
 {% endblock %}
-

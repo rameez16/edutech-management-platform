@@ -1,0 +1,800 @@
+{% extends 'bdm/layout/base.html' %}
+{% load static %}
+{% load tz %}
+
+{% block content %}
+
+<div class="admin-profile-container">
+    <div class="profile-header">
+        <div class="header-content">
+            <h1 class="profile-title">
+                <i class="profile-icon"></i>
+                Create Trainer Profile ( admin use)
+            </h1>
+            <p class="profile-subtitle">Create or update trainer administrative details</p>
+        </div>
+        <div class="profile-status-badge">
+            {% if form.is_active.value %}
+            <span class="status-badge active">
+                <span class="status-dot"></span>
+                Active Trainer
+            </span>
+            {% else %}
+            <span class="status-badge inactive">
+                <span class="status-dot"></span>
+                Inactive
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="post" class="admin-profile-form">
+        {% csrf_token %}
+        
+        <!-- Display non-field errors -->
+        {% if form.non_field_errors %}
+        <div class="global-error">
+            <i class="error-icon">⚠️</i>
+            <div class="error-content">
+                <h4>Please fix the following errors:</h4>
+                {{ form.non_field_errors }}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Section 1: Basic Information -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon"></div>
+                <h2 class="section-title">Basic Information</h2>
+            </div>
+            <div class="section-content">
+                <div class="form-grid">
+                    <!-- Trainer -->
+                    <div class="form-group">
+                        <label for="{{ form.trainer.id_for_label }}" class="form-label">
+                            Trainer *
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.trainer }}
+                            <div class="input-icon"></div>
+                        </div>
+                        {% if form.trainer.errors %}
+                        <div class="error-message">
+                            {{ form.trainer.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Employee ID -->
+                    <div class="form-group">
+                        <label for="{{ form.employee_id.id_for_label }}" class="form-label">
+                            Employee ID *
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.employee_id }}
+                            <div class="input-icon"></div>
+                        </div>
+                        {% if form.employee_id.errors %}
+                        <div class="error-message">
+                            {{ form.employee_id.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Payment Details -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon"></div>
+                <h2 class="section-title">Payment Details</h2>
+            </div>
+            <div class="section-content">
+                <div class="form-grid">
+                    <!-- Basic Pay -->
+                    <div class="form-group">
+                        <label for="{{ form.basic_pay.id_for_label }}" class="form-label">
+                            Basic Pay *
+                        </label>
+                        <div class="input-wrapper">
+                            <div class="currency-prefix">₹</div>
+                            {{ form.basic_pay }}
+                        </div>
+                        {% if form.basic_pay.errors %}
+                        <div class="error-message">
+                            {{ form.basic_pay.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Hourly Rate -->
+                    <div class="form-group">
+                        <label for="{{ form.hourly_rate.id_for_label }}" class="form-label">
+                            Hourly Rate *
+                        </label>
+                        <div class="input-wrapper">
+                            <div class="currency-prefix">₹</div>
+                            {{ form.hourly_rate }}
+                        </div>
+                        {% if form.hourly_rate.errors %}
+                        <div class="error-message">
+                            {{ form.hourly_rate.errors }}
+                        </div>
+                        {% endif %}
+                        <div class="help-text">Per hour rate for additional sessions</div>
+                    </div>
+                    
+                    <!-- Payment Mode -->
+                    <div class="form-group">
+                        <label for="{{ form.payment_mode.id_for_label }}" class="form-label">
+                            Payment Mode *
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.payment_mode }}
+                            <div class="input-icon"></div>
+                        </div>
+                        {% if form.payment_mode.errors %}
+                        <div class="error-message">
+                            {{ form.payment_mode.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Capacity & Performance -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon"></div>
+                <h2 class="section-title">Capacity & Performance</h2>
+            </div>
+            <div class="section-content">
+                <div class="form-grid">
+                    <!-- Max Students -->
+                    <div class="form-group">
+                        <label for="{{ form.max_students.id_for_label }}" class="form-label">
+                            Max Students *
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.max_students }}
+                            <div class="input-icon"></div>
+                        </div>
+                        {% if form.max_students.errors %}
+                        <div class="error-message">
+                            {{ form.max_students.errors }}
+                        </div>
+                        {% endif %}
+                        <div class="help-text">Maximum number of students this trainer can handle</div>
+                    </div>
+                    
+                    <!-- Performance Rating -->
+                    <div class="form-group">
+                        <label for="{{ form.performance_rating.id_for_label }}" class="form-label">
+                            Performance Rating
+                        </label>
+                        <div class="rating-container">
+                            {{ form.performance_rating }}
+                            <div class="rating-slider">
+                                <input type="range" min="0" max="5" step="0.5" 
+                                       value="{{ form.performance_rating.value|default:'0' }}"
+                                       class="rating-slider-input">
+                                <div class="rating-labels">
+                                    <span>0</span>
+                                    <span>1</span>
+                                    <span>2</span>
+                                    <span>3</span>
+                                    <span>4</span>
+                                    <span>5</span>
+                                </div>
+                            </div>
+                            <div class="rating-stars">
+                                {% for i in "12345" %}
+                                <span class="star" data-value="{{ i }}">★</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if form.performance_rating.errors %}
+                        <div class="error-message">
+                            {{ form.performance_rating.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Verification & Status -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon">✅</div>
+                <h2 class="section-title">Verification & Status</h2>
+            </div>
+            <div class="section-content">
+                <div class="checkbox-grid">
+                    <!-- Background Verified -->
+                    <div class="checkbox-card {% if form.background_verified.value %}checked{% endif %}">
+                        <label class="checkbox-label">
+                            <div class="checkbox-header">
+                                <div class="checkbox-icon">🔍</div>
+                                <div class="checkbox-content">
+                                    <h4>Background Verified</h4>
+                                    <p>Trainer's background check completed</p>
+                                </div>
+                            </div>
+                            {{ form.background_verified }}
+                            <span class="custom-checkbox"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Profile Verified -->
+                    <div class="checkbox-card {% if form.profile_verified.value %}checked{% endif %}">
+                        <label class="checkbox-label">
+                            <div class="checkbox-header">
+                                <div class="checkbox-icon">👤</div>
+                                <div class="checkbox-content">
+                                    <h4>Profile Verified</h4>
+                                    <p>Profile details verified and approved</p>
+                                </div>
+                            </div>
+                            {{ form.profile_verified }}
+                            <span class="custom-checkbox"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Is Active -->
+                    <div class="checkbox-card active-status {% if form.is_active.value %}checked{% endif %}">
+                        <label class="checkbox-label">
+                            <div class="checkbox-header">
+                                <div class="checkbox-icon"></div>
+                                <div class="checkbox-content">
+                                    <h4>Active Status</h4>
+                                    <p>Trainer is currently active in the system</p>
+                                </div>
+                            </div>
+                            {{ form.is_active }}
+                            <span class="custom-checkbox"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="reset" class="btn-secondary">
+                <i class="btn-icon">↻</i>
+                Reset
+            </button>
+            <button type="submit" class="btn-primary">
+                <i class="btn-icon"></i>
+                Save Admin Profile
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #0077cc;
+        --light-blue: #e6f2ff;
+        --lighter-blue: #f0f8ff;
+        --blue-hover: #005fa3;
+        --border-color: #d0e7ff;
+        --text-dark: #1a365d;
+        --text-light: #4a5568;
+        --success: #38a169;
+        --warning: #d69e2e;
+        --danger: #e53e3e;
+        --white: #ffffff;
+        --gray-light: #f7fafc;
+        --shadow: 0 4px 12px rgba(0, 119, 204, 0.08);
+        --shadow-hover: 0 8px 24px rgba(0, 119, 204, 0.15);
+    }
+
+    .admin-profile-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--light-blue);
+    }
+
+    .profile-title {
+        color: var(--text-dark);
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .profile-icon {
+        font-size: 32px;
+    }
+
+    .profile-subtitle {
+        color: var(--text-light);
+        margin: 8px 0 0 0;
+        font-size: 16px;
+    }
+
+    .profile-status-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .status-badge.active {
+        background-color: #e6fffa;
+        color: #234e52;
+        border: 1px solid #81e6d9;
+    }
+
+    .status-badge.inactive {
+        background-color: #fed7d7;
+        color: #742a2a;
+        border: 1px solid #fc8181;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-badge.active .status-dot {
+        background-color: #38a169;
+    }
+
+    .status-badge.inactive .status-dot {
+        background-color: #e53e3e;
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+        background: var(--lighter-blue);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    .section-header {
+        background: var(--light-blue);
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .section-icon {
+        font-size: 24px;
+    }
+
+    .section-title {
+        color: var(--text-dark);
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .section-content {
+        padding: 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .required-star {
+        color: var(--danger);
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
+        width: 100%;
+        padding: 12px 16px;
+        padding-left: 44px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: var(--white);
+        color: var(--text-dark);
+    }
+
+    .input-wrapper select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230077cc' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 12px;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        font-size: 18px;
+        color: var(--primary-blue);
+    }
+
+    .currency-prefix {
+        position: absolute;
+        left: 16px;
+        color: var(--primary-blue);
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    }
+
+    .help-text {
+        font-size: 12px;
+        color: var(--text-light);
+        margin-top: 6px;
+        font-style: italic;
+    }
+
+    .error-message {
+        color: var(--danger);
+        font-size: 12px;
+        margin-top: 4px;
+        padding: 4px 8px;
+        background: #fff5f5;
+        border-radius: 4px;
+        border-left: 3px solid var(--danger);
+    }
+
+    .global-error {
+        background: #fff5f5;
+        border: 1px solid #fed7d7;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    /* Rating Slider */
+    .rating-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .rating-slider {
+        position: relative;
+        padding-top: 20px;
+    }
+
+    .rating-slider-input {
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(to right, #fed7d7, #feebc8, #c6f6d5);
+        outline: none;
+        -webkit-appearance: none;
+    }
+
+    .rating-slider-input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--primary-blue);
+        cursor: pointer;
+        border: 3px solid var(--white);
+        box-shadow: 0 2px 8px rgba(0, 119, 204, 0.3);
+    }
+
+    .rating-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-light);
+        margin-top: 4px;
+    }
+
+    .rating-stars {
+        display: flex;
+        gap: 4px;
+        font-size: 24px;
+        color: #e2e8f0;
+        margin-top: 8px;
+    }
+
+    .rating-stars .star.active {
+        color: #f6e05e;
+    }
+
+    /* Checkbox Cards */
+    .checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .checkbox-card {
+        background: var(--white);
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .checkbox-card:hover {
+        border-color: var(--primary-blue);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .checkbox-card.checked {
+        border-color: var(--primary-blue);
+        background: var(--light-blue);
+    }
+
+    .checkbox-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .checkbox-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .checkbox-icon {
+        font-size: 24px;
+    }
+
+    .checkbox-content h4 {
+        margin: 0;
+        color: var(--text-dark);
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .checkbox-content p {
+        margin: 4px 0 0 0;
+        color: var(--text-light);
+        font-size: 13px;
+    }
+
+    .custom-checkbox {
+        position: relative;
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .checkbox-card.checked .custom-checkbox {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+
+    .checkbox-card.checked .custom-checkbox::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 40px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: var(--primary-blue);
+        color: var(--white);
+    }
+
+    .btn-primary:hover {
+        background: var(--blue-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .btn-secondary {
+        background: var(--gray-light);
+        color: var(--text-dark);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background: #edf2f7;
+    }
+
+    .btn-icon {
+        font-size: 18px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .admin-profile-container {
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .profile-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .checkbox-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+    // Initialize rating slider and stars
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingInput = document.querySelector('#{{ form.performance_rating.id_for_label }}');
+        const ratingSlider = document.querySelector('.rating-slider-input');
+        const stars = document.querySelectorAll('.rating-stars .star');
+        
+        if (ratingSlider && ratingInput) {
+            // Set initial value
+            const initialValue = parseFloat(ratingInput.value) || 0;
+            ratingSlider.value = initialValue;
+            updateStars(initialValue);
+            
+            // Update input when slider changes
+            ratingSlider.addEventListener('input', function() {
+                ratingInput.value = this.value;
+                updateStars(this.value);
+            });
+            
+            // Update slider when input changes
+            ratingInput.addEventListener('input', function() {
+                ratingSlider.value = this.value;
+                updateStars(this.value);
+            });
+            
+            // Star click functionality
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseFloat(this.dataset.value);
+                    ratingInput.value = value;
+                    ratingSlider.value = value;
+                    updateStars(value);
+                });
+            });
+        }
+        
+        function updateStars(value) {
+            stars.forEach((star, index) => {
+                const starValue = index + 1;
+                if (starValue <= value) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+        
+        // Checkbox card click functionality
+        document.querySelectorAll('.checkbox-card').forEach(card => {
+            const checkbox = card.querySelector('input[type="checkbox"]');
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('a')) {
+                    checkbox.checked = !checkbox.checked;
+                    if (checkbox.checked) {
+                        card.classList.add('checked');
+                    } else {
+                        card.classList.remove('checked');
+                    }
+                    // Trigger change event
+                    const event = new Event('change', { bubbles: true });
+                    checkbox.dispatchEvent(event);
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

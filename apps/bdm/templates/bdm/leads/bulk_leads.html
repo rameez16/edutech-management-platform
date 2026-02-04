@@ -1,0 +1,620 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block title %}Bulk Lead Actions | CRM Admin{% endblock %}
+
+{% block page_title %}
+Bulk Lead Actions
+{% endblock %}
+
+{% block page_subtitle %}
+Select and manage multiple leads at once
+{% endblock %}
+
+{% block extra_css %}
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Scoped styles - only affect content within .bulk-leads-wrapper */
+        .bulk-leads-wrapper {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .bulk-leads-wrapper * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .bulk-leads-wrapper {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --accent: #0ea5e9;
+            --accent-dark: #0284c7;
+            --success: #10b981;
+            --success-light: #34d399;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --purple: #8b5cf6;
+            --bg: #f0f9ff;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --border: #cbd5e1;
+        }
+
+        .bulk-leads-wrapper .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+        }
+
+        /* Back Button */
+        .bulk-leads-wrapper .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .bulk-leads-wrapper .back-button:hover {
+            gap: 0.75rem;
+            color: var(--primary-dark);
+        }
+
+        /* Bulk Header */
+        .bulk-leads-wrapper .bulk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+            border: 1px solid var(--border);
+        }
+
+        .bulk-leads-wrapper .bulk-header h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bulk-leads-wrapper .bulk-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .bulk-leads-wrapper .bulk-actions select {
+            padding: 0.625rem 0.875rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            font-size: 0.8125rem;
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+        }
+
+        .bulk-leads-wrapper .bulk-actions select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .bulk-leads-wrapper .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .bulk-leads-wrapper .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .bulk-leads-wrapper .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent-dark));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+        }
+
+        .bulk-leads-wrapper .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .bulk-leads-wrapper .btn-secondary:hover {
+            background: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Selection Info */
+        .bulk-leads-wrapper .selection-info {
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.08));
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+            border-left: 3px solid var(--primary);
+        }
+
+        .bulk-leads-wrapper .selection-info i {
+            color: var(--primary);
+        }
+
+        .bulk-leads-wrapper .selection-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.625rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Leads Table */
+        .bulk-leads-wrapper .leads-table-wrapper {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+            border: 1px solid var(--border);
+        }
+
+        .bulk-leads-wrapper .leads-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bulk-leads-wrapper .leads-table th,
+        .bulk-leads-wrapper .leads-table td {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            font-size: 0.8125rem;
+        }
+
+        .bulk-leads-wrapper .leads-table thead {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.08));
+            border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .bulk-leads-wrapper .leads-table th {
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+        }
+
+        .bulk-leads-wrapper .leads-table td {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bulk-leads-wrapper .leads-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .bulk-leads-wrapper .leads-table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.03);
+        }
+
+        /* Checkbox Styling */
+        .bulk-leads-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        /* Status Badge */
+        .bulk-leads-wrapper .status-badge {
+            display: inline-flex;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+       .status-badge.new {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--info);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.status-badge.assigned {
+    background: rgba(249, 115, 22, 0.1); /* light orange background */
+    color:  #f97316; /* orange text */
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+        .bulk-leads-wrapper .status-badge.follow-up {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .bulk-leads-wrapper .status-badge.converted {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .bulk-leads-wrapper .status-badge.lost {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Hidden class */
+        .bulk-leads-wrapper .hidden {
+            display: none;
+        }
+
+        /* Stats Summary */
+        .bulk-leads-wrapper .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bulk-leads-wrapper .stat-box {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .bulk-leads-wrapper .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        .bulk-leads-wrapper .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
+        .bulk-leads-wrapper .stat-details h4 {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .bulk-leads-wrapper .stat-details p {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-top: 0.25rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bulk-leads-wrapper .container {
+                padding: 1rem 0.75rem;
+            }
+
+            .bulk-leads-wrapper .bulk-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .bulk-leads-wrapper .bulk-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .bulk-leads-wrapper .bulk-actions select,
+            .bulk-leads-wrapper .bulk-actions .btn {
+                width: 100%;
+            }
+
+            .bulk-leads-wrapper .leads-table-wrapper {
+                overflow-x: auto;
+            }
+
+            .bulk-leads-wrapper .leads-table {
+                min-width: 700px;
+            }
+
+            .bulk-leads-wrapper .stats-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        
+    </style>
+{% endblock %}
+
+{% block page_actions %}
+    <a href="{% url 'leads' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Back to Leads
+    </a>
+{% endblock %}
+
+{% block breadcrumbs %}
+
+<a href="{% url 'leads' %}">Leads</a>
+
+<span>Bulk Actions</span>
+{% endblock %}
+
+{% block content %}
+
+
+{% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
+<div class="bulk-leads-wrapper">
+    <div class="container">
+        
+        <!-- Stats Summary -->
+        <div class="stats-summary">
+            <div class="stat-box">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-details">
+                    <h4>Total Leads</h4>
+                    <p>{{ leads.count }}</p>
+                </div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">
+                    <i class="fas fa-check-square"></i>
+                </div>
+                <div class="stat-details">
+                    <h4>Selected</h4>
+                    <p id="selectedCount">0</p>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'bulk_action' %}" id="bulkForm">
+            {% csrf_token %}
+            
+            <!-- Bulk Header -->
+            <div class="bulk-header">
+                <h2>
+                    <i class="fas fa-tasks"></i>
+                    Bulk Lead Actions
+                </h2>
+
+                <div class="bulk-actions">
+                    <select name="bulk_action" id="bulkAction" required>
+                        <option value="">Select Action</option>
+                        <option value="assign">Assign to Telecaller</option>
+                        <option value="converted">Update Status → Converted</option>
+                        <option value="lost">Mark as Lost</option>
+                    </select>
+
+                    <select name="telecaller" id="telecallerSelect" class="hidden">
+                        <option value="">Select Telecaller</option>
+                        {% for user in telecallers %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i>
+                        Apply Action
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selection Info -->
+            <div class="selection-info" id="selectionInfo" style="display: none;">
+                <i class="fas fa-info-circle"></i>
+                <span id="selectionText">
+                    <span class="selection-count">0</span> lead(s) selected
+                </span>
+            </div>
+
+            <!-- Leads Table -->
+            <div class="leads-table-wrapper">
+                <table class="leads-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll">
+                            </th>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Email</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                            <th>Mode</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="lead_ids" value="{{ lead.id }}" class="lead-checkbox">
+                            </td>
+                            <td><strong>{{ lead.name }}</strong></td>
+                            <td>{{ lead.phone }}</td>
+                            <td>{{ lead.email }}</td>
+                            <td>{{ lead.preferred_course|default:"—" }}</td>
+                            <td>
+                                <span class="status-badge {{ lead.status }}">
+                                    {{ lead.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ lead.get_mode_display }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-light);">
+                                <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                                No leads available
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const bulkAction = document.getElementById("bulkAction");
+    const telecallerSelect = document.getElementById("telecallerSelect");
+    const selectAll = document.getElementById("selectAll");
+    const leadCheckboxes = document.querySelectorAll(".lead-checkbox");
+    const selectionInfo = document.getElementById("selectionInfo");
+    const selectedCount = document.getElementById("selectedCount");
+    const selectionCountSpan = document.querySelector(".selection-count");
+    const bulkForm = document.getElementById("bulkForm");
+
+    // Show/hide telecaller select based on action
+    bulkAction.addEventListener("change", () => {
+        telecallerSelect.classList.toggle(
+            "hidden",
+            bulkAction.value !== "assign"
+        );
+        
+        // Make telecaller required only when assign action is selected
+        if (bulkAction.value === "assign") {
+            telecallerSelect.setAttribute("required", "required");
+        } else {
+            telecallerSelect.removeAttribute("required");
+        }
+    });
+
+    // Select all functionality
+    selectAll.addEventListener("change", function () {
+        leadCheckboxes.forEach(cb => {
+            cb.checked = this.checked;
+        });
+        updateSelectionCount();
+    });
+
+    // Update selection count when individual checkboxes change
+    leadCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", updateSelectionCount);
+    });
+
+    // Function to update selection count
+    function updateSelectionCount() {
+        const checkedCount = document.querySelectorAll('.lead-checkbox:checked').length;
+        selectedCount.textContent = checkedCount;
+        selectionCountSpan.textContent = checkedCount;
+        
+        // Show/hide selection info
+        if (checkedCount > 0) {
+            selectionInfo.style.display = "flex";
+        } else {
+            selectionInfo.style.display = "none";
+        }
+        
+        // Update "Select All" checkbox state
+        selectAll.checked = checkedCount === leadCheckboxes.length && checkedCount > 0;
+    }
+
+    // Form validation before submit
+    bulkForm.addEventListener("submit", function(e) {
+        const checkedCount = document.querySelectorAll('.lead-checkbox:checked').length;
+        const action = bulkAction.value;
+        
+        if (checkedCount === 0) {
+            e.preventDefault();
+            alert("Please select at least one lead to perform bulk action.");
+            return false;
+        }
+        
+        if (!action) {
+            e.preventDefault();
+            alert("Please select an action to perform.");
+            return false;
+        }
+        
+        // Confirm destructive actions
+        if (action === "lost") {
+            if (!confirm(`Are you sure you want to mark ${checkedCount} lead(s) as lost?`)) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        if (action === "converted") {
+            if (!confirm(`Are you sure you want to convert ${checkedCount} lead(s)?`)) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    // Initialize selection count on page load
+    updateSelectionCount();
+
+bulkForm.addEventListener("submit", function (e) {
+    const action = bulkAction.value;
+    const count = document.querySelectorAll(".lead-checkbox:checked").length;
+
+    if (!confirm(`Are you sure you want to ${action} ${count} leads?`)) {
+        e.preventDefault();
+    }
+});
+
+
+</script>
+{% endblock %}

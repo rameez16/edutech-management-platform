@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 
@@ -65,7 +66,7 @@ class FeePayment(models.Model):
     
     # Additional
     remarks = models.TextField(blank=True)
-    received_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, 
+    received_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, 
                                    related_name='received_payments')
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -132,7 +133,7 @@ class StudentDocument(models.Model):
     # Verification
     verification_status = models.CharField(max_length=15, choices=VerificationStatus.choices, 
                                           default=VerificationStatus.PENDING)
-    verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    verified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='verified_documents')
     verified_at = models.DateTimeField(null=True, blank=True)
     rejection_reason = models.TextField(blank=True)
@@ -144,7 +145,7 @@ class StudentDocument(models.Model):
         ordering = ['-uploaded_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.document_type} - {self.verification_status}"
+     return f"{self.student} - {self.document_type} ({self.verification_status})"
 
 class EnrollmentAgreement(models.Model):
     """Enrollment letter/agreement signed by student"""
@@ -174,7 +175,7 @@ class EnrollmentAgreement(models.Model):
     agreement_file = models.FileField(upload_to='enrollment_agreements/', null=True, blank=True)
     
     # Approval
-    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     approval_date = models.DateTimeField(null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -352,7 +353,7 @@ class CertificationRequest(models.Model):
     # Processing
     is_processed = models.BooleanField(default=False)
     processed_at = models.DateTimeField(null=True, blank=True)
-    processed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    processed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         ordering = ['-form_submitted_at']
@@ -457,7 +458,7 @@ class PlacementDrive(models.Model):
     status = models.CharField(max_length=15, choices=DriveStatus.choices, default=DriveStatus.SCHEDULED)
     
     # Coordinator
-    coordinator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+    coordinator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                                    related_name='coordinated_drives')
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -576,7 +577,7 @@ class BookIssue(models.Model):
     damage_charge = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     
     # Library staff
-    issued_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+    issued_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                                  related_name='issued_books')
     
     remarks = models.TextField(blank=True)

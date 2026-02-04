@@ -20,5 +20,9 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('password/', views.password, name='password'),
                path('QR_pay/', views.QR_pay, name='QR_pay'),
                path('installments_qr/', views.installments_qr, name='installments_qr'),
+               path('stud_onboard/',views.onboard,name='stud_onboard'),
+               path('stud_upload/',views.upload,name='stud_upload'),
+               
+               
                
 ]

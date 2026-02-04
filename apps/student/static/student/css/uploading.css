@@ -1,0 +1,165 @@
+/* ======================================
+   STUDENT ONBOARDING – DOCUMENT UPLOAD
+====================================== */
+
+.student-onboarding {
+    width: 100%;
+    padding: 0;
+}
+
+/* Upload card */
+.onboarding-card {
+    width: 100%;
+    padding: 28px 32px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* Header */
+.onboarding-card h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.instruction {
+    font-size: 14px;
+    color: #6b6b6b;
+    margin-bottom: 22px;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+}
+
+th {
+    text-align: left;
+    font-size: 13px;
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+td {
+    padding: 14px 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    vertical-align: top;
+}
+
+.subtext {
+    font-size: 12px;
+    color: #777;
+}
+
+/* Status badges */
+.status {
+    padding: 5px 14px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status.pending {
+    background: rgba(166, 107, 75, 0.15);
+    color: #a66b4b;
+}
+
+.status.optional {
+    background: rgba(0, 0, 0, 0.12);
+    color: #444;
+}
+
+/* ===== FILE UPLOAD FIX ===== */
+.file-upload input {
+    display: none;
+}
+
+.upload-btn {
+    display: inline-block;
+    background: #1f1f1f;
+    color: #fff;
+    padding: 8px 18px;
+    font-size: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.upload-btn:hover {
+    background: #000;
+}
+
+.file-info {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #777;
+}
+
+/* Buttons */
+.buttons {
+    display: flex;
+    gap: 14px;
+}
+
+.submit-btn {
+    background: #4169e1;
+    color: #fff;
+    padding: 11px 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #5a5a5a;
+    color: #fff;
+    padding: 11px 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Warning */
+.warning {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #d9534f;
+}
+
+.selected-files {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #444;
+    word-break: break-word;
+}
+
+.status.uploaded {
+    background: #e6f4ea;
+    color: #1e7f43;
+}
+
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    table, thead, tbody, tr, td, th {
+        font-size: 13px;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+
+    .submit-btn,
+    .cancel-btn {
+        width: 100%;
+    }
+}

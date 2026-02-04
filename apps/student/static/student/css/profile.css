@@ -1,6 +1,5 @@
 /* ===============================
    GLOBAL
-================================ */
 * {
     box-sizing: border-box;
     font-family: inherit;
@@ -8,7 +7,6 @@
 
 /* ===============================
    FORCE HIDE FILE INPUT
-================================ */
 input[type="file"],
 .hidden-file-input {
     display: none !important;
@@ -20,7 +18,6 @@ input[type="file"],
 
 /* ===============================
    MAIN CONTENT
-================================ */
 .main-content {
     padding: 30px;
     width: 100%;
@@ -28,7 +25,6 @@ input[type="file"],
 
 /* ===============================
    PAGE HEADER
-================================ */
 .page-header h2 {
     margin-bottom: 15px;
     text-align: center;
@@ -37,7 +33,6 @@ input[type="file"],
 
 /* ===============================
    TABS
-================================ */
 .tabs {
     display: flex;
     justify-content: center;   /* 👈 CENTER TABS */
@@ -60,7 +55,6 @@ input[type="file"],
 
 /* ===============================
    PROFILE CARD (VISUAL CENTER FIX)
-================================ */
 .profile-card {
     background: #ffffff;
     border-radius: 18px;
@@ -76,7 +70,6 @@ input[type="file"],
 
 /* ===============================
    PROFILE HEADER
-================================ */
 .profile-header {
     display: flex;
     align-items: center;
@@ -86,7 +79,6 @@ input[type="file"],
 
 /* ===============================
    PROFILE IMAGE
-================================ */
 .profile-pic-wrapper {
     position: relative;
     width: 100px;
@@ -119,7 +111,6 @@ input[type="file"],
 
 /* ===============================
    PROFILE NAME
-================================ */
 .profile-name-block h3 {
     margin: 0;
 }
@@ -131,7 +122,6 @@ input[type="file"],
 
 /* ===============================
    SECTION TITLES
-================================ */
 .section-title {
     margin: 30px 0 15px;
     font-size: 16px;
@@ -142,7 +132,6 @@ input[type="file"],
 
 /* ===============================
    FORM LAYOUT
-================================ */
 .form-row {
     display: flex;
     gap: 15px;
@@ -161,7 +150,6 @@ input[type="file"],
 
 /* ===============================
    INPUTS
-================================ */
 label {
     font-size: 13px;
     font-weight: 600;
@@ -185,7 +173,6 @@ textarea {
 
 /* ===============================
    FORM ACTIONS
-================================ */
 .form-actions {
     text-align: right;
     margin-top: 25px;
@@ -207,7 +194,6 @@ textarea {
 
 /* ===============================
    RESPONSIVE FIX
-================================ */
 @media (max-width: 768px) {
     .profile-card {
         transform: none; /* reset on mobile */
@@ -266,4 +252,184 @@ textarea {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
+/* ================================
+   STUDENT PROFILE MODULE
+
+/* Root wrapper fills base content */
+.student-profile {
+    width: 90%;
+    max-width: 100%;
+    padding: 0;  /* base.html already has padding */
+    margin: 0;
+}
+
+/* Header */
+.profile-header {
+    margin-bottom: 24px;
+    height: 180px;
+}
+
+.profile-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* PROFILE CARD */
+.profile-card {
+    width: 100%;
+    padding: 28px 32px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* TOP SECTION */
+.profile-top {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.avatar-section {
+    flex-shrink: 0;
+}
+
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.03);
+}
+
+.avatar-icon {
+    width: 50px;
+    height: 50px;
+    color: #777;
+}
+
+.profile-identity {
+    flex: 1;
+}
+
+.student-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.student-id {
+    font-size: 14px;
+    color: #777;
+    margin: 0;
+}
+
+/* PROFILE FORM */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-left: 100px;
+}
+
+.form-group {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    align-items: center;
+    gap: 16px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input {
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #333;
+    width: 80%;
+}
+
+.form-group input[readonly] {
+    color: #777;
+    cursor: default;
+}
+
+/* FORM ACTIONS */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    gap: 12px;
+}
+
+/* BUTTONS */
+.btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: white;
+}
+
+.btn.secondary {
+    background: #5a5a5a;
+    color: white;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .profile-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .form-group {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+    }
+
+    .avatar-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .student-name {
+        font-size: 18px;
+    }
 }

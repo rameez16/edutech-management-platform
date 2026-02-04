@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="{% static 'student/css/templatemo-daynight-style.css' %}">
     <link rel="stylesheet" href="{% static 'student/css/custom.css' %}">
 
+
+
     <!--
 
 TemplateMo 607 Glass Admin
@@ -19,6 +21,9 @@ TemplateMo 607 Glass Admin
 https://templatemo.com/tm-607-glass-admin
 
 -->
+{% block extra_css %}{% endblock %}
+
+
 </head>
 <body>
     <!-- Animated Background -->
@@ -40,7 +45,7 @@ https://templatemo.com/tm-607-glass-admin
                     <span class="nav-section-title">Main Menu</span>
                     <ul>
                         <li class="nav-item">
-                            <a href="index.html" class="nav-link active">
+                            <a href="{% url 'stud_dashboard' %}" class="nav-link active">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="3" width="7" height="7" rx="1"/>
                                     <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -184,7 +189,7 @@ https://templatemo.com/tm-607-glass-admin
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="onboarding.html" class="nav-link">
+                            <a href="{% url 'stud_onboard' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                     <polyline points="7 10 12 15 17 10"/>
@@ -223,14 +228,10 @@ https://templatemo.com/tm-607-glass-admin
                     <span class="nav-section-title">Account</span>
                     <ul>
                         <li class="nav-item">
-                            <a href="login.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                    <polyline points="16 17 21 12 16 7"/>
-                                    <line x1="21" y1="12" x2="9" y2="12"/>
-                                </svg>
-                                Logout
-                            </a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit">Logout</button>
+                            </form>
                         </li>
                     </ul>
                 </li>
@@ -249,7 +250,7 @@ https://templatemo.com/tm-607-glass-admin
 
         <script src="{% static 'student/js/templatemo-glass-admin-script.js' %}"></script>
     </div>
-        
+        {% block extra_js %}{% endblock %}
     </body>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'student/js/custom.js' %}"></script>
