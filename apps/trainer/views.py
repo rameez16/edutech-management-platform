@@ -86,3 +86,6 @@ def student_detail_view(request, batch_id, student_id):
         "active_tab": "students",
     }
     return render(request, "trainer/mybatches/student_detail.html", context)
+
+
+

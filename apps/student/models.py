@@ -1,18 +1,16 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
-
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.utils import timezone
 
-
 # =============================================
 # FINANCIAL MODELS
 # =============================================
-
 
 
 class FeePayment(models.Model):
@@ -68,7 +66,7 @@ class FeePayment(models.Model):
     
     # Additional
     remarks = models.TextField(blank=True)
-    received_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, 
+    received_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, 
                                    related_name='received_payments')
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -98,7 +96,6 @@ class FeePayment(models.Model):
             'course_fee': student.selected_course.course_fee,
             'balance': student.selected_course.course_fee - total_paid
         }
-
 
 # =============================================
 # ONBOARDING MODELS
@@ -136,7 +133,7 @@ class StudentDocument(models.Model):
     # Verification
     verification_status = models.CharField(max_length=15, choices=VerificationStatus.choices, 
                                           default=VerificationStatus.PENDING)
-    verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    verified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='verified_documents')
     verified_at = models.DateTimeField(null=True, blank=True)
     rejection_reason = models.TextField(blank=True)
@@ -148,8 +145,7 @@ class StudentDocument(models.Model):
         ordering = ['-uploaded_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.document_type} - {self.verification_status}"
-
+     return f"{self.student} - {self.document_type} ({self.verification_status})"
 
 class EnrollmentAgreement(models.Model):
     """Enrollment letter/agreement signed by student"""
@@ -179,14 +175,13 @@ class EnrollmentAgreement(models.Model):
     agreement_file = models.FileField(upload_to='enrollment_agreements/', null=True, blank=True)
     
     # Approval
-    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     approval_date = models.DateTimeField(null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return f"{self.student.name} - {self.agreement_number}"
-
 
 class StudentIDCard(models.Model):
     """Student ID card details"""
@@ -215,7 +210,6 @@ class StudentIDCard(models.Model):
     
     def __str__(self):
         return f"{self.student.name} - {self.card_number}"
-
 
 # =============================================
 # ACADEMIC OPERATIONS MODELS
@@ -271,7 +265,6 @@ class LeaveApplication(models.Model):
             self.total_days = (self.to_date - self.from_date).days + 1
         super().save(*args, **kwargs)
 
-
 class StudentFeedback(models.Model):
     """Student feedback on trainers, courses, sessions"""
     
@@ -326,7 +319,6 @@ class StudentFeedback(models.Model):
     def __str__(self):
         return f"{self.student.name if not self.is_anonymous else 'Anonymous'} - {self.feedback_type} - {self.overall_rating}★"
 
-
 # =============================================
 # CERTIFICATION MODELS
 # =============================================
@@ -361,14 +353,13 @@ class CertificationRequest(models.Model):
     # Processing
     is_processed = models.BooleanField(default=False)
     processed_at = models.DateTimeField(null=True, blank=True)
-    processed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    processed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         ordering = ['-form_submitted_at']
     
     def __str__(self):
         return f"{self.student.name} - Certification Request"
-
 
 # =============================================
 # PLACEMENT MODELS
@@ -427,7 +418,6 @@ class PlacementProfile(models.Model):
     def __str__(self):
         return f"{self.student.name} - Placement Profile"
 
-
 class PlacementDrive(models.Model):
     """Placement drives organized by the institute"""
     
@@ -468,7 +458,7 @@ class PlacementDrive(models.Model):
     status = models.CharField(max_length=15, choices=DriveStatus.choices, default=DriveStatus.SCHEDULED)
     
     # Coordinator
-    coordinator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+    coordinator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                                    related_name='coordinated_drives')
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -479,7 +469,6 @@ class PlacementDrive(models.Model):
     
     def __str__(self):
         return f"{self.company_name} - {self.job_role} - {self.drive_date}"
-
 
 class PlacementApplication(models.Model):
     """Student applications for placement drives"""
@@ -530,7 +519,6 @@ class PlacementApplication(models.Model):
     def __str__(self):
         return f"{self.student.name} - {self.placement_drive.company_name} - {self.status}"
 
-
 # =============================================
 # LEARNING RESOURCE MODELS
 # =============================================
@@ -558,7 +546,6 @@ class LMSAccess(models.Model):
     
     def __str__(self):
         return f"{self.student.name} - LMS Access"
-
 
 class BookIssue(models.Model):
     """Track books issued to students"""
@@ -590,7 +577,7 @@ class BookIssue(models.Model):
     damage_charge = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     
     # Library staff
-    issued_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+    issued_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                                  related_name='issued_books')
     
     remarks = models.TextField(blank=True)
@@ -610,3 +597,4 @@ class BookIssue(models.Model):
         if self.status == self.BookStatus.ISSUED:
             return timezone.now().date() > self.expected_return_date
         return False
+
