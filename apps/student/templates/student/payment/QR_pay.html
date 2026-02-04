@@ -1,14 +1,14 @@
-{% extends 'layout/base.html' %}
+{% extends 'student/layout/base.html' %}
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'student/css/install_qr.css' %}">
+<link rel="stylesheet" href="{% static 'student/css/QR_pay.css' %}">
 
 <div class="main-content qr-main">
 
     <div class="qr-card">
 
-        <h2 class="qr-title">Scan & Pay your Installments</h2>
+        <h2 class="qr-title">Scan & Pay (PDC)</h2>
 
         <!-- QR CODE -->
         <div class="qr-image">
@@ -17,12 +17,8 @@
 
         <!-- DETAILS -->
         <div class="qr-info">
-            <p><strong>Installment1</strong> ₹5,000</p>
+            <p><strong>Amount:</strong> ₹2,000</p>
             <p><strong>Due Date:</strong> 10-Mar-2026</p>
-            <p><strong>Installment2</strong> ₹25,000</p>
-              <p><strong>Due Date:</strong> 30-Mar-2026</p>
-              <p><strong>Installment3</strong> ₹20000</p>
-                <p><strong>Due Date:</strong> 10-April-2026</p>
         </div>
 
         <!-- RECEIPT UPLOAD -->
@@ -36,7 +32,7 @@
         </form>
 
         <!-- BACK -->
-        <a href="{% url 'payment' %}" class="back-btn">← Back to home</a>
+        <a href="{% url 'pdc' %}" class="back-btn">← Back to PDC</a>
 
     </div>
 

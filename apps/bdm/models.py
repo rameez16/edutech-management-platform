@@ -647,6 +647,7 @@ class OnboardingChecklist(models.Model):
     
     # Payment
     booking_fee_paid = models.BooleanField(default=False)
+    admission_fee_paid= models.BooleanField(default=False)
     payment_plan_created = models.BooleanField(default=False)
     
     # Enrollment
