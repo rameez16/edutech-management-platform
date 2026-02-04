@@ -26,6 +26,8 @@ urlpatterns = [
     path('',include('apps.bdm.urls')),
     path('',include('apps.trainer.urls')),
     path('',include('apps.student.urls')),
+   
+
     path('', include('apps.landing_page.urls')),
     path('', include('apps.accounts.urls')),
 ]

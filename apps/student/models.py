@@ -3,17 +3,14 @@ from django.conf import settings
 
 # Create your models here.
 
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.utils import timezone
 
-
 # =============================================
 # FINANCIAL MODELS
 # =============================================
-
 
 
 class FeePayment(models.Model):
@@ -100,7 +97,6 @@ class FeePayment(models.Model):
             'balance': student.selected_course.course_fee - total_paid
         }
 
-
 # =============================================
 # ONBOARDING MODELS
 # =============================================
@@ -151,7 +147,6 @@ class StudentDocument(models.Model):
     def __str__(self):
      return f"{self.student} - {self.document_type} ({self.verification_status})"
 
-
 class EnrollmentAgreement(models.Model):
     """Enrollment letter/agreement signed by student"""
     
@@ -188,7 +183,6 @@ class EnrollmentAgreement(models.Model):
     def __str__(self):
         return f"{self.student.name} - {self.agreement_number}"
 
-
 class StudentIDCard(models.Model):
     """Student ID card details"""
     
@@ -216,7 +210,6 @@ class StudentIDCard(models.Model):
     
     def __str__(self):
         return f"{self.student.name} - {self.card_number}"
-
 
 # =============================================
 # ACADEMIC OPERATIONS MODELS
@@ -272,7 +265,6 @@ class LeaveApplication(models.Model):
             self.total_days = (self.to_date - self.from_date).days + 1
         super().save(*args, **kwargs)
 
-
 class StudentFeedback(models.Model):
     """Student feedback on trainers, courses, sessions"""
     
@@ -327,7 +319,6 @@ class StudentFeedback(models.Model):
     def __str__(self):
         return f"{self.student.name if not self.is_anonymous else 'Anonymous'} - {self.feedback_type} - {self.overall_rating}★"
 
-
 # =============================================
 # CERTIFICATION MODELS
 # =============================================
@@ -369,7 +360,6 @@ class CertificationRequest(models.Model):
     
     def __str__(self):
         return f"{self.student.name} - Certification Request"
-
 
 # =============================================
 # PLACEMENT MODELS
@@ -428,7 +418,6 @@ class PlacementProfile(models.Model):
     def __str__(self):
         return f"{self.student.name} - Placement Profile"
 
-
 class PlacementDrive(models.Model):
     """Placement drives organized by the institute"""
     
@@ -481,7 +470,6 @@ class PlacementDrive(models.Model):
     def __str__(self):
         return f"{self.company_name} - {self.job_role} - {self.drive_date}"
 
-
 class PlacementApplication(models.Model):
     """Student applications for placement drives"""
     
@@ -531,7 +519,6 @@ class PlacementApplication(models.Model):
     def __str__(self):
         return f"{self.student.name} - {self.placement_drive.company_name} - {self.status}"
 
-
 # =============================================
 # LEARNING RESOURCE MODELS
 # =============================================
@@ -559,7 +546,6 @@ class LMSAccess(models.Model):
     
     def __str__(self):
         return f"{self.student.name} - LMS Access"
-
 
 class BookIssue(models.Model):
     """Track books issued to students"""
@@ -611,3 +597,4 @@ class BookIssue(models.Model):
         if self.status == self.BookStatus.ISSUED:
             return timezone.now().date() > self.expected_return_date
         return False
+
