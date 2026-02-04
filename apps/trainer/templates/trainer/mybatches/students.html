@@ -1,0 +1,40 @@
+{% extends "trainer/mybatches/base.html" %}
+
+{% block tab_content %}
+
+<div class="glass-card">
+    <h4 class="card-title">Students List</h4>
+    <div class="table-wrapper">
+        <table class="data-table students-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.phone }}</td>
+                    <td>
+                        <span class="status-badge {% if student.status == 'Active' %}active{% else %}inactive{% endif %}">
+                            {{ student.status }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'trainer:student-detail' batch_id student.id %}" class="btn btn-sm btn-outline-primary">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}
