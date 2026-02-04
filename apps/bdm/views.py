@@ -1,9 +1,5 @@
-from django.shortcuts import render ,redirect
+from django.shortcuts import get_object_or_404,render,redirect
 from .models import Student, Lead, Course, Batch
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
-from datetime import datetime
-from django.contrib import messages
 
 from .form import  TrainerAdminProfileForm
 
@@ -132,219 +128,23 @@ def dashboard(request):
     return render(request, 'bdm/dashboard/dashboard.html', context)
 
 
-
-# Leads management aleena
-
-def leads(request):
-    leads = Lead.objects.select_related(
-        'preferred_course',
-        'assigned_to'
-    )
-    
-    # Get filter parameters from request
-    status_filter = request.GET.get('status', '')
-    course_filter = request.GET.get('course', '')
-    mode_filter = request.GET.get('mode', '')
-    date_from = request.GET.get('date_from', '')
-    date_to = request.GET.get('date_to', '')
-    search_query = request.GET.get('search', '')
-    
-    # Apply status filter
-    if status_filter:
-        leads = leads.filter(status=status_filter)
-    
-    # Apply course filter
-    if course_filter:
-        leads = leads.filter(preferred_course_id=course_filter)
-    
-    # Apply mode filter
-    if mode_filter:
-        leads = leads.filter(mode=mode_filter)
-    
-    # Apply date range filter
-    if date_from:
-        try:
-            date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
-            leads = leads.filter(enquiry_date__gte=date_from_obj)
-        except ValueError:
-            pass
-    
-    if date_to:
-        try:
-            date_to_obj = datetime.strptime(date_to, '%Y-%m-%d')
-            # Add one day to include the entire end date
-            date_to_obj = date_to_obj + timedelta(days=1)
-            leads = leads.filter(enquiry_date__lt=date_to_obj)
-        except ValueError:
-            pass
-    
-    # Apply search filter (search in name, email, phone)
-    all_leads = Lead.objects.all()
-    filtered_leads = all_leads
-
-    search = request.GET.get("search")
-    status = request.GET.get("status")
-    course = request.GET.get("course")
-    mode = request.GET.get("mode")
-    date_from = request.GET.get("date_from")
-    date_to = request.GET.get("date_to")
-
-    if search:
-        filtered_leads = filtered_leads.filter(
-            Q(name__icontains=search) |
-            Q(email__icontains=search) |
-            Q(phone__icontains=search)
-        )
-
-    if status:
-        filtered_leads = filtered_leads.filter(status=status)
-
-    if course:
-        filtered_leads = filtered_leads.filter(preferred_course_id=course)
-
-    if mode:
-        filtered_leads = filtered_leads.filter(mode=mode)
-
-    if date_from:
-        filtered_leads = filtered_leads.filter(enquiry_date__gte=date_from)
-
-    if date_to:
-        filtered_leads = filtered_leads.filter(enquiry_date__lte=date_to)
-    
-    # Get statistics for the stat cards
-    total_leads = Lead.objects.count()
-    new_leads = Lead.objects.filter(status=Lead.LeadStatus.NEW).count()
-    
-    # Calculate follow-up leads (assigned or idle)
-    followup_leads = Lead.objects.filter(
-        status__in=[Lead.LeadStatus.ASSIGNED, Lead.LeadStatus.IDLE]
-    ).count()
-    
-    converted_leads = Lead.objects.filter(status=Lead.LeadStatus.CONVERTED).count()
-    
-    # Get all courses for the filter dropdown
-    courses = Course.objects.all().order_by('name')
-    
-    # Get choices for filters
-    status_choices = Lead.LeadStatus.choices
-    mode_choices = Lead.ModeChoice.choices
+# Optional: View for lead detail/management
+@login_required
+def lead_detail(request, lead_id):
+    """
+    View for individual lead details
+    """
+    lead = Lead.objects.select_related(
+        'preferred_course', 'assigned_to'
+    ).get(id=lead_id)
     
     context = {
-        'leads': leads,
-        "all_leads": all_leads,               # FULL LIST
-        "leads": all_leads,                   # for All Leads table (unchanged)
-        "filtered_leads": filtered_leads,     # FILTER RESULT TABLE
-        "filtered_count": filtered_leads.count(),
-        'courses': courses,
-        'status_choices': status_choices,
-        'mode_choices': mode_choices,
-        'new_leads_count': new_leads,
-        'followup_leads_count': followup_leads,
-        'converted_leads_count': converted_leads,
-        'total_leads': total_leads,
+        'lead': lead,
     }
     
-    return render(request, 'bdm/leads/leads.html', context)
+    return render(request, 'bdm/lead_detail.html', context)
 
 
-
-
-def lead_details(request, lead_id):
-    lead = get_object_or_404(Lead, id=lead_id)
-    counsellors = User.objects.filter(is_staff=True)
-
-    if request.method == "POST":
-        action = request.POST.get("action")
-
-        if action == "assign":
-            lead.assigned_to_id = request.POST.get("assigned_to")
-            lead.status = "assigned"
-            lead.save()
-
-        elif action == "status":
-            lead.status = request.POST.get("status")
-            lead.save()
-
-        elif action == "convert":
-            lead.status = "converted"
-            lead.save()
-            # later: create admission record here
-
-        elif action == "lost":
-            lead.status = "dropped"
-            lead.save()
-
-        return redirect("lead_details", lead_id=lead.id)
-
-    return render(request, "bdm/leads/lead_details.html", {
-        "lead": lead,
-        "counsellors": counsellors
-    })
-    
-    
-def bulk_leads(request):
-    leads = Lead.objects.all()
-    return render(request, "bdm/leads/bulk_leads.html", {
-        "leads": leads
-        
-    })
-    
-@login_required
-def bulk_action(request):
-    if request.method == "POST":
-        lead_ids = request.POST.getlist("lead_ids")
-        action = request.POST.get("bulk_action")
-
-        if not lead_ids or not action:
-            messages.warning(request, "No leads or action selected.")
-            return redirect("bulk_leads")
-
-        leads = Lead.objects.filter(id__in=lead_ids)
-        count = leads.count()
-
-        if action == "assign":
-            telecaller_id = request.POST.get("telecaller")
-            if not telecaller_id:
-                messages.error(request, "Please select a telecaller.")
-                return redirect("bulk_leads")
-
-            leads.update(
-                assigned_to_id=telecaller_id,
-                status=Lead.LeadStatus.ASSIGNED
-            )
-            messages.success(request, f"{count} leads assigned successfully.")
-
-        elif action == "converted":
-            leads.update(status=Lead.LeadStatus.CONVERTED)
-            messages.success(request, f"{count} leads marked as converted.")
-
-        elif action == "lost":
-            leads.update(status=Lead.LeadStatus.DROPPED)
-            messages.success(request, f"{count} leads marked as lost.")
-
-        return redirect("leads")
-
-def create_lead(request):
-    if request.method == "POST":
-        Lead.objects.create(
-            name=request.POST.get('name'),
-            phone=request.POST.get('phone'),
-            email=request.POST.get('email'),
-            preferred_course_id=request.POST.get('preferred_course') or None,
-            mode=request.POST.get('mode'),
-            notes=request.POST.get('notes', '')
-        )
-    return redirect('leads')
-
-def assign_lead(request):
-    if request.method == "POST":
-        lead = get_object_or_404(Lead, id=request.POST.get('lead_id'))
-        lead.assigned_to_id = request.POST.get('assigned_to')
-        lead.status = Lead.LeadStatus.ASSIGNED  # 🔥 auto status change
-        lead.save()
-
-    return redirect('bdm:leads')
-    return render(request, 'bdm/assign_lead.html', context)
 
 
 
@@ -373,7 +173,7 @@ def create_user(request):
                 pass
 
             messages.success(request, f"User '{user.username}' created successfully")
-            return redirect("user_list")
+            return redirect("bdm:user_list")
 
         messages.error(request, "Please correct the errors below")
 
@@ -392,17 +192,45 @@ def user_list(request):
     })
     
     
-def create_trainer_admin_profile(request):
+def create_admin_profile(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    # ----------------------------
+    # ROUTING BASED ON ROLE
+    # ----------------------------
+    if user.role == "trainer":
+        return create_trainer_admin_profile(request, user)
+
+    elif user.role == "student":
+        return create_student_admin_profile(request, user)
+
+    else:
+        messages.error(request, "Admin profile not supported for this role.")
+        return redirect("bdm:user_list")
+    
+    
+    
+    
+def create_trainer_admin_profile(request, user):
+    trainer = getattr(user, "trainer", None)
+
+    if not trainer:
+        messages.error(request, "Trainer profile not found.")
+        return redirect("user_list")
+
     if request.method == "POST":
         form = TrainerAdminProfileForm(request.POST)
 
         if form.is_valid():
-            admin_profile = form.save()
+            admin_profile = form.save(commit=False)
+            admin_profile.trainer = trainer
+            admin_profile.save()
+
             messages.success(
                 request,
-                f"Admin profile created for {admin_profile.trainer}"
+                f"Trainer admin profile created for {trainer}"
             )
-            return redirect("user_list")  # 👈 your target URL
+            return redirect("bdm:user_list")
 
     else:
         form = TrainerAdminProfileForm()
@@ -410,10 +238,47 @@ def create_trainer_admin_profile(request):
     return render(
         request,
         "bdm/trainer/trainer_profile.html",
-        {"form": form}
-    )    
+        {
+            "form": form,
+            "user": user,
+            "role": "trainer"
+        }
+    )   
     
-    
+def create_student_admin_profile(request, user):
+    student = getattr(user, "student", None)
+
+    if not student:
+        messages.error(request, "Student profile not found.")
+        return redirect("bdm:user_list")
+
+    if request.method == "POST":
+        form = StudentAdminProfileForm(request.POST)
+
+        if form.is_valid():
+            admin_profile = form.save(commit=False)
+            admin_profile.student = student
+            admin_profile.save()
+
+            messages.success(
+                request,
+                f"Student admin profile created for {student}"
+            )
+            return redirect("user_list")
+
+    else:
+        form = StudentAdminProfileForm()
+
+    return render(
+        request,
+        "bdm/student/student_profile.html",
+        {
+            "form": form,
+            "user": user,
+            "role": "student"
+        }
+    )
+   
 
 # def create_user(request):
 #     if request.method == "POST":
@@ -533,3 +398,212 @@ def trainers_tab(request):
     return render(request, "bdm/student_onboarding/trainer_tab.html", {
         "trainers": trainers
     })   
+    
+    
+    
+    
+
+# Leads management aleena
+
+def leads(request):
+    leads = Lead.objects.select_related(
+        'preferred_course',
+        'assigned_to'
+    )
+
+    # Get filter parameters from request
+    status_filter = request.GET.get('status', '')
+    course_filter = request.GET.get('course', '')
+    mode_filter = request.GET.get('mode', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    search_query = request.GET.get('search', '')
+
+    # Apply status filter
+    if status_filter:
+        leads = leads.filter(status=status_filter)
+
+    # Apply course filter
+    if course_filter:
+        leads = leads.filter(preferred_course_id=course_filter)
+
+    # Apply mode filter
+    if mode_filter:
+        leads = leads.filter(mode=mode_filter)
+
+    # Apply date range filter
+    if date_from:
+        try:
+            date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
+            leads = leads.filter(enquiry_date__gte=date_from_obj)
+        except ValueError:
+            pass
+
+    if date_to:
+        try:
+            date_to_obj = datetime.strptime(date_to, '%Y-%m-%d')
+            date_to_obj = date_to_obj + timedelta(days=1)
+            leads = leads.filter(enquiry_date__lt=date_to_obj)
+        except ValueError:
+            pass
+
+    # Apply search filter
+    all_leads = Lead.objects.all()
+    filtered_leads = all_leads
+
+    search = request.GET.get("search")
+    status = request.GET.get("status")
+    course = request.GET.get("course")
+    mode = request.GET.get("mode")
+    date_from = request.GET.get("date_from")
+    date_to = request.GET.get("date_to")
+
+    if search:
+        filtered_leads = filtered_leads.filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search) |
+            Q(phone__icontains=search)
+        )
+
+    if status:
+        filtered_leads = filtered_leads.filter(status=status)
+
+    if course:
+        filtered_leads = filtered_leads.filter(preferred_course_id=course)
+
+    if mode:
+        filtered_leads = filtered_leads.filter(mode=mode)
+
+    if date_from:
+        filtered_leads = filtered_leads.filter(enquiry_date__gte=date_from)
+
+    if date_to:
+        filtered_leads = filtered_leads.filter(enquiry_date__lte=date_to)
+
+    # Stats
+    total_leads = Lead.objects.count()
+    new_leads = Lead.objects.filter(status=Lead.LeadStatus.NEW).count()
+    followup_leads = Lead.objects.filter(
+        status__in=[Lead.LeadStatus.ASSIGNED, Lead.LeadStatus.IDLE]
+    ).count()
+    converted_leads = Lead.objects.filter(
+        status=Lead.LeadStatus.CONVERTED
+    ).count()
+
+    courses = Course.objects.all().order_by('name')
+    status_choices = Lead.LeadStatus.choices
+    mode_choices = Lead.ModeChoice.choices
+
+    context = {
+        "all_leads": all_leads,
+        "filtered_leads": filtered_leads,
+        "filtered_count": filtered_leads.count(),
+        "courses": courses,
+        "status_choices": status_choices,
+        "mode_choices": mode_choices,
+        "new_leads_count": new_leads,
+        "followup_leads_count": followup_leads,
+        "converted_leads_count": converted_leads,
+        "total_leads": total_leads,
+    }
+
+    return render(request, 'bdm/leads/leads.html', context)
+
+
+
+def lead_details(request, lead_id):
+    lead = get_object_or_404(Lead, id=lead_id)
+    counsellors = User.objects.filter(is_staff=True)
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "assign":
+            lead.assigned_to_id = request.POST.get("assigned_to")
+            lead.status = "assigned"
+            lead.save()
+
+        elif action == "status":
+            lead.status = request.POST.get("status")
+            lead.save()
+
+        elif action == "convert":
+            lead.status = "converted"
+            lead.save()
+
+        elif action == "lost":
+            lead.status = "dropped"
+            lead.save()
+
+        return redirect("bdm:lead_details", lead_id=lead.id)
+
+    return render(request, "bdm/leads/lead_details.html", {
+        "lead": lead,
+        "counsellors": counsellors
+    })
+
+
+def bulk_leads(request):
+    leads = Lead.objects.all()
+    return render(request, "bdm/leads/bulk_leads.html", {
+        "leads": leads
+    })
+
+
+@login_required
+def bulk_action(request):
+    if request.method == "POST":
+        lead_ids = request.POST.getlist("lead_ids")
+        action = request.POST.get("bulk_action")
+
+        if not lead_ids or not action:
+            messages.warning(request, "No leads or action selected.")
+            return redirect("bdm:bulk_leads")
+
+        leads = Lead.objects.filter(id__in=lead_ids)
+        count = leads.count()
+
+        if action == "assign":
+            telecaller_id = request.POST.get("telecaller")
+            if not telecaller_id:
+                messages.error(request, "Please select a telecaller.")
+                return redirect("bdm:bulk_leads")
+
+            leads.update(
+                assigned_to_id=telecaller_id,
+                status=Lead.LeadStatus.ASSIGNED
+            )
+            messages.success(request, f"{count} leads assigned successfully.")
+
+        elif action == "converted":
+            leads.update(status=Lead.LeadStatus.CONVERTED)
+            messages.success(request, f"{count} leads marked as converted.")
+
+        elif action == "lost":
+            leads.update(status=Lead.LeadStatus.DROPPED)
+            messages.success(request, f"{count} leads marked as lost.")
+
+        return redirect("bdm:leads")
+
+
+def create_lead(request):
+    if request.method == "POST":
+        Lead.objects.create(
+            name=request.POST.get('name'),
+            phone=request.POST.get('phone'),
+            email=request.POST.get('email'),
+            preferred_course_id=request.POST.get('preferred_course') or None,
+            mode=request.POST.get('mode'),
+            notes=request.POST.get('notes', '')
+        )
+    return redirect('bdm:leads')
+
+
+def assign_lead(request):
+    if request.method == "POST":
+        lead = get_object_or_404(Lead, id=request.POST.get('lead_id'))
+        lead.assigned_to_id = request.POST.get('assigned_to')
+        lead.status = Lead.LeadStatus.ASSIGNED
+        lead.save()
+
+    return redirect('bdm:leads')

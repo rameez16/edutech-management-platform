@@ -773,7 +773,7 @@ View, assign, and manage all leads
 {% endblock %}
 
 {% block breadcrumbs %}
-<a href="{% url 'leads' %}">Leads</a>
+<a href="{% url 'bdm:leads' %}">Leads</a>
 {% endblock %}
 
 {% block content %}
@@ -846,7 +846,7 @@ View, assign, and manage all leads
                 </div>
             </div>
 
-            <form method="GET" action="{% url 'leads' %}" id="filterForm">
+            <form method="GET" action="{% url 'bdm:leads' %}" id="filterForm">
                 <div class="filter-grid">
                     <div class="filter-group">
                         <label class="filter-label">Status</label>
@@ -905,7 +905,7 @@ View, assign, and manage all leads
                 </div>
 
                 <div class="filter-actions">
-                    <a href="{% url 'leads' %}" class="clear-filters">
+                    <a href="{% url 'bdm:leads' %}" class="clear-filters">
                         <i class="fas fa-times"></i> Clear Filters
                     </a>
                     <button type="submit" class="btn btn-primary btn-filter">
@@ -954,7 +954,7 @@ View, assign, and manage all leads
                             <td>{{ lead.enquiry_date|date:"M d, Y" }}</td>
                             <td style="display:flex; gap:0.5rem; flex-wrap:nowrap; align-items:center;">
 
-                                <a href="{% url 'lead_details' lead.id %}" class="btn-view">
+                                <a href="{% url 'bdm:lead_details' lead.id %}" class="btn-view">
                                     <i class="fas fa-eye"></i>
                                     View
                                 </a>
@@ -979,7 +979,7 @@ View, assign, and manage all leads
                 <h2 class="section-title">All Leads</h2>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <span class="results-count">Total Leads: {{ total_leads }}</span>
-                    <a href="{% url 'bulk_leads' %}" class="btn btn-secondary">
+                    <a href="{% url 'bdm:bulk_leads' %}" class="btn btn-secondary">
                         <i class="fas fa-tasks"></i> Bulk Actions
                     </a>
                 </div>
@@ -1015,7 +1015,7 @@ View, assign, and manage all leads
                             <td>{{ lead.enquiry_date|date:"M d, Y" }}</td>
                             <td style="display:flex; gap:0.5rem; flex-wrap:nowrap; align-items:center;">
 
-                                <a href="{% url 'lead_details' lead.id %}" class="btn-view">
+                                <a href="{% url 'bdm:lead_details' lead.id %}" class="btn-view">
                                     <i class="fas fa-eye"></i>
                                     View
                                 </a>
@@ -1041,7 +1041,7 @@ View, assign, and manage all leads
             <button class="close-btn" onclick="closeAssignModal()">×</button>
         </div>
 
-        <form method="post" action="{% url 'assign_lead' %}">
+        <form method="post" action="{% url 'bdm:assign_lead' %}">
             {% csrf_token %}
             <input type="hidden" name="lead_id" id="assignLeadId">
 
@@ -1075,7 +1075,7 @@ View, assign, and manage all leads
             <button class="close-btn" onclick="closeLeadModal()">×</button>
         </div>
 
-        <form method="post" action="{% url 'create_lead' %}">
+        <form method="post" action="{% url 'bdm:create_lead' %}">
             {% csrf_token %}
 
             <div class="form-grid">

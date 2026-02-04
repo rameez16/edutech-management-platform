@@ -1104,7 +1104,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
         <div class="sidebar-content">
             <nav class="sidebar-nav">
-                <a href="{% url 'bdm_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <a href="{% url 'bdm:bdm_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <div class="sidebar-link-icon">
                         <i class="fas fa-tachometer-alt"></i>
                     </div>
@@ -1114,7 +1114,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="sidebar-section">
                     <h4 class="sidebar-section-title">Management</h4>
                     
-                    <a href="{% url 'user_list' %}" class="sidebar-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                    <a href="{% url 'bdm:user_list' %}" class="sidebar-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
                         <div class="sidebar-link-icon">
                             <i class="fas fa-users"></i>
                         </div>
@@ -1160,7 +1160,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <span class="sidebar-link-text">Attendance</span>
                     </a>
                     
-                    <a href="{% url 'student_onboarding' %}" class="sidebar-link {% if 'onboarding' in request.resolver_match.url_name %}active{% endif %}">
+                    <a href="{% url 'bdm:student_onboarding' %}" class="sidebar-link {% if 'onboarding' in request.resolver_match.url_name %}active{% endif %}">
                         <div class="sidebar-link-icon">
                             <i class="fas fa-user-plus"></i>
                         </div>
@@ -1259,7 +1259,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </a>
                     <div class="nav-menu">
                         <div class="nav-item">
-                            <a href="{% url 'bdm_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <a href="{% url 'bdm:bdm_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                                 <i class="fas fa-tachometer-alt"></i>
                                 Dashboard
                             </a>
@@ -1352,7 +1352,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 Settings
                             </a>
                             <div class="dropdown-divider"></div>
-                            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                            <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
                                 {% csrf_token %}
                                 <button type="submit" style="all: unset; cursor: pointer; width: 100%;">
                                     <a href="#" class="logout-btn" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -1379,14 +1379,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
                 <div class="sidebar-content">
                     <nav class="sidebar-nav">
-                        <a href="{% url 'bdm_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <a href="{% url 'bdm:bdm_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                             <div class="sidebar-link-icon">
                                 <i class="fas fa-tachometer-alt"></i>
                             </div>
                             <span class="sidebar-link-text">Dashboard</span>
                         </a>
 
-                        <a href="{% url 'leads' %}" class="sidebar-link {% if 'lead' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'bdm:leads' %}" class="sidebar-link {% if 'lead' in request.resolver_match.url_name %}active{% endif %}">
                             <div class="sidebar-link-icon">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -1404,7 +1404,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="sidebar-section">
                             <h4 class="sidebar-section-title">Management</h4>
 
-                            <a href="{% url 'user_list' %}" class="sidebar-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                            <a href="{% url 'bdm:user_list' %}" class="sidebar-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
                                 <div class="sidebar-link-icon">
                                     <i class="fas fa-users"></i>
                                 </div>
@@ -1464,7 +1464,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </div>
                                 <span class="sidebar-link-text">Attendance</span>
                             </a>
-                            <a href="{% url 'student_onboarding' %}" class="sidebar-link {% if 'onboarding' in request.resolver_match.url_name %}active{% endif %}">
+                            <a href="{% url 'bdm:student_onboarding' %}" class="sidebar-link {% if 'onboarding' in request.resolver_match.url_name %}active{% endif %}">
                                 <div class="sidebar-link-icon">
                                     <i class="fas fa-user-plus"></i>
                                 </div>
@@ -1582,7 +1582,7 @@ document.addEventListener("DOMContentLoaded", function () {
                  </div>
               
                 <nav class="breadcrumbs">
-                    <a href="{% url 'bdm_dashboard' %}">
+                    <a href="{% url 'bdm:bdm_dashboard' %}">
                         <i class="fas fa-home"></i> Home
                     </a>
                     {% block breadcrumbs %}{% endblock %}
