@@ -31,18 +31,27 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'apps.student.apps.StudentConfig',
-    'apps.landing_page.apps.LandingPageConfig',
-    'apps.bdm.apps.BdmConfig',
-    'apps.trainer.apps.TrainerConfig',
-    'apps.accounts.apps.AccountsConfig',
-    'apps.test_app.apps.TestAppConfig',
+    # Django core
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Custom auth (ALWAYS early)
+    'apps.accounts.apps.AccountsConfig',
+
+    # Apps that depend on accounts / user
+    'apps.student.apps.StudentConfig',
+    'apps.trainer.apps.TrainerConfig',
+    'apps.bdm.apps.BdmConfig',
+
+    # Independent apps
+    'apps.landing_page.apps.LandingPageConfig',
+
+    # Experimental / testing
+    'apps.test_app.apps.TestAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -105,23 +114,6 @@ DATABASES = {
 }
 
 
-
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default=os.environ.get('DATABASE_URL'),
-#         conn_max_age=600,
-#         conn_health_checks=True,
-#     )
-# }
-
-# Fallback to SQLite for local development
-#if not os.environ.get('DATABASE_URL'):
-DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
 
 
 
