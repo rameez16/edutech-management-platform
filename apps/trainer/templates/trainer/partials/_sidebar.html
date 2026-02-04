@@ -123,10 +123,10 @@
             </a>
         </li>
 
-        {% comment %} <form method="post" action="{% url 'logout' %}">
+        <form method="post" action="{% url 'accounts:logout' %}">
             {% csrf_token %}
             <button type="submit">Logout</button>
-        </form> {% endcomment %}
+        </form>
 
     </ul>
 </aside>
