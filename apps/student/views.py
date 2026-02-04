@@ -23,7 +23,7 @@ from apps.bdm.models import Student
 def dashboard(request):
     """Simple dashboard"""
     
-    return render(request, 'dashboard/dashboard.html')
+    return render(request, 'student/dashboard/dashboard.html')
     
 
 
@@ -112,7 +112,7 @@ def payment(request):
         'payment_status': payment_status,
     }
 
-    return render(request, 'payment/payment.html', context)
+    return render(request, 'student/payment/payment.html', context)
 
 
 
@@ -164,11 +164,11 @@ def pdc(request):
         'active_mode': 'pdc',
     }
 
-    return render(request, 'payment/pdc.html', context)
+    return render(request, 'student/payment/pdc.html', context)
 
 
 def emi(request):
-    return render(request, 'payment/emi.html')
+    return render(request, 'student/payment/emi.html')
 
 def installments(request):
     """
@@ -215,12 +215,12 @@ def installments(request):
         'active_mode': 'installment',  # tab highlight
     }
 
-    return render(request, 'payment/installments.html', context)
+    return render(request, 'student/payment/installments.html', context)
 
 def installments_view(request):
-    return render(request, 'payment/loan_view.html')
+    return render(request, 'student/payment/loan_view.html')
 def pdc_view(request):
-    return render(request, 'payment/pdc_view.html')
+    return render(request, 'student/payment/pdc_view.html')
 def onetime_view(request):
     """
     ONE TIME PAYMENT – SUMMARY PAGE
@@ -246,15 +246,15 @@ def onetime_view(request):
         'remaining_amount': remaining_amount,
     }
 
-    return render(request, 'payment/onetime_view.html', context)
+    return render(request, 'student/payment/onetime_view.html', context)
 def emi_view(request):
-    return render(request, 'payment/emi_view.html')
+    return render(request, 'student/payment/emi_view.html')
 def profile(request):
-    return render(request, 'profile/profile.html')
+    return render(request, 'student/profile/profile.html')
 def overview(request):
-    return render(request, 'profile/overview.html')
+    return render(request, 'student/profile/overview.html')
 def password(request):
-    return render(request, 'profile/password.html')
+    return render(request, 'student/profile/password.html')
 def QR_pay(request):
     """
     Scan & Pay (PDC)
@@ -287,7 +287,7 @@ def QR_pay(request):
         'due_date': pdc.cheque_date,
     }
 
-    return render(request, 'payment/QR_pay.html', context)
+    return render(request, 'student/payment/QR_pay.html', context)
 def installments_qr(request):
     """
     Scan & Pay your Installments
@@ -325,10 +325,10 @@ def installments_qr(request):
         'installments': installments,
     }
 
-    return render(request, 'payment/installment_qr.html', context)
+    return render(request, 'student/payment/installment_qr.html', context)
 def onboard(request):
     
-    return render(request, 'dashboard/onboarding.html')
+    return render(request, 'student/dashboard/onboarding.html')
 
 
 
@@ -419,7 +419,7 @@ def upload(request):
 
     return render(
         request,
-        "dashboard/uploaddoc.html",
+        "student/dashboard/uploaddoc.html",
         {
             "docs": existing_docs,
             "locked": locked

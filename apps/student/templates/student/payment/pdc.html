@@ -1,4 +1,4 @@
-{% extends 'layout/base.html' %}
+{% extends 'student/layout/base.html' %}
 {% load static %}
 
 {% block content %}
@@ -6,10 +6,9 @@
 
 <div class="payment-container glass-card">
 
-    <!-- ================= HEADER ================= -->
+    <!-- HEADER -->
     <div class="payment-header">
         <h2>Student Admission & Fee Management</h2>
-
         <div class="student-info">
             <h3>{{ student.name }}</h3>
             <p>{{ student.email }}</p>
@@ -17,36 +16,38 @@
         </div>
     </div>
 
-    <!-- ================= SUMMARY ================= -->
+    <!-- SUMMARY -->
     <div class="fee-summary">
         <div class="fee-box">
             <p>Due Amount</p>
             <h3>₹{{ total_fee }}</h3>
         </div>
+
         <div class="fee-box">
             <p>Paid Amount</p>
             <h3>₹{{ paid_amount }}</h3>
         </div>
+
         <div class="fee-box highlight">
             <p>Pending Amount</p>
             <h3>₹{{ pending_amount }}</h3>
         </div>
     </div>
 
-    <center><h2>Installments</h2></center>
+    <center><h2>PDC</h2></center>
 
-    <!-- ================= PAYMENT MODE ================= -->
+    <!-- PAYMENT MODE -->
     <div class="payment-mode-switch">
         <span class="label">Payment Mode:</span>
         <div class="mode-tabs">
-            <a href="{% url 'payment' %}" class="mode-btn">One-Time Payment</a>
-            <a href="{% url 'pdc' %}" class="mode-btn">PDC</a>
+            <a href="{% url 'onetime_view' %}" class="mode-btn">One-Time Payment</a>
+            <a href="{% url 'pdc' %}" class="mode-btn active">PDC</a>
             <a href="{% url 'emi' %}" class="mode-btn">EMI</a>
-            <a href="{% url 'installments' %}" class="mode-btn active">Installments</a>
+            <a href="{% url 'installments' %}" class="mode-btn">Installment</a>
         </div>
     </div>
 
-    <!-- ================= MAIN ================= -->
+    <!-- MAIN -->
     <div class="payment-row">
 
         <!-- LEFT -->
@@ -58,28 +59,29 @@
                     <span>Admission Fee</span>
                     <strong>₹{{ admission_fee }}</strong>
                 </div>
+
                 <div class="fee-row">
                     <span>Course Fee</span>
                     <strong>₹{{ course_fee }}</strong>
                 </div>
+
                 <div class="fee-row total">
                     <span>Total Fee</span>
                     <strong>₹{{ total_fee }}</strong>
                 </div>
             </div>
-
-            <br>
-            <a href="#" class="mode-btn active">View Your Status</a>
         </div>
 
         <!-- CENTER -->
-        <div class="loan-table-box">
-            <h4>Installment Payment Details</h4>
+        <div class="center-column">
+            <h4>PDC Cheque</h4>
 
-            <table class="loan-table">
+            <table class="pdc-table">
                 <thead>
                     <tr>
                         <th>Installment</th>
+                        <th>Cheque No</th>
+                        <th>Bank</th>
                         <th>Amount</th>
                         <th>Due Date</th>
                         <th>Status</th>
@@ -88,38 +90,40 @@
                 </thead>
 
                 <tbody>
-                {% for ins in installments %}
+                {% for pdc in pdc_payments %}
                     <tr>
-                        <td>Installment {{ ins.installment_number }}</td>
-                        <td>₹{{ ins.amount }}</td>
-                        <td>{{ ins.due_date }}</td>
+                        <td>{{ pdc.installment_number }}</td>
+                        <td>{{ pdc.cheque_number }}</td>
+                        <td>{{ pdc.bank_name }}</td>
+                        <td>₹{{ pdc.amount }}</td>
+                        <td>{{ pdc.cheque_date }}</td>
 
                         <!-- STATUS -->
                         <td>
-                            {% if ins.payment_status == 'completed' %}
-                                <span class="status paid">Paid</span>
-                            {% elif ins.payment_status == 'pending' %}
-                                <span class="status pending">Pending</span>
+                            {% if pdc.payment_status == 'completed' %}
+                                <span class="status-paid">Paid</span>
                             {% else %}
-                                <span class="status upcoming">Upcoming</span>
+                                <span class="status-pending">Pending</span>
                             {% endif %}
                         </td>
 
                         <!-- ACTION -->
                         <td>
-                            {% if ins.payment_status == 'pending' %}
-                                <a href="{% url 'installments_qr' %}" class="pay-btn">
-                                    Pay
-                                </a>
+                            {% if pdc.payment_status == 'completed' %}
+                                <span class="status-completed">Completed</span>
+
+                            {% elif pdc.cheque_date <= today %}
+                                <a href="{% url 'QR_pay' %}" class="pay-btn">Pay</a>
+
                             {% else %}
-                                —
+                                <span class="status-upcoming">Upcoming</span>
                             {% endif %}
                         </td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="5" style="text-align:center;">
-                            No installment records found
+                        <td colspan="7" style="text-align:center;">
+                            No PDC records available
                         </td>
                     </tr>
                 {% endfor %}
@@ -128,17 +132,22 @@
         </div>
 
         <!-- RIGHT -->
-        <div class="reminder-box">
-            <h4>Reminders</h4>
-            <label><input type="checkbox" checked> Email reminder</label><br>
-            <label><input type="checkbox" checked> SMS reminder</label>
+        <div class="right-column">
+            <div class="reminder-box">
+                <h4>Reminders</h4>
+                <label><input type="checkbox" checked> Email reminder</label><br>
+                <label><input type="checkbox" checked> SMS reminder</label>
+
+                <br><br>
+                <a href="#" class="mode-btn active">View your status</a>
+            </div>
         </div>
 
     </div>
 
-    <!-- ================= NOTE ================= -->
+    <!-- NOTE -->
     <div class="note">
-        <b>Note:</b> Please pay on correct time.
+        <p><b>Note:</b> Please submit your post-dated cheques to the administration office.</p>
     </div>
 
 </div>

@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 
-# app_name='bdm'
+app_name='bdm'
 
 
 
@@ -26,9 +26,9 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("trainer-admin/create/",views.create_trainer_admin_profile,name="trainer_admin_create" ),
                 
                 path("student_onboarding", views.onboarding_view, name="student_onboarding"),
-                path("dashboard/trainers/", views.trainers_tab, name="trainers_tab"),
-                path("dashboard/students/", views.students_tab, name="students_tab"),
-                path("dashboard/trainers/", views.trainers_tab, name="trainers_tab"),
+                path("dashboard/trainers/", views.trainers_tab, name="document_verification"),
+                path("dashboard/students/", views.students_tab, name="enrollment_letter_generation"),
+                path("dashboard/trainers/", views.trainers_tab, name="id_card_generation"),
                 ]
 
 
