@@ -1,0 +1,29 @@
+<h2>Students – Document Verification</h2>
+
+<table>
+  <tr>
+    <th>Student</th>
+    <th>Email</th>
+    <th>phone</th>
+    <th>preferred_domain</th>
+    <th>Documents Uploaded</th>
+    <th>Documents Verified</th>
+    <th>Action</th>
+  </tr>
+
+  {% for checklist in checklists %}
+  <tr>
+    <td>{{ checklist.student.full_name }}</td>
+    <td>{{ checklist.student.email }}</td>
+    <td>{{ checklist.student.phone }}</td>
+    <td>{{ checklist.student.preferred_domain }}</td>
+    <td>✅</td>
+    <td>❌</td>
+    <td>
+      <a href="{% url 'bdm:student_document_review' checklist.student.id %}">
+        Review
+      </a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

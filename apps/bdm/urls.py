@@ -26,9 +26,10 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("trainer-admin/create/",views.create_trainer_admin_profile,name="trainer_admin_create" ),
                 
                 path("student_onboarding", views.onboarding_view, name="student_onboarding"),
-                path("dashboard/trainers/", views.trainers_tab, name="document_verification"),
-                path("dashboard/students/", views.students_tab, name="enrollment_letter_generation"),
-                path("dashboard/trainers/", views.trainers_tab, name="id_card_generation"),
+                path("student_onboarding/verification/", views.students_with_uploaded_documents, name="document_verification"),
+                path("student_onboarding/verification/review/<int:student_id>",views.student_document_review,name="student_document_review"),
+                path("student_onboarding/verification/verify/<int:doc_id>/",views.verify_document,name="verify_document"),
+                path("student_onboarding/enrollment_letter/", views.enrollmentLetter_tab, name="enrollment_letter_generation"),
+                path("student_onboarding/id_card_generation/", views.id_card_generation_tab, name="id_card_generation"),
                 ]
-
 

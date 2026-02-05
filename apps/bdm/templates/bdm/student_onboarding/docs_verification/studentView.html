@@ -1,0 +1,45 @@
+{% extends 'bdm/layout/base.html' %}
+{% load static %}
+{% load tz %}
+
+
+{% block content %}
+
+<h2>Document Review – {{ student }}</h2>
+
+<table>
+  <tr>
+    <th>Document</th>
+    <th>Status</th>
+    <th>File</th>
+    <th>Action</th>
+  </tr>
+
+  {% for doc in documents %}
+  <tr>
+    <td>{{ doc.get_document_type_display }}</td>
+    <td>{{ doc.get_verification_status_display }}</td>
+    <td>
+      <a href="{{ doc.document_file.url }}" target="_blank">Download</a>
+    </td>
+    <td>
+      {% if doc.verification_status == 'pending' %}
+        <a href="{% url 'bdm:verify_document' doc.id %}">Verify</a>
+      {% else %}
+      <p style="color: green;">
+        ✔ verified 
+      </p>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% if student.onboarding_checklist.documents_verified %}
+  <h4 style="color: green; margin-top: 10px;padding: 10px;">
+    ✔ All documents verified.Student Ready for enrollment letter.
+  </h4>
+{% endif %}
+
+
+{% endblock  %}

@@ -17,8 +17,11 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
-from .models import Lead, Student, Trainer, Course, Batch, TeleCallerProfile
+from .models import Lead, Student, Trainer, Course, Batch, TeleCallerProfile,OnboardingChecklist
 
+from apps.student.models import StudentDocument
+
+from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
 
 @login_required
 def dashboard(request):
@@ -382,24 +385,99 @@ def create_student_admin_profile(request, user):
 #     # GET request - show the form
 #     return render(request, "bdm/user/create_user.html")
 
+# student-onboarding- Ramees
 
 def onboarding_view(request):
     
     return render(request,"bdm/student_onboarding/tab_view.html")
 
-def students_tab(request):
+
+def students_with_uploaded_documents(request):
+   
+    checklists = (
+        OnboardingChecklist.objects
+        .select_related("student")
+        .filter(
+            documents_uploaded=True,
+            documents_verified=False
+        )
+    )
+
+    return render(
+        request,
+        "bdm/student_onboarding/docs_verification/studentList.html",
+        {"checklists": checklists}
+    )
+    
+ 
+def student_document_review(request, student_id):
+    
+    student = get_object_or_404(Student, id=student_id)
+
+    documents = student.documents.filter(
+        document_type__in=REQUIRED_DOCUMENT_TYPES
+    )
+
+    return render(
+        request,
+        "bdm/student_onboarding/docs_verification/studentView.html",
+        {
+            "student": student,
+            "documents": documents,
+        }
+    )    
+    
+    
+    
+def verify_document(request, doc_id):
+    
+    document = get_object_or_404(StudentDocument, id=doc_id)
+    student = document.student
+    checklist = student.onboarding_checklist
+
+    document.verification_status = StudentDocument.VerificationStatus.VERIFIED
+    document.verified_by = request.user
+    document.verified_at = timezone.now()
+    document.save()
+
+    #final check
+    check=student.all_required_documents_verified()
+    print(check)
+    if student.all_required_documents_verified():
+        checklist.documents_verified = True
+        checklist.save()
+        messages.success(
+            request,
+            "All documents verified. Student ready for enrollment letter."
+        )
+
+    return redirect(
+        "bdm:student_document_review",
+        student_id=student.id
+    )   
+    
+
+
+def docsVerification_tab(request):
     students = Student.objects.all()
     return render(request, "bdm/student_onboarding/students_tab.html", {
         "students": students
     })
     
-def trainers_tab(request):
+def enrollmentLetter_tab(request):
     trainers = Trainer.objects.all()
     return render(request, "bdm/student_onboarding/trainer_tab.html", {
         "trainers": trainers
     })   
     
+
+def id_card_generation_tab(request):
+    trainers = Trainer.objects.all()
+    return render(request, "bdm/student_onboarding/trainer_tab.html", {
+        "trainers": trainers
+    })   
     
+        
     
     
 

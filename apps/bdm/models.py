@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
+
+from apps.student.models import StudentDocument
 
 # Create your models here.
 
@@ -280,6 +283,31 @@ class Student(models.Model):
     # PROFILE STATUS
     # --------------------------------------------------
     profile_completed = models.BooleanField(default=False)
+    
+    
+    
+    def required_documents_queryset(self):
+        return self.documents.filter(
+            document_type__in=REQUIRED_DOCUMENT_TYPES
+        )
+    
+    print(required_documents_queryset)
+
+    def all_required_documents_uploaded(self):
+        return self.required_documents_queryset().count() == len(REQUIRED_DOCUMENT_TYPES)
+
+    def all_required_documents_verified(self):
+        qs = self.required_documents_queryset()
+
+        if qs.count() != len(REQUIRED_DOCUMENT_TYPES):
+            return False
+
+        return not qs.filter(
+            verification_status__in=[
+                StudentDocument.VerificationStatus.PENDING,
+                StudentDocument.VerificationStatus.REJECTED,
+            ]
+        ).exists()
 
     # --------------------------------------------------
     # META
@@ -677,7 +705,7 @@ class OnboardingChecklist(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.student.name} - Onboarding Progress"
+     return f"Onboarding progress- {self.student.full_name}"
     
     @property
     def completion_percentage(self):
