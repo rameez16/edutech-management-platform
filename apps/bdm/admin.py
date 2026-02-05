@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Lead,Course,Student,Trainer,Batch,TeleCallerProfile,TrainerAdminProfile,StudentAdminProfile
+
+from .models import Lead,Course,Student,Trainer,Batch,TeleCallerProfile,TrainerAdminProfile,StudentAdminProfile,PaymentDocument,OnboardingChecklist,Notification
 # Register your models here.
 
 
@@ -18,3 +19,9 @@ admin.site.register(TrainerAdminProfile)
 
 admin.site.register(Batch)
 admin.site.register(TeleCallerProfile)
+
+admin.site.register(PaymentDocument)
+admin.site.register(OnboardingChecklist)
+admin.site.register(Notification)
+
+
