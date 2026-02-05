@@ -24,9 +24,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('apps.test_app.urls')),
     path('',include('apps.bdm.urls')),
-    path('trainer/',include('apps.trainer.urls')),
+    path('',include('apps.trainer.urls')),
     path('',include('apps.student.urls')),
+   
+
     path('', include('apps.landing_page.urls')),
+    path('', include('apps.accounts.urls')),
 ]
 
 

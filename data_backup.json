@@ -1,0 +1,2350 @@
+[
+{
+  "model": "trainer.module",
+  "pk": 3,
+  "fields": {
+    "course": 2,
+    "title": "Python Programming Fundamentals",
+    "description": "Introduces core Python programming concepts required for backend web development focusing on syntax logic building and object oriented programming",
+    "module_number": 1,
+    "total_sessions": 20,
+    "phase": "Foundation",
+    "learning_objectives": "Understand Python syntax and data types; Write conditional logic and loops; Create reusable functions and modules; Apply object oriented programming concepts; Work with files and virtual environments",
+    "prerequisites": "Basic computer knowledge",
+    "created_at": "2026-01-26T20:09:24.773Z",
+    "updated_at": "2026-01-26T20:09:24.773Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 4,
+  "fields": {
+    "course": 2,
+    "title": "Web & Frontend Basics",
+    "description": "Covers essential web concepts and frontend basics needed to integrate Django with user interfaces",
+    "module_number": 2,
+    "total_sessions": 15,
+    "phase": "Foundation",
+    "learning_objectives": "Understand how the web works; Build simple web pages using HTML and CSS; Create forms and handle user input; Apply basic Bootstrap styling",
+    "prerequisites": "Python Programming Fundamentals",
+    "created_at": "2026-01-26T20:09:24.773Z",
+    "updated_at": "2026-01-26T20:09:24.773Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 5,
+  "fields": {
+    "course": 2,
+    "title": "Django Core Framework",
+    "description": "Introduces Django framework fundamentals including project structure views templates and ORM",
+    "module_number": 3,
+    "total_sessions": 20,
+    "phase": "Core",
+    "learning_objectives": "Create Django projects and apps; Implement URL routing views and templates; Design models and use Django ORM; Customize Django admin panel",
+    "prerequisites": "Python Programming Fundamentals; Web Basics",
+    "created_at": "2026-01-26T20:09:24.773Z",
+    "updated_at": "2026-01-26T20:09:24.773Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 6,
+  "fields": {
+    "course": 2,
+    "title": "Database & Authentication",
+    "description": "Focuses on database design relationships and implementing secure authentication systems in Django",
+    "module_number": 4,
+    "total_sessions": 15,
+    "phase": "Core",
+    "learning_objectives": "Design relational databases; Work with PostgreSQL Supabase; Implement authentication and authorization; Create and manage custom user models",
+    "prerequisites": "Django Core Framework",
+    "created_at": "2026-01-26T20:09:24.773Z",
+    "updated_at": "2026-01-26T20:09:24.773Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 7,
+  "fields": {
+    "course": 2,
+    "title": "Forms Media & Validation",
+    "description": "Teaches handling user input validations and media files using Django forms",
+    "module_number": 5,
+    "total_sessions": 10,
+    "phase": "Core",
+    "learning_objectives": "Build Django forms and model forms; Apply custom validations; Handle file and image uploads securely",
+    "prerequisites": "Database & Authentication",
+    "created_at": "2026-01-26T20:09:24.773Z",
+    "updated_at": "2026-01-26T20:09:24.773Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 8,
+  "fields": {
+    "course": 2,
+    "title": "APIs with Django REST Framework",
+    "description": "Introduces RESTful API development using Django REST Framework for modern applications",
+    "module_number": 6,
+    "total_sessions": 15,
+    "phase": "Advanced",
+    "learning_objectives": "Understand REST principles; Build CRUD APIs; Use serializers and viewsets; Implement JWT based authentication",
+    "prerequisites": "Django Core Framework; Database Knowledge",
+    "created_at": "2026-01-26T20:09:24.773Z",
+    "updated_at": "2026-01-26T20:09:24.773Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 9,
+  "fields": {
+    "course": 2,
+    "title": "Project Development",
+    "description": "Hands on module focused on building a complete real world Django application",
+    "module_number": 7,
+    "total_sessions": 20,
+    "phase": "Project",
+    "learning_objectives": "Plan and design a full stack application; Implement role based access control; Integrate APIs and frontend; Debug and test applications",
+    "prerequisites": "Completion of all core modules",
+    "created_at": "2026-01-26T20:09:24.773Z",
+    "updated_at": "2026-01-26T20:09:24.773Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 10,
+  "fields": {
+    "course": 2,
+    "title": "Deployment & Career Preparation",
+    "description": "Covers application deployment and prepares students for job interviews and real world development environments",
+    "module_number": 8,
+    "total_sessions": 10,
+    "phase": "Career",
+    "learning_objectives": "Configure production settings; Deploy Django applications; Use Git and GitHub effectively; Prepare for Django interviews",
+    "prerequisites": "Project Development",
+    "created_at": "2026-01-26T20:09:24.773Z",
+    "updated_at": "2026-01-26T20:09:24.773Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 11,
+  "fields": {
+    "course": 3,
+    "title": "Web Development Fundamentals",
+    "description": "Introduction to how the web works and core HTML, CSS, and JavaScript concepts required for MERN stack development.",
+    "module_number": 1,
+    "total_sessions": 10,
+    "phase": "phase1",
+    "learning_objectives": "Understand client–server architecture and HTTP\r\n\r\nBuild responsive webpages using HTML & CSS\r\n\r\nWrite basic JavaScript using ES6+ features",
+    "prerequisites": "Basic computer knowledge\r\n\r\nNo programming experience required",
+    "created_at": "2026-01-28T03:58:46.734Z",
+    "updated_at": "2026-01-28T03:58:46.734Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 12,
+  "fields": {
+    "course": 3,
+    "title": "Frontend Development with React.js",
+    "description": "Learn to build modern, component-based user interfaces using React.js and Tailwind CSS.",
+    "module_number": 2,
+    "total_sessions": 10,
+    "phase": "phase1",
+    "learning_objectives": "Build reusable React components\r\n\r\nUse props, state, and hooks\r\n\r\nImplement routing and layouts\r\n\r\nStyle applications with Tailwind CSS",
+    "prerequisites": "Completion of Module 1\r\n\r\nBasic JavaScript knowledge",
+    "created_at": "2026-01-28T04:00:09.292Z",
+    "updated_at": "2026-01-28T04:31:37.515Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 13,
+  "fields": {
+    "course": 3,
+    "title": "State Management & Frontend Best Practices",
+    "description": "Handle application state, forms, API integration, and frontend best practices in React.",
+    "module_number": 3,
+    "total_sessions": 10,
+    "phase": "phase1",
+    "learning_objectives": "Manage state across components\r\n\r\nWork with forms and validations\r\n\r\nConsume REST APIs\r\n\r\nHandle loading and error states",
+    "prerequisites": "Completion of Module 2",
+    "created_at": "2026-01-28T04:01:00.957Z",
+    "updated_at": "2026-01-28T04:32:50.042Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 14,
+  "fields": {
+    "course": 3,
+    "title": "Backend Development with Node.js & Express",
+    "description": "Develop scalable backend services and RESTful APIs using Node.js and Express.js.",
+    "module_number": 4,
+    "total_sessions": 10,
+    "phase": "phase1",
+    "learning_objectives": "Build REST APIs\r\n\r\nUse Express routing & middleware\r\n\r\nHandle errors and validations\r\n\r\nStructure backend applications",
+    "prerequisites": "JavaScript fundamentals\r\n\r\nCompletion of Module 1",
+    "created_at": "2026-01-28T04:01:55.238Z",
+    "updated_at": "2026-01-28T04:33:57.345Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 15,
+  "fields": {
+    "course": 3,
+    "title": "Database Management with MongoDB",
+    "description": "Design and manage NoSQL databases using MongoDB and Mongoose.",
+    "module_number": 5,
+    "total_sessions": 10,
+    "phase": "phase1",
+    "learning_objectives": "Design schemas and models\r\n\r\nPerform CRUD operations\r\n\r\nManage relationships\r\n\r\nOptimize queries",
+    "prerequisites": "Completion of Module 4",
+    "created_at": "2026-01-28T04:02:46.022Z",
+    "updated_at": "2026-01-28T04:34:30.983Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 16,
+  "fields": {
+    "course": 3,
+    "title": "Authentication & Security",
+    "description": "Implement secure authentication and authorization using JWT and best security practices.",
+    "module_number": 6,
+    "total_sessions": 6,
+    "phase": "phase1",
+    "learning_objectives": "Implement JWT authentication\r\n\r\nSecure APIs and routes\r\n\r\nApply role-based access control\r\n\r\nProtect sensitive data",
+    "prerequisites": "Completion of Modules 4 & 5",
+    "created_at": "2026-01-28T04:03:34.916Z",
+    "updated_at": "2026-01-28T04:03:34.916Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 17,
+  "fields": {
+    "course": 3,
+    "title": "Full-Stack Integration",
+    "description": "Connect frontend and backend to build complete MERN stack applications.",
+    "module_number": 7,
+    "total_sessions": 6,
+    "phase": "phase1",
+    "learning_objectives": "Connect React with backend APIs\r\n\r\nImplement end-to-end CRUD\r\n\r\nHandle auth across frontend & backend",
+    "prerequisites": "Completion of Modules 2–6",
+    "created_at": "2026-01-28T04:04:23.501Z",
+    "updated_at": "2026-01-28T04:04:23.501Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 18,
+  "fields": {
+    "course": 3,
+    "title": "Deployment & DevOps Basics",
+    "description": "Deploy MERN applications using modern cloud platforms and DevOps practices.",
+    "module_number": 8,
+    "total_sessions": 6,
+    "phase": "phase1",
+    "learning_objectives": "Manage environment variables\r\n\r\nDeploy frontend and backend\r\n\r\nUse Docker basics\r\n\r\nDebug production issues",
+    "prerequisites": "Completion of Module 7",
+    "created_at": "2026-01-28T04:05:21.155Z",
+    "updated_at": "2026-01-28T04:05:21.155Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 19,
+  "fields": {
+    "course": 3,
+    "title": "Capstone Project",
+    "description": "Build a real-world full-stack MERN application from scratch.",
+    "module_number": 9,
+    "total_sessions": 12,
+    "phase": "phase1",
+    "learning_objectives": "Apply full MERN stack skills\r\n\r\nBuild scalable applications\r\n\r\nFollow clean architecture\r\n\r\nOptimize performance",
+    "prerequisites": "Completion of all previous modules",
+    "created_at": "2026-01-28T04:06:27.581Z",
+    "updated_at": "2026-01-28T04:06:27.581Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 20,
+  "fields": {
+    "course": 3,
+    "title": "Career & Interview Preparation",
+    "description": "Prepare for job interviews and build a strong MERN stack developer profile.",
+    "module_number": 10,
+    "total_sessions": 4,
+    "phase": "phase1",
+    "learning_objectives": "Build GitHub portfolio\r\n\r\nPrepare for MERN interviews\r\n\r\nImprove resume & LinkedIn profile\r\n\r\nPerform live project demos",
+    "prerequisites": "Completion of Capstone Project",
+    "created_at": "2026-01-28T04:07:24.580Z",
+    "updated_at": "2026-01-28T04:07:24.580Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 21,
+  "fields": {
+    "course": 4,
+    "title": "Python & Data Foundations for Data Science",
+    "description": "This module introduces learners to Python programming and essential data handling concepts required for data science. Students will learn how to work with datasets, perform data manipulation, and visualize data using industry-standard Python libraries.",
+    "module_number": 1,
+    "total_sessions": 10,
+    "phase": "phase1",
+    "learning_objectives": "Understand Python basics for data science\r\n\r\nWork with data using NumPy and Pandas\r\n\r\nPerform data cleaning and preprocessing\r\n\r\nCreate basic data visualizations using Matplotlib and Seaborn\r\n\r\nGain hands-on experience with real-world datasets",
+    "prerequisites": "Basic computer knowledge\r\n\r\nFamiliarity with high school–level mathematics (algebra)\r\n\r\nNo prior programming experience required",
+    "created_at": "2026-01-28T04:13:10.148Z",
+    "updated_at": "2026-01-28T04:13:10.148Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 22,
+  "fields": {
+    "course": 4,
+    "title": "Statistics, Probability & Exploratory Data Analysis (EDA)",
+    "description": "This module focuses on the statistical foundations required for data science. Learners will explore data using descriptive statistics, probability concepts, and visualization techniques to uncover patterns and insights.",
+    "module_number": 2,
+    "total_sessions": 10,
+    "phase": "phase1",
+    "learning_objectives": "Understand descriptive and inferential statistics\r\n\r\nApply probability concepts in real-world datasets\r\n\r\nPerform Exploratory Data Analysis (EDA)\r\n\r\nIdentify patterns, trends, and anomalies in data\r\n\r\nVisualize data for better decision-making",
+    "prerequisites": "Completion of Module 1\r\n\r\nBasic understanding of Python and Pandas\r\n\r\nHigh school–level mathematics",
+    "created_at": "2026-01-28T04:18:26.000Z",
+    "updated_at": "2026-01-28T04:18:26.000Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 23,
+  "fields": {
+    "course": 4,
+    "title": "Machine Learning Fundamentals",
+    "description": "This module introduces core machine learning concepts, algorithms, and workflows. Learners will build predictive models using supervised and unsupervised learning techniques.",
+    "module_number": 3,
+    "total_sessions": 10,
+    "phase": "phase2",
+    "learning_objectives": "Understand machine learning concepts and types\r\n\r\nBuild supervised learning models (Regression & Classification)\r\n\r\nApply unsupervised learning techniques\r\n\r\nEvaluate and tune machine learning models\r\n\r\nWork with real-world ML datasets",
+    "prerequisites": "Completion of Modules 1 & 2\r\n\r\nUnderstanding of statistics and EDA\r\n\r\nComfortable with Python programming",
+    "created_at": "2026-01-28T04:20:52.780Z",
+    "updated_at": "2026-01-28T04:20:52.780Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 24,
+  "fields": {
+    "course": 4,
+    "title": "Artificial Intelligence & Advanced Machine Learning",
+    "description": "This module dives deeper into AI concepts and advanced ML techniques. Learners will explore neural networks, deep learning fundamentals, and real-world AI applications.",
+    "module_number": 4,
+    "total_sessions": 15,
+    "phase": "phase2",
+    "learning_objectives": "Understand core Artificial Intelligence concepts\r\n\r\nBuild neural networks using popular frameworks\r\n\r\nApply deep learning techniques\r\n\r\nWork with unstructured data (text & images)\r\n\r\nExplore real-world AI use cases",
+    "prerequisites": "Completion of Modules 1, 2 & 3\r\n\r\nStrong understanding of machine learning basics\r\n\r\nFamiliarity with linear algebra fundamentals",
+    "created_at": "2026-01-28T04:22:05.168Z",
+    "updated_at": "2026-01-28T04:22:05.168Z"
+  }
+},
+{
+  "model": "trainer.module",
+  "pk": 25,
+  "fields": {
+    "course": 4,
+    "title": "Model Deployment, Capstone Project & Industry Practices",
+    "description": "This final module focuses on deploying machine learning models and applying data science skills in real-world scenarios through a capstone project.",
+    "module_number": 5,
+    "total_sessions": 15,
+    "phase": "phase3",
+    "learning_objectives": "Deploy ML models into production\r\n\r\nWork with APIs and cloud platforms\r\n\r\nUnderstand MLOps fundamentals\r\n\r\nBuild an end-to-end data science project\r\n\r\nPresent insights and models professionally",
+    "prerequisites": "Completion of all previous modules\r\n\r\nKnowledge of ML and AI concepts\r\n\r\nWillingness to work on real-world projects",
+    "created_at": "2026-01-28T04:23:24.389Z",
+    "updated_at": "2026-01-28T04:23:24.389Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 42,
+  "fields": {
+    "course": 2,
+    "module": 3,
+    "session_number": 1,
+    "topic": "Introduction to Python & Programming Basics",
+    "description": "Overview of programming concepts and introduction to Python its features and use cases",
+    "subtopics": "What is programming; Why Python; Python use cases; Installing Python; Running Python programs",
+    "learning_outcomes": "Understand programming fundamentals; Install and run Python successfully",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Official Documentation; W3Schools Python Introduction",
+    "practice_exercises": "Install Python; Write and run Hello World program",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-27T17:36:10.313Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 43,
+  "fields": {
+    "course": 2,
+    "module": 3,
+    "session_number": 2,
+    "topic": "Python Syntax & Variables",
+    "description": "Understanding Python syntax rules and working with variables",
+    "subtopics": "Python syntax rules; Variables; Data types; Type conversion",
+    "learning_outcomes": "Declare and use variables; Understand basic data types",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs Variables; Real Python Basics",
+    "practice_exercises": "Create variables of different types; Perform type conversion",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-27T17:36:29.191Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 44,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 3,
+    "topic": "Operators & Expressions",
+    "description": "Learn how Python performs calculations and comparisons",
+    "subtopics": "Arithmetic operators; Comparison operators; Logical operators; Assignment operators",
+    "learning_outcomes": "Use operators in expressions; Evaluate logical conditions",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs Operators",
+    "practice_exercises": "Build calculator programs; Write condition based expressions",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 45,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 4,
+    "topic": "Control Flow Conditional Statements",
+    "description": "Decision making in Python using conditional statements",
+    "subtopics": "if statement; if else; elif; Nested conditions",
+    "learning_outcomes": "Implement decision making logic; Write clean conditional code",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "W3Schools Python Conditions",
+    "practice_exercises": "Grade calculator; Number comparison program",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 46,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 5,
+    "topic": "Loops for and while",
+    "description": "Understanding repetitive execution using loops",
+    "subtopics": "for loop; while loop; break; continue; range function",
+    "learning_outcomes": "Use loops effectively; Control loop execution",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs Loops",
+    "practice_exercises": "Print patterns; Multiplication table program",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 47,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 6,
+    "topic": "Strings & String Methods",
+    "description": "Working with text data and built in string functions",
+    "subtopics": "String indexing; Slicing; String methods; Formatting strings",
+    "learning_outcomes": "Manipulate string data; Apply formatting techniques",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs Strings",
+    "practice_exercises": "Palindrome checker; String formatter",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 48,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 7,
+    "topic": "Lists & Tuples",
+    "description": "Introduction to ordered collections in Python",
+    "subtopics": "List creation; List methods; Tuple basics; List vs tuple",
+    "learning_outcomes": "Store and manipulate collections; Choose appropriate data structures",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Real Python Lists and Tuples",
+    "practice_exercises": "Student marks list; List operations program",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 49,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 8,
+    "topic": "Sets & Dictionaries",
+    "description": "Working with unordered and key value data structures",
+    "subtopics": "Set operations; Dictionary creation; Dictionary methods; Use cases",
+    "learning_outcomes": "Use sets and dictionaries effectively; Store structured data",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs Dictionaries",
+    "practice_exercises": "Word count program; Student record dictionary",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 50,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 9,
+    "topic": "Functions & Arguments",
+    "description": "Writing reusable code using functions",
+    "subtopics": "Function definition; Parameters and arguments; Return values; Default arguments",
+    "learning_outcomes": "Write reusable functions; Understand parameter passing",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs Functions",
+    "practice_exercises": "Calculator using functions; Utility functions program",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 51,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 10,
+    "topic": "Modules & Packages",
+    "description": "Organizing Python code into modules and packages",
+    "subtopics": "Importing modules; Creating custom modules; Built in modules",
+    "learning_outcomes": "Structure Python programs; Reuse code across files",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs Modules",
+    "practice_exercises": "Create custom module; Use math and random modules",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 52,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 11,
+    "topic": "File Handling",
+    "description": "Reading from and writing to files using Python",
+    "subtopics": "File modes; Reading files; Writing files; File handling best practices",
+    "learning_outcomes": "Perform file IO operations; Handle files safely",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs File IO",
+    "practice_exercises": "Text file reader; Log file writer",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 53,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 12,
+    "topic": "Exception Handling",
+    "description": "Handling runtime errors gracefully",
+    "subtopics": "try except; else; finally; Custom exceptions",
+    "learning_outcomes": "Handle errors safely; Write robust programs",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Real Python Exceptions",
+    "practice_exercises": "Safe calculator; File error handling",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 54,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 13,
+    "topic": "Object Oriented Programming Basics",
+    "description": "Introduction to OOP concepts in Python",
+    "subtopics": "Classes and objects; init method; Instance variables",
+    "learning_outcomes": "Understand OOP fundamentals; Create classes and objects",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs Classes",
+    "practice_exercises": "Student class; Bank account class",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 55,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 14,
+    "topic": "OOP Inheritance & Polymorphism",
+    "description": "Advanced OOP concepts for code reuse",
+    "subtopics": "Inheritance; Method overriding; Polymorphism",
+    "learning_outcomes": "Apply inheritance; Write extensible code",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Real Python OOP",
+    "practice_exercises": "Employee inheritance system",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 56,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 15,
+    "topic": "Virtual Environments & pip",
+    "description": "Managing Python environments and dependencies",
+    "subtopics": "Virtual environments; pip package manager; Requirements file",
+    "learning_outcomes": "Create isolated environments; Manage dependencies",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs venv",
+    "practice_exercises": "Create virtual environment; Install packages",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 57,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 16,
+    "topic": "Python Coding Standards & Best Practices",
+    "description": "Writing clean and maintainable Python code",
+    "subtopics": "PEP 8 standards; Code readability; Comments and docstrings",
+    "learning_outcomes": "Follow Python coding standards; Write maintainable code",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "PEP 8 Documentation",
+    "practice_exercises": "Refactor existing code",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 58,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 17,
+    "topic": "Working with JSON & CSV",
+    "description": "Handling structured data formats in Python",
+    "subtopics": "JSON handling; CSV reading and writing; Real world use cases",
+    "learning_outcomes": "Process structured data; Work with external data sources",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Docs JSON and CSV",
+    "practice_exercises": "Read CSV file; Convert data to JSON",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 59,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 18,
+    "topic": "Mini Project Python Fundamentals",
+    "description": "Apply Python basics to build a mini project",
+    "subtopics": "Problem analysis; Implementation; Testing",
+    "learning_outcomes": "Apply learned concepts; Build confidence in Python",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Trainer provided resources",
+    "practice_exercises": "Build CLI based application",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 60,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 19,
+    "topic": "Revision & Problem Solving",
+    "description": "Consolidation of all Python fundamentals",
+    "subtopics": "Revision exercises; Doubt clearing; Problem solving",
+    "learning_outcomes": "Strengthen core concepts; Improve logic skills",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Trainer notes",
+    "practice_exercises": "Solve coding challenges",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 61,
+  "fields": {
+    "course": null,
+    "module": 3,
+    "session_number": 20,
+    "topic": "Assessment & Evaluation",
+    "description": "Final assessment to evaluate Python fundamentals",
+    "subtopics": "Written test; Practical test; Feedback session",
+    "learning_outcomes": "Demonstrate Python proficiency; Prepare for Django module",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Internal assessment materials",
+    "practice_exercises": "Assessment tasks",
+    "created_at": "2026-01-26T21:03:54.523Z",
+    "updated_at": "2026-01-26T21:03:54.523Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 62,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 1,
+    "topic": "Introduction to Data Science & Python Setup",
+    "description": "Overview of Data Science, career paths, and Python environment setup.",
+    "subtopics": "Data Science lifecycle, Python use cases, Anaconda, Jupyter Notebook",
+    "learning_outcomes": "Understand data science workflow, set up Python environment",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python.org, Jupyter Docs",
+    "practice_exercises": "Install Python, run basic Python commands",
+    "created_at": "2026-01-28T04:32:47.946Z",
+    "updated_at": "2026-01-28T04:32:47.946Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 63,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 2,
+    "topic": "Python Basics",
+    "description": "Learn Python syntax and basic programming constructs.",
+    "subtopics": "Variables, data types, operators",
+    "learning_outcomes": "Write simple Python programs",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "W3Schools Python",
+    "practice_exercises": "Simple calculator program",
+    "created_at": "2026-01-28T04:34:38.955Z",
+    "updated_at": "2026-01-28T04:34:38.955Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 64,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 3,
+    "topic": "Control Structures",
+    "description": "Decision making and loops in Python",
+    "subtopics": "if-else, for, while, break, continue",
+    "learning_outcomes": "Apply logic in Python programs",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "W3Schools Python P",
+    "practice_exercises": "Number guessing game",
+    "created_at": "2026-01-28T04:37:43.274Z",
+    "updated_at": "2026-01-28T04:37:43.274Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 65,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 1,
+    "topic": "Introduction to Web Development",
+    "description": "Overview of web development and how modern web applications work.",
+    "subtopics": "Client–server architecture, HTTP/HTTPS, frontend vs backend, web browsers",
+    "learning_outcomes": "Understand how the web works and the role of frontend and backend",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MDN Web Docs – Web Basics",
+    "practice_exercises": "Identify frontend and backend parts of popular websites",
+    "created_at": "2026-01-28T04:37:50.472Z",
+    "updated_at": "2026-01-28T04:37:50.472Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 66,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 2,
+    "topic": "HTML Fundamentals",
+    "description": "Learn the structure and semantics of HTML documents",
+    "subtopics": "HTML tags, elements, attributes, semantic HTML, forms",
+    "learning_outcomes": "Create structured web pages using HTML",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MDN HTML Guide",
+    "practice_exercises": "Build a basic personal profile page",
+    "created_at": "2026-01-28T04:39:21.342Z",
+    "updated_at": "2026-01-28T04:39:21.342Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 67,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 4,
+    "topic": "Functions & Modules",
+    "description": "Code reusability using functions and modules.",
+    "subtopics": "Functions, parameters, return, imports",
+    "learning_outcomes": "Functions, parameters, return, imports",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "W3Schools Python",
+    "practice_exercises": "Utility functions",
+    "created_at": "2026-01-28T04:39:30.108Z",
+    "updated_at": "2026-01-28T04:39:30.108Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 68,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 3,
+    "topic": "CSS Fundamentals",
+    "description": "Style web pages using CSS and understand layout techniques.",
+    "subtopics": "Selectors, box model, flexbox, responsive design",
+    "learning_outcomes": "Style and layout web pages effectively",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MDN CSS Guide",
+    "practice_exercises": "Style the profile page created in Session 2",
+    "created_at": "2026-01-28T04:41:16.539Z",
+    "updated_at": "2026-01-28T04:41:16.539Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 69,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 5,
+    "topic": "Data Structures",
+    "description": "Core data structures in Python",
+    "subtopics": "Lists, tuples, sets, dictionaries",
+    "learning_outcomes": "Manipulate collections efficiently",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "W3Schools Python",
+    "practice_exercises": "Student record system",
+    "created_at": "2026-01-28T04:41:34.873Z",
+    "updated_at": "2026-01-28T04:41:34.873Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 70,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 4,
+    "topic": "Responsive Web Design",
+    "description": "Learn to build mobile-friendly and responsive layouts.",
+    "subtopics": "Media queries, flexible layouts, mobile-first design",
+    "learning_outcomes": "Create responsive webpages for multiple screen sizes",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "CSS-Tricks Responsive Design",
+    "practice_exercises": "Make an existing page mobile responsive",
+    "created_at": "2026-01-28T04:42:42.989Z",
+    "updated_at": "2026-01-28T04:42:42.989Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 71,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 5,
+    "topic": "JavaScript Basics",
+    "description": "Introduction to JavaScript programming fundamentals.",
+    "subtopics": "Variables, data types, operators, conditions",
+    "learning_outcomes": "Write basic JavaScript programs",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "JavaScript.info",
+    "practice_exercises": "Write simple scripts for calculations and validations",
+    "created_at": "2026-01-28T04:43:49.591Z",
+    "updated_at": "2026-01-28T04:43:49.591Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 72,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 6,
+    "topic": "File Handling",
+    "description": "Read and write data from files",
+    "subtopics": "CSV files\r\nText files\r\nFile modes (read, write, append)",
+    "learning_outcomes": "Handle external data using Python file operations",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Python Official Docs – File I/O\r\nPython CSV Module Documentation\r\nAutomate the Boring Stuff with Python – Chapter on Files",
+    "practice_exercises": "CSV reader and writer program",
+    "created_at": "2026-01-28T04:44:12.335Z",
+    "updated_at": "2026-01-28T04:44:12.336Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 73,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 6,
+    "topic": "JavaScript Control Flow",
+    "description": "Learn how to control program execution",
+    "subtopics": "Loops, conditional statements, switch cases",
+    "learning_outcomes": "Implement logic using loops and conditions",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MDN JavaScript Guide",
+    "practice_exercises": "Create number-based logic programs",
+    "created_at": "2026-01-28T04:45:00.349Z",
+    "updated_at": "2026-01-28T04:45:00.349Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 74,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 7,
+    "topic": "JavaScript Functions",
+    "description": "Understand reusable code using functions.",
+    "subtopics": "Function declaration, parameters, return values",
+    "learning_outcomes": "Write reusable and modular JavaScript code",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "JavaScript.info – Functions",
+    "practice_exercises": "Build utility functions (calculator, validator)",
+    "created_at": "2026-01-28T04:46:43.906Z",
+    "updated_at": "2026-01-28T04:46:43.906Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 75,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 7,
+    "topic": "NumPy Basics",
+    "description": "Numerical computing with NumPy",
+    "subtopics": "NumPy arrays\r\nIndexing and slicing\r\nMathematical operations",
+    "learning_outcomes": "Perform numerical analysis using NumPy",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "NumPy Official Documentation\r\nPython for Data Analysis by Wes McKinney – NumPy section\r\nNumPy Beginner Tutorials (official)",
+    "practice_exercises": "Matrix operations using NumPy",
+    "created_at": "2026-01-28T04:47:27.090Z",
+    "updated_at": "2026-01-28T04:47:27.090Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 76,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 8,
+    "topic": "ES6+ Features",
+    "description": "Learn modern JavaScript features used in MERN stack.",
+    "subtopics": "let/const, arrow functions, template literals, destructuring",
+    "learning_outcomes": "Write modern, clean JavaScript code",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "ES6 Guide (freeCodeCamp)",
+    "practice_exercises": "Refactor old JS code using ES6 syntax",
+    "created_at": "2026-01-28T04:47:56.850Z",
+    "updated_at": "2026-01-28T04:47:56.850Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 77,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 8,
+    "topic": "Pandas Fundamentals",
+    "description": "Data manipulation using Pandas",
+    "subtopics": "Series\r\nDataFrames\r\nLoading datasets (CSV, Excel)",
+    "learning_outcomes": "Analyze and manipulate tabular data",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Pandas Official Documentation\r\nPython for Data Analysis – Pandas chapters\r\nKaggle Pandas Micro-Course",
+    "practice_exercises": "Dataset exploration using Pandas",
+    "created_at": "2026-01-28T04:48:59.333Z",
+    "updated_at": "2026-01-28T04:48:59.333Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 78,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 9,
+    "topic": "DOM Manipulation",
+    "description": "Learn how JavaScript interacts with HTML elements.",
+    "subtopics": "DOM selectors, events, event handling",
+    "learning_outcomes": "Manipulate webpage content dynamically",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MDN DOM Guide",
+    "practice_exercises": "Build a simple interactive form",
+    "created_at": "2026-01-28T04:49:04.866Z",
+    "updated_at": "2026-01-28T04:49:04.866Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 79,
+  "fields": {
+    "course": 3,
+    "module": 11,
+    "session_number": 10,
+    "topic": "Mini Project & Revision",
+    "description": "Apply all fundamentals in a small hands-on project.",
+    "subtopics": "HTML + CSS + JavaScript integration",
+    "learning_outcomes": "Build a complete static interactive webpage",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Project starter template",
+    "practice_exercises": "Create a landing page with basic interactivity",
+    "created_at": "2026-01-28T04:50:14.207Z",
+    "updated_at": "2026-01-28T04:50:14.207Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 80,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 9,
+    "topic": "Data Cleaning",
+    "description": "Handling missing and incorrect data",
+    "subtopics": "Handling null values\r\nRemoving duplicates\r\nData type conversion",
+    "learning_outcomes": "Clean and prepare real-world datasets",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Pandas Documentation – Data Cleaning\r\nKaggle Data Cleaning Tutorials\r\nDataCamp – Cleaning Data in Python",
+    "practice_exercises": "Clean a messy real-world dataset",
+    "created_at": "2026-01-28T04:50:42.360Z",
+    "updated_at": "2026-01-28T04:50:42.360Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 81,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 1,
+    "topic": "Introduction to React & Project Setup",
+    "description": "Understand React basics and set up a React application.",
+    "subtopics": "What is React, SPA concept, Node & npm, Vite/CRA setup, folder structure",
+    "learning_outcomes": "Understand React purpose and create a new React project",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Official Docs",
+    "practice_exercises": "Create and run a basic React app",
+    "created_at": "2026-01-28T04:51:35.109Z",
+    "updated_at": "2026-01-28T04:51:35.109Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 82,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 2,
+    "topic": "JSX & Components",
+    "description": "Learn JSX syntax and build reusable components.",
+    "subtopics": "JSX rules, functional components, component structure",
+    "learning_outcomes": "Create reusable React components using JSX",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React JSX Documentation",
+    "practice_exercises": "Build header, footer, and layout components",
+    "created_at": "2026-01-28T04:52:52.502Z",
+    "updated_at": "2026-01-28T04:52:52.502Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 83,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 3,
+    "topic": "Props & Component Communication",
+    "description": "Pass data between components using props.",
+    "subtopics": "Props, prop drilling, default props",
+    "learning_outcomes": "Share data across components effectively",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Props Guide",
+    "practice_exercises": "Create reusable card components with props",
+    "created_at": "2026-01-28T04:54:10.356Z",
+    "updated_at": "2026-01-28T04:54:10.356Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 84,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 4,
+    "topic": "State & useState Hook",
+    "description": "Manage component state using hooks.",
+    "subtopics": "State concept, useState hook, events",
+    "learning_outcomes": "Handle dynamic data and user interaction",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Hooks Documentation",
+    "practice_exercises": "Build counter and toggle components",
+    "created_at": "2026-01-28T04:55:13.156Z",
+    "updated_at": "2026-01-28T04:55:13.156Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 85,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 5,
+    "topic": "Handling Forms & Events",
+    "description": "Work with forms and user inputs in React.",
+    "subtopics": "Controlled components, form submission, validation basics",
+    "learning_outcomes": "Build interactive forms with React",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Forms Guide",
+    "practice_exercises": "Create a registration form with validation",
+    "created_at": "2026-01-28T04:56:29.033Z",
+    "updated_at": "2026-01-28T04:56:29.033Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 86,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 6,
+    "topic": "useEffect & Lifecycle",
+    "description": "Handle side effects and lifecycle events in React.",
+    "subtopics": "useEffect hook, dependencies, cleanup",
+    "learning_outcomes": "Manage side effects like API calls",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React useEffect Docs",
+    "practice_exercises": "Fetch and display data from a public API",
+    "created_at": "2026-01-28T04:57:30.402Z",
+    "updated_at": "2026-01-28T04:57:30.402Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 87,
+  "fields": {
+    "course": 4,
+    "module": 21,
+    "session_number": 10,
+    "topic": "Mini Project",
+    "description": "Apply Python and Pandas concepts",
+    "subtopics": "End-to-end data analysis workflow\r\nData loading, cleaning, and analysis",
+    "learning_outcomes": "End-to-end data analysis workflow\r\n\r\nData loading, cleaning, and analysis",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Kaggle Datasets Repository\r\nGitHub – Sample Python Data Analysis Projects\r\nGoogle Dataset Search",
+    "practice_exercises": "Mini data analysis project using a real dataset",
+    "created_at": "2026-01-28T04:58:12.760Z",
+    "updated_at": "2026-01-28T04:58:12.760Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 88,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 7,
+    "topic": "Routing with React Router",
+    "description": "Implement client-side routing for SPAs.",
+    "subtopics": "React Router setup, routes, links, params",
+    "learning_outcomes": "Build multi-page React applications",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Router Documentation",
+    "practice_exercises": "Create multi-page navigation (Home, About, Contact)",
+    "created_at": "2026-01-28T04:58:46.162Z",
+    "updated_at": "2026-01-28T04:58:46.162Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 89,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 8,
+    "topic": "API Integration with Axios",
+    "description": "Connect React frontend with backend APIs",
+    "subtopics": "Axios, GET/POST requests, loading & error states",
+    "learning_outcomes": "Consume REST APIs in React",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Axios Documentation",
+    "practice_exercises": "Display API data in a table or list",
+    "created_at": "2026-01-28T04:59:57.007Z",
+    "updated_at": "2026-01-28T04:59:57.007Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 90,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 9,
+    "topic": "Styling with Tailwind CSS",
+    "description": "Style React applications using Tailwind CSS.",
+    "subtopics": "Tailwind setup, utility classes, responsive design",
+    "learning_outcomes": "Build responsive UIs quickly with Tailwind",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Tailwind CSS Docs",
+    "practice_exercises": "Design a dashboard UI using Tailwind",
+    "created_at": "2026-01-28T05:01:09.230Z",
+    "updated_at": "2026-01-28T05:01:09.230Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 91,
+  "fields": {
+    "course": 3,
+    "module": 12,
+    "session_number": 10,
+    "topic": "Mini Project & Revision",
+    "description": "Apply React concepts in a small frontend project",
+    "subtopics": "Component structure, routing, API integration",
+    "learning_outcomes": "Build a complete React frontend application",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Project starter template",
+    "practice_exercises": "Build a simple React-based CRUD UI",
+    "created_at": "2026-01-28T05:02:30.572Z",
+    "updated_at": "2026-01-28T05:02:30.572Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 92,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 1,
+    "topic": "Understanding State Management",
+    "description": "Learn why state management is important in modern React applications",
+    "subtopics": "Local state, global state, state flow, common problems",
+    "learning_outcomes": "Understand when and how to manage application state",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React State Management Docs",
+    "practice_exercises": "Identify state usage in an existing React app",
+    "created_at": "2026-01-28T05:05:13.300Z",
+    "updated_at": "2026-01-28T05:05:13.300Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 93,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 2,
+    "topic": "Lifting State Up & Component Communication",
+    "description": "Share and control state across multiple components.",
+    "subtopics": "Lifting state, parent-child communication, callbacks",
+    "learning_outcomes": "Manage shared state between components",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Component Communication Guide",
+    "practice_exercises": "Refactor components to lift shared state",
+    "created_at": "2026-01-28T05:08:10.022Z",
+    "updated_at": "2026-01-28T05:08:10.022Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 94,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 3,
+    "topic": "Context API Basics",
+    "description": "Manage global state using React Context API",
+    "subtopics": "Context creation, provider, consumer, useContext hook",
+    "learning_outcomes": "Implement global state without prop drilling",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Context API Docs",
+    "practice_exercises": "Create a theme or auth context",
+    "created_at": "2026-01-28T05:09:14.081Z",
+    "updated_at": "2026-01-28T05:09:14.081Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 95,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 4,
+    "topic": "Handling Forms & Validations",
+    "description": "Build scalable forms and validations in React.",
+    "subtopics": "Controlled inputs, form state, validation strategies",
+    "learning_outcomes": "Build clean and validated React forms",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Forms Documentation",
+    "practice_exercises": "Build a multi-field form with validation",
+    "created_at": "2026-01-28T05:10:20.960Z",
+    "updated_at": "2026-01-28T05:10:20.960Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 96,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 5,
+    "topic": "API Integration Patterns",
+    "description": "Best practices for integrating APIs in frontend applications.",
+    "subtopics": "Axios patterns, async/await, error handling",
+    "learning_outcomes": "Handle API calls cleanly and efficiently",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Axios & Async JS Docs",
+    "practice_exercises": "Fetch and display API data with error handling",
+    "created_at": "2026-01-28T05:11:30.290Z",
+    "updated_at": "2026-01-28T05:11:30.290Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 97,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 6,
+    "topic": "Loading, Error & Empty States",
+    "description": "Improve UX by handling different UI states properly.",
+    "subtopics": "Loaders, skeletons, error messages, empty views",
+    "learning_outcomes": "Enhance user experience with proper UI feedback",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "UX Patterns for Web Apps",
+    "practice_exercises": "Add loading and error states to an existing component",
+    "created_at": "2026-01-28T05:12:37.125Z",
+    "updated_at": "2026-01-28T05:12:37.125Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 98,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 7,
+    "topic": "Performance Optimization Basics",
+    "description": "Improve frontend performance in React applications.",
+    "subtopics": "Memoization, React.memo, useCallback, useMemo",
+    "learning_outcomes": "Optimize component rendering and performance",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Performance Docs",
+    "practice_exercises": "Optimize a slow-rendering component",
+    "created_at": "2026-01-28T05:13:58.692Z",
+    "updated_at": "2026-01-28T05:13:58.692Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 99,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 1,
+    "topic": "Introduction to Statistics & Data Types",
+    "description": "Overview of statistics in data science and understanding different types of data used for analysis.",
+    "subtopics": "Statistics in Data Science\r\nPopulation vs Sample\r\nTypes of Data (Qualitative, Quantitative)\r\nLevels of Measurement (Nominal, Ordinal, Interval, Ratio)",
+    "learning_outcomes": "Understand the role of statistics in data science\r\nDifferentiate between data types and measurement scales",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Introduction to Statistical Learning – Chapter 2\r\nKhan Academy – Statistics Basics",
+    "practice_exercises": "Identify data types for given datasets\r\nClassify variables based on measurement scale",
+    "created_at": "2026-01-28T05:14:45.224Z",
+    "updated_at": "2026-01-28T05:14:45.224Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 100,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 8,
+    "topic": "Code Structure & Best Practices",
+    "description": "Learn how to organize React projects for scalability.",
+    "subtopics": "Folder structure, reusable components, clean code",
+    "learning_outcomes": "Write maintainable and scalable React code",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "React Best Practices Guide",
+    "practice_exercises": "Refactor project structure for clarity",
+    "created_at": "2026-01-28T05:15:06.103Z",
+    "updated_at": "2026-01-28T05:15:06.103Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 101,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 2,
+    "topic": "Descriptive Statistics – Measures of Central Tendency",
+    "description": "Learn how to summarize data using central values",
+    "subtopics": "Mean\r\nMedian\r\nMode\r\nUse cases and limitations",
+    "learning_outcomes": "Calculate and interpret measures of central tendency\r\nChoose appropriate measures for datasets",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "OpenIntro Statistics\r\nPython Statistics Documentation",
+    "practice_exercises": "Compute mean, median, and mode using Python\r\nAnalyze central tendency for real datasets",
+    "created_at": "2026-01-28T05:16:00.901Z",
+    "updated_at": "2026-01-28T05:16:00.901Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 102,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 9,
+    "topic": "Environment Variables & Configuration",
+    "description": "Manage environment-specific settings in frontend apps.",
+    "subtopics": ".env files, build-time variables, security basics",
+    "learning_outcomes": "Configure frontend apps for different environments",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Vite/CRA Environment Docs",
+    "practice_exercises": "Add environment variables to a React project",
+    "created_at": "2026-01-28T05:16:02.607Z",
+    "updated_at": "2026-01-28T05:16:02.607Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 103,
+  "fields": {
+    "course": 3,
+    "module": 13,
+    "session_number": 10,
+    "topic": "Mini Project & Review",
+    "description": "Apply state management and best practices in a mini project.",
+    "subtopics": "Context API, API integration, optimized components",
+    "learning_outcomes": "Build a well-structured and optimized frontend app",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Project starter repository",
+    "practice_exercises": "Create a frontend app using Context and API integration",
+    "created_at": "2026-01-28T05:17:06.543Z",
+    "updated_at": "2026-01-28T05:17:06.543Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 104,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 3,
+    "topic": "Descriptive Statistics – Measures of Dispersion",
+    "description": "Understand how data varies and spreads around central values",
+    "subtopics": "Range\r\nVariance\r\nStandard Deviation\r\nInterquartile Range (IQR)",
+    "learning_outcomes": "Measure and interpret data variability\r\nCompare spread across datasets",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – Variance & Standard Deviation\r\nNumPy & Pandas Documentation",
+    "practice_exercises": "Calculate variance and standard deviation\r\nCompare dispersion between datasets",
+    "created_at": "2026-01-28T05:17:16.650Z",
+    "updated_at": "2026-01-28T05:17:16.650Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 105,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 1,
+    "topic": "Introduction to Node.js",
+    "description": "Understand Node.js runtime and its advantages for backend development.",
+    "subtopics": "Node.js overview, event loop, npm, modules",
+    "learning_outcomes": "Explain Node.js concepts and set up a basic Node environment",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Node.js Official Docs",
+    "practice_exercises": "Set up a Node.js project and run a simple script",
+    "created_at": "2026-01-28T05:18:09.085Z",
+    "updated_at": "2026-01-28T05:18:09.085Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 106,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 4,
+    "topic": "Data Visualization for EDA",
+    "description": "Use visual tools to explore and understand data patterns",
+    "subtopics": "Histograms\r\nBox Plots\r\nBar Charts\r\nLine Plots",
+    "learning_outcomes": "Visualize distributions and outliers\r\nChoose appropriate plots for data",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Matplotlib & Seaborn Documentation\r\nData Visualization Handbook",
+    "practice_exercises": "Create plots using Matplotlib\r\nInterpret visual patterns",
+    "created_at": "2026-01-28T05:18:45.705Z",
+    "updated_at": "2026-01-28T05:18:45.705Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 107,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 2,
+    "topic": "Introduction to Express.js",
+    "description": "Learn the Express.js framework for building web servers.",
+    "subtopics": "Express setup, routing, middleware, request & response objects",
+    "learning_outcomes": "Create a simple Express server with routes",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Express.js Docs",
+    "practice_exercises": "Build a “Hello World” server with Express",
+    "created_at": "2026-01-28T05:19:32.103Z",
+    "updated_at": "2026-01-28T05:19:32.103Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 108,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 5,
+    "topic": "Introduction to Probability",
+    "description": "Learn probability concepts essential for data analysis and ML",
+    "subtopics": "Basic Probability Rules\r\nSample Space & Events\r\nConditional Probability\r\nBayes’ Theorem (Introduction)",
+    "learning_outcomes": "Apply probability rules\r\nSolve basic probability problems",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Khan Academy – Probability\r\nStatQuest – Probability",
+    "practice_exercises": "Solve probability problems\r\nImplement probability calculations in Python",
+    "created_at": "2026-01-28T05:19:55.779Z",
+    "updated_at": "2026-01-28T05:19:55.779Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 109,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 6,
+    "topic": "Probability Distributions",
+    "description": "Study common probability distributions used in data science",
+    "subtopics": "Discrete vs Continuous Distributions\r\nNormal Distribution\r\nBinomial Distribution\r\nPoisson Distribution",
+    "learning_outcomes": "Identify suitable distributions\r\nInterpret distribution parameters",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Think Stats – Allen B. Downey\r\nSciPy Statistics Documentation",
+    "practice_exercises": "Plot probability distributions\r\nAnalyze real-world examples",
+    "created_at": "2026-01-28T05:21:02.745Z",
+    "updated_at": "2026-01-28T05:21:02.745Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 110,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 7,
+    "topic": "Inferential Statistics – Sampling & Estimation",
+    "description": "Learn how to draw conclusions from sample data",
+    "subtopics": "Sampling Techniques\r\nSampling Bias\r\nPoint Estimation\r\nConfidence Intervals",
+    "learning_outcomes": "Apply sampling methods\r\nEstimate population parameters",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "OpenIntro Statistics\r\nStatQuest – Confidence Intervals",
+    "practice_exercises": "Create samples from datasets\r\nCalculate confidence intervals",
+    "created_at": "2026-01-28T05:22:20.674Z",
+    "updated_at": "2026-01-28T05:22:20.674Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 111,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 8,
+    "topic": "Hypothesis Testing",
+    "description": "Understand statistical testing to make data-driven decisions",
+    "subtopics": "Null & Alternative Hypothesis\r\np-value\r\nType I & Type II Errors\r\nt-test (Introduction)",
+    "learning_outcomes": "Formulate hypotheses\r\nPerform basic hypothesis tests",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – Hypothesis Testing\r\nSciPy Hypothesis Testing",
+    "practice_exercises": "Conduct t-tests using Python\r\nInterpret test results",
+    "created_at": "2026-01-28T05:23:29.452Z",
+    "updated_at": "2026-01-28T05:23:29.452Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 112,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 9,
+    "topic": "Exploratory Data Analysis (EDA) Using Python",
+    "description": "Perform complete EDA workflow on real datasets",
+    "subtopics": "Data Cleaning\r\nHandling Missing Values\r\nOutlier Detection\r\nCorrelation Analysis",
+    "learning_outcomes": "Perform structured EDA\r\nIdentify patterns and anomalies",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Pandas Documentation\r\nEDA Case Studies (Kaggle)",
+    "practice_exercises": "EDA on CSV dataset\r\nGenerate summary insights",
+    "created_at": "2026-01-28T05:24:52.373Z",
+    "updated_at": "2026-01-28T05:24:52.373Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 113,
+  "fields": {
+    "course": 4,
+    "module": 22,
+    "session_number": 10,
+    "topic": "EDA Case Study & Summary",
+    "description": "Apply all learned concepts through a mini project",
+    "subtopics": "End-to-End EDA\r\nVisualization & Interpretation\r\nInsights & Reporting",
+    "learning_outcomes": "Perform complete statistical analysis\r\nPresent findings clearly",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Kaggle EDA Notebooks\r\nGoogle Data Analytics Resources",
+    "practice_exercises": "Mini EDA project\r\nPrepare summary report",
+    "created_at": "2026-01-28T05:26:14.405Z",
+    "updated_at": "2026-01-28T05:26:14.405Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 114,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 3,
+    "topic": "Routing & Controllers",
+    "description": "Organize backend code using routes and controllers.",
+    "subtopics": "Route parameters, query params, controller structure",
+    "learning_outcomes": "Handle requests and responses cleanly using controllers",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Express Routing Guide",
+    "practice_exercises": "Create RESTful routes for a sample blog",
+    "created_at": "2026-01-28T05:30:48.084Z",
+    "updated_at": "2026-01-28T05:30:48.084Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 115,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 4,
+    "topic": "Middleware & Error Handling",
+    "description": "Learn how middleware works and handle errors gracefully.",
+    "subtopics": "Custom middleware, error-handling middleware, logging",
+    "learning_outcomes": "Implement middleware for reusable backend logic",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Express Middleware Docs",
+    "practice_exercises": "Add logging and error-handling middleware to your routes",
+    "created_at": "2026-01-28T05:31:58.876Z",
+    "updated_at": "2026-01-28T05:31:58.876Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 116,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 5,
+    "topic": "REST API Design Principles",
+    "description": "Understand best practices for designing RESTful APIs",
+    "subtopics": "HTTP methods, status codes, REST conventions",
+    "learning_outcomes": "Design clean and maintainable APIs",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "REST API Tutorial",
+    "practice_exercises": "Design REST endpoints for a Todo app",
+    "created_at": "2026-01-28T05:32:57.436Z",
+    "updated_at": "2026-01-28T05:32:57.436Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 117,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 6,
+    "topic": "CRUD Operations with Express",
+    "description": "Implement Create, Read, Update, Delete functionality.",
+    "subtopics": "POST, GET, PUT/PATCH, DELETE requests",
+    "learning_outcomes": "Build fully functional backend endpoints",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Express Docs & REST API Guide",
+    "practice_exercises": "Implement CRUD for a Notes app",
+    "created_at": "2026-01-28T05:34:09.953Z",
+    "updated_at": "2026-01-28T05:34:09.953Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 118,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 7,
+    "topic": "Working with JSON & Request Body",
+    "description": "Handle JSON data in requests and responses.",
+    "subtopics": "Body-parser, JSON formatting, sending responses",
+    "learning_outcomes": "Accept and return JSON data in APIs",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Express JSON Guide",
+    "practice_exercises": "Create an endpoint to receive and return JSON",
+    "created_at": "2026-01-28T05:35:15.224Z",
+    "updated_at": "2026-01-28T05:35:15.224Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 119,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 8,
+    "topic": "Modular Code & Project Structure",
+    "description": "Organize backend files for maintainability.",
+    "subtopics": "Folders for routes, controllers, models, utils",
+    "learning_outcomes": "Write scalable backend code",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Node.js Best Practices",
+    "practice_exercises": "Refactor existing project into modules",
+    "created_at": "2026-01-28T05:36:28.758Z",
+    "updated_at": "2026-01-28T05:36:28.758Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 120,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 9,
+    "topic": "Connecting to MongoDB",
+    "description": "Learn to store and retrieve data from MongoDB using Mongoose.",
+    "subtopics": "Mongoose setup, schemas, models, CRUD with DB",
+    "learning_outcomes": "Integrate MongoDB with Express backend",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Mongoose Docs",
+    "practice_exercises": "Store and fetch data for a sample app",
+    "created_at": "2026-01-28T05:37:22.963Z",
+    "updated_at": "2026-01-28T05:37:22.963Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 121,
+  "fields": {
+    "course": 3,
+    "module": 14,
+    "session_number": 10,
+    "topic": "Mini Backend Project & Review",
+    "description": "Build a small backend project applying all concepts learned.",
+    "subtopics": "Routing, CRUD, error handling, MongoDB integration",
+    "learning_outcomes": "Develop a fully functional backend application",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Project starter template",
+    "practice_exercises": "Build a Todo or Blog API with Express & MongoDB",
+    "created_at": "2026-01-28T05:38:22.948Z",
+    "updated_at": "2026-01-28T05:38:22.948Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 122,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 1,
+    "topic": "Introduction to NoSQL & MongoDB",
+    "description": "Understand NoSQL databases and MongoDB fundamentals.",
+    "subtopics": "NoSQL vs SQL, MongoDB overview, collections & documents",
+    "learning_outcomes": "Explain the differences between SQL and NoSQL and understand MongoDB basics",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MongoDB Official Docs",
+    "practice_exercises": "Install MongoDB and explore the shell",
+    "created_at": "2026-01-28T05:39:25.273Z",
+    "updated_at": "2026-01-28T05:39:25.273Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 123,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 2,
+    "topic": "MongoDB CRUD Operations – Part 1",
+    "description": "Learn to create and read data in MongoDB.",
+    "subtopics": "InsertOne, InsertMany, FindOne, Find queries, filters",
+    "learning_outcomes": "Perform basic create and read operations on MongoDB collections",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MongoDB CRUD Docs",
+    "practice_exercises": "Create a collection and insert sample documents",
+    "created_at": "2026-01-28T05:40:27.287Z",
+    "updated_at": "2026-01-28T05:40:27.287Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 124,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 3,
+    "topic": "MongoDB CRUD Operations – Part 2",
+    "description": "Update and delete documents in MongoDB.",
+    "subtopics": "UpdateOne, UpdateMany, DeleteOne, DeleteMany, upsert",
+    "learning_outcomes": "Perform update and delete operations on documents",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MongoDB CRUD Guide",
+    "practice_exercises": "Update and delete sample records in a collection",
+    "created_at": "2026-01-28T05:41:46.393Z",
+    "updated_at": "2026-01-28T05:41:46.393Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 125,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 4,
+    "topic": "Mongoose Basics",
+    "description": "Introduction to Mongoose for Node.js integration.",
+    "subtopics": "Schemas, models, connecting Mongoose to Express",
+    "learning_outcomes": "Create and use Mongoose schemas and models",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Mongoose Docs",
+    "practice_exercises": "Define a schema and model for a simple app",
+    "created_at": "2026-01-28T05:42:49.425Z",
+    "updated_at": "2026-01-28T05:42:49.425Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 126,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 5,
+    "topic": "Data Modeling & Relationships",
+    "description": "Learn how to structure data and create relationships",
+    "subtopics": "Embedded documents, references, one-to-many, many-to-many",
+    "learning_outcomes": "Model complex data structures using MongoDB and Mongoose",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Mongoose Relationships Guide",
+    "practice_exercises": "Design a schema with related collections",
+    "created_at": "2026-01-28T05:43:58.563Z",
+    "updated_at": "2026-01-28T05:43:58.563Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 127,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 6,
+    "topic": "Query Optimization & Indexing",
+    "description": "Improve performance with indexes and optimized queries.",
+    "subtopics": "Indexes, compound indexes, query efficiency",
+    "learning_outcomes": "Optimize MongoDB queries for faster performance",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MongoDB Indexing Docs",
+    "practice_exercises": "Create indexes and analyze query performance",
+    "created_at": "2026-01-28T05:44:59.602Z",
+    "updated_at": "2026-01-28T05:44:59.602Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 128,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 7,
+    "topic": "Aggregation Framework",
+    "description": "Learn MongoDB aggregation for complex queries.",
+    "subtopics": "$match, $group, $sort, $project, pipeline stages",
+    "learning_outcomes": "Use aggregation to summarize and transform data",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MongoDB Aggregation Docs",
+    "practice_exercises": "Aggregate sample sales or user data",
+    "created_at": "2026-01-28T05:46:08.421Z",
+    "updated_at": "2026-01-28T05:46:08.421Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 129,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 8,
+    "topic": "Validation & Schema Constraints",
+    "description": "Enforce data integrity with Mongoose validation.",
+    "subtopics": "Required fields, min/max values, custom validators",
+    "learning_outcomes": "Implement data validation in Mongoose schemas",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Mongoose Validation Docs",
+    "practice_exercises": "Add validation rules to an existing schema",
+    "created_at": "2026-01-28T05:47:12.215Z",
+    "updated_at": "2026-01-28T05:47:12.215Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 130,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 9,
+    "topic": "Data Migration & Backup",
+    "description": "Learn basic data migration and backup strategies.",
+    "subtopics": "MongoDB dump/restore, exporting data, migrating collections",
+    "learning_outcomes": "Backup and migrate MongoDB collections safely",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "MongoDB Backup & Restore Docs",
+    "practice_exercises": "Export and import sample data collections",
+    "created_at": "2026-01-28T05:48:10.989Z",
+    "updated_at": "2026-01-28T05:48:10.989Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 131,
+  "fields": {
+    "course": 3,
+    "module": 15,
+    "session_number": 10,
+    "topic": "Mini Database Project & Review",
+    "description": "Apply MongoDB and Mongoose skills in a mini project.",
+    "subtopics": "CRUD, data modeling, validation, aggregation",
+    "learning_outcomes": "Build a functional database layer for an application",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Project starter repository",
+    "practice_exercises": "Create a database for a small blog or e-commerce app",
+    "created_at": "2026-01-28T05:49:26.060Z",
+    "updated_at": "2026-01-28T05:49:26.060Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 132,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 1,
+    "topic": "Introduction to Machine Learning",
+    "description": "Introduction to machine learning concepts, real-world applications, and the overall ML workflow.",
+    "subtopics": "What is Machine Learning\r\nAI vs ML vs Deep Learning\r\nTypes of Machine Learning\r\nML Workflow",
+    "learning_outcomes": "Understand basic ML concepts\r\nIdentify different types of ML problems",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Andrew Ng – Machine Learning Notes\r\nGoogle Machine Learning Crash Course",
+    "practice_exercises": "Identify ML use cases\r\nClassify problems as supervised or unsupervised",
+    "created_at": "2026-01-28T12:25:39.636Z",
+    "updated_at": "2026-01-28T12:25:39.636Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 133,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 2,
+    "topic": "Machine Learning Pipeline & Data Preparation",
+    "description": "Understanding data preprocessing and the ML pipeline for model building.",
+    "subtopics": "Data Collection\r\nData Cleaning\r\nFeature Selection\r\nTrain-Test Split",
+    "learning_outcomes": "Prepare datasets for ML\r\nUnderstand ML workflow stages",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Scikit-learn Documentation\r\nPandas Documentation",
+    "practice_exercises": "Prepare dataset using Pandas\r\nSplit data into training and testing sets",
+    "created_at": "2026-01-28T12:26:53.271Z",
+    "updated_at": "2026-01-28T12:26:53.271Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 134,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 3,
+    "topic": "Linear Regression",
+    "description": "Build regression models to predict continuous values.",
+    "subtopics": "Simple Linear Regression\r\nMultiple Linear Regression\r\nCost Function\r\nModel Evaluation (R², MSE)",
+    "learning_outcomes": "Build regression models\r\nEvaluate regression performance",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – Linear Regression\r\nScikit-learn Regression Guide",
+    "practice_exercises": "Build linear regression model\r\nPredict housing prices dataset",
+    "created_at": "2026-01-28T12:27:52.054Z",
+    "updated_at": "2026-01-28T12:27:52.054Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 135,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 4,
+    "topic": "Logistic Regression & Classification Basics",
+    "description": "Introduction to classification algorithms and decision boundaries.",
+    "subtopics": "Logistic Regression\r\nSigmoid Function\r\nConfusion Matrix\r\nAccuracy, Precision, Recall",
+    "learning_outcomes": "Build classification models\r\nInterpret classification metrics",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – Logistic Regression\r\nScikit-learn Classification Guide",
+    "practice_exercises": "Build logistic regression model\r\nClassify spam vs non-spam emails",
+    "created_at": "2026-01-28T12:29:21.410Z",
+    "updated_at": "2026-01-28T12:29:21.410Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 136,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 5,
+    "topic": "k-Nearest Neighbors (KNN) Algorithm",
+    "description": "Understand instance-based learning using distance metrics.",
+    "subtopics": "KNN Algorithm\r\nDistance Metrics\r\nChoosing K\r\nPros and Cons",
+    "learning_outcomes": "Implement KNN models\r\nTune KNN parameters",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – KNN\r\nScikit-learn Neighbors Documentation",
+    "practice_exercises": "Implement KNN classifier\r\nTest different K values",
+    "created_at": "2026-01-28T12:30:42.164Z",
+    "updated_at": "2026-01-28T12:30:42.164Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 137,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 6,
+    "topic": "Decision Trees & Random Forests",
+    "description": "Tree-based models for regression and classification",
+    "subtopics": "Decision Trees\r\nEntropy & Gini Index\r\nRandom Forest Algorithm\r\nFeature Importance",
+    "learning_outcomes": "Build tree-based models\r\nUnderstand ensemble learning",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – Decision Trees\r\nScikit-learn Tree Models",
+    "practice_exercises": "Build decision tree classifier\r\nCompare decision tree vs random forest",
+    "created_at": "2026-01-28T12:33:16.381Z",
+    "updated_at": "2026-01-28T12:33:16.381Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 138,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 7,
+    "topic": "Support Vector Machines (SVM)",
+    "description": "Understand margin-based classification techniques.",
+    "subtopics": "Hyperplanes\r\nKernel Functions\r\nLinear vs Non-linear SVM\r\nRegularization",
+    "learning_outcomes": "Implement SVM models\r\nChoose appropriate kernels",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – SVM\r\nScikit-learn SVM Documentation",
+    "practice_exercises": "Train SVM classifier\r\nExperiment with kernels",
+    "created_at": "2026-01-28T12:34:41.066Z",
+    "updated_at": "2026-01-28T12:34:41.066Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 139,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 8,
+    "topic": "Unsupervised Learning – Clustering",
+    "description": "Explore patterns in unlabeled data using clustering algorithms",
+    "subtopics": "K-Means Clustering\r\nHierarchical Clustering\r\nElbow Method\r\nSilhouette Score",
+    "learning_outcomes": "Apply clustering techniques\r\nEvaluate clustering performance",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – K-Means\r\nScikit-learn Clustering Guide",
+    "practice_exercises": "Cluster customer segmentation data\r\nVisualize cluster results",
+    "created_at": "2026-01-28T12:36:34.535Z",
+    "updated_at": "2026-01-28T12:36:34.535Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 140,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 9,
+    "topic": "Model Evaluation & Hyperparameter Tuning",
+    "description": "Improve model performance through evaluation and tuning.",
+    "subtopics": "Cross Validation\r\nBias-Variance Tradeoff\r\nGrid Search\r\nRandom Search",
+    "learning_outcomes": "Evaluate ML models\r\nOptimize hyperparameters",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Scikit-learn Model Selection\r\nStatQuest – Bias vs Variance",
+    "practice_exercises": "Apply cross-validation\r\nTune model parameters",
+    "created_at": "2026-01-28T12:38:17.752Z",
+    "updated_at": "2026-01-28T12:38:17.752Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 141,
+  "fields": {
+    "course": 4,
+    "module": 23,
+    "session_number": 10,
+    "topic": "Machine Learning Mini Project",
+    "description": "Apply complete ML pipeline on a real-world dataset",
+    "subtopics": "Problem Definition\r\nData Preparation\r\nModel Building\r\nEvaluation & Reporting",
+    "learning_outcomes": "Build end-to-end ML model\r\nInterpret and present results",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Kaggle ML Datasets\r\nGoogle ML Case Studies",
+    "practice_exercises": "Mini ML project\r\nPrepare project report",
+    "created_at": "2026-01-28T12:39:40.702Z",
+    "updated_at": "2026-01-28T12:39:40.702Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 142,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 1,
+    "topic": "Introduction to Artificial Intelligence",
+    "description": "Overview of AI concepts, history, and applications",
+    "subtopics": "What is Artificial Intelligence\r\nHistory of AI\r\nAI vs ML vs Deep Learning\r\nApplications of AI",
+    "learning_outcomes": "Understand AI fundamentals\r\nDifferentiate AI, ML, and DL",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Russell & Norvig – Artificial Intelligence\r\nIBM AI Fundamentals",
+    "practice_exercises": "Identify AI-based applications",
+    "created_at": "2026-01-28T12:43:59.430Z",
+    "updated_at": "2026-01-28T12:43:59.430Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 143,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 2,
+    "topic": "Intelligent Agents & Search Techniques",
+    "description": "Study intelligent agents and problem-solving approaches",
+    "subtopics": "Intelligent Agents\r\nProblem Formulation\r\nUninformed Search\r\nInformed Search",
+    "learning_outcomes": "Understand agent-based systems\r\nApply basic search strategies",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "AI: A Modern Approach",
+    "practice_exercises": "Implement simple search logic",
+    "created_at": "2026-01-28T12:45:11.694Z",
+    "updated_at": "2026-01-28T12:45:11.694Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 144,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 3,
+    "topic": "Knowledge Representation & Reasoning",
+    "description": "Representing knowledge and reasoning in AI systems.",
+    "subtopics": "Logic-based Representation\r\nPredicate Logic\r\nInference Mechanisms",
+    "learning_outcomes": "Understand symbolic AI concepts\r\nApply logical reasoning",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Stanford AI Notes",
+    "practice_exercises": "Create logical rules for scenarios",
+    "created_at": "2026-01-28T12:46:24.184Z",
+    "updated_at": "2026-01-28T12:46:24.184Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 145,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 4,
+    "topic": "Introduction to Neural Networks",
+    "description": "Foundations of neural networks and biological inspiration",
+    "subtopics": "Biological Neurons\r\nArtificial Neuron Model\r\nPerceptron\r\nActivation Functions",
+    "learning_outcomes": "Understand neural network basics\r\nExplain neuron working",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Deep Learning – Ian Goodfellow\r\nStatQuest – Neural Networks",
+    "practice_exercises": "Implement single-layer perceptron",
+    "created_at": "2026-01-28T12:47:39.360Z",
+    "updated_at": "2026-01-28T12:47:39.360Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 146,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 5,
+    "topic": "Multi-Layer Neural Networks",
+    "description": "Deepening neural networks for complex tasks",
+    "subtopics": "Multi-Layer Perceptron\r\nForward Propagation\r\nLoss Functions",
+    "learning_outcomes": "Build multi-layer networks\r\nUnderstand loss minimization",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "Keras Documentation",
+    "practice_exercises": "Train simple MLP model",
+    "created_at": "2026-01-28T12:50:41.222Z",
+    "updated_at": "2026-01-28T12:50:41.222Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 147,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 6,
+    "topic": "Backpropagation & Optimization",
+    "description": "Learning how neural networks learn.",
+    "subtopics": "Backpropagation Algorithm\r\nGradient Descent\r\nLearning Rate\r\nOptimization Challenges",
+    "learning_outcomes": "Understand training process\r\nTune neural networks",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "StatQuest – Backpropagation",
+    "practice_exercises": "Visualize loss reduction",
+    "created_at": "2026-01-28T12:52:03.449Z",
+    "updated_at": "2026-01-28T12:52:03.449Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 148,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 7,
+    "topic": "Deep Learning Frameworks",
+    "description": "Hands-on introduction to DL libraries.",
+    "subtopics": "TensorFlow Basics\r\nKeras API\r\nPyTorch Overview",
+    "learning_outcomes": "Use DL frameworks\r\nBuild basic neural models",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "TensorFlow & PyTorch Docs",
+    "practice_exercises": "Build NN using Keras",
+    "created_at": "2026-01-28T12:54:56.489Z",
+    "updated_at": "2026-01-28T12:54:56.489Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 149,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 8,
+    "topic": "Convolutional Neural Networks (CNN)",
+    "description": "Deep learning for image processing",
+    "subtopics": "Convolution\r\nPooling\r\nCNN Architecture\r\nImage Classification",
+    "learning_outcomes": "Understand CNN structure\r\nApply CNNs on images",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "CS231n – Stanford",
+    "practice_exercises": "Image classification using CNN",
+    "created_at": "2026-01-28T12:56:04.608Z",
+    "updated_at": "2026-01-28T12:56:04.608Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 150,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 9,
+    "topic": "Transfer Learning",
+    "description": "Using pre-trained deep learning models.",
+    "subtopics": "Pre-trained Models\r\nFine-tuning\r\nVGG, ResNet Overview",
+    "learning_outcomes": "Apply transfer learning\r\nImprove model performance",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "TensorFlow Hub",
+    "practice_exercises": "Use pre-trained CNN",
+    "created_at": "2026-01-28T12:57:25.474Z",
+    "updated_at": "2026-01-28T12:57:25.474Z"
+  }
+},
+{
+  "model": "trainer.lessonplan",
+  "pk": 151,
+  "fields": {
+    "course": 4,
+    "module": 24,
+    "session_number": 10,
+    "topic": "Introduction to Natural Language Processing (NLP)",
+    "description": "Working with text data using AI",
+    "subtopics": "Text Preprocessing\r\nTokenization\r\nBag of Words\r\nTF-IDF",
+    "learning_outcomes": "Process text data\r\nExtract text features",
+    "estimated_duration_hours": "2.0",
+    "reference_materials": "NLTK Documentation",
+    "practice_exercises": "Text classification task",
+    "created_at": "2026-01-28T13:02:07.477Z",
+    "updated_at": "2026-01-28T13:02:07.477Z"
+  }
+}
+]

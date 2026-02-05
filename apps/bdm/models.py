@@ -1,8 +1,8 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 
-from django.contrib.auth.models import User
 from django.utils import timezone
 
 
@@ -29,7 +29,7 @@ class Lead(models.Model):
     status = models.CharField(max_length=10, choices=LeadStatus.choices, default=LeadStatus.NEW)
     
     # Assignment and Tracking
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, 
                                    limit_choices_to={'groups__name': 'TELE-CALLER'})
     enquiry_date = models.DateTimeField(auto_now_add=True)
     last_followup = models.DateTimeField(null=True, blank=True)
@@ -62,128 +62,295 @@ class Course(models.Model):
 
 
 class Trainer(models.Model):
-    
+
     class GenderChoice(models.TextChoices):
         MALE = 'M', 'Male'
         FEMALE = 'F', 'Female'
         OTHER = 'O', 'Other'
-    
-    # Personal Information
-    name = models.CharField(max_length=100)
-    gender = models.CharField(max_length=1, choices=GenderChoice.choices)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=15)
-    
-    # Professional Details
-    qualification = models.CharField(max_length=200)
-    coding_languages = models.TextField()  # Python, Java, JavaScript, etc.
-    frameworks = models.TextField()  # Django, React, Spring, etc.
+
+    class TeachingStyle(models.TextChoices):
+        PROJECT = 'project', 'Project-based'
+        THEORY = 'theory', 'Theory-oriented'
+        MIXED = 'mixed', 'Mixed approach'
+
+    # --------------------------------------------------
+    # RELATION
+    # --------------------------------------------------
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="trainer"
+    )
+
+    # --------------------------------------------------
+    # BASIC IDENTITY (Trainer Editable)
+    # --------------------------------------------------
+    full_name = models.CharField(max_length=150, blank=True)
+    profile_photo = models.ImageField(upload_to="trainers/", null=True, blank=True)
+    gender = models.CharField(max_length=1, choices=GenderChoice.choices, blank=True)
+
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+
     bio = models.TextField(blank=True)
-    experience = models.IntegerField()  # Years of experience
-    basic_pay = models.DecimalField(max_digits=10, decimal_places=2)
+
+    languages_spoken = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Comma-separated languages"
+    )
+
+    location = models.CharField(max_length=100, blank=True)
+    timezone = models.CharField(max_length=50, blank=True)
+
+    # --------------------------------------------------
+    # PROFESSIONAL EXPERTISE (Trainer Editable)
+    # --------------------------------------------------
+    qualification = models.CharField(max_length=200, blank=True)
+
+    certifications = models.TextField(
+        blank=True,
+        help_text="AWS, Google, Microsoft etc."
+    )
+
+    primary_domain = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Backend / Frontend / Data etc."
+    )
+
+    secondary_skills = models.TextField(
+        blank=True,
+        help_text="DevOps, Cloud, AI etc."
+    )
+
+    coding_languages = models.TextField(blank=True)
+    frameworks = models.TextField(blank=True)
+
+    experience_years = models.PositiveIntegerField(null=True, blank=True)
+    teaching_experience_years = models.PositiveIntegerField(null=True, blank=True)
+
+    teaching_style = models.CharField(
+        max_length=20,
+        choices=TeachingStyle.choices,
+        blank=True
+    )
+
+    portfolio_url = models.URLField(blank=True)
+    github_url = models.URLField(blank=True)
+    linkedin_url = models.URLField(blank=True)
+
+    # --------------------------------------------------
+    # PROFILE STATUS
+    # --------------------------------------------------
+    profile_completed = models.BooleanField(default=False)
+
+    # --------------------------------------------------
+    # META
+    # --------------------------------------------------
+    def __str__(self):
+        return self.full_name or self.user.username
     
     
-    
-    # System Fields
-    is_active = models.BooleanField(default=True)
+
+class TrainerAdminProfile(models.Model):
+
+    trainer = models.OneToOneField(
+        "Trainer",
+        on_delete=models.CASCADE,
+        related_name="admin_profile"
+    )
+
+    # -----------------------------
+    # HR / ADMIN CONTROLS
+    # -----------------------------
+    employee_id = models.CharField(
+        max_length=20,
+        blank=True
+    )
+
     date_joined = models.DateField(auto_now_add=True)
-    
+
+    salary = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Monthly salary"
+    )
+
+    batches_assigned = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Number of batches assigned"
+    )
+
+    performance_rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    background_verified = models.BooleanField(default=False)
+    profile_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    # -----------------------------
+    # AUTO EMPLOYEE ID (NO SIGNAL)
+    # -----------------------------
+    def save(self, *args, **kwargs):
+        if not self.employee_id:
+            last_pk = (
+                TrainerAdminProfile.objects
+                .order_by("-pk")
+                .values_list("pk", flat=True)
+                .first()
+            ) or 0
+
+            self.employee_id = f"TRN-{last_pk + 1:04d}"
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.name} - {self.experience} years"
+        return f"{self.employee_id} | {self.trainer}"
     
-    @property
-    def languages_list(self):
-        return [lang.strip() for lang in self.coding_languages.split(',')]
     
-    @property
-    def frameworks_list(self):
-        return [fw.strip() for fw in self.frameworks.split(',')]    
-
-
-
 class Student(models.Model):
+
     class GenderChoice(models.TextChoices):
         MALE = 'M', 'Male'
         FEMALE = 'F', 'Female'
         OTHER = 'O', 'Other'
-    
-    class PaymentOption(models.TextChoices):
-        EMI = 'emi', 'EMI'
-        ADVANCED = 'advanced', 'Advanced Full Payment'
-        MONTHLY = 'monthly', 'Monthly Payment'
-    
-    class CodingExpertise(models.TextChoices):
-        BEGINNER = 'beginner', 'Beginner'
-        INTERMEDIATE = 'intermediate', 'Intermediate'
-        EXPERT = 'expert', 'Expert'
-    
-    class ModeChoice(models.TextChoices):
-        REMOTE = 'remote', 'Remote'
-        ONSITE = 'onsite', 'Onsite'
-    
-    class BatchTime(models.TextChoices):
-        MORNING = 'morning', 'Morning'
-        EVENING = 'evening', 'Evening'
-        FULL_DAY = 'full_day', 'Full Day'
-    
-    class CourseStatus(models.TextChoices):
-        PHASE1 = 'phase1', 'Phase 1'
-        PHASE2 = 'phase2', 'Phase 2'
-        PHASE3 = 'phase3', 'Phase 3'
-        DROPPED = 'dropped', 'Dropped'
-        COMPLETED = 'completed', 'Completed'
-    
-    # Personal Information
-    name = models.CharField(max_length=100)
-    gender = models.CharField(max_length=1, choices=GenderChoice.choices)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=15)
-    address = models.TextField()
-    
-    # Educational Details
-    education = models.CharField(max_length=200)
+
+    # --------------------------------------------------
+    # RELATION
+    # --------------------------------------------------
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="student"
+    )
+
+    # --------------------------------------------------
+    # BASIC IDENTITY (Student Editable)
+    # --------------------------------------------------
+    full_name = models.CharField(max_length=150, blank=True)
+    profile_photo = models.ImageField(upload_to="students/", null=True, blank=True)
+    gender = models.CharField(max_length=1, choices=GenderChoice.choices, blank=True)
+
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+
+    # --------------------------------------------------
+    # ACADEMIC PROFILE (Student Editable)
+    # --------------------------------------------------
     bio = models.TextField(blank=True)
-    coding_expertise = models.CharField(max_length=15, choices=CodingExpertise.choices, 
-                                        default=CodingExpertise.BEGINNER)
-    
-    # Course Details
-    selected_course = models.ForeignKey(Course, on_delete=models.PROTECT)
-    payment_option = models.CharField(max_length=15, choices=PaymentOption.choices)
-    booking_fee_received = models.BooleanField(default=False)
-    mode = models.CharField(max_length=10, choices=ModeChoice.choices)
-    preferred_batch_time = models.CharField(max_length=10, choices=BatchTime.choices, 
-                                           null=True, blank=True)
-    
-    # Academic Progress
-    attendance_percentage = models.FloatField(null=True, blank=True)  # 0-100
-    task_score_sum = models.IntegerField(default=0)
-    join_date = models.DateField()
-    certificate_eligible = models.BooleanField(null=True, blank=True)
-    course_completion_status = models.CharField(max_length=10, choices=CourseStatus.choices, 
-                                                default=CourseStatus.PHASE1)
- 
-    
-    # System Fields
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-    
-    class Meta:
-        ordering = ['-join_date']
-    
+
+    current_education = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text="BSc / Diploma / High School etc."
+    )
+
+    institution = models.CharField(max_length=200, blank=True)
+
+    learning_goals = models.TextField(blank=True)
+
+    preferred_domain = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Web / Data / Mobile / AI"
+    )
+
+    skills = models.TextField(
+        blank=True,
+        help_text="Python, HTML, SQL etc."
+    )
+
+    experience_level = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Beginner / Intermediate / Advanced"
+    )
+
+    portfolio_url = models.URLField(blank=True)
+
+    # --------------------------------------------------
+    # PROFILE STATUS
+    # --------------------------------------------------
+    profile_completed = models.BooleanField(default=False)
+
+    # --------------------------------------------------
+    # META
+    # --------------------------------------------------
     def __str__(self):
-        return f"{self.name} - {self.selected_course}"
+        return self.full_name or self.user.username
     
-    def update_attendance(self, present_days, total_days):
-        if total_days > 0:
-            self.attendance_percentage = (present_days / total_days) * 100
-            self.save()
-    
-    def add_task_score(self, score):
-        self.task_score_sum += score
-        self.save()    
 
 
+from django.db import models
+
+
+class StudentAdminProfile(models.Model):
+
+    student = models.OneToOneField(
+        "Student",
+        on_delete=models.CASCADE,
+        related_name="admin_profile"
+    )
+
+    # --------------------------------------------------
+    # ADMIN CONTROLS
+    # --------------------------------------------------
+    student_code = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True
+    )
+
+    date_joined = models.DateField(auto_now_add=True)
+
+    enrolled_course = models.CharField(max_length=200, blank=True)
+    batch_assigned = models.CharField(max_length=100, blank=True)
+
+    booking_fee_paid = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+
+
+    background_verified = models.BooleanField(default=False)
+    profile_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    # --------------------------------------------------
+    # AUTO STUDENT ID (NO SIGNAL)
+    # --------------------------------------------------
+    def save(self, *args, **kwargs):
+        if not self.student_id:
+            last_pk = (
+                StudentAdminProfile.objects
+                .order_by("-pk")
+                .values_list("pk", flat=True)
+                .first()
+            ) or 0
+
+            self.student_id = f"STD-{last_pk + 1:04d}"
+
+        super().save(*args, **kwargs)
+
+    # --------------------------------------------------
+    # META
+    # --------------------------------------------------
+    def __str__(self):
+        return f"{self.student_id} | {self.student}"    
+    
+    
+    
 class Batch(models.Model):
     # Basic Information
     name = models.CharField(max_length=100, unique=True)
@@ -233,7 +400,7 @@ class Batch(models.Model):
     
    
 class TeleCallerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
     department = models.CharField(max_length=100, default='Business Development')
     join_date = models.DateField(auto_now_add=True)
@@ -257,7 +424,7 @@ class Counselor(models.Model):
     Counselors who handle lead follow-ups
     Similar to TeleCallerProfile but with counseling focus
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
     department = models.CharField(max_length=100, default='Admissions & Counseling')
     join_date = models.DateField(auto_now_add=True)
@@ -303,7 +470,7 @@ class CallHistory(models.Model):
         CONVERTED = 'converted', 'Converted'
     
     lead = models.ForeignKey('Lead', on_delete=models.CASCADE, related_name='call_history')
-    caller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+    caller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                               related_name='calls_made')
     
     # Call details
@@ -351,7 +518,7 @@ class PaymentDocument(models.Model):
     document_file = models.FileField(upload_to='payment_documents/%Y/%m/')
     description = models.TextField(blank=True)
     
-    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -401,7 +568,7 @@ class PaymentReminder(models.Model):
     message_template = models.TextField()
     
     # Follow-up
-    sent_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    sent_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     notes = models.TextField(blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -439,7 +606,7 @@ class PDCCollection(models.Model):
     
     # Collection details
     collected_date = models.DateField()
-    collected_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+    collected_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
                                     related_name='collected_cheques')
     
     # Status tracking
@@ -480,6 +647,7 @@ class OnboardingChecklist(models.Model):
     
     # Payment
     booking_fee_paid = models.BooleanField(default=False)
+    admission_fee_paid= models.BooleanField(default=False)
     payment_plan_created = models.BooleanField(default=False)
     
     # Enrollment
@@ -502,7 +670,7 @@ class OnboardingChecklist(models.Model):
     # Completion
     onboarding_completed = models.BooleanField(default=False)
     completed_date = models.DateField(null=True, blank=True)
-    completed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     
     # Tracking
     created_at = models.DateTimeField(auto_now_add=True)
@@ -567,7 +735,7 @@ class StudentIssue(models.Model):
     description = models.TextField()
     
     # Assignment
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='assigned_issues')
     
     # Status tracking
@@ -575,7 +743,7 @@ class StudentIssue(models.Model):
     
     # Resolution
     resolution_notes = models.TextField(blank=True)
-    resolved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='resolved_issues')
     resolved_at = models.DateTimeField(null=True, blank=True)
     
@@ -641,7 +809,7 @@ class Notification(models.Model):
         DOCUMENT_PENDING = 'document_pending', 'Document Pending'
         GENERAL = 'general', 'General Notification'
     
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE,
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                  related_name='notifications')
     
     # Notification details
@@ -675,7 +843,7 @@ class UserNotificationSettings(models.Model):
     """
     User preferences for notifications
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE,
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                related_name='notification_settings')
     
     # Email notifications

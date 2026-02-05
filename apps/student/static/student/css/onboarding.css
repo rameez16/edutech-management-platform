@@ -1,0 +1,210 @@
+/* ================================
+   STUDENT ONBOARDING MODULE
+================================ */
+
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+   
+}
+
+
+/* Root wrapper must fill base.html content area */
+.student-onboarding {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;          /* base.html already has padding */
+    margin: 0;
+}
+
+/* Header spacing */
+.onboarding-header {
+    margin-bottom: 24px;
+    height: 200px;
+}
+
+.onboarding-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* PROGRESS */
+.onboarding-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+
+/* Progress bar */
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 6px;
+}
+
+.onboarding-fill {
+    background: linear-gradient(90deg, var(--emerald-light), var(--emerald));
+    height: 100%;
+    border-radius: 10px;
+}
+
+.progress-status {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+}
+
+.status.completed { color: var(--success); }
+.status.pending   { color: var(--warning); }
+.status.locked    { color: var(--text-muted); }
+
+/* Steps layout */
+.onboarding-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+    height: 230px;
+}
+
+/* Step cards */
+.step-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Buttons full width inside cards */
+.step-card .btn,
+.step-card .btn-group-vertical a {
+    width: 100%;
+}
+
+/* HEADER */
+.step-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+}
+
+/* BADGES */
+.badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.badge.success {
+    background: rgba(34,197,94,0.15);
+    color: var(--success);
+}
+
+.badge.warning {
+    background: rgba(234,179,8,0.15);
+    color: var(--warning);
+}
+
+.badge.locked {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-muted);
+}
+
+/* TEXT */
+.step-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* BUTTONS */
+.btn {
+    padding: 10px 16px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+    color: white;
+}
+
+.btn.secondary {
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    color: white;
+}
+
+.btn.outline {
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+.btn.disabled {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.btn-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* NEXT STEP */
+.next-step-card {
+    padding: 26px;
+    height: 150px;
+}
+
+.next-step-card h4 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.next-step-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .onboarding-steps {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

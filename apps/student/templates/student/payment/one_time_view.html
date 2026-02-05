@@ -1,0 +1,60 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'student/css/pdc_view.css' %}">
+
+<div class="payment-page">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h2>Fee Payment & Admission</h2>
+      
+    </div>
+
+    <!-- STUDENT INFO CARD -->
+    <div class="card">
+        <div class="info-grid">
+            <p><strong>Application ID:</strong> ADI-1023</p>
+            <p><strong>Student Name:</strong> John Mathew</p>
+            <p><strong>Course:</strong> Full Stack Development</p>
+            <p>
+                <strong>Admission Status:</strong>
+                <span class="badge success">Confirmed</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- FEE SUMMARY CARD -->
+    <div class="card">
+        <h4>Fee Summary</h4>
+
+        <div class="row">
+            <span>Admission Fee</span>
+            <span>₹ 5,000</span>
+        </div>
+
+        <div class="row">
+            <span>Course Fee</span>
+            <span>₹ 45,000</span>
+        </div>
+
+        <div class="row">
+            <span>Remaining Amount</span>
+            <span class="amount-due">₹ 50,000</span>
+        </div>
+
+        <div class="row">
+            <span>Payment Mode</span>
+            <span class="pill">One Time Payment</span>
+        </div>
+        
+
+        <a href="{% url 'student:payment' %}" class="back-link">
+            ← Back to Home
+        </a>
+    </div>
+    
+
+</div>
+{% endblock %}

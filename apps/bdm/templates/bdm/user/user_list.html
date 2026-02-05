@@ -1,0 +1,914 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<div class="users-container">
+    <div class="users-header">
+        <div class="header-content">
+            <h1 class="page-title">
+                <i class="header-icon">👥</i>
+                User Management
+            </h1>
+            <p class="page-subtitle">Manage system users and their trainer profiles</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-card">
+                <div class="stat-icon">👤</div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ users|length }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <div class="stat-number">{{ active_users_count }}</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="users-table-container">
+        <div class="table-header">
+            <div class="table-actions">
+                <div class="search-box">
+                    <i class="search-icon">🔍</i>
+                    <input type="text" placeholder="Search users..." class="search-input" id="userSearch">
+                </div>
+                <div class="filter-dropdown">
+                    <select class="filter-select" id="roleFilter">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="trainer">Trainer</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                <div class="filter-dropdown">
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="active">Active Only</option>
+                        <option value="inactive">Inactive Only</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th class="user-col">
+                            <div class="table-header-cell">
+                                <span>User</span>
+                                <i class="sort-icon">↓</i>
+                            </div>
+                        </th>
+                        <th class="email-col">
+                            <div class="table-header-cell">
+                                <span>Email</span>
+                            </div>
+                        </th>
+                        <th class="status-col">
+                            <div class="table-header-cell">
+                                <span>Status</span>
+                            </div>
+                        </th>
+                        <th class="role-col">
+                            <div class="table-header-cell">
+                                <span>Role</span>
+                            </div>
+                        </th>
+                        <th class="actions-col">
+                            <div class="table-header-cell">
+                                <span>Actions</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="user-row" data-role="{{ user.role|lower }}" data-status="{% if user.is_active %}active{% else %}inactive{% endif %}">
+                        <td class="user-info-cell">
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    {{ user.username|first|upper }}
+                                </div>
+                                <div class="user-details">
+                                    <div class="user-name">{{ user.username }}</div>
+                                    <div class="user-meta">
+                                        {% if user.first_name or user.last_name %}
+                                        {{ user.first_name }} {{ user.last_name }}
+                                        {% else %}
+                                        No name provided
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="email-cell">
+                            <div class="email-wrapper">
+                                <i class="email-icon">✉️</i>
+                                <a href="mailto:{{ user.email }}" class="email-link">{{ user.email }}</a>
+                            </div>
+                        </td>
+                        <td class="status-cell">
+                            <div class="status-badge {% if user.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                <span class="status-dot"></span>
+                                {{ user.is_active|yesno:"Active,Inactive" }}
+                            </div>
+                        </td>
+                        <td class="role-cell">
+                            <div class="role-badge role-{{ user.role|lower }}">
+                                {{ user.role }}
+                            </div>
+                        </td>
+                        <td class="actions-cell">
+                            <div class="action-buttons">
+                                <a href="{% url 'bdm:trainer_admin_create' %}" class="action-btn btn-add" title="Add Trainer Profile">
+                                    <i class="btn-icon">➕</i>
+                                    <span class="btn-text">Add Profile</span>
+                                </a>
+                                <a href="#" class="action-btn btn-view" title="View Details">
+                                    <i class="btn-icon">👁️</i>
+                                    <span class="btn-text">View</span>
+                                </a>
+                                <div class="action-dropdown">
+                                    <button class="action-menu-btn">
+                                        <i class="menu-icon">⋯</i>
+                                    </button>
+                                    <div class="action-menu">
+                                        <a href="#" class="menu-item">
+                                            <i class="menu-icon">✏️</i>
+                                            Edit User
+                                        </a>
+                                        <a href="#" class="menu-item">
+                                            <i class="menu-icon">🔑</i>
+                                            Reset Password
+                                        </a>
+                                        <div class="menu-divider"></div>
+                                        <a href="#" class="menu-item text-danger">
+                                            <i class="menu-icon">🚫</i>
+                                            Deactivate
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="empty-row">
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon">👥</div>
+                                <h3>No Users Found</h3>
+                                <p>There are no users in the system yet.</p>
+                                <a href="#" class="btn-primary">
+                                    <i class="btn-icon">➕</i>
+                                    Add New User
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if users.has_other_pages %}
+        <div class="pagination">
+            {% if users.has_previous %}
+            <a href="?page={{ users.previous_page_number }}" class="page-link prev">
+                <i class="pagination-icon">←</i>
+                Previous
+            </a>
+            {% endif %}
+            
+            <div class="page-numbers">
+                {% for i in users.paginator.page_range %}
+                    {% if users.number == i %}
+                    <span class="page-number active">{{ i }}</span>
+                    {% else %}
+                    <a href="?page={{ i }}" class="page-number">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            {% if users.has_next %}
+            <a href="?page={{ users.next_page_number }}" class="page-link next">
+                Next
+                <i class="pagination-icon">→</i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #0077cc;
+        --light-blue: #e6f2ff;
+        --lighter-blue: #f0f8ff;
+        --blue-hover: #005fa3;
+        --border-color: #d0e7ff;
+        --text-dark: #1a365d;
+        --text-light: #4a5568;
+        --text-lighter: #718096;
+        --success: #38a169;
+        --warning: #d69e2e;
+        --danger: #e53e3e;
+        --white: #ffffff;
+        --gray-light: #f7fafc;
+        --gray-border: #e2e8f0;
+        --shadow: 0 4px 12px rgba(0, 119, 204, 0.08);
+        --shadow-hover: 0 8px 24px rgba(0, 119, 204, 0.15);
+    }
+
+    .users-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    .users-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--light-blue);
+    }
+
+    .page-title {
+        color: var(--text-dark);
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-icon {
+        font-size: 36px;
+    }
+
+    .page-subtitle {
+        color: var(--text-light);
+        margin: 8px 0 0 0;
+        font-size: 16px;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 20px;
+    }
+
+    .stat-card {
+        background: var(--lighter-blue);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        min-width: 140px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        font-size: 32px;
+        color: var(--primary-blue);
+    }
+
+    .stat-number {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--text-light);
+        margin-top: 4px;
+    }
+
+    .users-table-container {
+        background: var(--white);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px;
+        background: var(--lighter-blue);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        max-width: 300px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: var(--text-lighter);
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 44px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--white);
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    }
+
+    .filter-dropdown {
+        min-width: 150px;
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--white);
+        color: var(--text-dark);
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230077cc' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 12px;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        margin: 0;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .users-table thead {
+        background: var(--lighter-blue);
+    }
+
+    .users-table th {
+        padding: 16px 20px;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 14px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .table-header-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sort-icon {
+        font-size: 12px;
+        opacity: 0.5;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+
+    .sort-icon:hover {
+        opacity: 1;
+    }
+
+    .users-table td {
+        padding: 20px;
+        border-bottom: 1px solid var(--gray-border);
+        vertical-align: middle;
+    }
+
+    .users-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .users-table tbody tr:hover {
+        background: var(--lighter-blue);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 119, 204, 0.1);
+    }
+
+    .user-info-cell {
+        min-width: 200px;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #0077cc, #00b4d8);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+    }
+
+    .user-meta {
+        font-size: 12px;
+        color: var(--text-lighter);
+    }
+
+    .email-cell {
+        min-width: 250px;
+    }
+
+    .email-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .email-icon {
+        font-size: 14px;
+        opacity: 0.7;
+    }
+
+    .email-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .email-link:hover {
+        color: var(--blue-hover);
+        text-decoration: underline;
+    }
+
+    .status-cell {
+        min-width: 120px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #e6fffa;
+        color: #234e52;
+        border: 1px solid #81e6d9;
+    }
+
+    .status-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+        border: 1px solid #fc8181;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-active .status-dot {
+        background: #38a169;
+    }
+
+    .status-inactive .status-dot {
+        background: #e53e3e;
+    }
+
+    .role-cell {
+        min-width: 120px;
+    }
+
+    .role-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        min-width: 80px;
+    }
+
+    .role-admin {
+        background: #ebf8ff;
+        color: #2c5282;
+        border: 1px solid #90cdf4;
+    }
+
+    .role-trainer {
+        background: #f0fff4;
+        color: #276749;
+        border: 1px solid #9ae6b4;
+    }
+
+    .role-student {
+        background: #faf5ff;
+        color: #553c9a;
+        border: 1px solid #d6bcfa;
+    }
+
+    .actions-cell {
+        min-width: 250px;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-add {
+        background: var(--primary-blue);
+        color: white;
+    }
+
+    .btn-add:hover {
+        background: var(--blue-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .btn-view {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-view:hover {
+        background: var(--lighter-blue);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .action-menu-btn {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        color: var(--text-lighter);
+    }
+
+    .action-menu-btn:hover {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+    }
+
+    .action-dropdown {
+        position: relative;
+    }
+
+    .action-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 8px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        min-width: 180px;
+        z-index: 100;
+        display: none;
+        overflow: hidden;
+        border: 1px solid var(--gray-border);
+    }
+
+    .action-dropdown:hover .action-menu {
+        display: block;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        text-decoration: none;
+        color: var(--text-dark);
+        font-size: 14px;
+        transition: background 0.3s;
+        border-bottom: 1px solid var(--gray-border);
+    }
+
+    .menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .menu-item:hover {
+        background: var(--lighter-blue);
+    }
+
+    .menu-divider {
+        height: 1px;
+        background: var(--gray-border);
+        margin: 4px 0;
+    }
+
+    .text-danger {
+        color: var(--danger) !important;
+    }
+
+    .menu-icon {
+        font-size: 16px;
+    }
+
+    .btn-icon {
+        font-size: 14px;
+    }
+
+    .btn-text {
+        display: inline;
+    }
+
+    .empty-row {
+        text-align: center;
+    }
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        color: var(--text-dark);
+        margin: 0 0 12px 0;
+        font-size: 20px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        margin: 0 0 24px 0;
+    }
+
+    .empty-state .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .empty-state .btn-primary:hover {
+        background: var(--blue-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        padding: 30px 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .page-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: var(--primary-blue);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .page-link:hover {
+        background: var(--light-blue);
+        transform: translateY(-2px);
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 8px;
+    }
+
+    .page-number {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .page-number:hover {
+        background: var(--light-blue);
+    }
+
+    .page-number.active {
+        background: var(--primary-blue);
+        color: white;
+    }
+
+    .pagination-icon {
+        font-size: 14px;
+    }
+
+    @media (max-width: 1024px) {
+        .users-container {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .users-header {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header-stats {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .table-actions {
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            max-width: 100%;
+            flex: 100%;
+        }
+
+        .filter-dropdown {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-text {
+            display: none;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header-stats {
+            flex-direction: column;
+        }
+
+        .action-buttons {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userSearch = document.getElementById('userSearch');
+        const roleFilter = document.getElementById('roleFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const userRows = document.querySelectorAll('.user-row');
+        
+        function filterUsers() {
+            const searchTerm = userSearch.value.toLowerCase();
+            const roleValue = roleFilter.value.toLowerCase();
+            const statusValue = statusFilter.value;
+            
+            userRows.forEach(row => {
+                const username = row.querySelector('.user-name').textContent.toLowerCase();
+                const email = row.querySelector('.email-link').textContent.toLowerCase();
+                const role = row.dataset.role;
+                const status = row.dataset.status;
+                
+                const matchesSearch = username.includes(searchTerm) || email.includes(searchTerm);
+                const matchesRole = !roleValue || role === roleValue;
+                const matchesStatus = !statusValue || status === statusValue;
+                
+                if (matchesSearch && matchesRole && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Show/hide empty state
+            const visibleRows = Array.from(userRows).filter(row => row.style.display !== 'none');
+            const emptyRow = document.querySelector('.empty-row');
+            
+            if (visibleRows.length === 0 && userRows.length > 0) {
+                if (!emptyRow) {
+                    const tbody = document.querySelector('.users-table tbody');
+                    const newEmptyRow = document.createElement('tr');
+                    newEmptyRow.className = 'empty-row';
+                    newEmptyRow.innerHTML = `
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon">🔍</div>
+                                <h3>No Matching Users</h3>
+                                <p>Try adjusting your search or filters</p>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(newEmptyRow);
+                }
+            } else if (emptyRow) {
+                emptyRow.remove();
+            }
+        }
+        
+        userSearch.addEventListener('input', filterUsers);
+        roleFilter.addEventListener('change', filterUsers);
+        statusFilter.addEventListener('change', filterUsers);
+    });
+</script>
+
+{% endblock %}

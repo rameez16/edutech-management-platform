@@ -1,0 +1,34 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}My Batches{% endblock %}
+{% block page_title %}Assigned Batches{% endblock %}
+
+{% block content %}
+
+<section class="stats-grid">
+    {% for batch in batches %}
+    <a href="{% url 'trainer:batch-overview' batch.id %}">
+        <div class="glass-card batch-card">
+            <h4>Batch ID: {{ batch.name }}</h4>
+            <ul class="batch-info">
+                <li><strong>Course:</strong> {{ batch.course }}</li>
+                <li><strong>Timing:</strong> {{ batch.timing }}</li>
+                <li><strong>Duration:</strong> {{ batch.duration }}</li>
+                <li><strong>Start Date:</strong> {{ batch.start_date }}</li>
+                <li><strong>Expected End:</strong> {{ batch.end_date }}</li>
+                <li><strong>Classes:</strong> {{ batch.classes_completed }} Completed</li>
+            </ul>
+            <div class="progress-wrapper">
+                <div class="progress-label">Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ batch.progress }}%;"></div>
+                </div>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</section>
+
+
+{% endblock %}

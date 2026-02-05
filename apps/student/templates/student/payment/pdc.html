@@ -1,0 +1,154 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'student/css/payment.css' %}">
+
+<div class="payment-container glass-card">
+
+    <!-- HEADER -->
+    <div class="payment-header">
+        <h2>Student Admission & Fee Management</h2>
+        <div class="student-info">
+            <h3>{{ student.name }}</h3>
+            <p>{{ student.email }}</p>
+            <p><b>Student ID:</b> {{ student.student_id }}</p>
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="fee-summary">
+        <div class="fee-box">
+            <p>Due Amount</p>
+            <h3>₹{{ total_fee }}</h3>
+        </div>
+
+        <div class="fee-box">
+            <p>Paid Amount</p>
+            <h3>₹{{ paid_amount }}</h3>
+        </div>
+
+        <div class="fee-box highlight">
+            <p>Pending Amount</p>
+            <h3>₹{{ pending_amount }}</h3>
+        </div>
+    </div>
+
+    <center><h2>PDC</h2></center>
+
+    <!-- PAYMENT MODE -->
+    <div class="payment-mode-switch">
+        <span class="label">Payment Mode:</span>
+        <div class="mode-tabs">
+            <a href="{% url 'student:onetime_view' %}" class="mode-btn">One-Time Payment</a>
+            <a href="{% url 'student:pdc' %}" class="mode-btn active">PDC</a>
+            <a href="{% url 'student:emi' %}" class="mode-btn">EMI</a>
+            <a href="{% url 'student:installments' %}" class="mode-btn">Installment</a>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="payment-row">
+
+        <!-- LEFT -->
+        <div class="left-column">
+            <div class="fee-summary-box">
+                <h4>Fee Details</h4>
+
+                <div class="fee-row">
+                    <span>Admission Fee</span>
+                    <strong>₹{{ admission_fee }}</strong>
+                </div>
+
+                <div class="fee-row">
+                    <span>Course Fee</span>
+                    <strong>₹{{ course_fee }}</strong>
+                </div>
+
+                <div class="fee-row total">
+                    <span>Total Fee</span>
+                    <strong>₹{{ total_fee }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER -->
+        <div class="center-column">
+            <h4>PDC Cheque</h4>
+
+            <table class="pdc-table">
+                <thead>
+                    <tr>
+                        <th>Installment</th>
+                        <th>Cheque No</th>
+                        <th>Bank</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for pdc in pdc_payments %}
+                    <tr>
+                        <td>{{ pdc.installment_number }}</td>
+                        <td>{{ pdc.cheque_number }}</td>
+                        <td>{{ pdc.bank_name }}</td>
+                        <td>₹{{ pdc.amount }}</td>
+                        <td>{{ pdc.cheque_date }}</td>
+
+                        <!-- STATUS -->
+                        <td>
+                            {% if pdc.payment_status == 'completed' %}
+                                <span class="status-paid">Paid</span>
+                            {% else %}
+                                <span class="status-pending">Pending</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- ACTION -->
+                        <td>
+                            {% if pdc.payment_status == 'completed' %}
+                                <span class="status-completed">Completed</span>
+
+                            {% elif pdc.cheque_date <= today %}
+                                <a href="{% url 'QR_pay' %}" class="pay-btn">Pay</a>
+
+                            {% else %}
+                                <span class="status-upcoming">Upcoming</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align:center;">
+                            No PDC records available
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right-column">
+            <div class="reminder-box">
+                <h4>Reminders</h4>
+                <label><input type="checkbox" checked> Email reminder</label><br>
+                <label><input type="checkbox" checked> SMS reminder</label>
+
+                <br><br>
+                <a href="#" class="mode-btn active">View your status</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- NOTE -->
+    <div class="note">
+        <p><b>Note:</b> Please submit your post-dated cheques to the administration office.</p>
+    </div>
+
+</div>
+{% endblock %}

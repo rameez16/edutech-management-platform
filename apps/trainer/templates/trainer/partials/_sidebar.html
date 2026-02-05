@@ -8,7 +8,8 @@
 
         <!-- Dashboard -->
         <li class="nav-item">
-            <a href="{% url 'trainer:dashboard' %}" class="nav-link active">
+            <a href="{% url 'trainer:dashboard' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"/>
                     <rect x="14" y="3" width="7" height="7"/>
@@ -21,7 +22,8 @@
 
         <!-- Profile -->
         <li class="nav-item">
-            <a href="{% url 'trainer:profile' %}" class="nav-link">
+            <a href="{% url 'trainer:profile' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
@@ -32,7 +34,8 @@
 
         <!-- My Batches -->
         <li class="nav-item">
-            <a href="{% url 'trainer:my_batches' %}" class="nav-link">
+            <a href="{% url 'trainer:my_batches' %}"
+                class="nav-link {% if request.resolver_match.namespace == 'trainer' and 'batch' in request.resolver_match.url_name %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="18" height="6"/>
                     <rect x="3" y="9" width="18" height="6"/>
@@ -119,6 +122,11 @@
                 <span>Upload Daily Classes</span>
             </a>
         </li>
+
+        <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
 
     </ul>
 </aside>

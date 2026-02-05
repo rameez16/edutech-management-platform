@@ -1,0 +1,34 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'student/css/profile.css' %}">
+
+<div class="main-content overview-page">
+
+    <div class="page-header">
+        <h2>Student Settings</h2>
+        <p>Overview</p>
+    </div>
+
+    <div class="tabs">
+        <a href="/overview/" class="tab-link active">Overview</a>
+        <a href="/profile/" class="tab-link">Profile</a>
+        <a href="/password/" class="tab-link">Password</a>
+    </div>
+
+    <div class="overview-card">
+        <h3>Welcome, Rinta 👋</h3>
+
+        <ul class="overview-list">
+            <li><strong>Student ID:</strong> STU1023</li>
+            <li><strong>Course:</strong> BSc Computer Science</li>
+            <li><strong>Batch:</strong> 2023 – 2026</li>
+            <li><strong>Status:</strong> Active</li>
+        </ul>
+    </div>
+
+</div>
+
+{% endblock %}

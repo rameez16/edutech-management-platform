@@ -1,0 +1,1189 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block title %}Leads | CRM Admin{% endblock %}
+
+{% block page_title %}
+Leads Management
+{% endblock %}
+
+{% block page_subtitle %}
+View, assign, and manage all leads
+{% endblock %}
+
+   
+   
+{% block extra_css %} 
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Scoped styles - only affect content within .leads-page-wrapper */
+        .leads-page-wrapper {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .leads-page-wrapper * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .leads-page-wrapper {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --accent: #0ea5e9;
+            --accent-dark: #0284c7;
+            --success: #10b981;
+            --success-light: #34d399;
+            --warning: #f59e0b;
+            --warning-light: #fbbf24;
+            --info: #06b6d4;
+            --info-light: #22d3ee;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --teal: #14b8a6;
+            --bg: #f0f9ff;
+            --bg-secondary: #e0f2fe;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --border: #cbd5e1;
+            --shadow: 0 4px 24px rgba(59, 130, 246, 0.1);
+            --shadow-lg: 0 20px 60px rgba(59, 130, 246, 0.15);
+            --shadow-colored: 0 8px 32px rgba(14, 165, 233, 0.15);
+        }
+
+        /* Remove custom navbar - use base template's navbar */
+        .leads-page-wrapper .navbar {
+            display: none;
+        }
+
+        /* Main Container */
+        .leads-page-wrapper .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+        }
+
+        /* Header */
+        .leads-page-wrapper .page-header {
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .leads-page-wrapper .page-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.02em;
+        }
+
+        .leads-page-wrapper .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Stats Cards */
+        .leads-page-wrapper .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease 0.1s backwards;
+        }
+
+        .leads-page-wrapper .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leads-page-wrapper .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .leads-page-wrapper .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .leads-page-wrapper .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15);
+            border-color: var(--primary-light);
+        }
+
+        .leads-page-wrapper .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .leads-page-wrapper .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .leads-page-wrapper .stat-card.new {
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+
+        .leads-page-wrapper .stat-card.new:hover {
+            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.2);
+        }
+
+        .leads-page-wrapper .stat-card.new::before { 
+            background: linear-gradient(90deg, var(--info), var(--info-light)); 
+        }
+        
+        .leads-page-wrapper .stat-card.follow-up {
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .leads-page-wrapper .stat-card.follow-up:hover {
+            box-shadow: 0 12px 40px rgba(245, 158, 11, 0.2);
+        }
+
+        .leads-page-wrapper .stat-card.follow-up::before { 
+            background: linear-gradient(90deg, var(--warning), var(--warning-light)); 
+        }
+        
+        .leads-page-wrapper .stat-card.converted {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .leads-page-wrapper .stat-card.converted:hover {
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.2);
+        }
+
+        .leads-page-wrapper .stat-card.converted::before { 
+            background: linear-gradient(90deg, var(--success), var(--success-light)); 
+        }
+
+        .leads-page-wrapper .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .leads-page-wrapper .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .leads-page-wrapper .stat-card.new .stat-icon {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(34, 211, 238, 0.1));
+            color: var(--info);
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.2);
+        }
+
+        .leads-page-wrapper .stat-card.follow-up .stat-icon {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
+            color: var(--warning);
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+        }
+
+        .leads-page-wrapper .stat-card.converted .stat-icon {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+            color: var(--success);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+        }
+
+        .leads-page-wrapper .stat-count {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .leads-page-wrapper .stat-label {
+            color: var(--text-light);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin-top: 0.35rem;
+        }
+
+        .leads-page-wrapper .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .leads-page-wrapper .stat-change.positive {
+            color: var(--success);
+        }
+
+        .leads-page-wrapper .stat-change.neutral {
+            color: var(--text-light);
+        }
+
+        /* Filter Section */
+        .leads-page-wrapper .filter-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease 0.2s backwards;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leads-page-wrapper .filter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--info));
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .leads-page-wrapper .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .leads-page-wrapper .filter-title {
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .leads-page-wrapper .filter-title i {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .leads-page-wrapper .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .leads-page-wrapper .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .leads-page-wrapper .filter-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .leads-page-wrapper .filter-select,
+        .leads-page-wrapper .search-input {
+            padding: 0.625rem 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8125rem;
+            color: var(--text);
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .leads-page-wrapper .filter-select:focus,
+        .leads-page-wrapper .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .leads-page-wrapper .search-wrapper {
+            position: relative;
+            grid-column: 1 / -1;
+        }
+
+        .leads-page-wrapper .search-input {
+            width: 100%;
+            padding-left: 2.5rem;
+        }
+
+        .leads-page-wrapper .search-icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            pointer-events: none;
+            font-size: 0.875rem;
+        }
+
+        .leads-page-wrapper .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .leads-page-wrapper .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            text-decoration: none;
+        }
+
+        .leads-page-wrapper .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .leads-page-wrapper .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .leads-page-wrapper .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .leads-page-wrapper .btn-secondary:hover {
+            background: var(--bg-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .leads-page-wrapper .btn-filter {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .leads-page-wrapper .clear-filters {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.5rem 0.875rem;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .leads-page-wrapper .clear-filters:hover {
+            color: var(--primary);
+        }
+
+        /* Filter info display */
+        .leads-page-wrapper .filter-result-info {
+            margin-bottom: 1rem;
+            padding: 0.625rem 1rem;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.08));
+            color: var(--text);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .leads-page-wrapper .filter-result-info i {
+            color: var(--primary);
+        }
+
+        /* Leads Table */
+        .leads-page-wrapper .leads-section {
+            animation: fadeInUp 0.6s ease 0.3s backwards;
+        }
+
+        .leads-page-wrapper .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .leads-page-wrapper .section-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .leads-page-wrapper .results-count {
+            color: var(--text-light);
+            font-size: 0.8125rem;
+        }
+
+        .leads-page-wrapper .leads-table {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+        }
+
+        .leads-page-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leads-page-wrapper thead {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.08));
+            border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .leads-page-wrapper th {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .leads-page-wrapper td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8125rem;
+        }
+
+        .leads-page-wrapper tbody tr {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .leads-page-wrapper tbody tr:hover {
+            background: rgba(59, 130, 246, 0.03);
+        }
+
+        .leads-page-wrapper .lead-name {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .leads-page-wrapper .lead-company {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .leads-page-wrapper .status-badge {
+            display: inline-flex;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: capitalize;
+            transition: all 0.3s ease;
+        }
+
+        .leads-page-wrapper .status-badge:hover {
+            transform: translateY(-1px);
+        }
+        
+        .status-badge.new {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--info);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.status-badge.assigned {
+    background: rgba(249, 115, 22, 0.1); /* light orange background */
+    color: var(--orange); /* orange text */
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+
+        .leads-page-wrapper .status-badge.follow-up {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .leads-page-wrapper .status-badge.converted {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .leads-page-wrapper .status-badge.lost {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .leads-page-wrapper .btn-view {
+            padding: 0.5rem 0.875rem;
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            text-decoration: none;
+        }
+
+        .leads-page-wrapper .btn-view:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .leads-page-wrapper .btn-view:hover i {
+            transform: scale(1.1);
+        }
+
+        .leads-page-wrapper .btn-view i {
+            transition: transform 0.3s ease;
+        }
+
+        .leads-page-wrapper .btn-assign {
+            padding: 0.5rem 0.875rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            color: white;
+            background: linear-gradient(135deg, var(--success), var(--success-light));
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.3s ease;
+        }
+
+        .leads-page-wrapper .btn-assign:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .leads-page-wrapper .container {
+                padding: 1rem 0.75rem;
+            }
+
+            .leads-page-wrapper .page-title {
+                font-size: 1.5rem;
+            }
+
+            .leads-page-wrapper .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .leads-page-wrapper .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .leads-page-wrapper .leads-table {
+                overflow-x: auto;
+            }
+
+            .leads-page-wrapper table {
+                min-width: 700px;
+            }
+
+            .leads-page-wrapper .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-card {
+    background: #fff;
+    width: 520px;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    font-size: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+.form-select {
+            flex: 1;
+            min-width: 180px;
+            padding: 0.625rem 0.875rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8125rem;
+            color: var(--text);
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+    </style>
+{% endblock %}
+
+{% block page_actions %}
+    <a href="#all-leads" class="btn btn-secondary">
+        <i class="fas fa-list"></i>
+        View All Leads
+    </a>
+    <button class="btn btn-primary" onclick="openLeadModal()">
+    <i class="fas fa-plus"></i> Create New Lead
+</button>
+{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url 'bdm:leads' %}">Leads</a>
+{% endblock %}
+
+{% block content %}
+<div class="leads-page-wrapper">
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Track, manage, and convert your leads effectively</h1>
+           
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card new">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-count">{{ new_leads_count }}</div>
+                        <div class="stat-label">New Leads</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>12% this week</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card follow-up">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-count">{{ followup_leads_count }}</div>
+                        <div class="stat-label">Follow-up Leads</div>
+                        <div class="stat-change neutral">
+                            <i class="fas fa-minus"></i>
+                            <span>No change</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card converted">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-count">{{ converted_leads_count }}</div>
+                        <div class="stat-label">Converted Leads</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>8% this month</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-header">
+                <div class="filter-title">
+                    <i class="fas fa-filter"></i>
+                    Filter Leads
+                </div>
+            </div>
+
+            <form method="GET" action="{% url 'bdm:leads' %}" id="filterForm">
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select class="filter-select" name="status" id="statusFilter">
+                            <option value="">All Status</option>
+                            {% for key, value in status_choices %}
+                            <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>
+                                {{ value }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Course</label>
+                        <select class="filter-select" name="course" id="courseFilter">
+                            <option value="">All Courses</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}" {% if request.GET.course == course.id|stringformat:"s" %}selected{% endif %}>
+                                {{ course.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Mode</label>
+                        <select class="filter-select" name="mode" id="modeFilter">
+                            <option value="">All Modes</option>
+                            {% for key, value in mode_choices %}
+                            <option value="{{ key }}" {% if request.GET.mode == key %}selected{% endif %}>
+                                {{ value }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Date From</label>
+                        <input type="date" class="filter-select" name="date_from" id="dateFrom" 
+                            value="{{ request.GET.date_from }}">
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Date To</label>
+                        <input type="date" class="filter-select" name="date_to" id="dateTo" 
+                            value="{{ request.GET.date_to }}">
+                    </div>
+
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" name="search" id="searchInput"
+                            placeholder="Search leads by name, email, or phone..." 
+                            value="{{ request.GET.search }}">
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <a href="{% url 'bdm:leads' %}" class="clear-filters">
+                        <i class="fas fa-times"></i> Clear Filters
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-filter">
+                        <i class="fas fa-search"></i>
+                        Search & Filter
+                    </button>
+                </div>
+            </form>
+        
+            {% if request.GET.search or request.GET.status or request.GET.course or request.GET.mode or request.GET.date_from or request.GET.date_to %}
+            <div class="filter-result-info">
+                <i class="fas fa-info-circle"></i>
+                <span>
+                    {{ filtered_count }} result{{ leads.count|pluralize }} found
+                    {% if request.GET.search %}
+                        for "<strong>{{ request.GET.search }}</strong>"
+                    {% endif %}
+                </span> 
+            </div>
+                
+            <div class="leads-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Mode</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in filtered_leads %}
+                        <tr>
+                            <td>{{ lead.name }}</td>
+                            <td>{{ lead.preferred_course.name|default:"—" }}</td>
+                            <td>{{ lead.email }}</td>
+                            <td>
+                                <span class="status-badge {{ lead.status }}">
+                                    {{ lead.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ lead.get_mode_display }}</td>
+                            <td>{{ lead.enquiry_date|date:"M d, Y" }}</td>
+                            <td style="display:flex; gap:0.5rem; flex-wrap:nowrap; align-items:center;">
+
+                                <a href="{% url 'bdm:lead_details' lead.id %}" class="btn-view">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding:1.5rem;">
+                                No matching leads found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Leads Table -->
+        <div class="leads-section" id="all-leads">
+            <div class="section-header">
+                <h2 class="section-title">All Leads</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span class="results-count">Total Leads: {{ total_leads }}</span>
+                    <a href="{% url 'bdm:bulk_leads' %}" class="btn btn-secondary">
+                        <i class="fas fa-tasks"></i> Bulk Actions
+                    </a>
+                </div>
+            </div>
+
+            <div class="leads-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Mode</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr id="lead-row-{{ lead.id }}">
+                            <td>
+                                <div class="lead-name">{{ lead.name }}</div>
+                            </td>
+                            <td>{{ lead.preferred_course.name|default:"—" }}</td>
+                            <td>{{ lead.email }}</td>
+                            <td>
+                                <span class="status-badge {{ lead.status }}">
+                                    {{ lead.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ lead.get_mode_display }}</td>
+                            <td>{{ lead.enquiry_date|date:"M d, Y" }}</td>
+                            <td style="display:flex; gap:0.5rem; flex-wrap:nowrap; align-items:center;">
+
+                                <a href="{% url 'bdm:lead_details' lead.id %}" class="btn-view">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </a>
+                                <button type="button"
+                                class="btn-assign" onclick="openAssignModal({{ lead.id }})">
+                                <i class="fas fa-user-plus"></i> Assign
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding: 3rem; color: var(--text-light);">
+                                No leads found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+<div class="modal-overlay" id="assignModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Assign Lead</h3>
+            <button class="close-btn" onclick="closeAssignModal()">×</button>
+        </div>
+
+        <form method="post" action="{% url 'bdm:assign_lead' %}">
+            {% csrf_token %}
+            <input type="hidden" name="lead_id" id="assignLeadId">
+
+            <label>Assign to Telecaller</label>
+            <select name="assigned_to" class="form-select" required>
+                <option value="">Select</option>
+                {% for user in telecallers %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeAssignModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Assign</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Lead Modal -->
+<div class="modal-overlay" id="leadModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Create New Lead</h3>
+            <button class="close-btn" onclick="closeLeadModal()">×</button>
+        </div>
+
+        <form method="post" action="{% url 'bdm:create_lead' %}">
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="text" name="phone" required>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <!-- Course -->
+                <div class="form-group">
+                    <label>Preferred Course</label>
+                    <select name="preferred_course">
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Mode -->
+                <div class="form-group">
+                    <label>Mode</label>
+                    <select name="mode">
+                        {% for key, val in mode_choices %}
+                        <option value="{{ key }}">{{ val }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group full-width">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="3"></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeLeadModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Lead</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const target = document.querySelector(targetId);
+            if (target) {
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - 100;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Placeholder for openAssignModal function
+    function openAssignModal(leadId) {
+        console.log('Open assign modal for lead:', leadId);
+        // Implement your modal logic here
+    }
+
+   
+function openLeadModal() {
+    document.getElementById("leadModal").style.display = "flex";
+}
+
+function closeLeadModal() {
+    document.getElementById("leadModal").style.display = "none";
+}
+
+
+//assign lead
+function openAssignModal(leadId) {
+    document.getElementById("assignLeadId").value = leadId;
+    document.getElementById("assignModal").style.display = "flex";
+}
+
+function closeAssignModal() {
+    document.getElementById("assignModal").style.display = "none";
+}
+
+</script>
+{% endblock %}
