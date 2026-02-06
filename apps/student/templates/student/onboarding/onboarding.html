@@ -36,19 +36,27 @@
     <div class="onboarding-steps">
 
         <!-- STEP 1: Document Upload -->
-        <div class="glass-card step-card pending">
+        <div class="glass-card step-card {% if all_docs_verified %}completed{% else %}pending{% endif %}">
             <div class="step-header">
                 <span>1. Document Upload</span>
-                <span class="badge warning">Upload</span>
+
+                    <span class="badge warning">Upload</span>
+                
             </div>
 
             <p class="step-desc">
-                Upload your required documents.
+               
+                    Upload your required documents.
+                
             </p>
 
-            <a href="{% url 'student:stud_upload' %}" class="btn primary">Upload Documents</a>
-
+            
+                <a href="{% url 'student:stud_upload' %}" class="btn primary">
+                    Upload Documents
+                </a>
+            
         </div>
+
 
         <!-- STEP 2: Enrollment Letter -->
         <div class="glass-card step-card locked">

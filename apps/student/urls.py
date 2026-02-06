@@ -24,6 +24,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('installments_qr/', views.installments_qr, name='installments_qr'),
                path('stud_onboard/',views.onboard,name='stud_onboard'),
                path('stud_upload/',views.upload,name='stud_upload'),
+               path('stud_lessonplan/',views.lessonplan,name='stud_lessonplan'),
                
                
                

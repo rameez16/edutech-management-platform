@@ -55,18 +55,42 @@ td {
     color: #777;
 }
 
-/* Status badges */
+
+
+
+/* Status badges – common */
 .status {
-    padding: 5px 14px;
+    padding: 6px 14px;
     border-radius: 14px;
     font-size: 12px;
     font-weight: 600;
+    display: inline-block;
 }
 
+/* Pending */
 .status.pending {
     background: rgba(166, 107, 75, 0.15);
     color: #a66b4b;
 }
+
+/* ✅ Verified – same style, green */
+.status.verified {
+    background: rgba(46, 204, 113, 0.18); /* soft green */
+    color: #1e7f43;
+}
+
+/* Rejected */
+.status.rejected {
+    background: rgba(217, 83, 79, 0.18);
+    color: #b52b27;
+}
+
+/* Not uploaded */
+.status.not-uploaded {
+    background: rgba(0, 0, 0, 0.1);
+    color: #444;
+}
+
 
 .status.optional {
     background: rgba(0, 0, 0, 0.12);
@@ -116,6 +140,15 @@ td {
     cursor: pointer;
 }
 
+.upload-btn.disabled {
+    background-color: #e0e0e0;
+    color: #5b5b5b;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+
 .cancel-btn {
     background: #5a5a5a;
     color: #fff;
@@ -144,6 +177,28 @@ td {
 .status.uploaded {
     background: #e6f4ea;
     color: #1e7f43;
+}
+
+
+
+
+.status.selected {
+    background: #e6f4ea;
+    color: #1e7f43;
+}
+
+.cancel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.upload-section {
+    margin-top: 20px;
 }
 
 

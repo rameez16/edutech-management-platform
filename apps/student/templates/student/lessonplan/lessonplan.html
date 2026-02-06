@@ -1,0 +1,87 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Lesson Plan{% endblock %}
+
+{% block content %}
+<div style="width:100%; padding:24px;">
+
+    <!-- HEADER -->
+    <div class="glass-card" style="padding:24px; margin-bottom:24px;">
+        <h2 style="margin:0;">Lesson Plan</h2>
+        <p style="opacity:0.8; margin-top:6px;">
+            Click a module to view its lesson plan
+        </p>
+    </div>
+
+    <!-- MODULE LIST -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px;">
+
+        <!-- MODULE 1 -->
+        <div class="glass-card"
+             style="padding:20px; cursor:pointer;"
+             onclick="toggleLesson('module1')">
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">Module 1: Introduction</h4>
+                <span style="font-size:14px;">▶</span>
+            </div>
+
+            <!-- LESSON PLAN -->
+            <div id="module1" style="display:none; margin-top:16px;">
+
+                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); margin-bottom:10px;">
+                    Lesson 1: Course Overview
+                </div>
+
+                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); margin-bottom:10px;">
+                    Lesson 2: Tools Setup
+                </div>
+
+                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); opacity:0.6;">
+                    Lesson 3: Fundamentals (Locked)
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MODULE 2 -->
+        <div class="glass-card"
+             style="padding:20px; cursor:pointer;"
+             onclick="toggleLesson('module2')">
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0;">Module 2: Core Concepts</h4>
+                <span style="font-size:14px;">▶</span>
+            </div>
+
+            <div id="module2" style="display:none; margin-top:16px;">
+
+                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); margin-bottom:10px;">
+                    Lesson 1: Basics
+                </div>
+
+                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); margin-bottom:10px;">
+                    Lesson 2: Practical Examples
+                </div>
+
+                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6);">
+                    Lesson 3: Assessment
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- INLINE JS -->
+<script>
+function toggleLesson(id) {
+    const element = document.getElementById(id);
+    element.style.display = element.style.display === "none" ? "block" : "none";
+}
+</script>
+
+{% endblock %}

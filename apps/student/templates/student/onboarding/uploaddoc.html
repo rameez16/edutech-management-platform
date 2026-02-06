@@ -1,0 +1,154 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Student Onboarding{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/onboarding.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="student-onboarding">
+
+    <!-- HEADER -->
+    <div class="onboarding-header glass-card">
+        <h2 class="onboarding-title">Student Onboarding</h2>
+
+        <!-- PROGRESS -->
+        <div class="onboarding-progress">
+            <div class="progress-text">
+                <span>Onboarding Progress :</span>
+                <strong>{{ completed_steps }} / 3 Completed</strong>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-fill onboarding-fill"
+                    style="width: {{ progress_percentage }}%;">
+                </div>
+            </div>
+
+
+            <div class="progress-status">
+                <span class="status {% if completed_steps >= 1 %}completed{% else %}pending{% endif %}">
+                    ✔ Documents
+                </span>
+                <span class="status {% if completed_steps >= 2 %}completed{% else %}locked{% endif %}">
+                    ⦿ Enrollment Letter
+                </span>
+                <span class="status {% if completed_steps >= 3 %}completed{% else %}locked{% endif %}">
+                    🔒 ID Card
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEPS -->
+    <div class="onboarding-steps">
+
+        <!-- STEP 1: Document Upload -->
+        <div class="glass-card step-card {% if all_docs_verified %}completed{% else %}pending{% endif %}">
+            <div class="step-header">
+                <span>1. Document Upload</span>
+                {% if all_docs_verified %}
+                    <span class="badge success">Completed</span>
+                {% else %}
+                    <span class="badge warning">Upload</span>
+                {% endif %}
+            </div>
+
+            <p class="step-desc">
+                {% if all_docs_verified %}
+                    Documents verified successfully.
+                {% else %}
+                    Upload your required documents.
+                {% endif %}
+            </p>
+
+            {% if all_docs_verified %}
+                <a href="{% url 'student:stud_upload' %}" class="btn success">
+                    View Documents
+                </a>
+            {% else %}
+                <a href="{% url 'student:stud_upload' %}" class="btn primary">
+                    Upload Documents
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- STEP 2: Enrollment Letter -->
+        <div class="glass-card step-card {% if completed_steps >= 2 %}completed{% else %}locked{% endif %}">
+            <div class="step-header">
+                <span>2. Enrollment Letter</span>
+                {% if completed_steps >= 2 %}
+                    <span class="badge success">Completed</span>
+                {% else %}
+                    <span class="badge locked">Locked</span>
+                {% endif %}
+            </div>
+
+            <p class="step-desc">
+                {% if completed_steps >= 2 %}
+                    Enrollment letter uploaded successfully.
+                {% else %}
+                    Sign & upload your enrollment letter.
+                {% endif %}
+            </p>
+
+            {% if completed_steps >= 2 %}
+                <a href="{% url 'student:enrollment_upload' %}" class="btn success">
+                    View Enrollment Letter
+                </a>
+            {% else %}
+                <button class="btn disabled" disabled>Locked</button>
+            {% endif %}
+        </div>
+
+        <!-- STEP 3: Student ID Card -->
+        <div class="glass-card step-card {% if completed_steps >= 3 %}completed{% else %}locked{% endif %}">
+            <div class="step-header">
+                <span>3. Student ID Card</span>
+                {% if completed_steps >= 3 %}
+                    <span class="badge success">Completed</span>
+                {% else %}
+                    <span class="badge locked">Locked</span>
+                {% endif %}
+            </div>
+
+            <p class="step-desc">
+                {% if completed_steps >= 3 %}
+                    ID Card downloaded.
+                {% else %}
+                    Available after onboarding completion.
+                {% endif %}
+            </p>
+
+            {% if completed_steps >= 3 %}
+                <a href="{% url 'student:id_card_download' %}" class="btn success">
+                    Download ID Card
+                </a>
+            {% else %}
+                <button class="btn disabled" disabled>Download ID Card</button>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- NEXT STEP -->
+    <div class="glass-card next-step-card">
+        {% if completed_steps == 0 %}
+            <h4>Next step: Upload your documents</h4>
+            <p>Please upload all required documents to proceed.</p>
+        {% elif completed_steps == 1 %}
+            <h4>Next step: Enrollment Letter</h4>
+            <p>Your documents are verified. Please proceed to upload your enrollment letter.</p>
+        {% elif completed_steps == 2 %}
+            <h4>Next step: Student ID Card</h4>
+            <p>Enrollment letter completed. You can now download your Student ID Card.</p>
+        {% else %}
+            <h4>Onboarding Complete!</h4>
+            <p>All steps completed successfully.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

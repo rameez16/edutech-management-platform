@@ -145,6 +145,8 @@
     cursor: pointer;
 }
 
+
+
 .btn.primary {
     background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
     color: white;
@@ -187,6 +189,40 @@
     font-size: 14px;
     color: var(--text-secondary);
 }
+
+
+/* FORCE View Documents button to blue */
+.step-card .btn.success {
+    background: #2563eb !important;
+    color: #ffffff !important;
+}
+
+.step-card .btn.success:hover {
+    background: #1d4ed8 !important;
+}
+
+
+/* Badge for completed steps */
+.step-card .badge.success {
+    background: rgba(34,197,94,0.15);
+    color: var(--success);
+}
+
+/* Button for View / Download actions */
+.step-card .btn.success {
+    background: #2563eb !important;  /* Blue for view/download */
+    color: #ffffff !important;
+}
+
+.step-card .btn.success:hover {
+    background: #1d4ed8 !important;
+}
+
+/* Progress status colors already handled */
+.status.completed { color: var(--success); }
+.status.pending   { color: var(--warning); }
+.status.locked    { color: var(--text-muted); }
+
 
 
 /* RESPONSIVE */

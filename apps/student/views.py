@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from apps.accounts.decorators import role_required
 from django.contrib import messages
 from django.utils import timezone
 from decimal import Decimal
@@ -7,12 +8,11 @@ from django.db.models import Sum
 from apps.bdm.models import Student
 from .models import FeePayment
 
-
+from apps.bdm.models import OnboardingChecklist
 import uuid, os
-from django.shortcuts import render, redirect
-from django.contrib import messages
+
 from .models import StudentDocument
-from apps.bdm.models import Student
+
 
 # Create your views here.
 
@@ -326,80 +326,64 @@ def installments_qr(request):
     }
 
     return render(request, 'student/payment/installment_qr.html', context)
-def onboard(request):
-    
-    return render(request, 'student/dashboard/onboarding.html')
+
+
 
 
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
-
+@role_required("student")
 def upload(request):
-    student = Student.objects.first()  # temp until login
+
+    student = request.user.student
 
     REQUIRED_DOCS = {
         "photo": "Photograph",
-        "education": "Educational Certificates",
-        "residence": "Residence Proof",
+        "education": "Educational Certificate",
         "aadhaar": "Aadhaar",
+        "resume": "Resume / CV",
     }
 
-    OPTIONAL_DOCS = {
-        "resume": "Resume / CV"
-    }
+    onboarding, _ = OnboardingChecklist.objects.get_or_create(student=student)
 
-    ALL_DOCS = {**REQUIRED_DOCS, **OPTIONAL_DOCS}
-
-    # Existing documents mapped by document_type
     existing_docs = {
         doc.document_type: doc
         for doc in StudentDocument.objects.filter(student=student)
     }
 
+    # ====================================================
+    # 🔥 AUTO-VERIFY DOCUMENTS BASED ON CHECKLIST
+    # ====================================================
+    if onboarding.documents_verified:   # ← your checklist flag
+        for doc in existing_docs.values():
+            if doc.verification_status != StudentDocument.VerificationStatus.VERIFIED:
+                doc.verification_status = StudentDocument.VerificationStatus.VERIFIED
+                doc.save(update_fields=["verification_status"])
 
-
-
-
-
-
-    # Lock uploads if ANY document is pending or verified
-    locked = any(
-        doc.verification_status in [
-            StudentDocument.VerificationStatus.PENDING,
-            StudentDocument.VerificationStatus.VERIFIED
-        ]
-        for doc in existing_docs.values()
-    )
-
-
+    # ====================================================
+    # POST: UPLOAD LOGIC
+    # ====================================================
     if request.method == "POST":
 
-        if locked:
+        if onboarding.documents_uploaded:
             messages.error(request, "Documents already submitted.")
             return redirect(request.path)
 
-        # Validate required documents
-        missing = []
-        for key, label in REQUIRED_DOCS.items():
-            if not request.FILES.get(key):
-                missing.append(label)
+        missing = [
+            label for key, label in REQUIRED_DOCS.items()
+            if not request.FILES.get(key)
+        ]
 
         if missing:
-            messages.error(
-                request,
-                "Please upload: " + ", ".join(missing)
-            )
+            messages.error(request, "Please upload: " + ", ".join(missing))
             return redirect(request.path)
 
-        # Save / update documents
-        for key, label in ALL_DOCS.items():
-            file = request.FILES.get(key)
-            if not file:
-                continue
+        for key in REQUIRED_DOCS.keys():
+            file = request.FILES[key]
 
             if file.size > MAX_FILE_SIZE:
-                messages.error(request, f"{label} exceeds 5MB")
+                messages.error(request, f"{REQUIRED_DOCS[key]} exceeds 5MB")
                 return redirect(request.path)
 
             StudentDocument.objects.update_or_create(
@@ -407,21 +391,59 @@ def upload(request):
                 document_type=key,
                 defaults={
                     "document_file": file,
-                    "verification_status": StudentDocument.VerificationStatus.PENDING
+                    "verification_status": StudentDocument.VerificationStatus.PENDING,
                 }
             )
 
+        onboarding.documents_uploaded = True
+        onboarding.save(update_fields=["documents_uploaded"])
+
         messages.success(
             request,
-            "Documents submitted. Verification in progress."
+            "Documents submitted successfully. Verification in progress."
         )
         return redirect(request.path)
 
     return render(
         request,
-        "student/dashboard/uploaddoc.html",
+        "student/onboarding/uploaddoc.html",
         {
             "docs": existing_docs,
-            "locked": locked
+            "onboarding": onboarding,
         }
     )
+
+
+@role_required("student")
+def onboard(request):
+    student = request.user.student  # get logged-in student's object
+    checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
+
+    # Calculate number of completed steps
+    completed_steps = 0
+    if checklist.documents_verified:
+        completed_steps += 1
+    if getattr(checklist, "enrollment_uploaded", False):
+        completed_steps += 1
+    if getattr(checklist, "id_card_downloaded", False):
+        completed_steps += 1
+
+    # Calculate progress percentage
+    progress_percentage = (completed_steps / 3) * 100
+
+    context = {
+        "completed_steps": completed_steps,
+        "progress_percentage": progress_percentage,
+        "all_docs_verified": checklist.documents_verified,
+        "checklist": checklist,
+    }
+
+
+    return render(request, "student/onboarding/onboarding.html", context)
+
+
+def lessonplan(request):
+    """Simple dashboard"""
+    
+    return render(request, 'student/lessonplan/lessonplan.html')
+    
