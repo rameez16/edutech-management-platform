@@ -1,0 +1,97 @@
+{% extends "base/base.html" %}
+
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="glass-card profile-view-page">
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+        <div class="profile-avatar-large">
+            {% if trainer.profile_photo %}
+                <img src="{{ trainer.profile_photo.url }}" alt="{{ trainer.full_name }}">
+            {% else %}
+                {{ trainer.full_name|default:trainer.user.username|slice:":1" }}
+            {% endif %}
+        </div>
+
+        <div class="profile-info">
+            <h2>{{ trainer.full_name|default:trainer.user.username }}</h2>
+            <h5>
+                {% if trainer.teaching_style %}
+                    {{ trainer.get_teaching_style_display }}  ·  
+                {% endif %}
+                {% if trainer.primary_domain %}
+                    {{ trainer.primary_domain }}
+                {% endif %}
+            </h5>
+        </div>
+
+        <div style="margin-left:auto;">
+            <a href="{% url 'trainer:profile-edit' %}" class="btn btn-bordered">Edit Profile</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ABOUT (FULL WIDTH) -->
+    {% if trainer.bio %}
+    <div>
+        <h4>Bio</h4>
+        <p>{{ trainer.bio }}</p>
+    </div>
+    <hr>
+    {% endif %}
+
+    <!-- ROW 1 -->
+    <div class="profile-details-grid">
+        <div>
+            <h4>Personal Details</h4>
+            <p><strong>Email:</strong> {{ trainer.email }}</p>
+            <p><strong>Phone:</strong> {{ trainer.phone }}</p>
+            <p><strong>Gender:</strong> {{ trainer.get_gender_display }}</p>
+            <p><strong>Location:</strong> {{ trainer.location }}</p>
+            <p><strong>Timezone:</strong> {{ trainer.timezone }}</p>
+            <p><strong>Languages:</strong> {{ trainer.languages_spoken }}</p>
+        </div>
+
+        <div>
+            <h4>Professional Expertise</h4>
+            <p><strong>Qualification:</strong> {{ trainer.qualification }}</p>
+            <p><strong>Primary Domain:</strong> {{ trainer.primary_domain }}</p>
+            <p><strong>Secondary Skills:</strong> {{ trainer.secondary_skills }}</p>
+            <p><strong>Certifications:</strong> {{ trainer.certifications }}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ROW 2 -->
+    <div class="profile-details-grid">
+        <div>
+            <h4>Technical Skills</h4>
+            <p><strong>Coding Languages:</strong> {{ trainer.coding_languages }}</p>
+            <p><strong>Frameworks:</strong> {{ trainer.frameworks }}</p>
+        </div>
+
+        <div>
+            <h4>Experience & Teaching</h4>
+            <p><strong>Total Experience:</strong> {{ trainer.experience_years }} Years</p>
+            <p><strong>Teaching Experience:</strong> {{ trainer.teaching_experience_years }} Years</p>
+            <p><strong>Teaching Style:</strong> {{ trainer.get_teaching_style_display }}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- LINKS (FULL WIDTH) -->
+    <div class="professional-links">
+        <h4>Professional Links</h4>
+        {% if trainer.github_url %}<p><a href="{{ trainer.github_url }}" target="_blank">GitHub</a></p>{% endif %}
+        {% if trainer.linkedin_url %}<p><a href="{{ trainer.linkedin_url }}" target="_blank">LinkedIn</a></p>{% endif %}
+        {% if trainer.portfolio_url %}<p><a href="{{ trainer.portfolio_url }}" target="_blank">Portfolio</a></p>{% endif %}
+    </div>
+
+</div>
+{% endblock %}

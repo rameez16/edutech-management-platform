@@ -1,4 +1,11 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from apps.bdm.models import Trainer
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+
+from apps.trainer.forms import TrainerProfileForm
 
 def dashboard(request):
     """Dashboard view"""
@@ -7,8 +14,8 @@ def dashboard(request):
     }
     return render(request, 'trainer/dashboard/overview.html', context)
 
-def trainer_profile(request):
-    return render(request, "trainer/profile.html")
+# def trainer_profile(request):
+#     return render(request, "trainer/profile.html")
 
 # Static batches & students data
 BATCHES = {
@@ -89,3 +96,28 @@ def student_detail_view(request, batch_id, student_id):
 
 
 
+@login_required
+def profile_view(request):
+    # Get trainer instance for logged-in user
+    trainer = get_object_or_404(Trainer, user=request.user)
+    return render(request, "trainer/myprofile/profile_view.html", {"trainer": trainer})
+
+@login_required
+
+def profile_edit(request):
+    trainer = get_object_or_404(Trainer, user=request.user)
+
+    if request.method == "POST":
+        form = TrainerProfileForm(request.POST, request.FILES, instance=trainer)
+        if form.is_valid():
+            form.save()
+            return redirect("trainer:profile")
+    else:
+        # If full_name is blank, set initial from user object
+        initial_data = {}
+        if not trainer.full_name:
+            initial_data['full_name'] = request.user.get_full_name()
+
+        form = TrainerProfileForm(instance=trainer, initial=initial_data)
+
+    return render(request, "trainer/myprofile/profile_edit.html", {"form": form, "trainer": trainer})

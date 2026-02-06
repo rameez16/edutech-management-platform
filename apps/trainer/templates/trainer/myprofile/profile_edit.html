@@ -1,0 +1,84 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile{% endblock %}
+{% block page_title %}Edit Trainer Profile{% endblock %}
+
+{% block content %}
+<div class="glass-card profile-edit-page">
+
+    <!-- HEADER -->
+    <h4 class="card-title" style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <a href="{% url 'trainer:profile' %}" style="color:inherit;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                 viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </a>
+        Edit Profile
+    </h4>
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+        <div class="profile-avatar-large">
+            {% if trainer.profile_photo %}
+                <img src="{{ trainer.profile_photo.url }}" alt="Profile Photo">
+            {% else %}
+                {{ trainer.full_name|slice:":1" }}
+            {% endif %}
+        </div>
+
+        <div class="profile-info">
+            <h2>{{ trainer.full_name|default:trainer.user.username }}</h2>
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+            {% for field in form %}
+                {% if field.name != "profile_photo" %}
+                    <div class="form-group-settings">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <div class="error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <!-- PROFILE PHOTO FIELD (NO JS) -->
+            <div class="form-group-settings full-width">
+                <label>Profile photo</label>
+
+                <input type="file"
+                       name="profile_photo"
+                       accept="image/*">
+
+                {% if trainer.profile_photo %}
+                    <small class="help-text">
+                        Current image: {{ trainer.profile_photo.name|cut:"profile_photos/" }}
+                    </small>
+                {% else %}
+                    <small class="help-text">
+                        No image uploaded
+                    </small>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="btn-group">
+            <button type="submit" class="btn btn-bordered">Save Changes</button>
+            <a href="{% url 'trainer:profile' %}" class="btn btn-bordered">Cancel</a>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

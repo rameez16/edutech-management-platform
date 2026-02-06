@@ -1398,7 +1398,7 @@ html, body {
 /* dashboard  */
 
 /* ==============================
-   QUICK ACTIONS (ADDITIVE ONLY)
+   QUICK ACTIONS 
    ============================== */
 
 .quick-links h4 {
@@ -1444,7 +1444,7 @@ html, body {
 
 
 /* ==============================
-   SMALL DASHBOARD POLISH
+   DASHBOARD POLISH
    ============================== */
 
 /* Keep cards consistent */
@@ -1476,7 +1476,7 @@ html, body {
 /* Desktop/default styles */
 
 /* ==============================
-   CARD HEADINGS (Professional)
+   CARD HEADINGS
    ============================== */
 .card-title {
     display: flex;
@@ -1530,7 +1530,7 @@ html, body {
 }
 
 /* ===============================
-   Sidebar Active Item – Solid Blue
+   Sidebar Active Item 
 ================================ */
 
 .nav-link {
@@ -1558,123 +1558,42 @@ html, body {
     stroke: var(--primary);
 }
 
-
 /* ===============================
-   BLUE HEADER (CONNECTED)
+   HEADER / NAVBAR
 ================================ */
 
 .navbar {
-    background-color: #1e3a8a; /* professional blue */
-    color: #ffffff;
-
-    padding: 18px 24px;  /* SAME padding feel */
-    border-radius: 0;    /* important: no floating look */
-    box-shadow: none;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* Title inside header */
-.navbar .page-title {
-    color: #ffffff;
-    font-weight: 600;
-}
-
-/* Header buttons */
-.navbar .nav-btn {
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    border: none;
-}
-
-.navbar .nav-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-}
-
-/* Search box inside blue header */
-.navbar .search-input {
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    border: none;
-}
-
-.navbar .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-}
-/* // */
-
-/* ===============================
-   CRITICAL FIXES - Header & Layout
-================================ */
-
-/* Remove ALL gaps and ensure full-width header */
-.main-content {
-    margin-left: var(--sidebar-width);
-    padding: 0; /* Remove padding to eliminate gaps */
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-dark); /* Consistent background */
-}
-
-/* Header - Full width, no gaps */
-.navbar {
-    background-color: #1e3a8a !important;
+    background-color: #1e3a8a; /* Professional blue */
     color: #ffffff;
     padding: 20px 30px;
-    margin: 0; /* Remove any margin */
-    border-radius: 0; /* No rounded corners */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 0;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    width: 100%; /* Full width */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Page content wrapper - adds back the padding */
-.page-content {
-    flex: 1;
-    padding: 30px; /* Content padding (not header) */
-    background: var(--bg-dark);
-}
-
-/* Ensure consistent background throughout */
-body {
-    background: var(--bg-dark);
-}
-
-/* Light mode backgrounds */
-[data-theme="light"] body,
-[data-theme="light"] .main-content,
-[data-theme="light"] .page-content {
-    background: #f5f5f5;
-}
-
-[data-theme="light"] .navbar {
-    background-color: #1e3a8a !important; /* Keep header blue even in light mode */
-}
-
-/* ===============================
-   HEADER ELEMENTS STYLING
-================================ */
-
+/* Page title */
 .navbar .page-title {
-    color: #ffffff !important;
-    font-weight: 600;
-    font-size: 28px;
     margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+    color: #ffffff;
 }
 
+/* Right section */
 .navbar-right {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-/* Search box styling */
+/* ===============================
+   SEARCH BOX
+================================ */
+
 .navbar .search-box {
     position: relative;
 }
@@ -1683,13 +1602,11 @@ body {
     width: 280px;
     padding: 12px 20px 12px 48px;
     background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 12px;
     color: #ffffff;
-    font-family: inherit;
     font-size: 14px;
-    transition: all 0.2s ease;
+    outline: none;
 }
 
 .navbar .search-input::placeholder {
@@ -1697,10 +1614,8 @@ body {
 }
 
 .navbar .search-input:focus {
-    outline: none;
     background: rgba(255, 255, 255, 0.25);
     border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
 .navbar .search-icon {
@@ -1710,16 +1625,18 @@ body {
     transform: translateY(-50%);
     width: 20px;
     height: 20px;
-    color: rgba(255, 255, 255, 0.7);
+    stroke: #ffffff;
 }
 
-/* Navigation buttons */
+/* ===============================
+   HEADER ICON BUTTONS
+================================ */
+
 .navbar .nav-btn {
     width: 45px;
     height: 45px;
     background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -1732,16 +1649,15 @@ body {
 .navbar .nav-btn:hover {
     background: rgba(255, 255, 255, 0.25);
     border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-2px);
 }
 
 .navbar .nav-btn svg {
     width: 20px;
     height: 20px;
-    color: #ffffff;
     stroke: #ffffff;
 }
 
+/* Notification dot */
 .navbar .notification-dot {
     position: absolute;
     top: 8px;
@@ -1750,9 +1666,159 @@ body {
     height: 8px;
     background: #ef4444;
     border-radius: 50%;
-    box-shadow: 0 0 10px #ef4444;
 }
 
+/* ===============================
+   PROFILE DROPDOWN
+================================ */
+
+.profile-dropdown {
+    position: relative;
+}
+
+/* Profile button */
+.navbar .profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* Avatar */
+.navbar .profile-avatar-small {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    overflow: hidden;
+}
+
+.navbar .profile-avatar-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Profile name */
+.navbar .profile-name {
+    font-size: 14px;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+}
+
+/* Dropdown arrow */
+.navbar .dropdown-icon {
+    width: 16px;
+    height: 16px;
+    stroke: #ffffff;
+    fill: none;
+    transition: transform 0.3s ease;
+}
+
+.profile-dropdown:hover .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 48px;
+    min-width: 160px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.profile-dropdown:hover .dropdown-menu {
+    display: flex;
+}
+
+/* Dropdown items */
+.dropdown-menu a,
+.dropdown-menu form button {
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-size: 14px;
+    color: #1f2937;
+    cursor: pointer;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu form button:hover {
+    background: rgba(30, 58, 138, 0.08);
+}
+
+.dropdown-menu form {
+    margin: 0;
+}
+
+@media (max-width: 1024px) {
+
+    .navbar {
+        padding: 16px 20px;
+    }
+
+    .navbar .page-title {
+        font-size: 24px;
+    }
+
+    .navbar .search-input {
+        width: 220px;
+    }
+}
+@media (max-width: 768px) {
+
+    .navbar {
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    /* Hide search on mobile */
+    .navbar .search-box {
+        display: none;
+    }
+
+    .navbar .page-title {
+        font-size: 20px;
+    }
+
+    .navbar-right {
+        gap: 10px;
+    }
+
+    /* Smaller icon buttons */
+    .navbar .nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Hide name, keep avatar */
+    .navbar .profile-name {
+        display: none;
+    }
+
+    .navbar .profile-avatar-small {
+        width: 34px;
+        height: 34px;
+    }
+}
 /* ===============================
    BATCH CARDS IMPROVEMENTS
 ================================ */
@@ -2320,3 +2386,394 @@ a:hover {
     display: flex;
     justify-content: flex-start;
 }
+
+/* ===============================
+   DJANGO FORM FIXES (SAFE)
+================================ */
+
+/* Select dropdowns */
+.form-group-settings select {
+    padding: 12px 16px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    appearance: none;
+}
+
+/* File input */
+.form-group-settings input[type="file"] {
+    padding: 10px;
+    background: var(--glass-bg);
+    border: 1px dashed var(--glass-border);
+    border-radius: 10px;
+    color: var(--text-secondary);
+}
+
+/* Focus effect for select */
+.form-group-settings select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(30, 58, 138, 0.2);
+}
+
+
+/* =========================================
+   PROFILE VIEW – SUMMARY STYLE
+========================================= */
+
+.profile-view-page {
+    font-size: 0.95rem;
+}
+
+/* Card spacing */
+.profile-view-page.glass-card {
+    padding: 1.75rem;
+}
+
+/* ===============================
+   PROFILE HEADER
+================================ */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 1.5rem;
+}
+
+.profile-avatar-large {
+    width: 110px;
+    height: 110px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    font-size: 44px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.profile-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.profile-info p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* ===============================
+   SECTION TITLES
+================================ */
+
+.profile-view-page h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+/* ===============================
+   SUMMARY GRID (MATCHES BATCH)
+================================ */
+
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Column */
+.profile-details-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+/* ===============================
+   ROW STYLE (LABEL + VALUE)
+================================ */
+
+.profile-details-grid p {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    margin: 0;
+}
+
+[data-theme="light"] .profile-details-grid p {
+    background: #f8fafc;
+}
+
+.profile-details-grid p strong {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.profile-details-grid p span,
+.profile-details-grid p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ===============================
+   ABOUT SECTION
+================================ */
+
+.profile-view-page .about-section p {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+}
+
+/* ===============================
+   PROFESSIONAL LINKS
+================================ */
+
+.professional-links a {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.professional-links a:hover {
+    text-decoration: underline;
+}
+
+/* ===============================
+   BUTTON
+================================ */
+
+.profile-view-page .btn {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.55rem 1rem;
+}
+
+/* ===============================
+   DIVIDERS
+================================ */
+
+.profile-view-page hr {
+    margin: 1.75rem 0;
+    opacity: 0.5;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 900px) {
+
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* =========================================
+PROFILE EDIT PAGE 
+========================================= */
+
+.profile-edit-page {
+    font-size: 16px;
+}
+
+/* Back title */
+.profile-edit-page .card-title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Header */
+.profile-edit-page .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.profile-edit-page .profile-avatar-large {
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    font-size: 36px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-edit-page .profile-info h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.profile-edit-page .profile-info p {
+    font-size: 16px;
+    margin-top: 4px;
+    color: var(--text-muted);
+}
+
+/* Form labels */
+.profile-edit-page label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Inputs & selects */
+.profile-edit-page input,
+.profile-edit-page select,
+.profile-edit-page textarea {
+    font-size: 15px;
+    padding: 10px 12px;
+}
+
+/* Textarea */
+.profile-edit-page textarea {
+    line-height: 1.6;
+}
+
+/* Buttons */
+.profile-edit-page .btn {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Card padding */
+.profile-edit-page.glass-card {
+    padding: 24px;
+}
+
+/* -----------------------------
+PROFILE EDIT – HEADER & AVATAR
+------------------------------ */
+.profile-edit-page .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.profile-edit-page .profile-avatar-large {
+    width: 120px;          /* bigger size */
+    height: 120px;
+    border-radius: 8px;    /* sharp square corners */
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    font-size: 48px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;      /* ensures image fits perfectly */
+}
+
+.profile-edit-page .profile-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;      /* fills square without distortion */
+    image-rendering: auto;  /* sharp and smooth scaling */
+}
+
+.profile-edit-page .profile-info h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-edit-page .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-edit-page .profile-info h2 {
+        font-size: 22px;
+    }
+}
+
+.custom-file-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.file-name {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+/* ===============================
+   PROFILE VIEW – FONT SCALE UP
+================================ */
+
+/* Main name */
+.profile-info h2 {
+    font-size: 1.6rem;   /* was ~1.35rem */
+}
+
+/* Section titles */
+.profile-view-page h4 {
+    font-size: 1.15rem;  /* clearer hierarchy */
+}
+
+/* Label text */
+.profile-details-grid p strong {
+    font-size: 0.9rem;   /* was 0.8rem */
+}
+
+/* Value text */
+.profile-details-grid p {
+    font-size: 1rem;     /* was ~0.9rem */
+}
+
+/* About text */
+.profile-view-page .about-section p,
+.profile-view-page > p {
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+/* Professional links */
+.professional-links a {
+    font-size: 1rem;
+}
+
+/* Button */
+.profile-view-page .btn {
+    font-size: 0.95rem;
+    padding: 0.65rem 1.2rem;
+}
+
