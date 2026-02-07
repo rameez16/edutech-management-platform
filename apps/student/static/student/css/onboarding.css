@@ -225,6 +225,60 @@
 
 
 
+/* ===============================
+   STEP 2 ENROLLMENT LETTER BUTTONS
+================================= */
+
+
+.step2-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;           /* vertical spacing */
+    width: 100%;          /* full width inside card */
+}
+
+.step2-buttons .btn {
+    width: 100%;          /* full width buttons */
+    padding: 12px 0;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: solid 1px black !important;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+/* Download button (orange) */
+.btn-enroll-download {
+    background-color: #fcb148 !important;  /* lighter orange */
+    color: #000;
+}
+
+.btn-enroll-download:hover {
+    background-color: #da8403 !important;  /* darker hover */
+}
+
+/* Upload button (blue) */
+.btn-enroll-upload {
+    background-color: #22a155 !important;  /* blue */
+    color: #fff !important;
+}
+
+.btn-enroll-upload:hover {
+    background-color: #037233 !important;
+}
+
+/* Disabled button */
+.btn.disabled {
+    background-color: rgba(255,255,255,0.1) !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+
+
 /* RESPONSIVE */
 @media (max-width: 992px) {
     .onboarding-steps {

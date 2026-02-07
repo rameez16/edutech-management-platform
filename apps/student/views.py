@@ -4,10 +4,11 @@ from django.contrib import messages
 from django.utils import timezone
 from decimal import Decimal
 from django.db.models import Sum
-
+from django.http import FileResponse
 from apps.bdm.models import Student
 from .models import FeePayment
-
+from apps.trainer.models import Module, LessonPlan
+from apps.bdm.models import StudentAdminProfile, Batch
 from apps.bdm.models import OnboardingChecklist
 import uuid, os
 
@@ -19,11 +20,18 @@ from .models import StudentDocument
 
 
 
-
+@role_required("student")
 def dashboard(request):
-    """Simple dashboard"""
-    
-    return render(request, 'student/dashboard/dashboard.html')
+    student = request.user.student  # Student object
+    admin_profile = getattr(student, "admin_profile", None)  # May be None
+
+    context = {
+        "student": student,
+        "admin_profile": admin_profile
+    }
+    return render(request, "student/dashboard/dashboard.html", context)
+
+
     
 
 
@@ -335,7 +343,6 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 @role_required("student")
 def upload(request):
-
     student = request.user.student
 
     REQUIRED_DOCS = {
@@ -355,7 +362,7 @@ def upload(request):
     # ====================================================
     # 🔥 AUTO-VERIFY DOCUMENTS BASED ON CHECKLIST
     # ====================================================
-    if onboarding.documents_verified:   # ← your checklist flag
+    if onboarding.documents_verified:  # ← your checklist flag
         for doc in existing_docs.values():
             if doc.verification_status != StudentDocument.VerificationStatus.VERIFIED:
                 doc.verification_status = StudentDocument.VerificationStatus.VERIFIED
@@ -371,7 +378,8 @@ def upload(request):
             return redirect(request.path)
 
         missing = [
-            label for key, label in REQUIRED_DOCS.items()
+            label
+            for key, label in REQUIRED_DOCS.items()
             if not request.FILES.get(key)
         ]
 
@@ -410,36 +418,121 @@ def upload(request):
         {
             "docs": existing_docs,
             "onboarding": onboarding,
+            "REQUIRED_DOCS": REQUIRED_DOCS,  # needed for template form
         }
     )
-
 
 @role_required("student")
 def onboard(request):
     student = request.user.student  # get logged-in student's object
     checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
 
-    # Calculate number of completed steps
+    # Step 1: Document Upload
     completed_steps = 0
     if checklist.documents_verified:
         completed_steps += 1
-    if getattr(checklist, "enrollment_uploaded", False):
-        completed_steps += 1
+
+    # Step 2: Enrollment Letter
+    enrollment_generated = checklist.enrollment_letter_generated
+    enrollment_signed = checklist.enrollment_letter_signed
+    if enrollment_signed:
+        completed_steps += 1  # Only count as completed if signed
+
+    # Step 3: ID Card
     if getattr(checklist, "id_card_downloaded", False):
         completed_steps += 1
 
     # Calculate progress percentage
     progress_percentage = (completed_steps / 3) * 100
 
+    # Pass context to template
     context = {
         "completed_steps": completed_steps,
         "progress_percentage": progress_percentage,
         "all_docs_verified": checklist.documents_verified,
+        "enrollment_generated": enrollment_generated,
+        "enrollment_signed": enrollment_signed,
         "checklist": checklist,
     }
 
-
     return render(request, "student/onboarding/onboarding.html", context)
+
+
+@role_required("student")
+def download_enrollment_letter(request):
+    checklist = request.user.student.onboarding_checklist
+
+    if not checklist.enrollment_letter_generated:
+        messages.info(request, "BDM has not generated your enrollment letter yet.")
+        return redirect("student:onboarding")
+
+    # Here you would fetch the actual file from EnrollmentAgreement
+    try:
+        agreement = request.user.student.enrollment_agreement
+        if not agreement.agreement_file:
+            messages.info(request, "Enrollment letter file is not available yet.")
+            return redirect("student:onboarding")
+        return FileResponse(agreement.agreement_file.open('rb'), as_attachment=True)
+    except:
+        messages.info(request, "Enrollment letter not available yet.")
+        return redirect("student:onboarding")
+
+@role_required("student")
+def upload_signed_enrollment_letter(request):
+    checklist = request.user.student.onboarding_checklist
+
+    if not checklist.enrollment_letter_generated:
+        messages.error(request, "Cannot upload: BDM has not generated the enrollment letter yet.")
+        return redirect("student:onboarding")
+
+    if request.method == "POST" and request.FILES.get("signed_letter"):
+        signed_file = request.FILES["signed_letter"]
+
+        # Save file to EnrollmentAgreement
+        agreement = request.user.student.enrollment_agreement
+        agreement.agreement_file.save(signed_file.name, signed_file)
+
+        # Mark as signed
+        agreement.is_signed = True
+        agreement.signed_at = timezone.now()
+        agreement.signature_ip = request.META.get('REMOTE_ADDR')
+        agreement.save()
+
+        # Update checklist
+        checklist.enrollment_letter_signed = True
+        checklist.save()
+
+        messages.success(request, "Signed enrollment letter uploaded successfully!")
+        return redirect("student:onboarding")
+
+    messages.error(request, "Please upload a valid file.")
+    return redirect("student:onboarding")
+
+
+
+@role_required("student")
+def download_id_card(request):
+    checklist = request.user.student.onboarding_checklist
+
+    if not checklist.id_card_generated:
+        messages.info(request, "ID Card has not been generated by BDM yet.")
+        return redirect("student:onboarding")
+
+    try:
+        # Assuming student model has `id_card` FileField
+        id_card_file = request.user.student.id_card
+        if not id_card_file:
+            messages.info(request, "ID Card file is not available yet.")
+            return redirect("student:onboarding")
+        
+        # Optional: mark as issued when downloaded
+        checklist.id_card_issued = True
+        checklist.save()
+
+        return FileResponse(id_card_file.open('rb'), as_attachment=True)
+    except Exception as e:
+        messages.error(request, "ID Card not available: " + str(e))
+        return redirect("student:onboarding")
 
 
 def lessonplan(request):
@@ -447,3 +540,32 @@ def lessonplan(request):
     
     return render(request, 'student/lessonplan/lessonplan.html')
     
+
+
+
+@role_required("student")
+def lessonplan(request):
+    student = request.user.student
+
+    # Get the batch for this student
+    batch = student.batches.first()  # Assuming one batch per student
+    if not batch:
+        return render(request, 'student/lessoplan/lessonplan.html', {'error': 'No batch assigned yet.'})
+
+    course = batch.course
+    course_name = course.name
+
+    # Get all modules for this course
+    modules = Module.objects.filter(course=course).prefetch_related('lessons')
+
+    # Prepare lessons dict keyed by module.id
+    lessons_by_module = {}
+    for module in modules:
+        lessons_by_module[module.id] = LessonPlan.objects.filter(module=module).order_by('session_number')
+
+    context = {
+        'course_name': course_name,
+        'modules': modules,
+        'lessons_by_module': lessons_by_module,
+    }
+    return render(request, 'student/lessonplan/lessonplan.html', context)

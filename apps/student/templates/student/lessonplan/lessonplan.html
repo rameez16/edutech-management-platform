@@ -3,85 +3,48 @@
 
 {% block title %}Lesson Plan{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/lessonplan.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/lessonplan.js' %}"></script>
+{% endblock %}
+
 {% block content %}
-<div style="width:100%; padding:24px;">
+<div class="lesson-plan-container">
 
-    <!-- HEADER -->
-    <div class="glass-card" style="padding:24px; margin-bottom:24px;">
-        <h2 style="margin:0;">Lesson Plan</h2>
-        <p style="opacity:0.8; margin-top:6px;">
-            Click a module to view its lesson plan
-        </p>
-    </div>
-
-    <!-- MODULE LIST -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px;">
-
-        <!-- MODULE 1 -->
-        <div class="glass-card"
-             style="padding:20px; cursor:pointer;"
-             onclick="toggleLesson('module1')">
-
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h4 style="margin:0;">Module 1: Introduction</h4>
-                <span style="font-size:14px;">▶</span>
-            </div>
-
-            <!-- LESSON PLAN -->
-            <div id="module1" style="display:none; margin-top:16px;">
-
-                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); margin-bottom:10px;">
-                    Lesson 1: Course Overview
-                </div>
-
-                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); margin-bottom:10px;">
-                    Lesson 2: Tools Setup
-                </div>
-
-                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); opacity:0.6;">
-                    Lesson 3: Fundamentals (Locked)
-                </div>
-
-            </div>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% else %}
+        <div class="glass-card lesson-plan-header">
+            <h2>Lesson Plan: {{ course_name }}</h2>
+            <p>Click on a module to view its lessons</p>
         </div>
 
-        <!-- MODULE 2 -->
-        <div class="glass-card"
-             style="padding:20px; cursor:pointer;"
-             onclick="toggleLesson('module2')">
+        <div class="modules-grid">
+            {% for module in modules %}
+                <div class="module-card">
+                    <div class="module-header" onclick="toggleLesson('module{{ module.id }}', this)">
+                        <h4>Module {{ module.module_number }}: {{ module.title }}</h4>
+                        <span class="toggle-icon">▶</span>
+                    </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h4 style="margin:0;">Module 2: Core Concepts</h4>
-                <span style="font-size:14px;">▶</span>
-            </div>
-
-            <div id="module2" style="display:none; margin-top:16px;">
-
-                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); margin-bottom:10px;">
-                    Lesson 1: Basics
+                    <div id="module{{ module.id }}" class="lesson-plan-content">
+                        {% for lesson in module.lessons.all %}
+                            <div class="lesson-item">
+                                Session {{ lesson.session_number }}: {{ lesson.topic }}
+                            </div>
+                        {% empty %}
+                            <div class="lesson-item locked">
+                                No lessons added yet
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-
-                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6); margin-bottom:10px;">
-                    Lesson 2: Practical Examples
-                </div>
-
-                <div style="padding:12px; border-radius:12px; background:rgba(255,255,255,0.6);">
-                    Lesson 3: Assessment
-                </div>
-
-            </div>
+            {% endfor %}
         </div>
-
-    </div>
+    {% endif %}
 
 </div>
-
-<!-- INLINE JS -->
-<script>
-function toggleLesson(id) {
-    const element = document.getElementById(id);
-    element.style.display = element.style.display === "none" ? "block" : "none";
-}
-</script>
-
 {% endblock %}

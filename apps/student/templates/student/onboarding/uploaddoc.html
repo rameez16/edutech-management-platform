@@ -4,151 +4,229 @@
 {% block title %}Student Onboarding{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'student/css/onboarding.css' %}">
+<link rel="stylesheet" href="{% static 'student/css/uploading.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/upload.js' %}"></script>
 {% endblock %}
 
 {% block content %}
+
 <div class="student-onboarding">
+    <div class="onboarding-card glass-card">
 
-    <!-- HEADER -->
-    <div class="onboarding-header glass-card">
-        <h2 class="onboarding-title">Student Onboarding</h2>
+        <h2>Student Onboarding</h2>
+        <p class="instruction">
+            Please upload all the required documents for your admission verification
+        </p>
 
-        <!-- PROGRESS -->
-        <div class="onboarding-progress">
-            <div class="progress-text">
-                <span>Onboarding Progress :</span>
-                <strong>{{ completed_steps }} / 3 Completed</strong>
-            </div>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'student:stud_upload' %}">
+            {% csrf_token %}
 
-            <div class="progress-track">
-                <div class="progress-fill onboarding-fill"
-                    style="width: {{ progress_percentage }}%;">
-                </div>
-            </div>
+            {% for message in messages %}
+                <p class="alert {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+            <div class="upload-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Document Type</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
+                <tbody>
 
-            <div class="progress-status">
-                <span class="status {% if completed_steps >= 1 %}completed{% else %}pending{% endif %}">
-                    ✔ Documents
-                </span>
-                <span class="status {% if completed_steps >= 2 %}completed{% else %}locked{% endif %}">
-                    ⦿ Enrollment Letter
-                </span>
-                <span class="status {% if completed_steps >= 3 %}completed{% else %}locked{% endif %}">
-                    🔒 ID Card
-                </span>
-            </div>
-        </div>
-    </div>
-
-    <!-- STEPS -->
-    <div class="onboarding-steps">
-
-        <!-- STEP 1: Document Upload -->
-        <div class="glass-card step-card {% if all_docs_verified %}completed{% else %}pending{% endif %}">
-            <div class="step-header">
-                <span>1. Document Upload</span>
-                {% if all_docs_verified %}
-                    <span class="badge success">Completed</span>
-                {% else %}
-                    <span class="badge warning">Upload</span>
-                {% endif %}
-            </div>
-
-            <p class="step-desc">
-                {% if all_docs_verified %}
-                    Documents verified successfully.
-                {% else %}
-                    Upload your required documents.
-                {% endif %}
-            </p>
-
-            {% if all_docs_verified %}
-                <a href="{% url 'student:stud_upload' %}" class="btn success">
-                    View Documents
-                </a>
-            {% else %}
-                <a href="{% url 'student:stud_upload' %}" class="btn primary">
-                    Upload Documents
-                </a>
+<tr class="upload-row" data-doc="photo">
+    <td>Photograph *</td>
+    <td>
+        {% if docs.photo %}
+            {% if docs.photo.verification_status == 'pending' %}
+                <span class="status pending">Pending Verification</span>
+            {% elif docs.photo.verification_status == 'verified' %}
+                <span class="status verified">Verified</span>
+            {% elif docs.photo.verification_status == 'rejected' %}
+                <span class="status rejected">Rejected</span>
             {% endif %}
-        </div>
-
-        <!-- STEP 2: Enrollment Letter -->
-        <div class="glass-card step-card {% if completed_steps >= 2 %}completed{% else %}locked{% endif %}">
-            <div class="step-header">
-                <span>2. Enrollment Letter</span>
-                {% if completed_steps >= 2 %}
-                    <span class="badge success">Completed</span>
-                {% else %}
-                    <span class="badge locked">Locked</span>
-                {% endif %}
-            </div>
-
-            <p class="step-desc">
-                {% if completed_steps >= 2 %}
-                    Enrollment letter uploaded successfully.
-                {% else %}
-                    Sign & upload your enrollment letter.
-                {% endif %}
-            </p>
-
-            {% if completed_steps >= 2 %}
-                <a href="{% url 'student:enrollment_upload' %}" class="btn success">
-                    View Enrollment Letter
-                </a>
-            {% else %}
-                <button class="btn disabled" disabled>Locked</button>
-            {% endif %}
-        </div>
-
-        <!-- STEP 3: Student ID Card -->
-        <div class="glass-card step-card {% if completed_steps >= 3 %}completed{% else %}locked{% endif %}">
-            <div class="step-header">
-                <span>3. Student ID Card</span>
-                {% if completed_steps >= 3 %}
-                    <span class="badge success">Completed</span>
-                {% else %}
-                    <span class="badge locked">Locked</span>
-                {% endif %}
-            </div>
-
-            <p class="step-desc">
-                {% if completed_steps >= 3 %}
-                    ID Card downloaded.
-                {% else %}
-                    Available after onboarding completion.
-                {% endif %}
-            </p>
-
-            {% if completed_steps >= 3 %}
-                <a href="{% url 'student:id_card_download' %}" class="btn success">
-                    Download ID Card
-                </a>
-            {% else %}
-                <button class="btn disabled" disabled>Download ID Card</button>
-            {% endif %}
-        </div>
-
-    </div>
-
-    <!-- NEXT STEP -->
-    <div class="glass-card next-step-card">
-        {% if completed_steps == 0 %}
-            <h4>Next step: Upload your documents</h4>
-            <p>Please upload all required documents to proceed.</p>
-        {% elif completed_steps == 1 %}
-            <h4>Next step: Enrollment Letter</h4>
-            <p>Your documents are verified. Please proceed to upload your enrollment letter.</p>
-        {% elif completed_steps == 2 %}
-            <h4>Next step: Student ID Card</h4>
-            <p>Enrollment letter completed. You can now download your Student ID Card.</p>
         {% else %}
-            <h4>Onboarding Complete!</h4>
-            <p>All steps completed successfully.</p>
+            <span class="status not-uploaded">Not Uploaded</span>
         {% endif %}
-    </div>
+    </td>
+    <td>
+        {% if docs.photo %}
+            {% if docs.photo.verification_status == 'verified' %}
+                <a href="{{ docs.photo.document_file.url }}" target="_blank" class="upload-btn view">View</a>
+            {% elif docs.photo.verification_status == 'pending' %}
+                <span class="upload-btn disabled">Upload</span>
+            {% elif docs.photo.verification_status == 'rejected' %}
+                <label class="file-upload">
+                    <input type="file" name="photo" accept=".jpg,.jpeg,.png,.pdf">
+                    <span class="upload-btn">Upload</span>
+                </label>
+            {% endif %}
+        {% else %}
+            <label class="file-upload">
+                <input type="file" name="photo" accept=".jpg,.jpeg,.png,.pdf">
+                <span class="upload-btn">Upload</span>
+            </label>
+        {% endif %}
+        <span class="selected-files">
+            {% if docs.photo %}
+                {{ docs.photo.document_file.name|cut:"uploads/" }}
+            {% endif %}
+        </span>
+    </td>
+</tr>
 
+<tr class="upload-row" data-doc="education">
+    <td>Educational Certificate *</td>
+    <td>
+        {% if docs.education %}
+            {% if docs.education.verification_status == 'pending' %}
+                <span class="status pending">Pending Verification</span>
+            {% elif docs.education.verification_status == 'verified' %}
+                <span class="status verified">Verified</span>
+            {% elif docs.education.verification_status == 'rejected' %}
+                <span class="status rejected">Rejected</span>
+            {% endif %}
+        {% else %}
+            <span class="status not-uploaded">Not Uploaded</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if docs.education %}
+            {% if docs.education.verification_status == 'verified' %}
+                <a href="{{ docs.education.document_file.url }}" target="_blank" class="upload-btn view">View</a>
+            {% elif docs.education.verification_status == 'pending' %}
+                <span class="upload-btn disabled">Upload</span>
+            {% elif docs.education.verification_status == 'rejected' %}
+                <label class="file-upload">
+                    <input type="file" name="education" accept=".jpg,.jpeg,.png,.pdf">
+                    <span class="upload-btn">Upload</span>
+                </label>
+            {% endif %}
+        {% else %}
+            <label class="file-upload">
+                <input type="file" name="education" accept=".jpg,.jpeg,.png,.pdf">
+                <span class="upload-btn">Upload</span>
+            </label>
+        {% endif %}
+        <span class="selected-files">
+            {% if docs.education %}
+                {{ docs.education.document_file.name|cut:"uploads/" }}
+            {% endif %}
+        </span>
+    </td>
+</tr>
+
+<tr class="upload-row" data-doc="aadhaar">
+    <td>Aadhaar *</td>
+    <td>
+        {% if docs.aadhaar %}
+            {% if docs.aadhaar.verification_status == 'pending' %}
+                <span class="status pending">Pending Verification</span>
+            {% elif docs.aadhaar.verification_status == 'verified' %}
+                <span class="status verified">Verified</span>
+            {% elif docs.aadhaar.verification_status == 'rejected' %}
+                <span class="status rejected">Rejected</span>
+            {% endif %}
+        {% else %}
+            <span class="status not-uploaded">Not Uploaded</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if docs.aadhaar %}
+            {% if docs.aadhaar.verification_status == 'verified' %}
+                <a href="{{ docs.aadhaar.document_file.url }}" target="_blank" class="upload-btn view">View</a>
+            {% elif docs.aadhaar.verification_status == 'pending' %}
+                <span class="upload-btn disabled">Upload</span>
+            {% elif docs.aadhaar.verification_status == 'rejected' %}
+                <label class="file-upload">
+                    <input type="file" name="aadhaar" accept=".jpg,.jpeg,.png,.pdf">
+                    <span class="upload-btn">Upload</span>
+                </label>
+            {% endif %}
+        {% else %}
+            <label class="file-upload">
+                <input type="file" name="aadhaar" accept=".jpg,.jpeg,.png,.pdf">
+                <span class="upload-btn">Upload</span>
+            </label>
+        {% endif %}
+        <span class="selected-files">
+            {% if docs.aadhaar %}
+                {{ docs.aadhaar.document_file.name|cut:"uploads/" }}
+            {% endif %}
+        </span>
+    </td>
+</tr>
+
+<tr class="upload-row" data-doc="resume">
+    <td>Resume / CV *</td>
+    <td>
+        {% if docs.resume %}
+            {% if docs.resume.verification_status == 'pending' %}
+                <span class="status pending">Pending Verification</span>
+            {% elif docs.resume.verification_status == 'verified' %}
+                <span class="status verified">Verified</span>
+            {% elif docs.resume.verification_status == 'rejected' %}
+                <span class="status rejected">Rejected</span>
+            {% endif %}
+        {% else %}
+            <span class="status not-uploaded">Not Uploaded</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if docs.resume %}
+            {% if docs.resume.verification_status == 'verified' %}
+                <a href="{{ docs.resume.document_file.url }}" target="_blank" class="upload-btn view">View</a>
+            {% elif docs.resume.verification_status == 'pending' %}
+                <span class="upload-btn disabled">Upload</span>
+            {% elif docs.resume.verification_status == 'rejected' %}
+                <label class="file-upload">
+                    <input type="file" name="resume" accept=".jpg,.jpeg,.png,.pdf">
+                    <span class="upload-btn">Upload</span>
+                </label>
+            {% endif %}
+        {% else %}
+            <label class="file-upload">
+                <input type="file" name="resume" accept=".jpg,.jpeg,.png,.pdf">
+                <span class="upload-btn">Upload</span>
+            </label>
+        {% endif %}
+        <span class="selected-files">
+            {% if docs.resume %}
+                {{ docs.resume.document_file.name|cut:"uploads/" }}
+            {% endif %}
+        </span>
+    </td>
+</tr>
+
+</tbody>
+
+</table>
+    <div class="warning" id="formError"></div>
+
+        <div class="buttons">
+            <button type="submit" class="submit-btn" disabled>
+                Submit Documents
+            </button>
+            <button type="reset" class="cancel-btn"
+            {% if docs.photo or docs.education or docs.aadhaar or docs.resume %}
+                {% if docs.photo.verification_status == 'pending' or docs.education.verification_status == 'pending' or docs.aadhaar.verification_status == 'pending' or docs.resume.verification_status == 'pending' %}
+                    disabled
+                {% endif %}
+            {% endif %}>
+            Cancel
+            </button>
+
+        </div>
+
+    </div>
+</form>
+
+    </div>
 </div>
+
 {% endblock %}

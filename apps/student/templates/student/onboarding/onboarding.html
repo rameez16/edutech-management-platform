@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'student/css/onboarding.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'student/js/onboard.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="student-onboarding">
 
@@ -14,20 +18,30 @@
     <div class="onboarding-header glass-card">
         <h2 class="onboarding-title">Student Onboarding</h2>
 
+        <!-- PROGRESS -->
         <div class="onboarding-progress">
             <div class="progress-text">
                 <span>Onboarding Progress :</span>
-                <strong>0 / 3 Completed</strong>
+                <strong>{{ completed_steps }} / 3 Completed</strong>
             </div>
 
             <div class="progress-track">
-                <div class="progress-fill onboarding-fill" style="width: 0%;"></div>
+                <div class="progress-fill onboarding-fill"
+                    style="width: {{ progress_percentage }}%;">
+                </div>
             </div>
 
+
             <div class="progress-status">
-                <span class="status pending">✔ Documents</span>
-                <span class="status locked">⦿ Enrollment Letter</span>
-                <span class="status locked">🔒 ID Card</span>
+                <span class="status {% if completed_steps >= 1 %}completed{% else %}pending{% endif %}">
+                    ✔ Documents
+                </span>
+                <span class="status {% if completed_steps >= 2 %}completed{% else %}locked{% endif %}">
+                    ⦿ Enrollment Letter
+                </span>
+                <span class="status {% if completed_steps >= 3 %}completed{% else %}locked{% endif %}">
+                    🔒 ID Card
+                </span>
             </div>
         </div>
     </div>
@@ -39,59 +53,143 @@
         <div class="glass-card step-card {% if all_docs_verified %}completed{% else %}pending{% endif %}">
             <div class="step-header">
                 <span>1. Document Upload</span>
-
+                {% if all_docs_verified %}
+                    <span class="badge success">Completed</span>
+                {% else %}
                     <span class="badge warning">Upload</span>
-                
+                {% endif %}
             </div>
 
             <p class="step-desc">
-               
+                {% if all_docs_verified %}
+                    Documents verified successfully.
+                {% else %}
                     Upload your required documents.
-                
+                {% endif %}
             </p>
 
-            
+            {% if all_docs_verified %}
+                <a href="{% url 'student:stud_upload' %}" class="btn success">
+                    View Documents
+                </a>
+            {% else %}
                 <a href="{% url 'student:stud_upload' %}" class="btn primary">
                     Upload Documents
                 </a>
-            
+            {% endif %}
         </div>
 
+       <!-- STEP 2: Enrollment Letter -->
+<div class="glass-card step-card step2-card
+    {% if checklist.enrollment_letter_signed %}completed
+    {% elif checklist.enrollment_letter_generated %}pending
+    {% else %}locked{% endif %}">
 
-        <!-- STEP 2: Enrollment Letter -->
-        <div class="glass-card step-card locked">
-            <div class="step-header">
-                <span>2. Enrollment Letter</span>
-                <span class="badge locked">Locked</span>
-            </div>
+    <div class="step-header">
+        <span>2. Enrollment Letter</span>
+        {% if checklist.enrollment_letter_signed %}
+            <span class="badge success">Completed</span>
+        {% elif checklist.enrollment_letter_generated %}
+            <span class="badge warning">Pending</span>
+        {% else %}
+            <span class="badge locked">Locked</span>
+        {% endif %}
+    </div>
 
-            <p class="step-desc">
-                Sign & upload your enrollment letter.
-            </p>
+    <p class="step-desc">
+        {% if checklist.enrollment_letter_signed %}
+            Enrollment letter signed successfully.
+        {% elif checklist.enrollment_letter_generated %}
+            Download, sign, and upload your enrollment letter.
+        {% else %}
+            Waiting for BDM to generate the enrollment letter.
+        {% endif %}
+    </p>
 
-            <button class="btn disabled" disabled>Locked</button>
-        </div>
+    <div class="btn-group-vertical step2-buttons">
+        <!-- Download Button -->
+        <a href="{% url 'student:download_enrollment_letter' %}" 
+           class="btn btn-enroll-download {% if not checklist.enrollment_letter_generated %}disabled{% endif %}"
+           {% if not checklist.enrollment_letter_generated %}aria-disabled="true" tabindex="-1"{% endif %}>
+           Download Enrollment Letter
+        </a>
 
-        <!-- STEP 3: Student ID Card -->
-        <div class="glass-card step-card locked">
-            <div class="step-header">
-                <span>3. Student ID Card</span>
-                <span class="badge locked">Locked</span>
-            </div>
+        <!-- Upload Button -->
+        {% if checklist.enrollment_letter_generated and not checklist.enrollment_letter_signed %}
+            <form id="upload-signed-form" 
+                  action="{% url 'student:upload_signed_enrollment_letter' %}" 
+                  method="post" 
+                  enctype="multipart/form-data" 
+                  style="display: inline;">
+                {% csrf_token %}
+                <input type="file" id="signed-letter-input" name="signed_letter" style="display:none;" required>
+                <button type="button" class="btn btn-enroll-upload" id="upload-btn">
+                    Upload Signed Enrollment Letter
+                </button>
+            </form>
+        {% elif checklist.enrollment_letter_signed %}
+            <button class="btn success" disabled>
+                Uploaded Successfully ✔
+            </button>
+        {% endif %}
+    </div>
+</div>
 
-            <p class="step-desc">
-                Available after onboarding completion.
-            </p>
 
-            <button class="btn disabled" disabled>Download ID Card</button>
-        </div>
+
+<!-- STEP 3: Student ID Card -->
+<div class="glass-card step-card
+    {% if checklist.id_card_generated %}completed{% else %}locked{% endif %}">
+
+    <div class="step-header">
+        <span>3. Student ID Card</span>
+        {% if checklist.id_card_generated %}
+            <span class="badge success">Completed</span>
+        {% else %}
+            <span class="badge locked">Locked</span>
+        {% endif %}
+    </div>
+
+    <p class="step-desc">
+        {% if checklist.id_card_generated %}
+            ID Card is ready to download.
+        {% else %}
+            Waiting for BDM to generate ID Card.
+        {% endif %}
+    </p>
+
+    {% if checklist.id_card_generated %}
+    <button type="button" 
+            class="btn btn-idcard-download" 
+            id="download-idcard-btn"
+            data-url="{% url 'student:id_card_download' %}">
+        Download ID Card
+    </button>
+{% else %}
+    <button type="button" class="btn disabled" disabled>Download ID Card</button>
+{% endif %}
+
+</div>
+
+
 
     </div>
 
     <!-- NEXT STEP -->
     <div class="glass-card next-step-card">
-        <h4>Next step: Upload your documents</h4>
-        <p>Please upload all required documents to proceed.</p>
+        {% if completed_steps == 0 %}
+            <h4>Next step: Upload your documents</h4>
+            <p>Please upload all required documents to proceed.</p>
+        {% elif completed_steps == 1 %}
+            <h4>Next step: Enrollment Letter</h4>
+            <p>Your documents are verified. Please proceed to upload your enrollment letter.</p>
+        {% elif completed_steps == 2 %}
+            <h4>Next step: Student ID Card</h4>
+            <p>Enrollment letter completed. You can now download your Student ID Card.</p>
+        {% else %}
+            <h4>Onboarding Complete!</h4>
+            <p>All steps completed successfully.</p>
+        {% endif %}
     </div>
 
 </div>

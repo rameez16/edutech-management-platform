@@ -201,6 +201,18 @@ td {
     margin-top: 20px;
 }
 
+/* VIEW BUTTON */
+.upload-btn.view {
+    background-color: #3455b7;
+    color: #fff;
+}
+
+.upload-btn.view:hover {
+    background-color: #212688;
+}
+
+
+
 
 
 /* Responsive */

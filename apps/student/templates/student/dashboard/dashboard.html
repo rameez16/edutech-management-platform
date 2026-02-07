@@ -2,6 +2,38 @@
 {% load static %}
 
 {% block title %}Student Dashboard{% endblock %}
+{% block extra_css %}
+<style>
+    /* Profile Card Custom Styles */
+    .profile-card .stat-value {
+        font-size: 20px; /* Bigger name */
+        font-weight: 600;
+        color: #111; /* You can adjust */
+    }
+
+    .profile-card .stat-change {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .profile-card .stat-change.positive {
+        color: green; /* Active Student */
+    }
+
+    .profile-card .stat-change.inactive {
+        color: red; /* Inactive Student */
+        background-color: rgba(255, 0, 0, 0.1); /* light red bg */
+    }
+
+    /* Optional: Profile Avatar Size */
+    .profile-card .stat-icon img.profile-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 
@@ -42,25 +74,44 @@
    <!-- TOP STATS GRID (ALL CARDS IN ONE ROW) -->
 <section class="stats-grid">
 
-    <!-- Student Profile Card -->
+   <!-- Student Profile Card -->
 <div class="glass-card glass-card-3d stat-card profile-card">
     <div class="stat-card-inner">
 
         <div class="stat-info">
-            <div class="stat-value">John Doe</div>
-            <h3>Student ID: STU12345</h3>
-            <span class="stat-change positive">Active Student</span>
+            <div class="stat-value">{{ student.full_name }}</div>
+            <h3>
+                Student ID: 
+                {% if admin_profile %}
+                    {{ admin_profile.student_code }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </h3>
+            <span class="stat-change {% if admin_profile and admin_profile.is_active %}positive{% else %}inactive{% endif %}">
+                {% if admin_profile and admin_profile.is_active %}
+                    Active Student
+                {% else %}
+                    Inactive
+            {% endif %}
+            </span>
+
         </div>
 
         <div class="stat-icon cyan">
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--emerald-light)" stroke-width="2">
-                <circle cx="12" cy="7" r="4"/>
-                <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
-            </svg>
+            {% if student.profile_photo %}
+                <img src="{{ student.profile_photo.url }}" alt="Profile" class="profile-avatar">
+            {% else %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--emerald-light)" stroke-width="2">
+                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
+                </svg>
+            {% endif %}
         </div>
 
     </div>
 </div>
+
 
 
 

@@ -1,0 +1,88 @@
+/* Container */
+.lesson-plan-container {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/* Header */
+.lesson-plan-header {
+    padding: 24px;
+    margin-bottom: 24px;
+    background: rgb(237, 231, 238);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+}
+
+/* Modules Grid */
+.modules-grid {
+    display: flex;
+    flex-direction: column;  /* stack vertically */
+    gap: 20px;               /* spacing between modules */
+}
+
+
+/* Module Card */
+.module-card {
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.418);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hover Effect */
+.module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Module Header */
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+/* Toggle Icon */
+.toggle-icon {
+    font-size: 18px;
+    transition: transform 0.2s ease;
+}
+
+/* Lesson Plan Content */
+.lesson-plan-content {
+    display: none; /* hidden by default */
+    flex-direction: column;
+    gap: 12px; /* consistent gap between lessons */
+    margin-top: 12px;
+}
+
+/* Visible Content */
+.lesson-plan-content.visible {
+    display: flex; /* flex-column keeps spacing */
+}
+
+/* Lesson Item */
+.lesson-item {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgb(255, 255, 255);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Locked Lesson */
+.lesson-item.locked {
+    opacity: 0.6;
+    background: rgba(220, 220, 220, 0.3);
+    font-style: italic;
+}
