@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="{% static 'student/js/onboard.js' %}"></script>
 {% endblock %}
 
@@ -78,8 +79,7 @@
                 </a>
             {% endif %}
         </div>
-
-       <!-- STEP 2: Enrollment Letter -->
+<!-- STEP 2: Enrollment Letter -->
 <div class="glass-card step-card step2-card
     {% if checklist.enrollment_letter_signed %}completed
     {% elif checklist.enrollment_letter_generated %}pending
@@ -87,6 +87,7 @@
 
     <div class="step-header">
         <span>2. Enrollment Letter</span>
+
         {% if checklist.enrollment_letter_signed %}
             <span class="badge success">Completed</span>
         {% elif checklist.enrollment_letter_generated %}
@@ -107,69 +108,109 @@
     </p>
 
     <div class="btn-group-vertical step2-buttons">
-        <!-- Download Button -->
-        <a href="{% url 'student:download_enrollment_letter' %}" 
-           class="btn btn-enroll-download {% if not checklist.enrollment_letter_generated %}disabled{% endif %}"
-           {% if not checklist.enrollment_letter_generated %}aria-disabled="true" tabindex="-1"{% endif %}>
-           Download Enrollment Letter
-        </a>
 
-        <!-- Upload Button -->
+        <!-- DOWNLOAD (real download, button-style link) -->
+        {% if checklist.enrollment_letter_generated %}
+            <a href="{% url 'student:download_enrollment_letter' %}"
+               class="btn btn-enroll-download"
+               download>
+                Download Enrollment Letter
+            </a>
+        {% else %}
+            <a class="btn btn-enroll-download disabled"
+               aria-disabled="true">
+                Download Enrollment Letter
+            </a>
+        {% endif %}
+
+        <!-- UPLOAD -->
         {% if checklist.enrollment_letter_generated and not checklist.enrollment_letter_signed %}
-            <form id="upload-signed-form" 
-                  action="{% url 'student:upload_signed_enrollment_letter' %}" 
-                  method="post" 
-                  enctype="multipart/form-data" 
-                  style="display: inline;">
+            <form id="uploadSignedForm"
+                  data-url="{% url 'student:upload_signed_enrollment_letter' %}"
+                  enctype="multipart/form-data">
+
                 {% csrf_token %}
-                <input type="file" id="signed-letter-input" name="signed_letter" style="display:none;" required>
-                <button type="button" class="btn btn-enroll-upload" id="upload-btn">
+
+                <input type="file"
+                       id="signedLetterInput"
+                       name="signed_letter"
+                       accept=".pdf,.jpg,.png"
+                       hidden
+                       required>
+
+                <button type="button"
+                        class="btn btn-enroll-upload"
+                        id="uploadSignedBtn">
                     Upload Signed Enrollment Letter
                 </button>
+
+                <small id="uploadStatus"
+                       style="display:block;margin-top:6px;font-size:12px;"></small>
             </form>
+
         {% elif checklist.enrollment_letter_signed %}
-            <button class="btn success" disabled>
+            <button class="btn btn-enroll-upload" disabled>
                 Uploaded Successfully ✔
             </button>
         {% endif %}
+
     </div>
 </div>
 
 
 
+
 <!-- STEP 3: Student ID Card -->
-<div class="glass-card step-card
-    {% if checklist.id_card_generated %}completed{% else %}locked{% endif %}">
+<div class="glass-card step-card step3-card
+    {% if checklist.id_card_issued %}completed
+    {% elif checklist.id_card_generated %}pending
+    {% else %}locked{% endif %}">
 
     <div class="step-header">
         <span>3. Student ID Card</span>
-        {% if checklist.id_card_generated %}
+
+        {% if checklist.id_card_issued %}
             <span class="badge success">Completed</span>
+        {% elif checklist.id_card_generated %}
+            <span class="badge warning">Pending</span>
         {% else %}
             <span class="badge locked">Locked</span>
         {% endif %}
     </div>
 
     <p class="step-desc">
-        {% if checklist.id_card_generated %}
-            ID Card is ready to download.
+        {% if checklist.id_card_issued %}
+            Student ID card issued successfully.
+        {% elif checklist.id_card_generated %}
+            ID card generated. Please wait until it is issued.
         {% else %}
-            Waiting for BDM to generate ID Card.
+            Waiting for BDM to generate ID card.
         {% endif %}
     </p>
 
-    {% if checklist.id_card_generated %}
-    <button type="button" 
-            class="btn btn-idcard-download" 
-            id="download-idcard-btn"
-            data-url="{% url 'student:id_card_download' %}">
-        Download ID Card
-    </button>
-{% else %}
-    <button type="button" class="btn disabled" disabled>Download ID Card</button>
-{% endif %}
+  <div class="btn-group-vertical step3-buttons">
+        {% if checklist.id_card_issued %}
+            <!-- VIEW BUTTON -->
+            <button type="button" class="btn view-id-btn" data-id-url="{% url 'student:view_id_card' %}">
+                View ID Card
+            </button>
 
+            <!-- DOWNLOAD BUTTON -->
+            <button type="button" class="btn btn-idcard-download" data-id-url="{% url 'student:view_id_card' %}">
+                Download ID Card
+            </button>
+        {% elif checklist.id_card_generated %}
+            <button class="btn disabled" disabled>
+                ID Card Issuance Pending
+            </button>
+        {% else %}
+            <button class="btn disabled" disabled>
+                ID Card Not Available
+            </button>
+        {% endif %}
+    </div>
 </div>
+
 
 
 
@@ -191,6 +232,17 @@
             <p>All steps completed successfully.</p>
         {% endif %}
     </div>
+<!-- Fullscreen Modal (Place here!) -->
+    <div id="idCardModal" class="fullscreen-modal">
+        <div class="modal-content-full">
+            <span class="close">&times;</span>
+            <div id="modal-body-full">
+                <!-- ID card HTML will be loaded here -->
+            </div>
+        </div>
+    </div>
+
 
 </div>
+
 {% endblock %}

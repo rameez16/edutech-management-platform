@@ -1,18 +1,27 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from apps.accounts.decorators import role_required
-from django.contrib import messages
+from django.http import HttpResponse, JsonResponse, FileResponse
+from django.views.decorators.http import require_POST
+
 from django.utils import timezone
-from decimal import Decimal
+from django.contrib import messages
 from django.db.models import Sum
-from django.http import FileResponse
-from apps.bdm.models import Student
-from .models import FeePayment
-from apps.trainer.models import Module, LessonPlan
-from apps.bdm.models import StudentAdminProfile, Batch
-from apps.bdm.models import OnboardingChecklist
+
+from decimal import Decimal
 import uuid, os
 
-from .models import StudentDocument
+from apps.accounts.decorators import role_required
+
+from apps.bdm.models import (
+    Student,
+    StudentAdminProfile,
+    Batch,
+    OnboardingChecklist,
+
+)
+
+from apps.trainer.models import Module, LessonPlan
+
+from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard
 
 
 # Create your views here.
@@ -439,7 +448,7 @@ def onboard(request):
         completed_steps += 1  # Only count as completed if signed
 
     # Step 3: ID Card
-    if getattr(checklist, "id_card_downloaded", False):
+    if getattr(checklist, "id_card_issued", False):
         completed_steps += 1
 
     # Calculate progress percentage
@@ -458,55 +467,54 @@ def onboard(request):
     return render(request, "student/onboarding/onboarding.html", context)
 
 
-@role_required("student")
-def download_enrollment_letter(request):
-    checklist = request.user.student.onboarding_checklist
 
-    if not checklist.enrollment_letter_generated:
-        messages.info(request, "BDM has not generated your enrollment letter yet.")
-        return redirect("student:onboarding")
-
-    # Here you would fetch the actual file from EnrollmentAgreement
-    try:
-        agreement = request.user.student.enrollment_agreement
-        if not agreement.agreement_file:
-            messages.info(request, "Enrollment letter file is not available yet.")
-            return redirect("student:onboarding")
-        return FileResponse(agreement.agreement_file.open('rb'), as_attachment=True)
-    except:
-        messages.info(request, "Enrollment letter not available yet.")
-        return redirect("student:onboarding")
 
 @role_required("student")
+@require_POST
 def upload_signed_enrollment_letter(request):
     checklist = request.user.student.onboarding_checklist
 
     if not checklist.enrollment_letter_generated:
-        messages.error(request, "Cannot upload: BDM has not generated the enrollment letter yet.")
-        return redirect("student:onboarding")
+        return JsonResponse({
+            "success": False,
+            "message": "Enrollment letter not generated yet."
+        }, status=400)
 
-    if request.method == "POST" and request.FILES.get("signed_letter"):
-        signed_file = request.FILES["signed_letter"]
+    signed_file = request.FILES.get("signed_letter")
 
-        # Save file to EnrollmentAgreement
-        agreement = request.user.student.enrollment_agreement
-        agreement.agreement_file.save(signed_file.name, signed_file)
+    if not signed_file:
+        return JsonResponse({
+            "success": False,
+            "message": "No file selected."
+        }, status=400)
 
-        # Mark as signed
-        agreement.is_signed = True
-        agreement.signed_at = timezone.now()
-        agreement.signature_ip = request.META.get('REMOTE_ADDR')
-        agreement.save()
+    # Get or create agreement
+    agreement, _ = EnrollmentAgreement.objects.get_or_create(
+        student=request.user.student,
+        defaults={
+            "agreement_number": f"AGR-{request.user.student.id}",
+            "agreement_date": timezone.now().date(),
+            "course_fee_agreed": 0,
+            "payment_plan": "full"
+        }
+    )
 
-        # Update checklist
-        checklist.enrollment_letter_signed = True
-        checklist.save()
+    # Save file
+    agreement.agreement_file.save(signed_file.name, signed_file)
+    agreement.is_signed = True
+    agreement.signed_at = timezone.now()
+    agreement.signature_ip = request.META.get("REMOTE_ADDR")
+    agreement.save()
 
-        messages.success(request, "Signed enrollment letter uploaded successfully!")
-        return redirect("student:onboarding")
+    # Update checklist
+    checklist.enrollment_letter_signed = True
+    checklist.save()
 
-    messages.error(request, "Please upload a valid file.")
-    return redirect("student:onboarding")
+    return JsonResponse({
+        "success": True,
+        "message": "Signed enrollment letter uploaded successfully."
+    })
+
 
 
 
@@ -569,3 +577,46 @@ def lessonplan(request):
         'lessons_by_module': lessons_by_module,
     }
     return render(request, 'student/lessonplan/lessonplan.html', context)
+
+
+
+
+@role_required("student")
+def view_id_card(request):
+    student = request.user.student
+    # Directly get the ID card
+    id_card = student.id_card  
+
+    context = {
+        "id_card": id_card
+    }
+    return render(request, "student/onboarding/view_id_card.html", context)
+
+
+
+
+
+
+
+
+
+#when merging delete this view this is for just check logic correct or not
+
+@role_required("student")
+def download_enrollment_letter(request):
+    checklist = request.user.student.onboarding_checklist
+
+    if not checklist.enrollment_letter_generated:
+        messages.info(request, "Enrollment letter not generated yet.")
+        return redirect("student:onboarding")
+
+    content = (
+        "ENROLLMENT LETTER (TEMP)\n\n"
+        f"Student: {request.user.get_full_name()}\n\n"
+        "This is a temporary enrollment letter.\n"
+        "A PDF version will be added by BDM."
+    )
+
+    response = HttpResponse(content, content_type="application/octet-stream")
+    response["Content-Disposition"] = 'attachment; filename="enrollment_letter.txt"'
+    return response

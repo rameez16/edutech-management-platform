@@ -73,10 +73,11 @@
             </label>
         {% endif %}
         <span class="selected-files">
-            {% if docs.photo %}
+            {% if docs.photo and docs.photo.verification_status != 'rejected' %}
                 {{ docs.photo.document_file.name|cut:"uploads/" }}
             {% endif %}
         </span>
+
     </td>
 </tr>
 
@@ -114,10 +115,11 @@
             </label>
         {% endif %}
         <span class="selected-files">
-            {% if docs.education %}
+            {% if docs.education and docs.education.verification_status != 'rejected' %}
                 {{ docs.education.document_file.name|cut:"uploads/" }}
             {% endif %}
         </span>
+
     </td>
 </tr>
 
@@ -155,10 +157,11 @@
             </label>
         {% endif %}
         <span class="selected-files">
-            {% if docs.aadhaar %}
+            {% if docs.aadhaar and docs.aadhaar.verification_status != 'rejected' %}
                 {{ docs.aadhaar.document_file.name|cut:"uploads/" }}
             {% endif %}
         </span>
+
     </td>
 </tr>
 
@@ -196,10 +199,11 @@
             </label>
         {% endif %}
         <span class="selected-files">
-            {% if docs.resume %}
+            {% if docs.resume and docs.resume.verification_status != 'rejected' %}
                 {{ docs.resume.document_file.name|cut:"uploads/" }}
             {% endif %}
         </span>
+
     </td>
 </tr>
 

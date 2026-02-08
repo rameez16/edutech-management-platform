@@ -25,7 +25,13 @@ urlpatterns = [ path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path('stud_onboard/',views.onboard,name='stud_onboard'),
                 path('stud_upload/',views.upload,name='stud_upload'),
                 path('stud_lessonplan/',views.lessonplan,name='stud_lessonplan'),
-                path("download-enrollment-letter/",views.download_enrollment_letter,name="download_enrollment_letter"),
                 path("upload-signed-enrollment-letter/",views.upload_signed_enrollment_letter,name="upload_signed_enrollment_letter"),
                 path("download-id-card/",views.download_id_card,name="id_card_download"),
+                path('onboarding/id-card/',views.view_id_card, name='view_id_card'),
+
+
+
+                #only for checking logic delete later for merge
+                path("download-enrollment-letter/",views.download_enrollment_letter,name="download_enrollment_letter"),
+
                ]

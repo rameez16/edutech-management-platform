@@ -210,7 +210,7 @@
 
 /* Button for View / Download actions */
 .step-card .btn.success {
-    background: #2563eb !important;  /* Blue for view/download */
+    background: #4464ce !important;  /* Blue for view/download */
     color: #ffffff !important;
 }
 
@@ -275,6 +275,86 @@
     color: var(--text-muted) !important;
     cursor: not-allowed !important;
     pointer-events: none !important;
+}
+
+
+/* Make link behave like button content */
+.btn-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+    pointer-events: auto;
+}
+
+/* When parent button is disabled, block link clicks */
+button:disabled .btn-link {
+    pointer-events: none;
+}
+
+
+
+/* Fullscreen modal */
+.fullscreen-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* scroll if content too tall */
+    background-color: rgba(0,0,0,0.8);
+}
+
+/* Fullscreen content */
+.modal-content-full {
+    background-color: #fff;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+/* Close button */
+.modal-content-full .close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-content-full .close:hover {
+    color: black;
+}
+
+
+/* ===============================
+   VIEW ID CARD BUTTON - FORCE STYLE
+================================== */
+.step3-card .btn-group-vertical .view-id-btn {
+    background-color: #9072e9 !important; /* green */
+    color: white !important;
+    border: solid 2px black !important;
+    border-radius: 12px !important;
+    padding: 12px 20px !important;
+    width: 100% !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.step3-card .btn-group-vertical .view-id-btn:hover {
+    background-color: #622ab7 !important; /* darker green */
 }
 
 
