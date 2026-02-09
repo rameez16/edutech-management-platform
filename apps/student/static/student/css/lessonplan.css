@@ -13,7 +13,7 @@
 .lesson-plan-header {
     padding: 24px;
     margin-bottom: 24px;
-    background: rgb(237, 231, 238);
+    background: rgb(255, 255, 255);
     backdrop-filter: blur(10px);
     border-radius: 12px;
 }
@@ -33,7 +33,7 @@
 .module-card {
     padding: 20px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.418);
+    background: rgba(244, 221, 249, 0.601);
     backdrop-filter: blur(8px);
     display: flex;
     flex-direction: column;
@@ -58,11 +58,7 @@
     cursor: pointer;
 }
 
-/* Toggle Icon */
-.toggle-icon {
-    font-size: 18px;
-    transition: transform 0.2s ease;
-}
+
 
 /* ===============================
    Lesson Plan Content (Module Body)

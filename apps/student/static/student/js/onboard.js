@@ -1,23 +1,83 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ===============================
-    // Step 2: Upload signed enrollment letter
-    // ===============================
-    const uploadBtn = document.getElementById('uploadSignedBtn');
-    const fileInput = document.getElementById('signedLetterInput');
-    const form = document.getElementById('uploadSignedForm');
+// ===============================
+// Step 2: Upload signed enrollment letter
+// ===============================
+const uploadBtn = document.getElementById('uploadSignedBtn');
+const fileInput = document.getElementById('signedLetterInput');
+const form = document.getElementById('uploadSignedForm');
+const uploadStatus = document.getElementById('uploadStatus');
 
-    if (uploadBtn && fileInput && form) {
-        // When button clicked, trigger file dialog
-        uploadBtn.addEventListener('click', () => fileInput.click());
+if (uploadBtn && fileInput && form) {
+    // Trigger file selector when clicking upload button
+    uploadBtn.addEventListener('click', () => fileInput.click());
 
-        // When file selected, submit form automatically
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                form.submit();
+    // Upload when a file is selected
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length === 0) return;
+
+        const url = form.dataset.url;
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        const formData = new FormData();
+        formData.append('signed_letter', fileInput.files[0]);
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // ✅ Update upload status
+                uploadStatus.textContent = "Uploaded successfully ✔";
+                uploadStatus.style.color = "green";
+
+                // ✅ Disable upload button
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = "Uploaded Successfully ✔";
+
+                // ✅ Disable file input
+                fileInput.disabled = true;
+
+                // ✅ Update step badge
+                const stepCard = form.closest('.step-card');
+                const badge = stepCard.querySelector('.badge');
+                if (badge) {
+                    badge.textContent = "Completed";
+                    badge.classList.remove('warning', 'locked');
+                    badge.classList.add('success');
+                }
+
+                // ✅ Update step card class
+                stepCard.classList.remove('pending', 'locked');
+                stepCard.classList.add('completed');
+
+                // ✅ Update step description
+                const stepDesc = stepCard.querySelector('.step-desc');
+                if (stepDesc) {
+                    stepDesc.textContent = "Enrollment letter signed successfully.";
+                }
+
+                // ✅ Optional: update checkbox if exists
+                const checkbox = stepCard.querySelector('input[type="checkbox"]');
+                if (checkbox) checkbox.checked = true;
+
+            } else {
+                uploadStatus.textContent = data.message || "Upload failed";
+                uploadStatus.style.color = "red";
             }
+        })
+        .catch(err => {
+            console.error(err);
+            uploadStatus.textContent = "Something went wrong";
+            uploadStatus.style.color = "red";
         });
-    }
+    });
+}
+
+
 
     const modal = document.getElementById("idCardModal");
     const modalBody = document.getElementById("modal-body-full");

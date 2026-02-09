@@ -31,17 +31,47 @@ from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDC
 
 @role_required("student")
 def dashboard(request):
-    student = request.user.student  # Student object
-    admin_profile = getattr(student, "admin_profile", None)  # May be None
+    student = request.user.student
+    admin_profile = getattr(student, "admin_profile", None)
+    checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
 
+    # Get latest photo document
+    profile_photo = student.documents.filter(
+        document_type=StudentDocument.DocumentType.PHOTO
+    ).order_by('-id').first()
+
+    # Only show if VERIFIED
+    if profile_photo and profile_photo.verification_status != StudentDocument.VerificationStatus.VERIFIED:
+        profile_photo = None
+
+    # Step completion logic (same as onboard)
+    completed_steps = 0
+    if checklist.documents_verified:
+        completed_steps += 1
+
+    enrollment_generated = checklist.enrollment_letter_generated
+    enrollment_signed = checklist.enrollment_letter_signed
+    if enrollment_signed:
+        completed_steps += 1
+
+    if getattr(checklist, "id_card_issued", False):
+        completed_steps += 1
+
+    # Pass context to template
     context = {
         "student": student,
-        "admin_profile": admin_profile
+        "admin_profile": admin_profile,
+        "profile_photo": profile_photo,
+        "all_docs_verified": checklist.documents_verified,
+        "user": request.user,
+        "checklist": checklist,
+        "completed_steps": completed_steps,
+        "enrollment_generated": enrollment_generated,
+        "enrollment_signed": enrollment_signed,
     }
+
     return render(request, "student/dashboard/dashboard.html", context)
 
-
-    
 
 
 
@@ -345,9 +375,6 @@ def installments_qr(request):
     return render(request, 'student/payment/installment_qr.html', context)
 
 
-
-
-
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 @role_required("student")
@@ -363,73 +390,117 @@ def upload(request):
 
     onboarding, _ = OnboardingChecklist.objects.get_or_create(student=student)
 
-    existing_docs = {
-        doc.document_type: doc
-        for doc in StudentDocument.objects.filter(student=student)
-    }
+    # =====================================
+    # Get latest document per type
+    # =====================================
+    latest_docs_qs = (
+        StudentDocument.objects
+        .filter(student=student)
+        .order_by("document_type", "-id")
+        .distinct("document_type")
+    )
+    existing_docs = {doc.document_type: doc for doc in latest_docs_qs}
 
-    # ====================================================
-    # 🔥 AUTO-VERIFY DOCUMENTS BASED ON CHECKLIST
-    # ====================================================
-    if onboarding.documents_verified:  # ← your checklist flag
-        for doc in existing_docs.values():
-            if doc.verification_status != StudentDocument.VerificationStatus.VERIFIED:
-                doc.verification_status = StudentDocument.VerificationStatus.VERIFIED
-                doc.save(update_fields=["verification_status"])
+    # =====================================
+    # If any doc rejected → allow re-upload
+    # =====================================
+    if any(doc.verification_status == StudentDocument.VerificationStatus.REJECTED
+           for doc in existing_docs.values()):
+        onboarding.documents_uploaded = False
+        onboarding.save(update_fields=["documents_uploaded"])
 
-    # ====================================================
-    # POST: UPLOAD LOGIC
-    # ====================================================
+    # =====================================
+    # POST: Upload logic
+    # =====================================
     if request.method == "POST":
 
-        if onboarding.documents_uploaded:
-            messages.error(request, "Documents already submitted.")
-            return redirect(request.path)
+        uploaded_any = False
 
-        missing = [
-            label
-            for key, label in REQUIRED_DOCS.items()
-            if not request.FILES.get(key)
-        ]
-
-        if missing:
-            messages.error(request, "Please upload: " + ", ".join(missing))
-            return redirect(request.path)
-
-        for key in REQUIRED_DOCS.keys():
-            file = request.FILES[key]
+        for key, label in REQUIRED_DOCS.items():
+            file = request.FILES.get(key)
+            if not file:
+                continue
 
             if file.size > MAX_FILE_SIZE:
-                messages.error(request, f"{REQUIRED_DOCS[key]} exceeds 5MB")
+                messages.error(request, f"{label} exceeds 5MB")
                 return redirect(request.path)
 
-            StudentDocument.objects.update_or_create(
+            last_doc = existing_docs.get(key)
+
+            # Block overwrite if already pending or verified
+            if last_doc and last_doc.verification_status in (
+                StudentDocument.VerificationStatus.PENDING,
+                StudentDocument.VerificationStatus.VERIFIED,
+            ):
+                continue
+
+            # Create new doc only if rejected or not exists
+            StudentDocument.objects.create(
                 student=student,
                 document_type=key,
-                defaults={
-                    "document_file": file,
-                    "verification_status": StudentDocument.VerificationStatus.PENDING,
-                }
+                document_file=file,
+                verification_status=StudentDocument.VerificationStatus.PENDING,
+                rejection_reason="",  # clear old reason
             )
+            uploaded_any = True
+
+        if not uploaded_any:
+            messages.error(request, "No new documents uploaded.")
+            return redirect(request.path)
 
         onboarding.documents_uploaded = True
         onboarding.save(update_fields=["documents_uploaded"])
 
         messages.success(
             request,
-            "Documents submitted successfully. Verification in progress."
+            "Documents uploaded successfully. Verification in progress."
         )
         return redirect(request.path)
+
+    # =====================================
+    # Prepare documents for template display
+    # =====================================
+    display_docs = {}
+
+    for key, doc in existing_docs.items():
+
+        # Rejected → always rejected, ensure rejection reason
+        if doc.verification_status == StudentDocument.VerificationStatus.REJECTED:
+            if not doc.rejection_reason:
+                doc.rejection_reason = "No reason provided"
+            display_docs[key] = doc
+            continue
+
+        # Checklist not verified → force pending in UI
+        if not onboarding.documents_verified:
+            doc.verification_status = StudentDocument.VerificationStatus.PENDING
+            display_docs[key] = doc
+            continue
+
+        # Checklist verified → show actual status
+        display_docs[key] = doc
+
+    # =====================================
+    # Check if submit button should be enabled
+    # =====================================
+    can_submit = True
+    for key in REQUIRED_DOCS:
+        doc = existing_docs.get(key)
+        if not doc or doc.verification_status == StudentDocument.VerificationStatus.REJECTED:
+            can_submit = False
+            break
 
     return render(
         request,
         "student/onboarding/uploaddoc.html",
         {
-            "docs": existing_docs,
+            "docs": display_docs,
             "onboarding": onboarding,
-            "REQUIRED_DOCS": REQUIRED_DOCS,  # needed for template form
+            "REQUIRED_DOCS": REQUIRED_DOCS,
+            "can_submit": can_submit,
         }
     )
+
 
 @role_required("student")
 def onboard(request):
@@ -462,10 +533,10 @@ def onboard(request):
         "enrollment_generated": enrollment_generated,
         "enrollment_signed": enrollment_signed,
         "checklist": checklist,
+        
     }
 
     return render(request, "student/onboarding/onboarding.html", context)
-
 
 
 
@@ -475,18 +546,17 @@ def upload_signed_enrollment_letter(request):
     checklist = request.user.student.onboarding_checklist
 
     if not checklist.enrollment_letter_generated:
-        return JsonResponse({
-            "success": False,
-            "message": "Enrollment letter not generated yet."
-        }, status=400)
+        return JsonResponse(
+            {"success": False, "message": "Enrollment letter not generated yet."},
+            status=400
+        )
 
     signed_file = request.FILES.get("signed_letter")
-
     if not signed_file:
-        return JsonResponse({
-            "success": False,
-            "message": "No file selected."
-        }, status=400)
+        return JsonResponse(
+            {"success": False, "message": "No file selected."},
+            status=400
+        )
 
     # Get or create agreement
     agreement, _ = EnrollmentAgreement.objects.get_or_create(
@@ -495,7 +565,7 @@ def upload_signed_enrollment_letter(request):
             "agreement_number": f"AGR-{request.user.student.id}",
             "agreement_date": timezone.now().date(),
             "course_fee_agreed": 0,
-            "payment_plan": "full"
+            "payment_plan": "full",
         }
     )
 
@@ -509,12 +579,10 @@ def upload_signed_enrollment_letter(request):
     # Update checklist
     checklist.enrollment_letter_signed = True
     checklist.save()
-
-    return JsonResponse({
-        "success": True,
-        "message": "Signed enrollment letter uploaded successfully."
-    })
-
+    
+    return JsonResponse(
+        {"success": True, "message": "Signed enrollment letter uploaded successfully."}
+    )
 
 
 
@@ -580,16 +648,15 @@ def lessonplan(request):
 
 
 
-
 @role_required("student")
 def view_id_card(request):
     student = request.user.student
-    # Directly get the ID card
-    id_card = student.id_card  
+    try:
+        id_card = student.id_card  # may not exist
+        context = {"id_card": id_card, "available": True}
+    except student.id_card.RelatedObjectDoesNotExist:
+        context = {"available": False}  # ID card not issued
 
-    context = {
-        "id_card": id_card
-    }
     return render(request, "student/onboarding/view_id_card.html", context)
 
 
