@@ -19,7 +19,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Lead, Student, Trainer, Course, Batch, TeleCallerProfile,OnboardingChecklist
 
-from apps.student.models import StudentDocument
+from apps.student.models import StudentDocument,EnrollmentAgreement,StudentIDCard
 
 from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
 
@@ -454,8 +454,135 @@ def verify_document(request, doc_id):
     return redirect(
         "bdm:student_document_review",
         student_id=student.id
-    )   
+    ) 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST    
     
+@require_POST
+@csrf_exempt
+def reject_document(request, document_id):
+    try:
+        document = StudentDocument.objects.get(id=document_id)
+        rejection_reason = request.POST.get('rejection_reason', '')
+        notes = request.POST.get('notes', '')
+        
+        # Update document status
+        document.verification_status = 'rejected'
+        document.rejection_reason = rejection_reason
+        document.verified_by = request.user
+        document.verified_at = timezone.now()
+        document.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Document rejected successfully'
+        })
+    except StudentDocument.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Document not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=500)      
+    
+
+
+@login_required
+def enrollment_verification_list(request):
+    agreements = EnrollmentAgreement.objects.filter(
+        is_signed=True,
+        approved_by__isnull=True
+    ).select_related('student')
+    
+    print(agreements)
+
+    return render(
+        request,
+        'bdm/student_onboarding/enrollment-letter/student_list_enrollment.html',
+        {
+            'agreements': agreements
+        }
+    )
+
+
+from .utils import generate_card_number
+
+@login_required
+def approve_enrollment_agreement(request, student_id):
+    agreement = get_object_or_404(
+        EnrollmentAgreement,
+        student__id=student_id
+    )
+
+    checklist = agreement.student.onboarding_checklist
+
+    if not agreement.is_signed:
+        messages.error(request, "Agreement not signed.")
+        return redirect('enrollment_verification_list')
+
+    if request.method == "POST":
+        # ✅ Approve agreement
+        agreement.approved_by = request.user
+        agreement.approval_date = timezone.now()
+        agreement.save()
+
+        # ✅ Update checklist
+        checklist.enrollment_letter_signed = True
+        checklist.enrollment_letter_generated = True
+        checklist.save()
+
+        # ✅ AUTO CREATE ID CARD (if not exists)
+        StudentIDCard.objects.get_or_create(
+            student=agreement.student,
+            defaults={
+                'card_number': generate_card_number(agreement.student),
+                'issue_date': timezone.now().date(),
+                'expiry_date': timezone.now().date() + timedelta(days=200),
+            }
+        )
+
+        messages.success(request, "Agreement approved & ID card generated.")
+        return redirect('bdm:view_student_id_card', student_id=student_id)
+
+    return render(
+        request,
+        "bdm/student_onboarding/enrollment-letter/enrollment-letter-verification.html",
+        {"agreement": agreement}
+    )
+
+
+
+@login_required
+def view_student_id_card(request, student_id):
+    id_card = get_object_or_404(
+        StudentIDCard,
+        student__id=student_id
+    )
+
+    if request.method == "POST":
+        if "collect" in request.POST:
+            id_card.is_collected = True
+            id_card.collected_date = timezone.now().date()
+
+        if "lost" in request.POST:
+            id_card.is_lost = True
+            id_card.lost_date = timezone.now().date()
+
+        id_card.save()
+        messages.success(request, "ID card status updated.")
+
+    return render(
+        request,
+        "bdm/student_onboarding/student_id card/id_card.html",
+        {"id_card": id_card}
+    )
+
+
+
 
 
 def docsVerification_tab(request):
@@ -477,7 +604,36 @@ def id_card_generation_tab(request):
         "trainers": trainers
     })   
     
-        
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.utils import timezone
+
+from apps.bdm.utils import render_to_pdf    
+    
+    
+def download_enrollment_letter(request):
+    student = request.user.student
+    checklist = student.onboarding_checklist
+
+    # 🔒 SECURITY CHECK
+    if not checklist.documents_verified:
+        return HttpResponseForbidden("Documents not verified yet")
+
+    # Auto-mark generated (first time only)
+    if not checklist.enrollment_letter_generated:
+        checklist.enrollment_letter_generated = True
+        checklist.save()
+
+    context = {
+        "student": student,
+        "date": timezone.now().date(),
+    }
+
+    return render_to_pdf(
+        "bdm/student_onboarding/enrollment-letter/enrollment-letter.html",
+        context,
+        filename="Enrollment_Letter.pdf"
+    )        
     
     
 
@@ -685,3 +841,8 @@ def assign_lead(request):
         lead.save()
 
     return redirect('bdm:leads')
+
+
+
+
+

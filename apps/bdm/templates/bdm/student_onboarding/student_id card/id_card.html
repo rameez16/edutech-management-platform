@@ -1,0 +1,891 @@
+{% extends 'bdm/layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #1e88e5;
+        --dark-blue: #1565c0;
+        --light-blue: #e3f2fd;
+        --success-green: #4caf50;
+        --danger-red: #f44336;
+        --warning-orange: #ff9800;
+        --text-dark: #263238;
+        --text-light: #546e7a;
+        --border-color: #e0e0e0;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .id-card-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .page-header h1 {
+        font-size: 32px;
+        color: var(--dark-blue);
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .page-header h1::before {
+        content: '🆔';
+        font-size: 36px;
+    }
+
+    .page-subtitle {
+        color: var(--text-light);
+        font-size: 16px;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Main Content Layout */
+    .content-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    @media (max-width: 992px) {
+        .content-wrapper {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ID Card Preview */
+    .id-card-preview {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(30, 136, 229, 0.12);
+        border: 1px solid var(--border-color);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--light-blue);
+    }
+
+    .card-title {
+        font-size: 20px;
+        color: var(--dark-blue);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-title::before {
+        content: '📇';
+        font-size: 24px;
+    }
+
+    .status-badge {
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .status-active {
+        background: linear-gradient(135deg, var(--success-green), #2e7d32);
+        color: white;
+    }
+
+    .status-inactive {
+        background: linear-gradient(135deg, #757575, #424242);
+        color: white;
+    }
+
+    .status-lost {
+        background: linear-gradient(135deg, var(--danger-red), #c62828);
+        color: white;
+    }
+
+    /* ID Card Design */
+    .id-card-design {
+        background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(26, 35, 126, 0.3);
+    }
+
+    .id-card-design::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 30px 30px;
+        transform: rotate(15deg);
+        opacity: 0.3;
+    }
+
+    .institute-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--dark-blue);
+        margin-bottom: 20px;
+    }
+
+    .card-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 30px;
+    }
+
+    .student-info {
+        flex: 1;
+    }
+
+    .student-name {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: white;
+    }
+
+    .student-id {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .info-item h4 {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-bottom: 5px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .info-item p {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .qr-section {
+        text-align: center;
+    }
+
+    .qr-code {
+        width: 140px;
+        height: 140px;
+        background: white;
+        border-radius: 10px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .qr-code img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 5px;
+    }
+
+    .qr-label {
+        font-size: 12px;
+        opacity: 0.8;
+        font-weight: 500;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    /* Details Panel */
+    .details-panel {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--light-blue);
+    }
+
+    .panel-header h3 {
+        font-size: 18px;
+        color: var(--dark-blue);
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .panel-header::before {
+        content: '📋';
+        font-size: 22px;
+    }
+
+    .details-grid {
+        display: grid;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: var(--light-blue);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .detail-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(30, 136, 229, 0.15);
+    }
+
+    .detail-label {
+        color: var(--text-light);
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: var(--dark-blue);
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    /* Action Panel */
+    .action-panel {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+        margin-top: 40px;
+    }
+
+    .action-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .action-header h3 {
+        font-size: 18px;
+        color: var(--dark-blue);
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .action-header::before {
+        content: '⚡';
+        font-size: 22px;
+    }
+
+    .action-buttons {
+        display: grid;
+        gap: 15px;
+    }
+
+    .action-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .action-btn {
+        padding: 16px 24px;
+        border: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .action-btn i {
+        font-size: 18px;
+    }
+
+    .btn-collect {
+        background: linear-gradient(135deg, var(--success-green), #2e7d32);
+        color: white;
+        box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .btn-collect:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        background: linear-gradient(135deg, #43a047, #1b5e20);
+    }
+
+    .btn-lost {
+        background: linear-gradient(135deg, var(--danger-red), #c62828);
+        color: white;
+        box-shadow: 0 5px 20px rgba(244, 67, 54, 0.3);
+    }
+
+    .btn-lost:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4);
+        background: linear-gradient(135deg, #e53935, #b71c1c);
+    }
+
+    .btn-download {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: white;
+        box-shadow: 0 5px 20px rgba(30, 136, 229, 0.3);
+    }
+
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(30, 136, 229, 0.4);
+        background: linear-gradient(135deg, #1976d2, #0d47a1);
+    }
+
+    .btn-print {
+        background: linear-gradient(135deg, #757575, #424242);
+        color: white;
+        box-shadow: 0 5px 20px rgba(117, 117, 117, 0.3);
+    }
+
+    .btn-print:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(117, 117, 117, 0.4);
+        background: linear-gradient(135deg, #616161, #212121);
+    }
+
+    /* Status Messages */
+    .status-message {
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message-success {
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        border-left: 5px solid var(--success-green);
+        color: #2e7d32;
+    }
+
+    .message-danger {
+        background: linear-gradient(135deg, #ffebee, #ffcdd2);
+        border-left: 5px solid var(--danger-red);
+        color: #c62828;
+    }
+
+    .message-icon {
+        font-size: 24px;
+    }
+
+    /* Timeline */
+    .timeline {
+        margin-top: 40px;
+        padding: 25px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+    }
+
+    .timeline-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .timeline-header h3 {
+        font-size: 18px;
+        color: var(--dark-blue);
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .timeline-header::before {
+        content: '📅';
+        font-size: 22px;
+    }
+
+    .timeline-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 18px;
+    }
+
+    .icon-issued {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: white;
+    }
+
+    .icon-collected {
+        background: linear-gradient(135deg, var(--success-green), #2e7d32);
+        color: white;
+    }
+
+    .icon-lost {
+        background: linear-gradient(135deg, var(--danger-red), #c62828);
+        color: white;
+    }
+
+    .timeline-content {
+        flex: 1;
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+    }
+
+    .timeline-date {
+        font-size: 13px;
+        color: var(--text-light);
+    }
+
+    .timeline-status {
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+
+    /* Print Styles */
+    @media print {
+        .action-panel,
+        .action-buttons,
+        .btn-print {
+            display: none;
+        }
+        
+        .id-card-container {
+            padding: 0;
+        }
+        
+        .id-card-design {
+            box-shadow: none;
+            border: 2px solid #000;
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .id-card-container {
+            padding: 15px;
+        }
+        
+        .card-content {
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .qr-section {
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .action-buttons {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="id-card-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Student ID Card Management</h1>
+        <p class="page-subtitle">
+            View and manage ID card details, status, and perform necessary actions.
+            {% if id_card.is_active %}
+            <span style="color: var(--success-green); font-weight: 500;">✓ Active ID Card</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Left Column: ID Card Preview -->
+        <div class="id-card-preview">
+            <div class="card-header">
+                <h2 class="card-title">ID Card Preview</h2>
+                <span class="status-badge {% if id_card.is_active %}status-active{% else %}status-inactive{% endif %} {% if id_card.is_lost %}status-lost{% endif %}">
+                    {% if id_card.is_lost %}Lost{% elif id_card.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+            </div>
+
+            <!-- ID Card Design -->
+            <div class="id-card-design">
+                <div class="institute-logo">
+                    {{ institute_initials|default:"AI" }}
+                </div>
+                
+                <div class="card-content">
+                    <div class="student-info">
+                        <h2 class="student-name">{{ id_card.student.name }}</h2>
+                        <div class="student-id">ID: {{ id_card.student.student_id|default:"-" }}</div>
+                        
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <h4>Card Number</h4>
+                                <p>{{ id_card.card_number }}</p>
+                            </div>
+                            <div class="info-item">
+                                <h4>Issue Date</h4>
+                                <p>{{ id_card.issue_date }}</p>
+                            </div>
+                            <div class="info-item">
+                                <h4>Expiry Date</h4>
+                                <p>{{ id_card.expiry_date }}</p>
+                            </div>
+                            <div class="info-item">
+                                <h4>Valid Until</h4>
+                                <p>
+                                    {% if id_card.is_expired %}
+                                    <span style="color: #ff6b6b;">Expired</span>
+                                    {% else %}
+                                    {{ id_card.days_remaining }} days
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if id_card.qr_code %}
+                    <div class="qr-section">
+                        <div class="qr-code">
+                            <img src="{{ id_card.qr_code.url }}" alt="QR Code">
+                        </div>
+                        <div class="qr-label">Scan to Verify</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer">
+                    <div>Issued by: Admissions Office</div>
+                    <div>{{ id_card.card_number }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Details & Actions -->
+        <div class="details-panel">
+            <div class="panel-header">
+                <h3>Card Details</h3>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Student Name</span>
+                    <span class="detail-value">{{ id_card.student.name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Card Number</span>
+                    <span class="detail-value">{{ id_card.card_number }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Issue Date</span>
+                    <span class="detail-value">{{ id_card.issue_date }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Expiry Date</span>
+                    <span class="detail-value">{{ id_card.expiry_date }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Current Status</span>
+                    <span class="detail-value">
+                        {% if id_card.is_lost %}
+                        <span style="color: var(--danger-red);">Lost</span>
+                        {% elif id_card.is_collected %}
+                        <span style="color: var(--success-green);">Collected</span>
+                        {% elif id_card.is_active %}
+                        <span style="color: var(--success-green);">Active</span>
+                        {% else %}
+                        <span style="color: var(--text-light);">Inactive</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- QR Code Section -->
+            {% if id_card.qr_code %}
+            <div class="detail-item">
+                <span class="detail-label">QR Code</span>
+                <div style="text-align: right;">
+                    <img src="{{ id_card.qr_code.url }}" alt="QR Code" style="width: 80px; border-radius: 5px;">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Panel -->
+    <div class="action-panel">
+        <div class="action-header">
+            <h3>Manage ID Card</h3>
+        </div>
+        
+        <form method="post" class="action-form">
+            {% csrf_token %}
+            
+            <div class="action-buttons">
+                {% if not id_card.is_collected %}
+                <button name="collect" type="submit" class="action-btn btn-collect">
+                    <span>✓</span> Mark as Collected
+                </button>
+                {% else %}
+                <div class="status-message message-success">
+                    <span class="message-icon">✓</span>
+                    <div>
+                        <strong>Collected</strong><br>
+                        <small>Collected on {{ id_card.collected_date }}</small>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if not id_card.is_lost %}
+                <button name="lost" type="submit" class="action-btn btn-lost" 
+                        onclick="return confirm('Are you sure you want to mark this ID card as lost? This action cannot be undone.')">
+                    <span>⚠️</span> Mark as Lost
+                </button>
+                {% else %}
+                <div class="status-message message-danger">
+                    <span class="message-icon">⚠️</span>
+                    <div>
+                        <strong>Marked as Lost</strong><br>
+                        <small>Lost on {{ id_card.lost_date }}</small>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <a href="#" class="action-btn btn-download">
+                    <span>📥</span> Download ID Card
+                </a>
+                
+                <a href="javascript:window.print()" class="action-btn btn-print">
+                    <span>🖨️</span> Print ID Card
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline">
+        <div class="timeline-header">
+            <h3>ID Card Timeline</h3>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-icon icon-issued">📅</div>
+            <div class="timeline-content">
+                <div class="timeline-title">ID Card Issued</div>
+                <div class="timeline-date">{{ id_card.issue_date }}</div>
+            </div>
+            <span class="timeline-status" style="background: var(--light-blue); color: var(--dark-blue);">Issued</span>
+        </div>
+        
+        {% if id_card.is_collected %}
+        <div class="timeline-item">
+            <div class="timeline-icon icon-collected">✓</div>
+            <div class="timeline-content">
+                <div class="timeline-title">ID Card Collected</div>
+                <div class="timeline-date">{{ id_card.collected_date }}</div>
+            </div>
+            <span class="timeline-status" style="background: #e8f5e9; color: #2e7d32;">Collected</span>
+        </div>
+        {% endif %}
+        
+        {% if id_card.is_lost %}
+        <div class="timeline-item">
+            <div class="timeline-icon icon-lost">⚠️</div>
+            <div class="timeline-content">
+                <div class="timeline-title">ID Card Reported Lost</div>
+                <div class="timeline-date">{{ id_card.lost_date }}</div>
+                <div class="timeline-status" style="background: #ffebee; color: #c62828;">Lost</span>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="timeline-item">
+            <div class="timeline-icon" style="background: linear-gradient(135deg, #ff9800, #ef6c00); color: white;">⏰</div>
+            <div class="timeline-content">
+                <div class="timeline-title">Expiry Date</div>
+                <div class="timeline-date">{{ id_card.expiry_date }}</div>
+                <div class="timeline-status" style="background: #fff3e0; color: #e65100;">
+                    {% if id_card.is_expired %}Expired{% else %}Valid{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add confirmation for destructive actions
+    document.addEventListener('DOMContentLoaded', function() {
+        const collectBtn = document.querySelector('button[name="collect"]');
+        const lostBtn = document.querySelector('button[name="lost"]');
+        
+        if (collectBtn) {
+            collectBtn.addEventListener('click', function(e) {
+                if (!confirm('Mark this ID card as collected?\n\nThis will update the card status to "Collected".')) {
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        // Print functionality
+        const printBtn = document.querySelector('.btn-print');
+        if (printBtn) {
+            printBtn.addEventListener('click', function() {
+                // Focus on ID card design for printing
+                const cardDesign = document.querySelector('.id-card-design');
+                if (cardDesign) {
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <html>
+                        <head>
+                            <title>ID Card - {{ id_card.student.name }}</title>
+                            <style>
+                                body { margin: 0; padding: 20px; }
+                                .id-card-design { 
+                                    transform: scale(1.2); 
+                                    transform-origin: top left;
+                                    margin: 0 auto;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            ${cardDesign.outerHTML}
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                }
+            });
+        }
+        
+        // Download functionality
+        const downloadBtn = document.querySelector('.btn-download');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('ID Card download feature would be implemented here.\nThis would generate a PDF version of the ID card.');
+                // In production, this would trigger a PDF generation endpoint
+            });
+        }
+        
+        // Add subtle animations
+        const detailItems = document.querySelectorAll('.detail-item');
+        detailItems.forEach((item, index) => {
+            item.style.animationDelay = `${index * 0.1}s`;
+        });
+    });
+</script>
+
+{% endblock %}

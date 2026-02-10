@@ -2,44 +2,911 @@
 {% load static %}
 {% load tz %}
 
-
 {% block content %}
 
-<h2>Document Review – {{ student }}</h2>
+<style>
+    /* All your CSS styles remain exactly the same as before */
+    .document-review-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e3f2fd;
+    }
+    
+    .student-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .student-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2196f3, #21cbf3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: 600;
+    }
+    
+    .student-info h2 {
+        margin: 0 0 8px 0;
+        color: #1a365d;
+        font-size: 24px;
+    }
+    
+    .student-id {
+        color: #5a6c7d;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .student-id::before {
+        content: "🆔";
+        font-size: 12px;
+    }
+    
+    .verification-summary {
+        display: flex;
+        gap: 20px;
+    }
+    
+    .summary-card {
+        text-align: center;
+        padding: 12px 20px;
+        background: #f8fbff;
+        border-radius: 10px;
+        border: 1px solid #e3f2fd;
+        min-width: 120px;
+    }
+    
+    .summary-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2196f3;
+        margin-bottom: 4px;
+    }
+    
+    .summary-label {
+        font-size: 12px;
+        color: #5a6c7d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .documents-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e3f2fd;
+        margin-bottom: 30px;
+    }
+    
+    .documents-table thead {
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    }
+    
+    .documents-table th {
+        padding: 18px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #1a365d;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #90caf9;
+    }
+    
+    .documents-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .documents-table tbody tr:hover {
+        background-color: #f8fbff;
+    }
+    
+    .documents-table td {
+        padding: 16px;
+        color: #4a5568;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+    
+    .document-type {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .doc-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #e3f2fd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2196f3;
+        font-size: 18px;
+    }
+    
+    .doc-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .doc-name {
+        font-weight: 500;
+        color: #2d3748;
+    }
+    
+    .doc-number {
+        font-size: 12px;
+        color: #718096;
+        background: #f7fafc;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+        text-align: center;
+        min-width: 120px;
+    }
+    
+    .status-pending {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+    
+    .status-verified {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .status-rejected {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .btn-verify {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #4caf50, #2e7d32);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-verify:hover {
+        background: linear-gradient(135deg, #388e3c, #1b5e20);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-verify::before {
+        content: "✅";
+        font-size: 12px;
+    }
+    
+    .btn-reject {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #f44336, #d32f2f);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-reject:hover {
+        background: linear-gradient(135deg, #d32f2f, #b71c1c);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+    }
+    
+    .btn-reject::before {
+        content: "❌";
+        font-size: 12px;
+    }
+    
+    .btn-download {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #2196f3, #1976d2);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-download:hover {
+        background: linear-gradient(135deg, #1976d2, #1565c0);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+    }
+    
+    .btn-download::before {
+        content: "⬇";
+        font-size: 12px;
+    }
+    
+    .verified-info {
+        font-size: 13px;
+        color: #666;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .verified-by {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .verified-at {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+    }
+    
+    .verification-complete {
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        border: 1px solid #a5d6a7;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 30px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+    }
+    
+    .completion-message {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 18px;
+        color: #2e7d32;
+        font-weight: 500;
+    }
+    
+    .completion-icon {
+        font-size: 24px;
+    }
+    
+    /* Rejection Modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .rejection-modal {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+    }
+    
+    .modal-overlay.active .rejection-modal {
+        transform: translateY(0);
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #e3f2fd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        color: #c62828;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+        padding: 4px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #4a5568;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #2196f3;
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    }
+    
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    .modal-footer {
+        padding: 20px;
+        border-top: 1px solid #e3f2fd;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    
+    .btn-cancel {
+        padding: 10px 20px;
+        background: #f7fafc;
+        color: #4a5568;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-cancel:hover {
+        background: #edf2f7;
+    }
+    
+    .btn-submit-reject {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #f44336, #d32f2f);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-submit-reject:hover {
+        background: linear-gradient(135deg, #d32f2f, #b71c1c);
+    }
+    
+    /* Timezone note */
+    .timezone-note {
+        font-size: 12px;
+        color: #718096;
+        background: #f8fbff;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-top: 20px;
+        border: 1px solid #e3f2fd;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header-section {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .documents-table {
+            display: block;
+            overflow-x: auto;
+        }
+        
+        .student-header {
+            width: 100%;
+        }
+        
+        .verification-summary {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+</style>
 
-<table>
-  <tr>
-    <th>Document</th>
-    <th>Status</th>
-    <th>File</th>
-    <th>Action</th>
-  </tr>
+<div class="document-review-container">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="student-header">
+            <div class="student-avatar">
+                {{ student.full_name|first|upper }}
+            </div>
+            <div class="student-info">
+                <h2>Document Review – {{ student.full_name }}</h2>
+                <div class="student-id">
+                    Student ID: {{ student.id }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="verification-summary">
+            <div class="summary-card">
+                <div class="summary-number">{{ documents|length }}</div>
+                <div class="summary-label">Total Docs</div>
+            </div>
+            <div class="summary-card">
+                {% with verified_docs=documents|length|add:"-1" %}
+                <div class="summary-number">{{ verified_docs }}</div>
+                {% endwith %}
+                <div class="summary-label">Verified</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number">1</div>
+                <div class="summary-label">Pending</div>
+            </div>
+        </div>
+    </div>
 
-  {% for doc in documents %}
-  <tr>
-    <td>{{ doc.get_document_type_display }}</td>
-    <td>{{ doc.get_verification_status_display }}</td>
-    <td>
-      <a href="{{ doc.document_file.url }}" target="_blank">Download</a>
-    </td>
-    <td>
-      {% if doc.verification_status == 'pending' %}
-        <a href="{% url 'bdm:verify_document' doc.id %}">Verify</a>
-      {% else %}
-      <p style="color: green;">
-        ✔ verified 
-      </p>
-      {% endif %}
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+    <!-- Documents Table -->
+    <table class="documents-table">
+        <thead>
+            <tr>
+                <th>Document</th>
+                <th>Status</th>
+                <th>File</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doc in documents %}
+            <tr>
+                <td>
+                    <div class="document-type">
+                        <div class="doc-icon">
+                            {% if "aadhaar" in doc.get_document_type_display|lower %}
+                            🪪
+                            {% elif "pan" in doc.get_document_type_display|lower %}
+                            💳
+                            {% elif "photo" in doc.get_document_type_display|lower %}
+                            📸
+                            {% elif "mark" in doc.get_document_type_display|lower %}
+                            📊
+                            {% elif "address" in doc.get_document_type_display|lower %}
+                            🏠
+                            {% else %}
+                            📄
+                            {% endif %}
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-name">{{ doc.get_document_type_display }}</div>
+                            {% if doc.document_number %}
+                            <div class="doc-number">{{ doc.document_number }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% if doc.verification_status == 'verified' %}
+                        <span class="status-badge status-verified">
+                            ✔ Verified
+                        </span>
+                        <div class="verified-info">
+                            {% if doc.verified_by %}
+                            <div class="verified-by">
+                                By: {{ doc.verified_by.get_full_name|default:doc.verified_by.username }}
+                            </div>
+                            {% endif %}
+                            {% if doc.verified_at %}
+                            <div class="verified-at">
+                                {{ doc.verified_at|date:"M d, Y H:i" }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% elif doc.verification_status == 'rejected' %}
+                        <span class="status-badge status-rejected">
+                            ❌ Rejected
+                        </span>
+                        {% if doc.rejection_reason %}
+                        <div class="verified-info">
+                            Reason: {{ doc.rejection_reason|truncatechars:50 }}
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <span class="status-badge status-pending">
+                            ⏳ Pending
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if doc.document_file %}
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="btn-download">
+                        Download
+                    </a>
+                    {% else %}
+                    <span style="color: #718096; font-style: italic;">No file</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        {% if doc.verification_status == 'pending' %}
+                            <a href="{% url 'bdm:verify_document' doc.id %}" class="btn-verify">
+                                Verify
+                            </a>
+                            <button type="button" class="btn-reject reject-btn" 
+                                    data-doc-id="{{ doc.id }}" 
+                                    data-doc-type="{{ doc.get_document_type_display }}">
+                                Reject
+                            </button>
+                        {% elif doc.verification_status == 'verified' %}
+                            <span style="color: #2e7d32; display: flex; align-items: center; gap: 6px;">
+                                <span style="font-size: 18px;">✓</span> Verified
+                            </span>
+                        {% elif doc.verification_status == 'rejected' %}
+                            <span style="color: #c62828; display: flex; align-items: center; gap: 6px;">
+                                <span style="font-size: 18px;">✗</span> Rejected
+                            </span>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-{% if student.onboarding_checklist.documents_verified %}
-  <h4 style="color: green; margin-top: 10px;padding: 10px;">
-    ✔ All documents verified.Student Ready for enrollment letter.
-  </h4>
-{% endif %}
+    <!-- Verification Complete Message -->
+    {% if student.onboarding_checklist.documents_verified %}
+    <div class="verification-complete">
+        <div class="completion-message">
+            <span class="completion-icon">✅</span>
+            All documents verified. {{student.full_name}} can now download enrollment letter from his account.
+        </div>
+    
+    </div>
+    {% endif %}
 
+    <!-- Timezone Note -->
+    <div class="timezone-note">
+        ⏰ Note: Your local time is {% now "H:i" %}. Server time is {% now "H:i" %} (UTC). 
+        You are 5.5 hours ahead of server time.
+    </div>
+</div>
 
-{% endblock  %}
+<!-- Rejection Modal -->
+<div class="modal-overlay" id="rejectModal">
+    <div class="rejection-modal">
+        <div class="modal-header">
+            <h3>
+                <span>❌</span>
+                Reject Document
+            </h3>
+            <button type="button" class="modal-close" id="closeModalBtn">&times;</button>
+        </div>
+        <form id="rejectForm" method="POST" action="">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Student:</label>
+                    <input type="text" class="form-control" value="{{ student.full_name }}" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Document Type:</label>
+                    <input type="text" class="form-control" id="rejectDocType" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Rejection Reason *</label>
+                    <textarea 
+                        class="form-control" 
+                        name="rejection_reason" 
+                        id="rejectionReason"
+                        placeholder="Please provide a reason for rejecting this document..."
+                        required
+                        rows="4"
+                    ></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea 
+                        class="form-control" 
+                        name="notes" 
+                        id="rejectionNotes"
+                        placeholder="Any additional notes or instructions for the student..."
+                        rows="3"
+                    ></textarea>
+                </div>
+                
+                <input type="hidden" name="document_id" id="rejectDocId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+                <button type="submit" class="btn-submit-reject">Submit Rejection</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Simple notification function to replace toastr
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: ${type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#2196f3'};
+            color: white;
+            border-radius: 8px;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        `;
+        notification.textContent = message;
+        
+        // Add styles for animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.body.appendChild(notification);
+        
+        // Remove after 5 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideIn 0.3s ease reverse';
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Document Review page loaded');
+        
+        // Get modal elements
+        const rejectModal = document.getElementById('rejectModal');
+        const rejectForm = document.getElementById('rejectForm');
+        const rejectDocId = document.getElementById('rejectDocId');
+        const rejectDocType = document.getElementById('rejectDocType');
+        const rejectionReason = document.getElementById('rejectionReason');
+        const rejectionNotes = document.getElementById('rejectionNotes');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        
+        // Get all reject buttons
+        const rejectButtons = document.querySelectorAll('.reject-btn');
+        
+        console.log(`Found ${rejectButtons.length} reject buttons`);
+        
+        // Add click event to each reject button
+        rejectButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const docId = this.getAttribute('data-doc-id');
+                const docType = this.getAttribute('data-doc-type');
+                
+                console.log(`Opening reject modal for document ${docId}: ${docType}`);
+                
+                // Set modal values
+                rejectDocId.value = docId;
+                rejectDocType.value = docType;
+                
+                // Set form action (update this URL to match your Django URL pattern)
+                rejectForm.action = `/bdm/document/${docId}/reject/`;
+                
+                // Clear previous inputs
+                rejectionReason.value = '';
+                rejectionNotes.value = '';
+                
+                // Show modal
+                rejectModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+        
+        // Close modal function
+        function closeModal() {
+            rejectModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            rejectForm.reset();
+        }
+        
+        // Close modal events
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeModal);
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', closeModal);
+        }
+        
+        // Close when clicking outside modal
+        rejectModal.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Handle form submission
+        if (rejectForm) {
+            rejectForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const submitBtn = this.querySelector('.btn-submit-reject');
+                const originalText = submitBtn.textContent;
+                
+                // Validate required field
+                if (!rejectionReason.value.trim()) {
+                    showNotification('Please provide a rejection reason', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                submitBtn.textContent = 'Submitting...';
+                submitBtn.disabled = true;
+                
+                // Get CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                // Prepare form data
+                const formData = new FormData(this);
+                
+                console.log('Submitting rejection for document:', rejectDocId.value);
+                
+                // Submit via AJAX
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response:', data);
+                    
+                    if (data.success) {
+                        // Success
+                        showNotification('Document rejected successfully', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        // Error from server
+                        showNotification(data.message || 'Error rejecting document', 'error');
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred. Please try again.', 'error');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+        
+        // Debug: Check if elements exist
+        console.log('Modal exists:', !!rejectModal);
+        console.log('Form exists:', !!rejectForm);
+    });
+    
+    // Keyboard shortcut to close modal (ESC key)
+    document.addEventListener('keydown', function(event) {
+        const rejectModal = document.getElementById('rejectModal');
+        if (event.key === 'Escape' && rejectModal.classList.contains('active')) {
+            rejectModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+</script>
+
+{% endblock %}
