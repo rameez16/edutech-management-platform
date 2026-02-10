@@ -1,0 +1,41 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Course & Syllabus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/syllabus.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<!-- No extra JS needed since syllabus is fully visible -->
+{% endblock %}
+
+{% block content %}
+<div class="syllabus-container">
+
+    <div class="syllabus-header">
+        <h2>{{ course.name }}</h2>
+        <p>{{ course.description }}</p>
+        <p><strong>Duration:</strong> {{ course.duration }}</p>
+        <p><strong>Course Fee:</strong> ${{ course.course_fee }}</p>
+
+        <div>
+            {% for tech in course.tech_stack_list %}
+                <span class="syllabus-tech-badge">{{ tech }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="syllabus-card">
+        <div class="syllabus-card-header">
+            <h4>Complete Syllabus</h4>
+        </div>
+        <div class="syllabus-content">
+            <p>{{ course.syllabus|linebreaks }}</p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

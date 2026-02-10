@@ -28,6 +28,7 @@ urlpatterns = [ path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path("upload-signed-enrollment-letter/",views.upload_signed_enrollment_letter,name="upload_signed_enrollment_letter"),
                 path("download-id-card/",views.download_id_card,name="id_card_download"),
                 path('onboarding/id-card/',views.view_id_card, name='view_id_card'),
+                path('stud_syllabus/',views.syllabus,name='stud_syllabus'),
 
 
 

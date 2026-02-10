@@ -1,0 +1,76 @@
+/* ===============================
+   Container
+   =============================== */
+.syllabus-container {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/* ===============================
+   Course Header
+   =============================== */
+.syllabus-header {
+    padding: 24px;
+    margin-bottom: 24px;
+    background: rgb(255, 255, 255);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+}
+
+/* Tech stack badges */
+.syllabus-tech-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #e0d7f5;
+    color: #4338ca;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+}
+
+/* ===============================
+   Syllabus Card
+   =============================== */
+.syllabus-card {
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(244, 221, 249, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover effect on card */
+.syllabus-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Header */
+.syllabus-card-header {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+/* ===============================
+   Syllabus Content
+   =============================== */
+.syllabus-content {
+    display: flex; /* always visible */
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Paragraph spacing inside syllabus */
+.syllabus-content p {
+    margin-bottom: 12px;
+}

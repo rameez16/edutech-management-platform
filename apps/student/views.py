@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Sum
 
+
+
 from decimal import Decimal
 import uuid, os
 
@@ -16,6 +18,7 @@ from apps.bdm.models import (
     StudentAdminProfile,
     Batch,
     OnboardingChecklist,
+    Course,
 
 )
 
@@ -649,6 +652,34 @@ def lessonplan(request):
 
 
 @role_required("student")
+def syllabus(request):
+    student = request.user.student
+    batch = student.batches.filter(is_active=True).first()
+
+    if not batch:
+        return render(request, 'student/coursessyllabus/syllabus.html', {
+            'error': 'No active batch assigned yet.'
+        })
+
+    course = batch.course
+    print("Student:", student)
+    print("Batch:", batch)
+    print("Course:", course)
+    print("Syllabus:", course.syllabus[:100])  # first 100 chars
+
+    context = {
+        'course': course,
+    }
+    return render(request, 'student/coursessyllabus/syllabus.html', context)
+
+
+
+
+
+
+
+
+@role_required("student")
 def view_id_card(request):
     student = request.user.student
     try:
@@ -687,3 +718,13 @@ def download_enrollment_letter(request):
     response = HttpResponse(content, content_type="application/octet-stream")
     response["Content-Disposition"] = 'attachment; filename="enrollment_letter.txt"'
     return response
+
+
+
+
+@role_required("student")
+def syllabus(request):
+    student = request.user.student
+
+   
+    return render(request, 'student/coursesyllabus/syllabus.html')
