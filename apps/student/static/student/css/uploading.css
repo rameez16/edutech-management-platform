@@ -1,6 +1,9 @@
 /* ======================================
    STUDENT ONBOARDING – DOCUMENT UPLOAD
 ====================================== */
+/* ======================================
+   STUDENT ONBOARDING – DOCUMENT UPLOAD
+====================================== */
 
 .student-onboarding {
     width: 100%;
@@ -55,10 +58,10 @@ td {
     color: #777;
 }
 
+/* ===============================
+   STATUS BADGES
+================================ */
 
-
-
-/* Status badges – common */
 .status {
     padding: 6px 14px;
     border-radius: 14px;
@@ -67,37 +70,33 @@ td {
     display: inline-block;
 }
 
-/* Pending */
 .status.pending {
     background: rgba(166, 107, 75, 0.15);
     color: #a66b4b;
 }
 
-/* ✅ Verified – same style, green */
-.status.verified {
-    background: rgba(46, 204, 113, 0.18); /* soft green */
+.status.verified,
+.status.uploaded,
+.status.selected {
+    background: rgba(46, 204, 113, 0.18);
     color: #1e7f43;
 }
 
-/* Rejected */
 .status.rejected {
     background: rgba(217, 83, 79, 0.18);
     color: #b52b27;
 }
 
-/* Not uploaded */
-.status.not-uploaded {
-    background: rgba(0, 0, 0, 0.1);
-    color: #444;
-}
-
-
+.status.not-uploaded,
 .status.optional {
     background: rgba(0, 0, 0, 0.12);
     color: #444;
 }
 
-/* ===== FILE UPLOAD FIX ===== */
+/* ===============================
+   FILE UPLOAD
+================================ */
+
 .file-upload input {
     display: none;
 }
@@ -117,29 +116,15 @@ td {
     background: #000;
 }
 
-.file-info {
-    display: block;
-    margin-top: 6px;
-    font-size: 12px;
-    color: #777;
+.upload-btn.view {
+    background-color: #3455b7;
 }
 
-/* Buttons */
-.buttons {
-    display: flex;
-    gap: 14px;
+.upload-btn.view:hover {
+    background-color: #212688;
 }
 
-.submit-btn {
-    background: #4169e1;
-    color: #fff;
-    padding: 11px 20px;
-    font-weight: 600;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-}
-
+/* Disabled upload ONLY */
 .upload-btn.disabled {
     background-color: #e0e0e0;
     color: #5b5b5b;
@@ -148,22 +133,15 @@ td {
     opacity: 0.6;
 }
 
-
-.cancel-btn {
-    background: #5a5a5a;
-    color: #fff;
-    padding: 11px 20px;
-    font-weight: 600;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
+.upload-btn:not(.disabled) {
+    pointer-events: auto;
 }
 
-/* Warning */
-.warning {
-    margin-top: 18px;
-    font-size: 13px;
-    color: #d9534f;
+.file-info {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #777;
 }
 
 .selected-files {
@@ -174,22 +152,27 @@ td {
     word-break: break-word;
 }
 
-.status.uploaded {
-    background: #e6f4ea;
-    color: #1e7f43;
+/* ===============================
+   ACTION BUTTONS
+================================ */
+
+.buttons {
+    display: flex;
+    gap: 14px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 3;
 }
 
-
-
-
-.status.selected {
-    background: #e6f4ea;
-    color: #1e7f43;
-}
-
-.cancel-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+/* Submit */
+.submit-btn {
+    background: #4169e1;
+    color: #fff;
+    padding: 11px 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
 }
 
 .submit-btn:disabled {
@@ -197,36 +180,63 @@ td {
     cursor: not-allowed;
 }
 
+/* Cancel — ALWAYS CLICKABLE */
+.cancel-btn {
+    background: #5a5a5a;
+    color: #fff;
+    padding: 11px 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    position: relative;
+    z-index: 5;
+}
+
+/* ===============================
+   WARNINGS / SECTIONS
+================================ */
+
+.warning {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #d9534f;
+}
+
 .upload-section {
     margin-top: 20px;
 }
 
-/* VIEW BUTTON */
-.upload-btn.view {
-    background-color: #3455b7;
-    color: #fff;
-}
-
-.upload-btn.view:hover {
-    background-color: #212688;
-}
 
 
 
 
 
 /* Responsive */
-@media (max-width: 768px) {
-    table, thead, tbody, tr, td, th {
+@media (max-width: 1024px) {
+
+    .onboarding-card {
+        padding: 24px;
+    }
+
+    table {
         font-size: 13px;
     }
 
-    .buttons {
-        flex-direction: column;
+    th, td {
+        padding: 12px 8px;
+    }
+
+    .upload-btn {
+        padding: 7px 14px;
+        font-size: 12px;
     }
 
     .submit-btn,
     .cancel-btn {
-        width: 100%;
+        padding: 10px 18px;
+        font-size: 14px;
     }
 }

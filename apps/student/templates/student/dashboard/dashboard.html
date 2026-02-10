@@ -42,6 +42,47 @@
         margin-top: 15px;
     }
 
+    .announcement-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Common notification box */
+.announcement-item {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 500;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+}
+
+.announcement-item:hover {
+    transform: translateY(-2px);
+}
+
+/* Status colors */
+.announcement-item.warning {
+    background: #fff4e5;
+    color: #a15c00;
+    border-left: 4px solid #ff9800;
+}
+
+.announcement-item.success {
+    background: #e8f7ee;
+    color: #1b7a46;
+    border-left: 4px solid #22c55e;
+}
+
+.announcement-item.info {
+    background: #eef5ff;
+    color: #1e4ed8;
+    border-left: 4px solid #3b82f6;
+}
+
+
 
 </style>
 {% endblock %}

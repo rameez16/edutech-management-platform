@@ -1,100 +1,132 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
+
     const rows = document.querySelectorAll(".upload-row");
     const submitBtn = document.querySelector(".submit-btn");
     const cancelBtn = document.querySelector(".cancel-btn");
     const errorBox = document.getElementById("formError");
 
-    // Update Submit button state
-    function updateSubmitState() {
-        let allSelected = true;
+    /* =============================
+       Helpers
+    ============================= */
+
+    function isLocked(row) {
+        return row.dataset.locked === "true";
+    }
+
+    function hasFile(row) {
+        const input = row.querySelector("input[type='file']");
+        return input && input.files.length > 0;
+    }
+
+    function isRequired(row) {
+        // Required if NOT locked
+        return !isLocked(row);
+    }
+
+    function updateButtons() {
+        let anySelected = false;
+        let allRequiredSelected = true;
+
         rows.forEach(row => {
-            const input = row.querySelector("input[type=file]");
-            const status = row.querySelector(".status");
-            if (status.textContent === "Pending Verification" || status.textContent === "Verified") return;
-            if (!input || !input.files.length) allSelected = false;
+            if (hasFile(row)) {
+                anySelected = true;
+            }
+
+            if (isRequired(row) && !hasFile(row)) {
+                allRequiredSelected = false;
+            }
         });
-        submitBtn.disabled = !allSelected;
-        updateCancelState();
+
+        cancelBtn.disabled = !anySelected;
+        submitBtn.disabled = !allRequiredSelected;
     }
 
-    // Update Cancel button state
-    function updateCancelState() {
-        const anySelected = [...document.querySelectorAll("input[type=file]")]
-            .some(input => input.files.length > 0);
-        if (cancelBtn) cancelBtn.disabled = !anySelected;
-    }
+    function resetRow(row) {
+        if (isLocked(row)) return; // 🚫 never touch DB-backed rows
 
-    // Handle file selection
-    rows.forEach(row => {
-        const input = row.querySelector("input[type=file]");
+        const input = row.querySelector("input[type='file']");
         const status = row.querySelector(".status");
         const fileBox = row.querySelector(".selected-files");
 
-        if (!input) return;
+        if (input) input.value = "";
 
-        input.addEventListener("change", () => {
-            if (input.files.length) {
+        if (status) {
+            status.textContent = "Not Uploaded";
+            status.className = "status not-uploaded";
+        }
+
+        if (fileBox) {
+            fileBox.textContent = "";
+        }
+    }
+
+    /* =============================
+       File selection
+    ============================= */
+
+    rows.forEach(row => {
+        const input = row.querySelector("input[type='file']");
+        const status = row.querySelector(".status");
+        const fileBox = row.querySelector(".selected-files");
+
+        if (!input || isLocked(row)) return;
+
+        input.addEventListener("change", function () {
+            if (input.files.length > 0) {
                 status.textContent = "Selected";
                 status.className = "status selected";
                 fileBox.textContent = input.files[0].name;
             } else {
-                status.textContent = "Not Uploaded";
-                status.className = "status not-uploaded";
-                fileBox.textContent = "";
+                resetRow(row);
             }
-            updateSubmitState();
+
+            updateButtons();
         });
     });
 
-    // Cancel button clears all selected files
-    if (cancelBtn) {
-        cancelBtn.addEventListener("click", () => {
-            rows.forEach(row => {
-                const input = row.querySelector("input[type=file]");
-                const status = row.querySelector(".status");
-                const fileBox = row.querySelector(".selected-files");
-                if (input) input.value = "";
-                if (status) {
-                    const docKey = row.dataset.doc;
-                    if (docs[docKey]) {
-                        const ver = docs[docKey].verification_status;
-                        if (ver === "pending") status.textContent = "Pending Verification";
-                        else if (ver === "verified") status.textContent = "Verified";
-                        else if (ver === "rejected") status.textContent = "Rejected";
-                        else status.textContent = "Not Uploaded";
-                    } else {
-                        status.textContent = "Not Uploaded";
-                    }
-                    status.className = "status " + status.textContent.toLowerCase().replace(/\s/g, "-");
-                }
-                if (fileBox) fileBox.textContent = "";
-            });
-            if (submitBtn) submitBtn.disabled = true;
-            if (errorBox) errorBox.textContent = "";
-            updateCancelState();
-        });
-    }
+    /* =============================
+       Cancel button
+    ============================= */
 
-    // Prevent submitting if any required file missing
-    if (submitBtn) {
-        submitBtn.addEventListener("click", (e) => {
-            let missing = [];
-            rows.forEach(row => {
-                const key = row.dataset.doc;
-                const input = row.querySelector("input[type=file]");
-                const status = row.querySelector(".status");
-                if (!input || !input.files.length) {
-                    if (status.textContent !== "Pending Verification" && status.textContent !== "Verified")
-                        missing.push(key.toUpperCase());
-                }
-            });
-            if (missing.length) {
-                e.preventDefault();
-                errorBox.textContent = "Please upload: " + missing.join(", ");
+    cancelBtn.addEventListener("click", function () {
+        rows.forEach(row => resetRow(row));
+
+        submitBtn.disabled = true;
+        cancelBtn.disabled = true;
+
+        if (errorBox) {
+            errorBox.textContent = "";
+            errorBox.style.display = "none";
+        }
+    });
+
+    /* =============================
+       Submit validation
+    ============================= */
+
+    submitBtn.addEventListener("click", function (e) {
+        let missing = [];
+
+        rows.forEach(row => {
+            if (isRequired(row) && !hasFile(row)) {
+                missing.push(row.dataset.doc);
             }
         });
-    }
 
-    // Initialize states on page load
-    updateSubmitState();
+        if (missing.length > 0) {
+            e.preventDefault();
+
+            errorBox.style.display = "block";
+            errorBox.textContent =
+                "Please upload required files: " +
+                missing.map(m => m.replace("_", " ").toUpperCase()).join(", ");
+        }
+    });
+
+    /* =============================
+       Initial state
+    ============================= */
+
+    submitBtn.disabled = true;
+    cancelBtn.disabled = true;
 });
