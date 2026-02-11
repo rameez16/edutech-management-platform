@@ -6,253 +6,192 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlassAdmin Dashboard</title>
     <meta name="description" content="3D Glassmorphism Dashboard Template by TemplateMo">
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- FONT AWESOME ICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- GlassAdmin CSS -->
     <link rel="stylesheet" href="{% static 'student/css/templatemo-daynight-style.css' %}">
     <link rel="stylesheet" href="{% static 'student/css/custom.css' %}">
 
+    <!-- ALERTIFY CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css">
 
+    <!-- SWEETALERT -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-    <!--
-
-TemplateMo 607 Glass Admin
-
-https://templatemo.com/tm-607-glass-admin
-
--->
-{% block extra_css %}{% endblock %}
-
-
+    {% block extra_css %}{% endblock %}
 </head>
+
 <body>
-    <!-- Animated Background -->
-    <div class="background"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
 
-    <div class="dashboard">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">S</div>
-                <span class="logo-text">Student</span>
-            </div>
+<div class="background"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-            <ul class="nav-menu">
-                <li class="nav-section">
-                    <span class="nav-section-title">Main Menu</span>
-                    <ul>
-                        <li class="nav-item">
-                            <a href="{% url 'student:stud_dashboard' %}" class="nav-link active">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="7" height="7" rx="1"/>
-                                    <rect x="14" y="3" width="7" height="7" rx="1"/>
-                                    <rect x="3" y="14" width="7" height="7" rx="1"/>
-                                    <rect x="14" y="14" width="7" height="7" rx="1"/>
-                                </svg>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'student:stud_profile' %}" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                </svg>
-                                Profile
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="courses.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                                    <path d="M4 4v15.5"/>
-                                    <path d="M20 4v13"/>
-                                </svg>
-                                Course & Syllabus
-                            </a>
-                        </li>
+<div class="dashboard">
 
-                        <li class="nav-item">
-                            <a href="batch-schedule.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2"/>
-                                    <line x1="16" y1="2" x2="16" y2="6"/>
-                                    <line x1="8" y1="2" x2="8" y2="6"/>
-                                    <line x1="3" y1="10" x2="21" y2="10"/>
-                                </svg>
-                                Batch & Schedule
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="lesson-plan.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z"></path>
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z"></path>
-                                </svg>
-                                Lesson Plan
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="lms-portal.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-                                </svg>
-                                LMS Portal
-                            </a>
-                        </li>
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">S</div>
+        <span class="logo-text">Student</span>
+    </div>
 
+    <ul class="nav-menu">
 
+        <li class="nav-section">
+            <span class="nav-section-title">Main Menu</span>
+            <ul>
 
-                        <li class="nav-item">
-                            <a href="attendance.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2"/>
-                                    <path d="M16 2v4M8 2v4"/>
-                                    <path d="M3 10h18"/>
-                                    <path d="M9 16l2 2 4-4"/>
-                                </svg>
-                                Attendance Calendar
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="tasks.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M9 11l3 3L22 4"/>
-                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                                </svg>
-                                Task Portal
-                            </a>
-                        </li>
-
-                        
-
-                        <li class="nav-item">
-                            <a href="leave.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2v20"/>
-                                    <path d="M2 12h20"/>
-                                </svg>
-                                Leave Application
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="feedback.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                </svg>
-                                Feedback
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="announcements.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
-                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                                </svg>
-                                Announcements
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="notifications.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                                </svg>
-                                Notifications
-                            </a>
-                        </li>
-
-
-
-                        <li class="nav-item">
-                            <a href="evaluation.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 20l9-5-9-5-9 5 9 5z"/>
-                                    <path d="M12 12l9-5-9-5-9 5 9 5z"/>
-                                </svg>
-                                Evaluation
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'student:payment' %}" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="1" y="4" width="22" height="16" rx="2"/>
-                                    <line x1="1" y1="10" x2="23" y2="10"/>
-                                </svg>
-                                Payment Portal
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'student:stud_onboard' %}" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                    <polyline points="7 10 12 15 17 10"/>
-                                    <line x1="12" y1="15" x2="12" y2="3"/>
-                                </svg>
-                                Complete Onboarding
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="certificate.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="4" y="3" width="16" height="18" rx="2"/>
-                                    <path d="M9 12l2 2 4-4"/>
-                                </svg>
-                                Certificate
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="change-password.html" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="11" width="18" height="11" rx="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                </svg>
-                                Password Change
-                            </a>
-                        </li>
-                        
-
-      
-                    </ul>
+                <li class="nav-item">
+                    <a href="{% url 'student:stud_dashboard' %}" class="nav-link active">
+                        <i class="fa-solid fa-gauge"></i><span>Dashboard</span>
+                    </a>
                 </li>
 
-                <li class="nav-section">
-                    <span class="nav-section-title">Account</span>
-                    <ul>
-                        <li class="nav-item">
-                            <form method="post" action="{% url 'accounts:logout' %}">
-                                {% csrf_token %}
-                                <button type="submit">Logout</button>
-                            </form>
-                        </li>
-                    </ul>
+                <li class="nav-item">
+                    <a href="{% url 'student:stud_profile' %}" class="nav-link">
+                        <i class="fa-solid fa-user"></i><span>Profile</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="courses.html" class="nav-link">
+                        <i class="fa-solid fa-book-open"></i><span>Course & Syllabus</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="batch-schedule.html" class="nav-link">
+                        <i class="fa-solid fa-calendar-days"></i><span>Batch & Schedule</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="lesson-plan.html" class="nav-link">
+                        <i class="fa-solid fa-clipboard-list"></i><span>Lesson Plan</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'student:lms_login' %}" class="nav-link">
+                        <i class="fa-solid fa-laptop-code"></i><span>LMS Portal</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="attendance.html" class="nav-link">
+                        <i class="fa-solid fa-calendar-check"></i><span>Attendance Calendar</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="tasks.html" class="nav-link">
+                        <i class="fa-solid fa-list-check"></i><span>Task Portal</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="leave.html" class="nav-link">
+                        <i class="fa-solid fa-envelope-open-text"></i><span>Leave Application</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'student:stud_feedback' %}" class="nav-link">
+                        <i class="fa-solid fa-comment-dots"></i><span>Feedback</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="announcements.html" class="nav-link">
+                        <i class="fa-solid fa-bullhorn"></i><span>Announcements</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="notifications.html" class="nav-link">
+                        <i class="fa-solid fa-bell"></i><span>Notifications</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="evaluation.html" class="nav-link">
+                        <i class="fa-solid fa-square-poll-vertical"></i><span>Evaluation</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'student:payment' %}" class="nav-link">
+                        <i class="fa-solid fa-credit-card"></i><span>Payment Portal</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'student:stud_onboard' %}" class="nav-link">
+                        <i class="fa-solid fa-user-check"></i><span>Complete Onboarding</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="certificate.html" class="nav-link">
+                        <i class="fa-solid fa-certificate"></i><span>Certificate</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="change-password.html" class="nav-link">
+                        <i class="fa-solid fa-key"></i><span>Password Change</span>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+        <li class="nav-section">
+            <span class="nav-section-title">Account</span>
+            <ul>
+                <li class="nav-item">
+                    <form method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link" style="background:none;border:none;">
+                            <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+                        </button>
+                    </form>
                 </li>
             </ul>
+        </li>
 
-        </aside>
-        <!-- PAGE CONTENT -->
-        <main class="content">
-        {% block content %}{% endblock %}
-        </main>
+    </ul>
+</aside>
 
-        <!-- Footer -->
-        <footer class="site-footer">
-             <a href="https://templatemo.com" target="_blank" rel="nofollow"></a></p>
-        </footer>
+<main class="content">
+    {% block content %}{% endblock %}
+</main>
 
-        <script src="{% static 'student/js/templatemo-glass-admin-script.js' %}"></script>
-    </div>
-        {% block extra_js %}{% endblock %}
-    </body>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'student/js/custom.js' %}"></script>
+<footer class="site-footer"></footer>
 
+</div>
+
+<script src="{% static 'student/js/templatemo-glass-admin-script.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
+
+<script>
+    alertify.set('notifier','position', 'top-right');
+    {% for message in messages %}
+        alertify.{{ message.tags|default:'message' }}("{{ message|escapejs }}");
+    {% endfor %}
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
 </html>

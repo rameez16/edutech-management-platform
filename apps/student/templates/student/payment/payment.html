@@ -1,149 +1,171 @@
 {% extends 'student/layout/base.html' %}
 {% load static %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'student/css/payment.css' %}">
+{% endblock %}
 
-<div class="payment-container glass-card">
+{% block content %}
 
-    <!-- ================= MESSAGES ================= -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
+<div class="page-center">
+    <div class="payment-container glass-card">
+
+        <!-- ================= HEADER ================= -->
+        <div class="payment-header">
+            <h2>Student Admission & Fee Management</h2>
+
+            <!-- ✅ STUDENT INFO (FIXED) -->
+            <div class="student-info">
+                <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+                <p><strong>Email:</strong> {{ student.user.email }}</p>
+                <p><strong>Student ID:</strong> {{ student.id }}</p>
             </div>
-        {% endfor %}
-    {% endif %}
-
-    <!-- ================= HEADER ================= -->
-    <div class="payment-header">
-        <h2>Student Admission & Fee Management</h2>
-
-        <div class="student-info">
-            <h3>{{ student.name }}</h3>
-            <p>{{ student.email }}</p>
-            <p><b>Student ID:</b> {{ student.student_id }}</p>
-        </div>
-    </div>
-
-    <!-- ================= SUMMARY ================= -->
-    <div class="fee-summary">
-        <div class="fee-box">
-            <p>Total Fee</p>
-            <h3>₹{{ total_fee }}</h3>
         </div>
 
-        <div class="fee-box">
-            <p>Paid Amount</p>
-            <h3>₹{{ paid_amount }}</h3>
-        </div>
-
-        <div class="fee-box highlight">
-            <p>Pending Amount</p>
-            <h3>₹{{ pending_amount }}</h3>
-        </div>
-    </div>
-
-    <center><h2>One Time Payment</h2></center>
-
-    <!-- ================= PAYMENT MODE TABS ================= -->
-    <div class="payment-mode-switch">
-        <span class="label">Payment Mode:</span>
-
-        <div class="mode-tabs">
-            <a href="{% url 'student:onetime_view' %}"
-               class="mode-btn active">One-Time Payment</a>
-
-            <a href="{% url 'student:pdc' %}"
-               class="mode-btn">PDC</a>
-
-            <a href="{% url 'student:emi' %}"
-               class="mode-btn">EMI</a>
-
-            <a href="{% url 'student:installments' %}"
-               class="mode-btn">Installment</a>
-        </div>
-    </div>
-
-    <!-- ================= MAIN CONTENT ================= -->
-    <div class="payment-row">
-
-        <!-- LEFT COLUMN -->
-        <div class="left-column">
-            <div class="fee-summary-box">
-                <h4>Fee Details</h4>
-
-                <div class="fee-row">
-                    <span>Admission Fee</span>
-                    <strong>₹{{ admission_fee }}</strong>
-                </div>
-
-                <div class="fee-row">
-                    <span>Course Fee</span>
-                    <strong>₹{{ course_fee }}</strong>
-                </div>
-
-                <div class="fee-row total">
-                    <span>Total Fee</span>
-                    <strong>₹{{ total_fee }}</strong>
-                </div>
+        <!-- ================= SUMMARY ================= -->
+        <div class="fee-summary">
+            <div class="fee-box">
+                <p>Total Fee</p>
+                <h3>₹{{ total_fee }}</h3>
             </div>
 
-            <a href="#" class="mode-btn active">View your status</a>
+            <div class="fee-box">
+                <p>Paid Amount</p>
+                <h3>₹{{ paid_amount }}</h3>
+            </div>
+
+            <div class="fee-box highlight">
+                <p>Pending Amount</p>
+                <h3>₹{{ pending_amount }}</h3>
+            </div>
         </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="right-column">
+        <!-- ================= SECTION TITLE ================= -->
+        <h3 class="section-title">One Time Payment</h3>
 
-            <div class="qr-payment-box">
-                <h4>Fee Payment Mode</h4>
+        <!-- ================= PAYMENT MODE TABS ================= -->
+        <div class="payment-mode-switch">
+            <span>Payment Mode:</span>
 
-                <img src="{% static 'student/images/image.png' %}"
-                     alt="QR Code"
-                     class="qr-image">
+            <div class="mode-tabs">
+                <a href="{% url 'student:admission' %}?mode=admission"
+                   class="mode-btn">
+                    Admission Fee
+                </a>
 
-                <p>Scan the QR code to pay</p>
+                <a href="{% url 'student:payment' %}?mode=onetime"
+                   class="mode-btn active">
+                    One-Time Payment
+                </a>
 
-                {% if not existing_payment %}
-                <!-- ONE-TIME PAYMENT FORM -->
-                <form method="post">
+                <a href="{% url 'student:payment' %}?mode=pdc"
+                   class="mode-btn">
+                    PDC
+                </a>
+
+                <a href="{% url 'student:emi' %}?mode=emi"
+                   class="mode-btn">
+                    EMI
+                </a>
+
+                <a href="{% url 'student:installments' student.id %}?mode=installment"
+                   class="mode-btn">
+                    Installment
+                </a>
+            </div>
+        </div>
+
+        <!-- ================= MAIN ROW ================= -->
+        <div class="payment-row">
+
+            <!-- -------- LEFT COLUMN -------- -->
+            <div class="left-column">
+                <div class="fee-summary-box">
+                    <h4>Fee Details</h4>
+
+                    <div class="fee-row">
+                        <span>Admission Fee</span>
+                        <strong>₹{{ admission_fee.amount|default:"0" }}</strong>
+                    </div>
+
+                    <div class="fee-row">
+                        <span>Course Fee</span>
+                        <strong>₹{{ course_fee }}</strong>
+                    </div>
+
+                    <div class="fee-row">
+                        <span>Total Fee</span>
+                        <strong>₹{{ total_fee }}</strong>
+                    </div>
+                </div>
+
+                <a href="{% url 'student:onetime_view' %}" class="status-btn">View Your Status</a>
+            </div>
+
+            <!-- -------- RIGHT COLUMN -------- -->
+            <div class="right-column">
+
+                <!-- QR + RECEIPT -->
+                <form method="POST"
+                      enctype="multipart/form-data"
+                      class="qr-payment-box">
                     {% csrf_token %}
 
-                    <input type="text"
-                           name="transaction_id"
-                           placeholder="Enter UPI Transaction ID"
-                           required
-                           class="txn-input">
+                    
 
-                    <button type="submit" class="mode-btn active submit-btn">
-                        Submit
-                    </button>
+                    <img src="{% static 'student/images/image.png' %}"
+                         class="qr-image"
+                         alt="QR Code">
+
+                    <p>Scan the QR code to pay</p>
+
+                    {% if not existing_payment %}
+                        <label for="receipt" class="upload-btn">
+                            Upload Payment Receipt
+                        </label>
+
+                        <input type="file"
+                               id="receipt"
+                               name="receipt"
+                               accept="image/*,application/pdf"
+                               required>
+
+                        <span id="file-name" class="file-name"></span>
+
+                        <button type="submit" class="submit-btn">
+                            Submit Payment
+                        </button>
+                        <br>
+                    {% else %}
+                        <p class="payment-status done">Payment Submitted</p>
+                    {% endif %}
                 </form>
-                {% else %}
-                <p class="payment-status">
-                    Payment Status:
-                    <b>{{ existing_payment.payment_status|title }}</b>
-                </p>
-                {% endif %}
-            </div>
 
-            <!-- REMINDERS -->
-            <div class="reminder-box">
-                <h4>Reminders</h4>
-                <label><input type="checkbox" checked> Email reminder</label><br>
-                <label><input type="checkbox" checked> SMS reminder</label>
-            </div>
+                <!-- REMINDERS -->
+                <div class="reminder-box">
+                    <h4>Reminders</h4>
+                    <label><input type="checkbox" checked> Email reminder</label>
+                    <br>
+                    <label><input type="checkbox" checked> SMS reminder</label>
+                </div>
 
+            </div>
         </div>
-    </div>
 
-    <!-- ================= NOTE ================= -->
-    <div class="note">
-        <p><b>Note:</b> The total fee must be paid in a single installment.</p>
-        <p>One-time payment is non-refundable.</p>
-        <p>No EMI / PDC available.</p>
-        <p>Institution not responsible for bank issues.</p>
-    </div>
+        <!-- ================= NOTE ================= -->
+        <div class="note">
+            <p><strong>Note:</strong> One-time payment only. Non-refundable.</p>
+        </div>
 
+    </div>
 </div>
+
+<!-- ================= FILE NAME PREVIEW ================= -->
+<script>
+document.getElementById("receipt")?.addEventListener("change", function () {
+    document.getElementById("file-name").innerText =
+        this.files[0] ? this.files[0].name : "";
+});
+</script>
+
 {% endblock %}

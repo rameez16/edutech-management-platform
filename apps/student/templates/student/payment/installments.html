@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'student/css/payment.css' %}">
+<link rel="stylesheet" href="{% static 'student/css/Installments.css' %}">
 
 <div class="payment-container glass-card">
 
@@ -10,10 +10,11 @@
     <div class="payment-header">
         <h2>Student Admission & Fee Management</h2>
 
+        <!-- STUDENT INFO -->
         <div class="student-info">
-            <h3>{{ student.name }}</h3>
-            <p>{{ student.email }}</p>
-            <p><b>Student ID:</b> {{ student.student_id }}</p>
+            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ student.user.email }}</p>
+            <p><strong>Student ID:</strong> {{ student.id }}</p>
         </div>
     </div>
 
@@ -23,10 +24,12 @@
             <p>Due Amount</p>
             <h3>₹{{ total_fee }}</h3>
         </div>
+
         <div class="fee-box">
             <p>Paid Amount</p>
             <h3>₹{{ paid_amount }}</h3>
         </div>
+
         <div class="fee-box highlight">
             <p>Pending Amount</p>
             <h3>₹{{ pending_amount }}</h3>
@@ -39,40 +42,47 @@
     <div class="payment-mode-switch">
         <span class="label">Payment Mode:</span>
         <div class="mode-tabs">
+            <a href="{% url 'student:admission' %}" class="mode-btn">Admission Fee</a>
             <a href="{% url 'student:payment' %}" class="mode-btn">One-Time Payment</a>
             <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
             <a href="{% url 'student:emi' %}" class="mode-btn">EMI</a>
-            <a href="{% url 'student:installments' %}" class="mode-btn active">Installments</a>
+
+            <!-- ✅ FIXED: student.id passed -->
+            <a href="{% url 'student:installments' student.id %}" class="mode-btn active">
+                Installments
+            </a>
         </div>
     </div>
 
     <!-- ================= MAIN ================= -->
     <div class="payment-row">
 
-        <!-- LEFT -->
+        <!-- LEFT COLUMN -->
         <div class="left-column">
             <div class="fee-summary-box">
                 <h4>Fee Details</h4>
 
                 <div class="fee-row">
-                    <span>Admission Fee</span>
+                    <span>Admission Fee:</span>
                     <strong>₹{{ admission_fee }}</strong>
                 </div>
+
                 <div class="fee-row">
-                    <span>Course Fee</span>
+                    <span>Course Fee:</span>
                     <strong>₹{{ course_fee }}</strong>
                 </div>
+
                 <div class="fee-row total">
-                    <span>Total Fee</span>
+                    <span>Total Fee:</span>
                     <strong>₹{{ total_fee }}</strong>
                 </div>
             </div>
 
             <br>
-            <a href="#" class="mode-btn active">View Your Status</a>
+            <a href="{% url 'student:installments_view' %}" class="mode-btn active">View Your Status</a>
         </div>
 
-        <!-- CENTER -->
+        <!-- CENTER COLUMN -->
         <div class="loan-table-box">
             <h4>Installment Payment Details</h4>
 
@@ -92,7 +102,7 @@
                     <tr>
                         <td>Installment {{ ins.installment_number }}</td>
                         <td>₹{{ ins.amount }}</td>
-                        <td>{{ ins.due_date }}</td>
+                        <td>{{ ins.due_date|default:"—" }}</td>
 
                         <!-- STATUS -->
                         <td>
@@ -108,8 +118,8 @@
                         <!-- ACTION -->
                         <td>
                             {% if ins.payment_status == 'pending' %}
-                                <a href="{% url 'student:installments_qr' %}" class="pay-btn">
-                                    Pay
+                                <a href="{% url 'student:install_qr' ins.id %}" class="pay-btn">
+                                    Pay Installment
                                 </a>
                             {% else %}
                                 —
@@ -127,7 +137,7 @@
             </table>
         </div>
 
-        <!-- RIGHT -->
+        <!-- RIGHT COLUMN -->
         <div class="reminder-box">
             <h4>Reminders</h4>
             <label><input type="checkbox" checked> Email reminder</label><br>
@@ -142,4 +152,5 @@
     </div>
 
 </div>
+
 {% endblock %}

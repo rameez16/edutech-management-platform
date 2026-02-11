@@ -1,0 +1,108 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'student/css/admission.css' %}">
+
+<div class="qr-wrapper">
+    <div class="qr-card">
+
+        <h2 class="qr-title">Scan & Pay Admission Fee</h2>
+
+        <!-- STUDENT INFO -->
+        <div class="student-info">
+            <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Student ID:</strong> {{ student.id }}</p>
+        </div>
+
+        <!-- QR IMAGE -->
+        <div class="qr-image">
+            <img src="{% static 'student/images/image.png' %}" alt="QR Code">
+        </div>
+
+        <!-- PAYMENT INFO -->
+        <div class="qr-info">
+            <p>
+                <strong>Admission Fee:</strong>
+                ₹{{ admission_fee.amount|default:admission_amount }}
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                {% if admission_fee and admission_fee.payment_status == 'completed' %}
+                    <span class="text-success">Paid</span>
+                {% else %}
+                    <span class="text-warning">Pending</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- PAYMENT SECTION -->
+        {% if admission_fee and admission_fee.payment_status == 'completed' %}
+
+            <p class="paid-msg">✅ Admission fee paid</p>
+
+        {% else %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- UPLOAD BUTTON -->
+                <label class="upload-btn" for="receiptInput">
+                    Upload Receipt
+                </label>
+
+                <!-- HIDDEN FILE INPUT -->
+                <input type="file"
+                       id="receiptInput"
+                       name="receipt"
+                       accept="image/*"
+                       hidden
+                       required
+                       onchange="previewReceipt(event)">
+
+                <!-- IMAGE PREVIEW -->
+                <div id="receiptPreview" class="receipt-preview" style="display:none;">
+                    <img id="previewImg" alt="Receipt Preview">
+                </div>
+
+                <!-- SUBMIT -->
+                <button type="submit" class="submit-btn">
+                    Submit Payment
+                </button>
+
+            </form>
+
+        {% endif %}
+
+        <!-- BACK -->
+        <a href="{% url 'student:installments' student.id %}" class="back-btn">
+            ← Back
+        </a>
+
+    </div>
+</div>
+
+<!-- IMAGE PREVIEW SCRIPT -->
+<script>
+function previewReceipt(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please upload an image file only");
+        event.target.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function () {
+        document.getElementById("previewImg").src = reader.result;
+        document.getElementById("receiptPreview").style.display = "block";
+    };
+    reader.readAsDataURL(file);
+}
+</script>
+
+{% endblock %}

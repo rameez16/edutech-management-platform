@@ -1,0 +1,137 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Student Feedback{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'student/css/feedback.css' %}">
+
+<div class="admin-container">
+    <h1>Student Feedback</h1>
+
+    <!-- 🔔 MESSAGE DISPLAY -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'student:stud_feedback' %}">
+        {% csrf_token %}
+
+        <!-- Student -->
+        <div class="form-row">
+            <label>Student:</label>
+            <select name="student">
+                <option value="">---------</option>
+                {% for s in students %}
+                    <option value="{{ s.id }}">
+                        {{ s.full_name|default:s.user.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Feedback Type -->
+        <div class="form-row">
+            <label>Feedback type <span class="req">*</span>:</label>
+            <select name="feedback_type" required>
+                <option value="">---------</option>
+                <option value="trainer">Trainer Feedback</option>
+                <option value="course">Course Feedback</option>
+                <option value="session">Session Feedback</option>
+                <option value="batch">Batch Feedback</option>
+                <option value="facility">Facility Feedback</option>
+                <option value="general">General Feedback</option>
+            </select>
+        </div>
+
+        <!-- Trainer -->
+        <div class="form-row">
+            <label>Trainer:</label>
+            <select name="trainer">
+                <option value="">---------</option>
+                {% for t in trainers %}
+                    <option value="{{ t.id }}">
+                        {{ t.full_name|default:t.user.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Course -->
+        <div class="form-row">
+            <label>Course:</label>
+            <select name="course">
+                <option value="">---------</option>
+                {% for c in courses %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Batch -->
+        <div class="form-row">
+            <label>Batch:</label>
+            <select name="batch">
+                <option value="">---------</option>
+                {% for b in batches %}
+                    <option value="{{ b.id }}">{{ b.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Ratings -->
+        <div class="form-row">
+            <label>Content quality (1–5):</label>
+            <input type="number" name="content_quality" min="1" max="5">
+        </div>
+
+        <div class="form-row">
+            <label>Teaching methodology (1–5):</label>
+            <input type="number" name="teaching_methodology" min="1" max="5">
+        </div>
+
+        <div class="form-row">
+            <label>Responsiveness (1–5):</label>
+            <input type="number" name="responsiveness" min="1" max="5">
+        </div>
+
+        <div class="form-row">
+            <label><strong>Overall rating *</strong> (1–5):</label>
+            <input type="number" name="overall_rating" min="1" max="5" required>
+        </div>
+
+        <!-- Comments -->
+        <div class="form-row textarea-row">
+            <label>Comments:</label>
+            <textarea name="comments" rows="4" placeholder="Write your feedback here..."></textarea>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="form-row textarea-row">
+            <label>Suggestions:</label>
+            <textarea name="suggestions" rows="4" placeholder="Any suggestions for improvement?"></textarea>
+        </div>
+
+        <!-- Anonymous -->
+        <div class="form-row checkbox-row">
+            <label>
+                <input type="checkbox" name="is_anonymous">
+                Submit as anonymous
+            </label>
+        </div>
+
+        <!-- Submit -->
+        <div class="actions">
+            <button type="submit" class="btn primary">Submit Feedback</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

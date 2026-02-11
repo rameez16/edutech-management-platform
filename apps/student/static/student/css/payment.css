@@ -1,94 +1,116 @@
+/* PAGE CENTER */
+.page-center {
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
 
+/* MAIN CARD */
+.payment-container {
+    width: 100%;
+    max-width: 1100px;
+    padding: 28px 32px;
+    border-radius: 22px;
+}
 
-/* ================= HEADER ================= */
+/* HEADER */
 .payment-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
+    align-items: flex-start;
+    margin-bottom: 26px;
+    gap: 20px;
 }
 
 .payment-header h2 {
-    margin: 0;
-    font-size: 27px;
+    font-size: 22px;
     font-weight: 600;
+    margin: 0;
 }
 
+.student-info {
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: right;
+    color: #111;
+}
 
+.student-info p {
+    margin: 0;
+}
 
-/* ================= SUMMARY ================= */
+/* SUMMARY */
 .fee-summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
 .fee-box {
-    background: #f6f7fb;
-    padding: 14px;
-    border-radius: 12px;
+    background: #fff;
+    padding: 18px;
+    border-radius: 16px;
     text-align: center;
 }
 
 .fee-box.highlight {
-    background: #e8edff;
+    background: #eef2ff;
 }
 
-/* ================= PAYMENT MODE ================= */
+/* PAYMENT MODE */
 .payment-mode-switch {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: #eef2ff;
-    padding: 6px 10px;
-    border-radius: 8px;
-    width: fit-content;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 24px;
 }
 
 .mode-tabs {
     display: flex;
     background: #e5e7eb;
-    border-radius: 6px;
+    padding: 4px;
+    border-radius: 10px;
 }
 
 .mode-btn {
-    border: none;
-    background: transparent;
     padding: 6px 14px;
-    font-size: 12px;
-    cursor: pointer;
+    font-size: 13px;
+    border-radius: 8px;
 }
 
 .mode-btn.active {
     background: #4f46e5;
-    color: #ffffff;
-    border-radius: 6px;
+    color: #fff;
 }
 
-/* ================= MAIN ROW ================= */
+/* MAIN ROW */
 .payment-row {
     display: flex;
     gap: 26px;
 }
 
-/* ================= LEFT ================= */
 .left-column {
-    width: 280px;
+    width: 300px;
 }
 
+.right-column {
+    display: flex;
+    gap: 22px;
+    align-items: flex-start;
+}
+
+/* FEE DETAILS */
 .fee-summary-box {
-    background: #f9fafc;
-    padding: 16px;
-    border-radius: 14px;
+    background: #fff;
+    padding: 18px;
+    border-radius: 16px;
 }
 
 .fee-row {
     display: flex;
     justify-content: space-between;
     padding: 6px 0;
-    font-size: 14px;
     border-bottom: 1px solid #e5e7eb;
 }
 
@@ -97,51 +119,77 @@
 }
 
 .status-btn {
+    display: block;
     margin-top: 14px;
-    width: 100%;
-    padding: 9px;
+    padding: 10px;
     background: #16a34a;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
+    color: #fff;
+    text-align: center;
+    border-radius: 10px;
 }
 
-/* ================= RIGHT ================= */
-.right-column {
-    display: flex;
-    gap: 20px;
-}
-
-.qr-payment-box,
-.reminder-box {
-    
-    padding: 16px;
-    border-radius: 14px;
-}
-
+/* QR BOX */
 .qr-payment-box {
-    width: 240px;
+    width: 280px;
+    background: #fff;
+    padding: 18px;
+    border-radius: 16px;
     text-align: center;
 }
 
+.qr-image {
+    max-width: 200px;
+    margin: 12px auto;
+}
+
+/* UPLOAD */
+input[type="file"] {
+    display: none;
+}
+
+.upload-btn {
+    display: block;
+    margin-top: 12px;
+    padding: 10px;
+    border: 2px dashed #4f46e5;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.file-name {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+}
+
+/* SUBMIT */
+.submit-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    background: #16a34a;
+    color: #fff;
+    border-radius: 10px;
+    border: none;
+}
+
+/* REMINDER */
 .reminder-box {
     width: 220px;
+    background: #fff;
+    padding: 18px;
+    border-radius: 16px;
 }
 
-/* ================= NOTE ================= */
+/* NOTE */
 .note {
-    margin-top: 18px;
+    margin-top: 26px;
     font-size: 12px;
-    color: #666;
 }
 
-/* ================= MOBILE ================= */
+/* RESPONSIVE */
 @media (max-width: 992px) {
-    .payment-container.glass-card {
-        margin-left: 0;
-        width: 100%;
-    }
-
     .payment-row,
     .right-column {
         flex-direction: column;
@@ -156,339 +204,13 @@
     .fee-summary {
         grid-template-columns: 1fr;
     }
-}
-.qr-payment-box {
-    width: 240px;
-    background: #f9fafc;
-    padding: 16px;
-    border-radius: 14px;
-    text-align: center;
 
-    overflow: hidden;   /* ✅ VERY IMPORTANT */
-}
+    .payment-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-.qr-image {
-    max-width: 150%;    /* ✅ stop overflow */
-    height: auto;
-}
-.reminder-box label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-}
-.qr-payment-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* ===== SIDEBAR (already fixed in base.html) ===== */
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 260px;
-    height: 100vh;
-}
-
-/* ===== MAIN CONTENT AREA ===== */
-.main-content {
-                 /* EXACT sidebar width */
-    padding: 24px;
-    min-height: 100vh;
-    box-sizing: border-box;
-}
-
-/* ===== PAYMENT CARD ===== */
-
-
-/* Payment card ONLY */
-
-.payment-container {
-    max-width: 1100px;
-    margin-left: auto;   /* 🔥 pushes container to right */
-    margin-right: 0;
-}
-
-.layout {
-    display: flex;
-    min-height: 100vh;
-}
-
-.sidebar {
-    width: 260px;
-    flex-shrink: 0;
-}
-
-.content {
-    flex: 1;              /* ✅ fills remaining space */
-    padding: 24px;
-}
-.payment-header {
-    display: flex;
-    align-items: center;
-    position: relative;
-    padding: 10px 0;
-}
-
-/* Center title */
-.payment-header h2 {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
-    text-align: center;
-}
-
-/* Right side student info */
-.student-info {
-    margin-left: auto;
-    text-align: right;
-}
-
-.student-info h3 {
-    margin: 0;
-}
-.student-info p {
-    margin: 2px 0;
-    font-size: 14px;
-}
-
-.payment-container button {
-    margin-top: 12px;
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    background: green;
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s ease;
-}
-
-.payment-container button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4);
-}
-
-.payment-container button:active {
-    transform: scale(0.98);
-}
-.pdc-table-box {
-    padding: 15px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.15);
-    margin-top: 20px;
-}
-
-.pdc-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-.pdc-table th,
-.pdc-table td {
-    padding: 8px;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.paid {
-    color: green;
-    font-weight: bold;
-}
-
-.pending {
-    color: red;
-    font-weight: bold;
-}
-.emi-payment-box {
-    padding: 20px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.15);
-    text-align: center;
-}
-
-.emi-info {
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.emi-note {
-    font-size: 13px;
-    opacity: 0.85;
-    margin-bottom: 15px;
-}
-
-.emi-payment-box .transfer-btn {
-    width: auto;
-    padding: 8px 20px;
-    display: inline-block;
-}
-
-
-.transfer-btn:hover {
-    background: #1e40af;
-}
-/* EDUCATION LOAN MODE */
-.loan-payment-box {
-    padding: 18px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.15);
-    margin-bottom: 20px;
-}
-
-/* LOAN TABLE */
-.loan-table-box {
-    padding: 18px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.15);
-}
-
-.loan-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    margin-top: 10px;
-}
-
-.loan-table th,
-.loan-table td {
-    padding: 8px;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.pay-btn {
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.pay-red {
-    background: #dc2626;   /* RED */
-    color: #ffffff;
-}
-
-.pay-red:hover {
-    background: #b91c1c;   /* DARK RED */
-}
-
-.paid {
-    color: #16a34a;
-    font-weight: 600;
-}
-
-.pending {
-    color: #dc2626;
-    font-weight: 600;
-}
-
-.paid-text {
-    color: #16a34a;
-    font-weight: 600;
-}
-
-
-
-
-.pay-btn {
-    background: #dc2626;        /* RED */
-    color: #ffffff;
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-    transition: 0.2s ease;
-}
-
-.pay-btn:hover {
-    background: #b91c1c;        /* DARK RED */
-}
-
-
-.payment-status-wrap {
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.status-label {
-    font-weight: 500;
-    color: #333;
-}
-
-.status-btn {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: capitalize;
-}
-
-/* Pending = Blue */
-.status-pending {
-    background: #e0e7ff;
-    color: #1e3a8a;
-    border: 1px solid #6366f1;
-}
-
-/* Completed = Green */
-.status-completed {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #22c55e;
-}
-
-/* Failed = Red */
-.status-failed {
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #ef4444;
-}
-.status-paid {
-    color: #16a34a;
-    font-weight: 600;
-}
-
-.status-pending {
-    color: #dc2626;
-    font-weight: 600;
-}
-
-.status-completed {
-    background: #dcfce7;
-    color: #166534;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.status-upcoming {
-    background: #e0f2fe;
-    color: #0369a1;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.pay-btn {
-    background: #dc2626;
-    color: #ffffff;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    text-decoration: none;
+    .student-info {
+        text-align: left;
+    }
 }

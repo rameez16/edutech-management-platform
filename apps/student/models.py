@@ -79,7 +79,12 @@ class FeePayment(models.Model):
         ordering = ['-payment_date']
     
     def __str__(self):
-        return f"{self.student.name} - {self.payment_type} - ₹{self.amount}"
+      name = self.student.user.get_full_name()
+      if name:
+        return name
+      return self.student.user.email
+
+
     
     @classmethod
     def get_payment_summary(cls, student):
@@ -181,7 +186,7 @@ class EnrollmentAgreement(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.student.name} - {self.agreement_number}"
+        return f"{self.student.full_name} - {self.agreement_number}"
 
 
 class StudentIDCard(models.Model):
@@ -210,7 +215,7 @@ class StudentIDCard(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.student.name} - {self.card_number}"
+        return f"{self.student.full_name} - {self.card_number}"
 
 
 # =============================================
@@ -259,7 +264,7 @@ class LeaveApplication(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.leave_type} - {self.from_date} to {self.to_date}"
+        return f"{self.student.full_name} - {self.leave_type} - {self.from_date} to {self.to_date}"
     
     def save(self, *args, **kwargs):
         # Calculate total days
@@ -320,7 +325,7 @@ class StudentFeedback(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.student.name if not self.is_anonymous else 'Anonymous'} - {self.feedback_type} - {self.overall_rating}★"
+        return f"{self.student.full_name if not self.is_anonymous else 'Anonymous'} - {self.feedback_type} - {self.overall_rating}★"
 
 
 # =============================================
@@ -363,7 +368,7 @@ class CertificationRequest(models.Model):
         ordering = ['-form_submitted_at']
     
     def __str__(self):
-        return f"{self.student.name} - Certification Request"
+        return f"{self.student.full_name} - Certification Request"
 
 
 # =============================================
@@ -421,7 +426,7 @@ class PlacementProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.student.name} - Placement Profile"
+        return f"{self.student.full_name} - Placement Profile"
 
 
 class PlacementDrive(models.Model):
@@ -524,7 +529,7 @@ class PlacementApplication(models.Model):
         ordering = ['-applied_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.placement_drive.company_name} - {self.status}"
+        return f"{self.student.full_name} - {self.placement_drive.company_name} - {self.status}"
 
 
 # =============================================
