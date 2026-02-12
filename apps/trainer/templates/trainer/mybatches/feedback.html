@@ -1,0 +1,101 @@
+{% extends "trainer/mybatches/base.html" %}
+
+{% block tab_content %}
+
+<div class="glass-card">
+
+    <div class="card-header-flex">
+        <h4 class="card-title">Student Feedback</h4>
+        <span class="badge-soft">
+            {{ feedbacks|length }} Feedback{{ feedbacks|length|pluralize }}
+        </span>
+    </div>
+
+    <div class="feedback-accordion">
+
+        {% for feedback in feedbacks %}
+        <details class="feedback-item">
+
+            <!-- SUMMARY -->
+            <summary class="feedback-summary">
+                <h5 class="feedback-student">
+                    {% if feedback.is_anonymous %}
+                        Anonymous Student
+                    {% else %}
+                        {{ feedback.student.full_name|default:feedback.student.user.username }}
+                    {% endif %}
+                </h5>
+
+                <span class="rating-badge">
+                    ⭐ {{ feedback.overall_rating }}/5
+                </span>
+            </summary>
+
+            <!-- DROPDOWN -->
+            <div class="feedback-details">
+
+                <div class="feedback-course">
+                    {{ feedback.course.name }}
+                </div>
+                <div class="feedback-batch">
+                    {{ feedback.batch.name }}
+                </div>
+
+                <!-- ONE INLINE ROW -->
+                <div class="rating-row">
+                    <div class="ratings-inline">
+                    {% if feedback.content_quality %}
+                        <span class="rating-inline">
+                            <strong>Content Quality :</strong>
+                            <span class="rating-score">{{ feedback.content_quality }}/5</span>
+                        </span>
+                    {% endif %}
+
+                    {% if feedback.teaching_methodology %}
+                        <span class="rating-inline">
+                            <strong>Teaching Methodology :</strong>
+                            <span class="rating-score">{{ feedback.teaching_methodology }}/5</span>
+                        </span>
+                    {% endif %}
+
+                    {% if feedback.responsiveness %}
+                        <span class="rating-inline">
+                            <strong>Responsiveness :</strong>
+                            <span class="rating-score">{{ feedback.responsiveness }}/5</span>
+                        </span>
+                    {% endif %}
+                </div>
+                </div>
+
+                <!-- COMMENTS -->
+                <div class="feedback-body">
+                    <p class="feedback-comment">
+                        “{{ feedback.comments }}”
+                    </p>
+
+                    {% if feedback.suggestions %}
+                        <p class="feedback-suggestion">
+                            💡 {{ feedback.suggestions }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- FOOTER -->
+                <div class="feedback-footer">
+                    <span>{{ feedback.get_feedback_type_display }}</span>
+                    <span>{{ feedback.created_at|date:"d M Y" }}</span>
+                </div>
+
+            </div>
+
+        </details>
+        {% empty %}
+            <p class="text-muted text-center">
+                No feedback submitted for this batch yet.
+            </p>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}

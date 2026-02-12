@@ -1,7 +1,12 @@
 {% load static %}
 
 <nav class="navbar">
-    <h1 class="page-title">{% block page_title %}Dashboard Overview{% endblock %}</h1>
+    <h1 class="page-title">{% block page_title %}Dashboard Overview{% endblock %}
+    </h1>
+
+    <div class="navbar-date">
+    {% now "l, d M Y" %}
+</div>
 
     <div class="navbar-right">
         <!-- Search Box -->

@@ -17,7 +17,7 @@
         </div>
 
         <div class="profile-info">
-            <h2>{{ trainer.full_name|default:trainer.user.username }}</h2>
+            <h4>{{ trainer.full_name|default:trainer.user.username }}</h4>
             <h5>
                 {% if trainer.teaching_style %}
                     {{ trainer.get_teaching_style_display }}  ·  

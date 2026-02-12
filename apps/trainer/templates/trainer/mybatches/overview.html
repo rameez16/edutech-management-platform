@@ -1,5 +1,4 @@
 {% extends "trainer/mybatches/base.html" %}
-
 {% block tab_content %}
 
 <div class="glass-card batch-summary-card">
@@ -8,13 +7,15 @@
     <div class="card-header">
         <div>
             <h4 class="card-title">Batch Summary</h4>
-            <p class="card-subtitle">{{ batch.course }} · {{ batch.timing }}</p>
+            <p class="card-subtitle">
+                {{ batch.course.name }} · {{ batch.duration_months }} Months
+            </p>
         </div>
 
         <div class="progress-compact">
-            <span class="progress-percent">{{ batch.progress }}%</span>
+            <span class="progress-percent">{{ progress }}%</span>
             <div class="progress-bar">
-                <div class="progress-fill" style="width: {{ batch.progress }}%;"></div>
+                <div class="progress-fill" style="width: {{ progress }}%;"></div>
             </div>
         </div>
     </div>
@@ -22,21 +23,16 @@
     <!-- Content Grid -->
     <div class="summary-grid">
 
-        <!-- LEFT COLUMN: Basic Batch Info -->
+        <!-- LEFT COLUMN -->
         <div class="summary-column">
             <div class="summary-item">
                 <span class="label">Course</span>
-                <span class="value">{{ batch.course }}</span>
-            </div>
-
-            <div class="summary-item">
-                <span class="label">Timing</span>
-                <span class="value">{{ batch.timing }}</span>
+                <span class="value">{{ batch.course.name }}</span>
             </div>
 
             <div class="summary-item">
                 <span class="label">Duration</span>
-                <span class="value">{{ batch.duration }}</span>
+                <span class="value">{{ batch.duration_months }} Months</span>
             </div>
 
             <div class="summary-item">
@@ -46,20 +42,20 @@
 
             <div class="summary-item">
                 <span class="label">Expected End</span>
-                <span class="value">{{ batch.end_date }}</span>
+                <span class="value">{{ batch.expected_finish_date }}</span>
             </div>
 
             <div class="summary-item">
                 <span class="label">Classes Completed</span>
-                <span class="value">{{ batch.classes_completed }}</span>
+                <span class="value">{{ classes_completed }}</span>
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Stats -->
+        <!-- RIGHT COLUMN -->
         <div class="summary-column">
             <div class="summary-item">
                 <span class="label">Total Students</span>
-                <span class="value">{{ batch.students|length }}</span>
+                <span class="value">{{ total_students }}</span>
             </div>
 
             <div class="summary-item">
@@ -72,20 +68,16 @@
                 <span class="value danger">{{ inactive_students }}</span>
             </div>
 
-
-            <div class="summary-item">
+            {% comment %} <div class="summary-item">
                 <span class="label">Attendance %</span>
-                <span class="value info">{{ batch.attendance|default:"87%" }}</span>
-            </div>
+                <span class="value info">{{ attendance }}%</span>
+            </div> {% endcomment %}
 
             <div class="summary-item">
-                <span class="label">Fees Pending</span>
-                <span class="value danger">{{ batch.fees_pending|default:"5" }}</span>
-            </div>
-
-            <div class="summary-item">
-                <span class="label">Exams Completed</span>
-                <span class="value success">{{ batch.exams_completed|default:"3 / 5" }}</span>
+                <span class="label">Batch Status</span>
+                <span class="value {% if batch.is_completed %}danger{% else %}success{% endif %}">
+                    {% if batch.is_completed %}Completed{% else %}Ongoing{% endif %}
+                </span>
             </div>
         </div>
 

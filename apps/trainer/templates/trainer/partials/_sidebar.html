@@ -34,7 +34,7 @@
 
         <!-- My Batches -->
         <li class="nav-item">
-            <a href="{% url 'trainer:my_batches' %}"
+            <a href="{% url 'trainer:batches' %}"
                 class="nav-link {% if request.resolver_match.namespace == 'trainer' and 'batch' in request.resolver_match.url_name %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="18" height="6"/>
