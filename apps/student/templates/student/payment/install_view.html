@@ -2,128 +2,75 @@
 {% load static %}
 
 {% block content %}
+
 <link rel="stylesheet" href="{% static 'student/css/install_view.css' %}">
 
-<div class="payment-page">
+<div class="installment-page">
 
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-        <h2>Fee Payment & Admission</h2>
-        <p class="subtitle">Student fee status and payment details</p>
-    </div>
+    <!-- WHITE CARD -->
+    <div class="white-card">
 
-    <!-- STUDENT INFO -->
-    <div class="card">
-        <div class="info-grid">
-            <p><strong>Application ID:</strong> ADI-1023</p>
-            <p><strong>Student Name:</strong> John Mathew</p>
-            <p><strong>Course:</strong> Full Stack Development</p>
-            <p>
-                <strong>Admission Status:</strong>
-                <span class="badge success">Confirmed</span>
-            </p>
-        </div>
-    </div>
+        <h2>Installment Details</h2>
 
-    <!-- FEE SUMMARY -->
-    <div class="card">
-        <h4>Fee Summary</h4>
-
-        <div class="row">
-            <span>Total Course Fee</span>
-            <span>₹ 80,000</span>
+        <div class="student-info">
+            <p><strong>ID:</strong> {{ student.id}}</p>
+            <p><strong>Student:</strong> {{ student.full_name }}</p>
+            <p><strong>Email:</strong> {{ student.user.email }}</p>
         </div>
 
-        <div class="row">
-            <span>Booking Fee Paid</span>
-            <span>₹ 10,000</span>
-        </div>
+        <div class="header-divider"></div>
 
-        <div class="row">
-            <span>Remaining Amount</span>
-            <span class="amount-due">₹ 70,000</span>
-        </div>
+        <table class="installment-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
-        <div class="row">
-            <span>Payment Mode</span>
-            <span class="pill">Education Loan</span>
-        </div>
-    </div>
+            <tbody>
+            {% for inst in installments %}
+                <tr>
+                    <td>{{ inst.installment_number }}</td>
+                    <td>₹{{ inst.amount }}</td>
 
-   
-    <!-- LOAN + ACTIONS -->
-    <div class="grid">
+                    <td>
+                        {% if inst.payment_status == "pending" %}
+                            <span class="status pending">Pending</span>
+                        {% elif inst.payment_status == "completed" %}
+                            <span class="status paid">Paid</span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
 
-        <!-- LOAN DETAILS -->
-        <div class="card">
-            <h4>Loan / PDC Details</h4>
+                    <td>
+                        {% if inst.payment_status == "pending" %}
+                            <a href="{% url 'student:install_qr' inst.id %}" class="pay-btn">
+                                Pay Now
+                            </a>
+                        {% elif inst.payment_status == "completed" %}
+                            ✓
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No installments found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Cheque #</th>
-                        <th>Due Date</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>123456</td>
-                        <td>18-Mar-26</td>
-                        <td>₹25,000</td>
-                        <td><span class="badge pending">Pending</span></td>
-                    </tr>
-                    <tr>
-                        <td>123457</td>
-                        <td>16-Apr-26</td>
-                        <td>₹25,000</td>
-                        <td><span class="badge pending">Pending</span></td>
-                    </tr>
-                    <tr>
-                        <td>123458</td>
-                        <td>16-May-26</td>
-                        <td>₹20,000</td>
-                        <td><span class="badge pending">Pending</span></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="loan-info">
-                <p><strong>Bank Name:</strong> SBI</p>
-                <p>
-                    <strong>Loan Status:</strong>
-                    <span class="badge success">Approved</span>
-                </p>
-            </div>
-        </div>
-
-        <!-- ACTION BUTTONS -->
-        <div class="card actions">
-            <button class="btn green">Approve Admission</button>
-            <button class="btn blue">Send Payment Reminder</button>
-            <button class="btn orange">Change Payment Mode</button>
-            <button class="btn dark">Mark Admission Confirmed</button>
-        </div>
+        <a href="{% url 'student:payment' %}" class="back-link">
+            ← Back
+        </a>
 
     </div>
-
-    <!-- PAYMENT ACTION -->
-    <div class="card">
-        <h4>Payment Actions</h4>
-
-        <div class="payment-actions">
-            <button class="btn blue">Upload Payment Proof</button>
-            <button class="btn green"> ✔️Make Payment</button>
-        </div>
-
-        <p class="note">Last Payment Date: 18-Feb-26</p>
-        <p class="note">Next Due Date: 18-Mar-26</p>
-    </div>
-    <a href="{% url 'student:payment' %}" class="back-link">
-    ← Back to Home
-</a>
-
-
 </div>
+
 {% endblock %}

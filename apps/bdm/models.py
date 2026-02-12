@@ -318,7 +318,7 @@ class Student(models.Model):
     
 
 
-from django.db import models
+
 
 
 class StudentAdminProfile(models.Model):

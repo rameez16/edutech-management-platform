@@ -1,0 +1,114 @@
+{% extends "student/layout/lms_main.html" %}
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+{% load static %}
+<div class="content-header">
+    <h2>Student Dashboard</h2>
+    <div class="user-badge">
+        <i class="fa-solid fa-user"></i> {{ request.user.first_name|default:"Student" }}
+    </div>
+</div>
+
+<!-- TOP CARDS -->
+<div class="row g-4 mt-3">
+    <div class="col-md-4">
+        <div class="info-card">
+            <i class="fa-solid fa-calendar-days text-success"></i>
+            <h3>82%</h3>
+            <p>Attendance</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="info-card">
+            <i class="fa-solid fa-graduation-cap text-primary"></i>
+            <h3>6 / 10</h3>
+            <p>Course Progress</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="info-card">
+            <i class="fa-solid fa-clipboard-list text-warning"></i>
+            <h3>3</h3>
+            <p>Pending Tasks</p>
+        </div>
+    </div>
+</div>
+
+<!-- NEW SECTION -->
+<div class="row g-4 mt-4">
+
+    <div class="col-md-4">
+        <div class="panel highlight">
+            <h5><i class="fa-solid fa-bullseye"></i> Today’s Focus</h5>
+            <p><strong>Topic:</strong> JavaScript Arrays</p>
+            <p><strong>Class:</strong> 10:00 AM – 12:00 PM</p>
+            <button class="btn btn-primary btn-sm">Join Class</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel">
+            <h5><i class="fa-solid fa-clock"></i> Assignments Due Soon</h5>
+            <ul class="simple-list">
+                <li>JS Assignment – <span class="warn">Tomorrow</span></li>
+                <li>React Setup – <span>3 days</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel">
+            <h5><i class="fa-solid fa-calendar"></i> Weekly Schedule</h5>
+            <ul class="simple-list">
+                <li>Mon – HTML</li>
+                <li>Tue – CSS</li>
+                <li class="today">Wed – JavaScript</li>
+                <li>Thu – React</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- PROGRESS -->
+<div class="row g-4 mt-4">
+    <div class="col-md-8">
+        <div class="panel">
+            <h5><i class="fa-solid fa-chart-pie"></i> Course Progress Overview</h5>
+            <ul class="status-list">
+                <li class="done">✔ HTML Basics</li>
+                <li class="done">✔ CSS Fundamentals</li>
+                <li class="pending">⏳ JavaScript</li>
+                <li class="pending">⏳ React</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel">
+            <h5><i class="fa-solid fa-clock"></i> Batch & Schedule</h5>
+            <p><strong>Batch:</strong> MERN-FS-01</p>
+            <p><strong>Time:</strong> 10:00 AM – 12:00 PM</p>
+            <p><strong>Trainer:</strong> Anamika N</p>
+        </div>
+    </div>
+</div>
+
+<!-- ACTIVITY -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="panel">
+            <h5><i class="fa-solid fa-bolt"></i> Recent Activities</h5>
+            <ul class="activity-list">
+                <li>✔ Attendance marked</li>
+                <li>📤 Task submitted</li>
+                <li>📊 Evaluation updated</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

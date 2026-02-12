@@ -10,10 +10,11 @@
     <div class="payment-header">
         <h2>Student Admission & Fee Management</h2>
 
+        <!-- ✅ DATABASE VALUES -->
         <div class="student-info">
-            <h3>John Smith</h3>
-            <p>john.smith@email.com</p>
-            <p><b>Student ID:</b> 202300456</p>
+            <h3>{{ user.get_full_name }}</h3>
+            <p>{{ user.email }}</p>
+            <p><b>Student ID:</b> {{ student.id }}</p>
         </div>
     </div>
 
@@ -21,27 +22,30 @@
     <div class="fee-summary">
         <div class="fee-box">
             <p>Due Amount</p>
-            <h3>₹50,000</h3>
+            <h3>₹{{ total_fee }}</h3>
         </div>
         <div class="fee-box">
             <p>Paid Amount</p>
-            <h3>₹45,000</h3>
+            <h3>₹{{ paid_amount }}</h3>
         </div>
         <div class="fee-box highlight">
             <p>Pending Amount</p>
-            <h3>₹5,000</h3>
+            <h3>₹{{ pending_amount }}</h3>
         </div>
     </div>
-    <center> <h1>EMI</h1></center>
+
+    <center><h1>EMI</h1></center>
+
     <!-- PAYMENT MODE -->
     <div class="payment-mode-switch">
         <span class="label">Payment Mode:</span>
 
         <div class="mode-tabs">
+            <a href="{% url 'student:admission' %}" class="mode-btn">Admission Fee</a>
             <a href="{% url 'student:payment' %}" class="mode-btn">One-Time Payment</a>
             <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
-            <a href="{% url 'student:emi' %}" class="mode-btn active">EMI  </a>
-            <a href="{% url 'student:installments' %}" class="mode-btn">Installments</a>
+            <a href="{% url 'student:emi' %}" class="mode-btn ">EMI</a>
+            <a href="{% url 'student:installments' student.id %}" class="mode-btn">Installments</a>
         </div>
     </div>
 
@@ -55,47 +59,62 @@
 
                 <div class="fee-row">
                     <span>Admission Fee</span>
-                    <strong>₹5000</strong>
+                    <strong>₹{{ admission_fee }}</strong>
                 </div>
                 <div class="fee-row">
                     <span>Course Fee</span>
-                    <strong>₹45000</strong>
+                    <strong>₹{{ course_fee }}</strong>
                 </div>
                 <div class="fee-row total">
                     <span>Total Fee</span>
-                    <strong>₹50000</strong>
+                    <strong>₹{{ total_fee }}</strong>
                 </div>
             </div>
-
-            <a href="{% url 'student:emi_view' %}" class="mode-btn active">View Your Status</a>
         </div>
 
         <!-- RIGHT -->
         <div class="right-column">
 
-            <!-- EMI PAYMENT MODE -->
+            <!-- EMI INFO -->
             <div class="emi-payment-box">
-               
-                <br>
-<li>
-                <p class="emi-info"><b>
-                    EMI facility is handled by authorized third-party financial partners
-                    such as Bajaj Finance</b>.
-                </p>
-</li>
-<li>
-                <p class="emi-info"><b>
-                    To proceed with EMI approval, your request will be transferred
-                    to the administration office,Wait for confirmation.</b>
-                </p>
-</li>
-                
+                <ul>
+                    <li>
+                        <b>
+                            EMI facility is handled by authorized third-party financial
+                            partners such as Bajaj Finance.
+                        </b>
+                    </li>
+                    <li>
+                        <b>
+                            To proceed with EMI approval, your request will be transferred
+                            to the administration office. Wait for confirmation.
+                        </b>
+                    </li>
+                </ul>
 
-                <button class="transfer-btn">
-                    Transfer to Administration
-                </button>
+                <br>
+
+               <!-- BUTTON -->
+<button
+    type="button"
+    class="transfer-btn"
+    style="
+        padding: 10px 22px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        color: #ffffff;
+        background: linear-gradient(135deg, #7c3aed, #9333ea);
+        box-shadow: 0 8px 18px rgba(124, 58, 237, 0.35);
+        transition: all 0.3s ease;
+    ">
+    Transfer to Administration
+</button>
             </div>
 
+            <!-- REMINDERS -->
             <div class="reminder-box">
                 <h4>Reminders</h4>
                 <label><input type="checkbox" checked> Email reminder</label>
@@ -111,6 +130,4 @@
     </div>
 
 </div>
-
-
 {% endblock %}

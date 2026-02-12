@@ -2,31 +2,33 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'student/css/payment.css' %}">
+<link rel="stylesheet" href="{% static 'student/css/Installments.css' %}">
 
 <div class="payment-container glass-card">
 
-    <!-- ================= HEADER ================= -->
+    <!-- HEADER -->
     <div class="payment-header">
         <h2>Student Admission & Fee Management</h2>
 
         <div class="student-info">
-            <h3>{{ student.name }}</h3>
-            <p>{{ student.email }}</p>
-            <p><b>Student ID:</b> {{ student.student_id }}</p>
+            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ student.user.email }}</p>
+            <p><strong>Student ID:</strong> {{ student.id }}</p>
         </div>
     </div>
 
-    <!-- ================= SUMMARY ================= -->
+    <!-- SUMMARY -->
     <div class="fee-summary">
         <div class="fee-box">
-            <p>Due Amount</p>
+            <p>Total Fee</p>
             <h3>₹{{ total_fee }}</h3>
         </div>
+
         <div class="fee-box">
             <p>Paid Amount</p>
             <h3>₹{{ paid_amount }}</h3>
         </div>
+
         <div class="fee-box highlight">
             <p>Pending Amount</p>
             <h3>₹{{ pending_amount }}</h3>
@@ -35,111 +37,79 @@
 
     <center><h2>Installments</h2></center>
 
-    <!-- ================= PAYMENT MODE ================= -->
+    <!-- PAYMENT TABS -->
     <div class="payment-mode-switch">
         <span class="label">Payment Mode:</span>
+
         <div class="mode-tabs">
+            <a href="{% url 'student:admission' %}" class="mode-btn">Admission Fee</a>
             <a href="{% url 'student:payment' %}" class="mode-btn">One-Time Payment</a>
-            <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
             <a href="{% url 'student:emi' %}" class="mode-btn">EMI</a>
-            <a href="{% url 'student:installments' %}" class="mode-btn active">Installments</a>
+            <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
+            <a href="{% url 'student:installments' student.id %}" class="mode-btn ">Installments</a>
         </div>
     </div>
 
-    <!-- ================= MAIN ================= -->
-    <div class="payment-row">
+    <!-- TABLE -->
+    <div class="loan-table-box">
+        <h4>Installment Payment Details</h4>
 
-        <!-- LEFT -->
-        <div class="left-column">
-            <div class="fee-summary-box">
-                <h4>Fee Details</h4>
+        <table class="loan-table">
+            <thead>
+                <tr>
+                    <th>Installment</th>
+                    <th>Amount</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
-                <div class="fee-row">
-                    <span>Admission Fee</span>
-                    <strong>₹{{ admission_fee }}</strong>
-                </div>
-                <div class="fee-row">
-                    <span>Course Fee</span>
-                    <strong>₹{{ course_fee }}</strong>
-                </div>
-                <div class="fee-row total">
-                    <span>Total Fee</span>
-                    <strong>₹{{ total_fee }}</strong>
-                </div>
-            </div>
+            <tbody>
+            {% for ins in installments %}
+                <tr>
+                    <td>Installment {{ ins.installment_number }}</td>
+                    <td>₹{{ ins.amount }}</td>
+                    <td>{{ ins.due_date|default:"—" }}</td>
 
-            <br>
-            <a href="#" class="mode-btn active">View Your Status</a>
-        </div>
+                    <td>
+                        {% if ins.payment_status == 'completed' %}
+                            <span class="status paid">Paid</span>
 
-        <!-- CENTER -->
-        <div class="loan-table-box">
-            <h4>Installment Payment Details</h4>
+                        {% elif ins.payment_status == 'pending' %}
+                            <span class="status pending">Pending</span>
 
-            <table class="loan-table">
-                <thead>
-                    <tr>
-                        <th>Installment</th>
-                        <th>Amount</th>
-                        <th>Due Date</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
+                        {% else %}
+                            <span class="status upcoming">Upcoming</span>
+                        {% endif %}
+                    </td>
 
-                <tbody>
-                {% for ins in installments %}
-                    <tr>
-                        <td>Installment {{ ins.installment_number }}</td>
-                        <td>₹{{ ins.amount }}</td>
-                        <td>{{ ins.due_date }}</td>
+                    <td>
+                        {% if ins.payment_status == 'pending' %}
+                            <a href="{% url 'student:install_qr' ins.id %}" class="pay-btn">
+                                Pay Installment
+                            </a>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
 
-                        <!-- STATUS -->
-                        <td>
-                            {% if ins.payment_status == 'completed' %}
-                                <span class="status paid">Paid</span>
-                            {% elif ins.payment_status == 'pending' %}
-                                <span class="status pending">Pending</span>
-                            {% else %}
-                                <span class="status upcoming">Upcoming</span>
-                            {% endif %}
-                        </td>
-
-                        <!-- ACTION -->
-                        <td>
-                            {% if ins.payment_status == 'pending' %}
-                                <a href="{% url 'student:installments_qr' %}" class="pay-btn">
-                                    Pay
-                                </a>
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="5" style="text-align:center;">
-                            No installment records found
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="reminder-box">
-            <h4>Reminders</h4>
-            <label><input type="checkbox" checked> Email reminder</label><br>
-            <label><input type="checkbox" checked> SMS reminder</label>
-        </div>
-
+            {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center;">
+                        No installment records found
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <!-- ================= NOTE ================= -->
     <div class="note">
-        <b>Note:</b> Please pay on correct time.
+        <b>Note:</b> Please pay installments on time.
     </div>
 
 </div>
+
 {% endblock %}

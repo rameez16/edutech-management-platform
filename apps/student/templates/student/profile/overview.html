@@ -1,34 +1,82 @@
 {% extends 'student/layout/base.html' %}
 {% load static %}
 
+{% block title %}Profile Overview{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/overview.css' %}">
+{% endblock %}
+
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'student/css/profile.css' %}">
+<div class="profile-wrapper">
 
-<div class="main-content overview-page">
-
-    <div class="page-header">
-        <h2>Student Settings</h2>
-        <p>Overview</p>
+    <center><!-- TABS -->
+    <div class="profile-tabs-center">
+        <a href="{% url 'student:overview' %}" class="tab active">Overview</a>
+        <a href="{% url 'student:stud_profile' %}" class="tab">Edit Profile</a>
+        <a href="{% url 'student:password' %}" class="tab">Password</a>
     </div>
+</center>
+    <h2 class="page-title">Profile Overview</h2>
+    
 
-    <div class="tabs">
-        <a href="/overview/" class="tab-link active">Overview</a>
-        <a href="/profile/" class="tab-link">Profile</a>
-        <a href="/password/" class="tab-link">Password</a>
+    <div class="profile-card">
+
+        <!-- HEADER -->
+        <div class="image-row">
+            {% if student.profile_photo %}
+                <img src="{{ student.profile_photo.url }}" class="profile-image">
+            {% else %}
+                <div class="profile-image">
+                    {{ student.user.username|slice:":1"|upper }}
+                </div>
+            {% endif %}
+
+            <div>
+                <h3>{{ student.full_name|default:student.user.username }}</h3>
+                <p>{{ student.user.email }}</p>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 🔥 OVERVIEW GRID (CORRECT STRUCTURE) -->
+        <div class="overview-grid">
+
+            <label>Bio</label>
+            <p>{{ student.bio|default:"Not added yet" }}</p>
+
+            <label>Current Education</label>
+            <p>{{ student.current_education|default:"Not added yet" }}</p>
+
+            <label>Institution</label>
+            <p>{{ student.institution|default:"Not added yet" }}</p>
+
+            <label>Preferred Domain</label>
+            <p>{{ student.preferred_domain|default:"Not added yet" }}</p>
+
+            <label>Skills</label>
+            <p>{{ student.skills|default:"Not added yet" }}</p>
+
+            <label>Experience Level</label>
+            <p>{{ student.experience_level|default:"Not added yet" }}</p>
+
+            <label>Learning Goals</label>
+            <p>{{ student.learning_goals|default:"Not added yet" }}</p>
+
+            <label>Portfolio</label>
+            {% if student.portfolio_url %}
+                <a href="{{ student.portfolio_url }}" target="_blank">
+                    {{ student.portfolio_url }}
+                </a>
+            {% else %}
+                <p>Not added yet</p>
+            {% endif %}
+
+        </div>
+
     </div>
-
-    <div class="overview-card">
-        <h3>Welcome, Rinta 👋</h3>
-
-        <ul class="overview-list">
-            <li><strong>Student ID:</strong> STU1023</li>
-            <li><strong>Course:</strong> BSc Computer Science</li>
-            <li><strong>Batch:</strong> 2023 – 2026</li>
-            <li><strong>Status:</strong> Active</li>
-        </ul>
-    </div>
-
 </div>
 
 {% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'student/css/admission.css' %}">
+
+<div class="qr-wrapper">
+    <div class="qr-card">
+
+        <!-- TITLE -->
+        <h2 class="qr-title">Scan & Pay Admission Fee</h2>
+
+        <!-- ✅ COURSE -->
+        <div class="course-name">
+            <p><strong>Course:</strong> {{ course.name }}</p>
+            <p><strong>Batch:</strong> {{ batch.name }}</p>
+        </div>
+
+        <!-- STUDENT INFO -->
+        <div class="student-info">
+            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ student.user.email }}</p>
+            <p><strong>Student ID:</strong> {{ student.id }}</p>
+        </div>
+
+        <!-- FEES -->
+        <div class="fee-box">
+            <p>
+                <strong>Course Fee:</strong>
+                ₹{{ course_fee|floatformat:2 }}
+            </p>
+
+            <p>
+                <strong>Admission Fee (10%):</strong>
+                ₹{{ admission_amount|floatformat:2 }}
+            </p>
+        </div>
+
+        <!-- QR -->
+        <div class="qr-image">
+            <img src="{% static 'student/images/image.png' %}" alt="QR Code">
+        </div>
+
+        <!-- STATUS -->
+        <div class="qr-info">
+            <p>
+                <strong>Status:</strong>
+
+                {% if admission_fee and admission_fee.payment_status == 'completed' %}
+                    <span class="status-paid">✅ Paid</span>
+                {% else %}
+                    <span class="status-pending">⏳ Pending</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- PAYMENT RESULT -->
+        {% if admission_fee and admission_fee.payment_status == 'completed' %}
+
+            <div class="paid-box">
+                <p>🎉 Admission fee successfully paid</p>
+                <p><strong>Receipt No:</strong> {{ admission_fee.receipt_number }}</p>
+                <p><strong>Transaction ID:</strong> {{ admission_fee.transaction_id }}</p>
+            </div>
+
+        {% else %}
+
+            <!-- PAYMENT FORM -->
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <label class="upload-btn" for="receiptInput">
+                    📤 Upload Payment Receipt
+                </label>
+
+                <input type="file"
+                       id="receiptInput"
+                       name="receipt"
+                       accept="image/*"
+                       hidden
+                       required
+                       onchange="previewReceipt(event)">
+
+                <div id="receiptPreview" class="receipt-preview">
+                    <img id="previewImg" alt="Receipt Preview">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    ✅ Submit Payment
+                </button>
+
+            </form>
+
+        {% endif %}
+
+        <!-- BACK -->
+        <a href="{% url 'student:payment_gateway' %}" class="back-btn">
+            ← Back
+        </a>
+
+    </div>
+</div>
+
+<script>
+function previewReceipt(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please upload image only");
+        event.target.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function () {
+        document.getElementById("previewImg").src = reader.result;
+        document.getElementById("receiptPreview").style.display = "block";
+    };
+
+    reader.readAsDataURL(file);
+}
+</script>
+
+{% endblock %}

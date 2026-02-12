@@ -6,18 +6,20 @@
 
 <div class="payment-container glass-card">
 
-    <!-- HEADER -->
+    <!-- ================= HEADER ================= -->
     <div class="payment-header">
         <h2>Student Admission & Fee Management</h2>
+
         <div class="student-info">
-            <h3>{{ student.name }}</h3>
-            <p>{{ student.email }}</p>
-            <p><b>Student ID:</b> {{ student.student_id }}</p>
+            <h3>{{ student.user.get_full_name }}</h3>
+            <p>{{ student.user.email }}</p>
+            <p><b>Student ID:</b> {{ student.id }}</p>
         </div>
     </div>
 
-    <!-- SUMMARY -->
+    <!-- ================= SUMMARY ================= -->
     <div class="fee-summary">
+
         <div class="fee-box">
             <p>Due Amount</p>
             <h3>₹{{ total_fee }}</h3>
@@ -32,25 +34,42 @@
             <p>Pending Amount</p>
             <h3>₹{{ pending_amount }}</h3>
         </div>
+
     </div>
 
     <center><h2>PDC</h2></center>
 
-    <!-- PAYMENT MODE -->
+    <!-- ================= PAYMENT MODE ================= -->
     <div class="payment-mode-switch">
         <span class="label">Payment Mode:</span>
+
         <div class="mode-tabs">
-            <a href="{% url 'student:onetime_view' %}" class="mode-btn">One-Time Payment</a>
-            <a href="{% url 'student:pdc' %}" class="mode-btn active">PDC</a>
-            <a href="{% url 'student:emi' %}" class="mode-btn">EMI</a>
-            <a href="{% url 'student:installments' %}" class="mode-btn">Installment</a>
+            <a href="{% url 'student:admission' %}" class="mode-btn">
+                Admission Fee
+            </a>
+
+            <a href="{% url 'student:payment' %}" class="mode-btn">
+                One-Time Payment
+            </a>
+
+            <a href="{% url 'student:emi' %}" class="mode-btn">
+                EMI
+            </a>
+
+            <a href="{% url 'student:pdc' %}" class="mode-btn active">
+                PDC
+            </a>
+
+            <a href="{% url 'student:installments' student.id %}" class="mode-btn">
+                Installment
+            </a>
         </div>
     </div>
 
-    <!-- MAIN -->
+    <!-- ================= MAIN ================= -->
     <div class="payment-row">
 
-        <!-- LEFT -->
+        <!-- LEFT COLUMN -->
         <div class="left-column">
             <div class="fee-summary-box">
                 <h4>Fee Details</h4>
@@ -72,7 +91,7 @@
             </div>
         </div>
 
-        <!-- CENTER -->
+        <!-- CENTER COLUMN -->
         <div class="center-column">
             <h4>PDC Cheque</h4>
 
@@ -113,7 +132,9 @@
                                 <span class="status-completed">Completed</span>
 
                             {% elif pdc.cheque_date <= today %}
-                                <a href="{% url 'QR_pay' %}" class="pay-btn">Pay</a>
+                                <a href="{% url 'student:QR_pay' %}" class="pay-btn">
+                                    Pay
+                                </a>
 
                             {% else %}
                                 <span class="status-upcoming">Upcoming</span>
@@ -131,23 +152,35 @@
             </table>
         </div>
 
-        <!-- RIGHT -->
+        <!-- RIGHT COLUMN -->
         <div class="right-column">
             <div class="reminder-box">
                 <h4>Reminders</h4>
-                <label><input type="checkbox" checked> Email reminder</label><br>
-                <label><input type="checkbox" checked> SMS reminder</label>
+
+                <label>
+                    <input type="checkbox" checked> Email reminder
+                </label>
+                <br>
+
+                <label>
+                    <input type="checkbox" checked> SMS reminder
+                </label>
 
                 <br><br>
-                <a href="#" class="mode-btn active">View your status</a>
+
+                <a href="{% url 'student:pdc_view' %}" class="mode-btn active">
+                    View your status
+                </a>
             </div>
         </div>
 
     </div>
 
-    <!-- NOTE -->
+    <!-- ================= NOTE ================= -->
     <div class="note">
-        <p><b>Note:</b> Please submit your post-dated cheques to the administration office.</p>
+        <p>
+            <b>Note:</b> Please submit your post-dated cheques to the administration office.
+        </p>
     </div>
 
 </div>

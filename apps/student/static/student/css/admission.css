@@ -1,0 +1,104 @@
+/* ===== QR PAGE WRAPPER ===== */
+.qr-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 40px);
+    padding: 20px;
+}
+
+/* ===== CARD ===== */
+.qr-card {
+    width: 380px;
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 28px;
+    text-align: center;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+
+/* ===== TITLE ===== */
+.qr-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+/* ===== STUDENT INFO ===== */
+.student-info p {
+    font-size: 14px;
+    margin: 4px 0;
+    color: #333;
+}
+
+/* ===== QR IMAGE ===== */
+.qr-image {
+    margin: 18px 0;
+}
+
+.qr-image img {
+    width: 180px;
+    height: 180px;
+}
+
+/* ===== INFO ===== */
+.qr-info p {
+    font-size: 14px;
+    margin: 6px 0;
+}
+
+/* ===== PAID MESSAGE ===== */
+.paid-msg {
+    color: #16a34a;
+    font-weight: 600;
+    margin: 15px 0;
+}
+
+/* ===== UPLOAD BUTTON ===== */
+.upload-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 16px rgba(124,58,237,0.35);
+}
+
+/* ===== SUBMIT BUTTON ===== */
+.submit-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #16a34a;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* ===== BACK BUTTON ===== */
+.back-btn {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 480px) {
+    .qr-card {
+        width: 100%;
+    }
+
+    .qr-image img {
+        width: 150px;
+        height: 150px;
+    }
+}

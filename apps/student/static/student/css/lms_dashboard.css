@@ -1,0 +1,134 @@
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background: #f4f6fb;
+}
+
+/* LAYOUT */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    background: #1f2a44;
+    color: #fff;
+    padding: 24px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+}
+
+.menu li {
+    margin-bottom: 8px;
+}
+
+.menu a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 12px;
+    border-radius: 10px;
+    opacity: 0.9;
+}
+
+.menu a i {
+    margin-right: 10px;
+}
+
+.menu a:hover {
+    background: rgba(255,255,255,0.1);
+    opacity: 1;
+}
+
+/* CONTENT */
+.content {
+    flex: 1;
+    padding: 30px;
+}
+
+/* HEADER */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-badge {
+    background: #fff;
+    padding: 8px 14px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* CARDS */
+.info-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.info-card i {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+/* PANELS */
+.panel {
+    background: #fff;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* LISTS */
+.status-list,
+.activity-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 15px;
+}
+
+.status-list li,
+.activity-list li {
+    padding: 8px 0;
+}
+
+.done { color: #2e7d32; }
+.pending { color: #f9a825; }
+.sidebar-logout-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #ffffff;
+    padding: 12px;
+    text-align: left;
+    border-radius: 10px;
+    cursor: pointer;
+    opacity: 0.9;
+    font-size: 15px;
+}
+
+.sidebar-logout-btn i {
+    margin-right: 10px;
+}
+
+.sidebar-logout-btn:hover {
+    background: rgba(255,255,255,0.12);
+    opacity: 1;
+}
