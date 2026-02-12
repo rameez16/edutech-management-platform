@@ -1,0 +1,1175 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block title %}User Profile - {{ user_obj.username }}{% endblock %}
+
+{% block content %}
+
+<div class="profile-container">
+    <!-- Back Navigation -->
+    <div class="back-nav">
+        <a href="{% url 'bdm:user_list' %}" class="back-link">
+            <i class="back-icon">←</i>
+            <span>Back to Users</span>
+        </a>
+    </div>
+
+    <div class="profile-layout">
+        <!-- Profile Header with Integrated Navigation -->
+        <div class="profile-header-section">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar-large">
+                    {{ user_obj.username|first|upper }}
+                </div>
+                <div class="profile-header-info">
+                    <h1 class="profile-name">
+                        {% if user_obj.first_name or user_obj.last_name %}
+                            {{ user_obj.first_name }} {{ user_obj.last_name }}
+                        {% else %}
+                            {{ user_obj.username }}
+                        {% endif %}
+                    </h1>
+                    <p class="profile-username">@{{ user_obj.username }}</p>
+                    <div class="profile-badges">
+                        <div class="status-badge {% if user_obj.is_active %}status-active{% else %}status-inactive{% endif %}">
+                            <span class="status-dot"></span>
+                            {{ user_obj.is_active|yesno:"Active,Inactive" }}
+                        </div>
+                        {% if user_obj.groups.all %}
+                            {% for group in user_obj.groups.all %}
+                            <div class="role-badge role-{{ group.name|lower }}">
+                                {{ group.name }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horizontal Section Navigation -->
+            <nav class="section-nav">
+                <ul class="nav-links">
+                    <li><a href="#basic-info" class="nav-link active">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-text">Basic Info</span>
+                    </a></li>
+                    
+                    {% if trainer_profile and trainer_profile.admin_profile or student_profile and student_profile.admin_profile %}
+                    <li><a href="#admin-details" class="nav-link">
+                        <span class="nav-icon">🛡️</span>
+                        <span class="nav-text">Admin Details</span>
+                    </a></li>
+                    {% endif %}
+                    
+                    {% if trainer_profile %}
+                    <li><a href="#trainer-profile" class="nav-link">
+                        <span class="nav-icon">👨‍🏫</span>
+                        <span class="nav-text">Trainer Profile</span>
+                    </a></li>
+                    {% endif %}
+                    
+                    {% if student_profile %}
+                    <li><a href="#student-profile" class="nav-link">
+                        <span class="nav-icon">🎓</span>
+                        <span class="nav-text">Student Profile</span>
+                    </a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="content-sections">
+            <!-- Basic Information Card -->
+            <div id="basic-info" class="info-card section-anchor">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="title-icon">📋</i>
+                        Basic Information
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Username</span>
+                            <span class="info-value">{{ user_obj.username }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email Address</span>
+                            <span class="info-value">
+                                {% if user_obj.email %}
+                                <a href="mailto:{{ user_obj.email }}" class="email-link">
+                                    <i class="email-icon">✉️</i>
+                                    {{ user_obj.email }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Not provided</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Full Name</span>
+                            <span class="info-value">
+                                {% if user_obj.first_name or user_obj.last_name %}
+                                    {{ user_obj.first_name }} {{ user_obj.last_name }}
+                                {% else %}
+                                    <span class="text-muted">Not provided</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Account Status</span>
+                            <span class="info-value">
+                                <span class="status-indicator {% if user_obj.is_active %}active{% else %}inactive{% endif %}">
+                                    {{ user_obj.is_active|yesno:"Active Account,Inactive Account" }}
+                                </span>
+                            </span>
+                        </div>
+                        {% if user_obj.date_joined %}
+                        <div class="info-item">
+                            <span class="info-label">Date Joined</span>
+                            <span class="info-value">{{ user_obj.date_joined|date:"F d, Y" }}</span>
+                        </div>
+                        {% endif %}
+                        {% if user_obj.last_login %}
+                        <div class="info-item">
+                            <span class="info-label">Last Login</span>
+                            <span class="info-value">{{ user_obj.last_login|date:"F d, Y H:i" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ================= ADMIN PROFILE SECTION ================= #}
+            {% if trainer_profile and trainer_profile.admin_profile or student_profile and student_profile.admin_profile %}
+            <div id="admin-details" class="info-card section-anchor">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="title-icon">🛡️</i>
+                        Administrative Details
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {% if trainer_profile and trainer_profile.admin_profile %}
+                    <div class="info-grid">
+                        {% if trainer_profile.admin_profile.employee_id %}
+                        <div class="info-item">
+                            <span class="info-label">Employee ID</span>
+                            <span class="info-value">{{ trainer_profile.admin_profile.employee_id }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if trainer_profile.admin_profile.date_joined %}
+                        <div class="info-item">
+                            <span class="info-label">Date Joined</span>
+                            <span class="info-value">
+                                {{ trainer_profile.admin_profile.date_joined|date:"F d, Y" }}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        {% if trainer_profile.admin_profile.batches_assigned %}
+                        <div class="info-item">
+                            <span class="info-label">Batches Assigned</span>
+                            <span class="info-value">{{ trainer_profile.admin_profile.batches_assigned }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if trainer_profile.admin_profile.performance_rating %}
+                        <div class="info-item">
+                            <span class="info-label">Performance Rating</span>
+                            <span class="info-value">
+                                {{ trainer_profile.admin_profile.performance_rating }}/5
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <div class="info-item">
+                            <span class="info-label">Profile Verified</span>
+                            <span class="info-value">
+                                <span class="status-indicator {% if trainer_profile.admin_profile.profile_verified %}active{% else %}inactive{% endif %}">
+                                    {{ trainer_profile.admin_profile.profile_verified|yesno:"Verified,Not Verified" }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    {% elif student_profile and student_profile.admin_profile %}
+                    <div class="info-grid">
+                        {% if student_profile.admin_profile.student_code %}
+                        <div class="info-item">
+                            <span class="info-label">Student Code</span>
+                            <span class="info-value">{{ student_profile.admin_profile.student_code }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if student_profile.admin_profile.date_joined %}
+                        <div class="info-item">
+                            <span class="info-label">Date Joined</span>
+                            <span class="info-value">
+                                {{ student_profile.admin_profile.date_joined|date:"F d, Y" }}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        {% if student_profile.admin_profile.enrolled_course %}
+                        <div class="info-item">
+                            <span class="info-label">Enrolled Course</span>
+                            <span class="info-value">{{ student_profile.admin_profile.enrolled_course }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if student_profile.admin_profile.batch_assigned %}
+                        <div class="info-item">
+                            <span class="info-label">Batch Assigned</span>
+                            <span class="info-value">{{ student_profile.admin_profile.batch_assigned }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="info-item">
+                            <span class="info-label">Profile Verified</span>
+                            <span class="info-value">
+                                <span class="status-indicator {% if student_profile.admin_profile.profile_verified %}active{% else %}inactive{% endif %}">
+                                    {{ student_profile.admin_profile.profile_verified|yesno:"Verified,Not Verified" }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Trainer Profile Card -->
+            {% if trainer_profile %}
+            <div id="trainer-profile" class="info-card section-anchor">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="title-icon">👨‍🏫</i>
+                        Trainer Profile
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        {% if trainer_profile.full_name %}
+                        <div class="info-item">
+                            <span class="info-label">Full Name</span>
+                            <span class="info-value">{{ trainer_profile.full_name }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.email %}
+                        <div class="info-item">
+                            <span class="info-label">Trainer Email</span>
+                            <span class="info-value">
+                                <a href="mailto:{{ trainer_profile.email }}" class="email-link">
+                                    <i class="email-icon">✉️</i>
+                                    {{ trainer_profile.email }}
+                                </a>
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.phone %}
+                        <div class="info-item">
+                            <span class="info-label">Phone Number</span>
+                            <span class="info-value">
+                                <a href="tel:{{ trainer_profile.phone }}" class="phone-link">
+                                    <i class="phone-icon">📞</i>
+                                    {{ trainer_profile.phone }}
+                                </a>
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.gender %}
+                        <div class="info-item">
+                            <span class="info-label">Gender</span>
+                            <span class="info-value">{{ trainer_profile.get_gender_display }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.experience_years %}
+                        <div class="info-item">
+                            <span class="info-label">Years of Experience</span>
+                            <span class="info-value">
+                                <span class="experience-badge">{{ trainer_profile.experience_years }} years</span>
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.teaching_experience_years %}
+                        <div class="info-item">
+                            <span class="info-label">Teaching Experience</span>
+                            <span class="info-value">
+                                <span class="experience-badge">{{ trainer_profile.teaching_experience_years }} years</span>
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.primary_domain %}
+                        <div class="info-item">
+                            <span class="info-label">Primary Domain</span>
+                            <span class="info-value">{{ trainer_profile.primary_domain }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.teaching_style %}
+                        <div class="info-item">
+                            <span class="info-label">Teaching Style</span>
+                            <span class="info-value">{{ trainer_profile.get_teaching_style_display }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.qualification %}
+                        <div class="info-item full-width">
+                            <span class="info-label">Qualification</span>
+                            <span class="info-value">{{ trainer_profile.qualification }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.coding_languages %}
+                        <div class="info-item full-width">
+                            <span class="info-label">Coding Languages</span>
+                            <span class="info-value">{{ trainer_profile.coding_languages }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.frameworks %}
+                        <div class="info-item full-width">
+                            <span class="info-label">Frameworks</span>
+                            <span class="info-value">{{ trainer_profile.frameworks }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if trainer_profile.location %}
+                        <div class="info-item">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">{{ trainer_profile.location }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if trainer_profile.bio %}
+                    <div class="info-section">
+                        <span class="info-label">Bio</span>
+                        <p class="info-text">{{ trainer_profile.bio }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if trainer_profile.github_url or trainer_profile.linkedin_url or trainer_profile.portfolio_url %}
+                    <div class="info-section">
+                        <span class="info-label">Links</span>
+                        <div class="link-group">
+                            {% if trainer_profile.github_url %}
+                            <a href="{{ trainer_profile.github_url }}" target="_blank" class="profile-link">
+                                <i class="link-icon">🔗</i> GitHub
+                            </a>
+                            {% endif %}
+                            {% if trainer_profile.linkedin_url %}
+                            <a href="{{ trainer_profile.linkedin_url }}" target="_blank" class="profile-link">
+                                <i class="link-icon">🔗</i> LinkedIn
+                            </a>
+                            {% endif %}
+                            {% if trainer_profile.portfolio_url %}
+                            <a href="{{ trainer_profile.portfolio_url }}" target="_blank" class="profile-link">
+                                <i class="link-icon">🔗</i> Portfolio
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Student Profile Card -->
+            {% if student_profile %}
+            <div id="student-profile" class="info-card section-anchor">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="title-icon">🎓</i>
+                        Student Profile
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        {% if student_profile.full_name %}
+                        <div class="info-item">
+                            <span class="info-label">Full Name</span>
+                            <span class="info-value">{{ student_profile.full_name }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if student_profile.email %}
+                        <div class="info-item">
+                            <span class="info-label">Student Email</span>
+                            <span class="info-value">
+                                <a href="mailto:{{ student_profile.email }}" class="email-link">
+                                    <i class="email-icon">✉️</i>
+                                    {{ student_profile.email }}
+                                </a>
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if student_profile.phone %}
+                        <div class="info-item">
+                            <span class="info-label">Phone Number</span>
+                            <span class="info-value">
+                                <a href="tel:{{ student_profile.phone }}" class="phone-link">
+                                    <i class="phone-icon">📞</i>
+                                    {{ student_profile.phone }}
+                                </a>
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if student_profile.gender %}
+                        <div class="info-item">
+                            <span class="info-label">Gender</span>
+                            <span class="info-value">{{ student_profile.get_gender_display }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if student_profile.current_education %}
+                        <div class="info-item">
+                            <span class="info-label">Current Education</span>
+                            <span class="info-value">{{ student_profile.current_education }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if student_profile.institution %}
+                        <div class="info-item">
+                            <span class="info-label">Institution</span>
+                            <span class="info-value">{{ student_profile.institution }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if student_profile.preferred_domain %}
+                        <div class="info-item">
+                            <span class="info-label">Preferred Domain</span>
+                            <span class="info-value">{{ student_profile.preferred_domain }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if student_profile.experience_level %}
+                        <div class="info-item">
+                            <span class="info-label">Experience Level</span>
+                            <span class="info-value">{{ student_profile.experience_level }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if student_profile.skills %}
+                        <div class="info-item full-width">
+                            <span class="info-label">Skills</span>
+                            <span class="info-value">{{ student_profile.skills }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if student_profile.bio %}
+                    <div class="info-section">
+                        <span class="info-label">Bio</span>
+                        <p class="info-text">{{ student_profile.bio }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if student_profile.learning_goals %}
+                    <div class="info-section">
+                        <span class="info-label">Learning Goals</span>
+                        <p class="info-text">{{ student_profile.learning_goals }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if student_profile.portfolio_url %}
+                    <div class="info-section">
+                        <span class="info-label">Portfolio</span>
+                        <div class="link-group">
+                            <a href="{{ student_profile.portfolio_url }}" target="_blank" class="profile-link">
+                                <i class="link-icon">🔗</i> View Portfolio
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="profile-actions">
+                <a href="{% url 'bdm:user_list' %}" class="action-btn btn-secondary">
+                    <i class="btn-icon">←</i>
+                    <span>Back to Users</span>
+                </a>
+                <a href="#" class="action-btn btn-primary">
+                    <i class="btn-icon">✏️</i>
+                    <span>Edit Profile</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #0077cc;
+        --light-blue: #e6f2ff;
+        --lighter-blue: #f0f8ff;
+        --blue-hover: #005fa3;
+        --border-color: #d0e7ff;
+        --text-dark: #1a365d;
+        --text-light: #4a5568;
+        --text-lighter: #718096;
+        --success: #38a169;
+        --warning: #d69e2e;
+        --danger: #e53e3e;
+        --white: #ffffff;
+        --gray-light: #f7fafc;
+        --gray-border: #e2e8f0;
+        --shadow: 0 4px 12px rgba(0, 119, 204, 0.08);
+        --shadow-hover: 0 8px 24px rgba(0, 119, 204, 0.15);
+    }
+
+    .profile-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 30px 30px;
+    }
+
+    /* Back Navigation */
+    .back-nav {
+        margin-bottom: 20px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+
+    .back-link:hover {
+        background: var(--lighter-blue);
+        transform: translateX(-4px);
+    }
+
+    .back-icon {
+        font-size: 18px;
+    }
+
+    /* Layout Grid */
+    .profile-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    /* Sticky Header Section */
+    .profile-header-section {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--white);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin: 0 -30px 24px -30px;
+        padding: 0 30px;
+    }
+
+    /* Compact Profile Header */
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary-blue), #00b4d8);
+        padding: 20px 30px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-avatar-large {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--primary-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 28px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+    }
+
+    .profile-header-info {
+        flex: 1;
+        color: white;
+    }
+
+    .profile-name {
+        margin: 0 0 4px 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+    }
+
+    .profile-username {
+        margin: 0 0 10px 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .profile-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* Compact Section Navigation */
+    .section-nav {
+        background: var(--white);
+        padding: 16px 30px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .nav-header {
+        display: none;
+    }
+
+    .nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav-links li {
+        margin-bottom: 0;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--text-light);
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        white-space: nowrap;
+        background: var(--gray-light);
+    }
+
+    .nav-link:hover {
+        background: var(--lighter-blue);
+        color: var(--primary-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 119, 204, 0.15);
+    }
+
+    .nav-link.active {
+        background: linear-gradient(135deg, var(--primary-blue), #00b4d8);
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 119, 204, 0.3);
+    }
+
+    .nav-icon {
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .nav-text {
+        flex: 1;
+    }
+
+    /* Content Sections */
+    .content-sections {
+        padding: 0;
+    }
+
+    .section-anchor {
+        scroll-margin-top: 180px;
+    }
+
+    /* Info Cards - Compact */
+    .info-card {
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        background: var(--lighter-blue);
+        padding: 16px 24px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .card-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .title-icon {
+        font-size: 20px;
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    /* Info Grid - Compact */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .info-item.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .info-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-lighter);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-size: 15px;
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .info-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid var(--light-blue);
+    }
+
+    .info-section .info-label {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .info-text {
+        font-size: 14px;
+        color: var(--text-light);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .text-muted {
+        color: var(--text-lighter);
+        font-style: italic;
+    }
+
+    /* Links */
+    .email-link,
+    .phone-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        transition: color 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .email-link:hover,
+    .phone-link:hover {
+        color: var(--blue-hover);
+        text-decoration: underline;
+    }
+
+    .email-icon,
+    .phone-icon {
+        font-size: 14px;
+    }
+
+    .link-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .profile-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    .profile-link:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .link-icon {
+        font-size: 14px;
+    }
+
+    /* Status Badge - Compact */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .status-inactive {
+        background: rgba(229, 62, 62, 0.15);
+        color: #742a2a;
+        border: 1px solid #fc8181;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-active .status-dot {
+        background: white;
+    }
+
+    .status-inactive .status-dot {
+        background: #e53e3e;
+    }
+
+    .status-indicator {
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .status-indicator.active {
+        background: #e6fffa;
+        color: #234e52;
+    }
+
+    .status-indicator.inactive {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    /* Role Badge - Compact */
+    .role-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    /* Experience Badge */
+    .experience-badge {
+        padding: 4px 12px;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-block;
+    }
+
+    /* Profile Actions */
+    .profile-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding-top: 20px;
+        margin-top: 20px;
+        border-top: 2px solid var(--light-blue);
+    }
+
+    .action-btn {
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: var(--primary-blue);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--blue-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .btn-secondary {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border: 2px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background: var(--lighter-blue);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .btn-icon {
+        font-size: 16px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .section-nav {
+            padding: 12px 20px;
+        }
+
+        .nav-links {
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+
+        .info-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            margin: 20px auto;
+            padding: 0 20px 20px;
+        }
+
+        .profile-header-section {
+            margin: 0 -20px 20px -20px;
+            padding: 0 20px;
+        }
+
+        .profile-header {
+            padding: 16px 20px;
+        }
+
+        .profile-avatar-large {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+        }
+
+        .profile-name {
+            font-size: 20px;
+        }
+
+        .profile-username {
+            font-size: 13px;
+        }
+
+        .section-nav {
+            padding: 12px 15px;
+        }
+
+        .nav-links {
+            gap: 6px;
+        }
+
+        .nav-link {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .nav-text {
+            display: none;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        .section-anchor {
+            scroll-margin-top: 150px;
+        }
+
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            font-size: 28px;
+        }
+
+        .profile-name {
+            font-size: 24px;
+        }
+
+        .profile-badges {
+            justify-content: flex-start;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-header,
+        .card-body {
+            padding: 16px 20px;
+        }
+
+        .profile-actions {
+            flex-direction: column-reverse;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-header {
+            padding: 12px 15px;
+        }
+
+        .profile-avatar-large {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        .profile-name {
+            font-size: 18px;
+        }
+
+        .card-title {
+            font-size: 16px;
+        }
+
+        .nav-link {
+            padding: 6px 10px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Smooth scroll behavior
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all links
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+            
+            // Smooth scroll to section
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Update active link on scroll
+    const sections = document.querySelectorAll('.section-anchor');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    function updateActiveLink() {
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (window.pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveLink);
+    updateActiveLink(); // Initial call
+});
+</script>
+
+{% endblock %}

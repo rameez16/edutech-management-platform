@@ -461,7 +461,7 @@ View and manage lead information
 {% endblock %}
 
 {% block page_actions %}
-    <a href="{% url 'leads' %}" class="btn btn-secondary">
+    <a href="{% url 'bdm:leads' %}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i>
         Back to Leads
     </a>
@@ -469,7 +469,7 @@ View and manage lead information
 
 {% block breadcrumbs %}
 {% comment %} <span>/</span> {% endcomment %}
-<a href="{% url 'leads' %}">Leads</a>
+<a href="{% url 'bdm:leads' %}">Leads</a>
 
 <span>{{ lead.name }}</span>
 {% endblock %}

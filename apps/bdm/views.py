@@ -1,12 +1,24 @@
 from django.shortcuts import get_object_or_404,render,redirect
 from .models import Student, Lead, Course, Batch
-
+from django.core.paginator import Paginator
 from .form import  TrainerAdminProfileForm
+from django.db import transaction
+from decimal import Decimal
+from django.db.models import Sum, DecimalField
+from django.db.models.functions import Coalesce
 
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime
+from .models import StudentAdminProfile, TrainerAdminProfile
+from .form import StudentAdminProfileForm, TrainerAdminProfileForm
+
+from django.db.models import Sum
+
+from apps.student.models import FeePayment
+from apps.bdm.models import Student
+
 
 # Create your views here.
 
@@ -214,30 +226,74 @@ def create_admin_profile(request, user_id):
     
     
     
-def create_trainer_admin_profile(request, user):
-    trainer = getattr(user, "trainer", None)
+# def create_trainer_admin_profile(request, user):
+#     trainer = getattr(user, "trainer", None)
 
-    if not trainer:
-        messages.error(request, "Trainer profile not found.")
-        return redirect("user_list")
+#     if not trainer:
+#         messages.error(request, "Trainer profile not found.")
+#         return redirect("user_list")
 
-    if request.method == "POST":
-        form = TrainerAdminProfileForm(request.POST)
+#     if request.method == "POST":
+#         form = TrainerAdminProfileForm(request.POST)
 
-        if form.is_valid():
-            admin_profile = form.save(commit=False)
-            admin_profile.trainer = trainer
-            admin_profile.save()
+#         if form.is_valid():
+#             admin_profile = form.save(commit=False)
+#             admin_profile.trainer = trainer
+#             admin_profile.save()
 
-            messages.success(
-                request,
-                f"Trainer admin profile created for {trainer}"
-            )
-            return redirect("bdm:user_list")
+#             messages.success(
+#                 request,
+#                 f"Trainer admin profile created for {trainer}"
+#             )
+#             return redirect("bdm:user_list")
 
-    else:
-        form = TrainerAdminProfileForm()
+#     else:
+#         form = TrainerAdminProfileForm()
 
+#     return render(
+#         request,
+#         "bdm/trainer/trainer_profile.html",
+#         {
+#             "form": form,
+#             "user": user,
+#             "role": "trainer"
+#         }
+#     )   
+    
+# def create_student_admin_profile(request, user):
+#     student = getattr(user, "student", None)
+
+#     if not student:
+#         messages.error(request, "Student profile not found.")
+#         return redirect("bdm:user_list")
+
+#     if request.method == "POST":
+#         form = StudentAdminProfileForm(request.POST)
+
+#         if form.is_valid():
+#             admin_profile = form.save(commit=False)
+#             admin_profile.student = student
+#             admin_profile.save()
+
+#             messages.success(
+#                 request,
+#                 f"Student admin profile created for {student}"
+#             )
+#             return redirect("user_list")
+
+#     else:
+#         form = StudentAdminProfileForm()
+
+#     return render(
+#         request,
+#         "bdm/student/student_profile.html",
+#         {
+#             "form": form,
+#             "user": user,
+#             "role": "student"
+#         }
+#     )
+   
     return render(
         request,
         "bdm/trainer/trainer_profile.html",
@@ -505,65 +561,24 @@ def download_enrollment_letter(request):
 # Leads management aleena
 
 def leads(request):
-    leads = Lead.objects.select_related(
+    # 1️⃣ Base queryset (ALWAYS all leads)
+    all_leads = Lead.objects.select_related(
         'preferred_course',
         'assigned_to'
-    )
+    ).order_by('-enquiry_date')
 
-    # Get filter parameters from request
-    status_filter = request.GET.get('status', '')
-    course_filter = request.GET.get('course', '')
-    mode_filter = request.GET.get('mode', '')
-    date_from = request.GET.get('date_from', '')
-    date_to = request.GET.get('date_to', '')
-    search_query = request.GET.get('search', '')
-
-    # Apply status filter
-    if status_filter:
-        leads = leads.filter(status=status_filter)
-
-    # Apply course filter
-    if course_filter:
-        leads = leads.filter(preferred_course_id=course_filter)
-
-    # Apply mode filter
-    if mode_filter:
-        leads = leads.filter(mode=mode_filter)
-
-    # Apply date range filter
-    if date_from:
-        try:
-            date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
-            leads = leads.filter(enquiry_date__gte=date_from_obj)
-        except ValueError:
-            pass
-
-    if date_to:
-        try:
-            date_to_obj = datetime.strptime(date_to, '%Y-%m-%d')
-            date_to_obj = date_to_obj + timedelta(days=1)
-            leads = leads.filter(enquiry_date__lt=date_to_obj)
-        except ValueError:
-            pass
-
-    # Apply search filter
-    all_leads = Lead.objects.all()
+    # 2️⃣ Filtered queryset (start from all_leads)
     filtered_leads = all_leads
 
-    search = request.GET.get("search")
-    status = request.GET.get("status")
-    course = request.GET.get("course")
-    mode = request.GET.get("mode")
-    date_from = request.GET.get("date_from")
-    date_to = request.GET.get("date_to")
+    # Get filter parameters
+    status = request.GET.get('status')
+    course = request.GET.get('course')
+    mode = request.GET.get('mode')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    search = request.GET.get('search')
 
-    if search:
-        filtered_leads = filtered_leads.filter(
-            Q(name__icontains=search) |
-            Q(email__icontains=search) |
-            Q(phone__icontains=search)
-        )
-
+    # Apply filters
     if status:
         filtered_leads = filtered_leads.filter(status=status)
 
@@ -574,40 +589,57 @@ def leads(request):
         filtered_leads = filtered_leads.filter(mode=mode)
 
     if date_from:
-        filtered_leads = filtered_leads.filter(enquiry_date__gte=date_from)
+        try:
+            filtered_leads = filtered_leads.filter(
+                enquiry_date__date__gte=date_from
+            )
+        except ValueError:
+            pass
 
     if date_to:
-        filtered_leads = filtered_leads.filter(enquiry_date__lte=date_to)
+        try:
+            filtered_leads = filtered_leads.filter(
+                enquiry_date__date__lte=date_to
+            )
+        except ValueError:
+            pass
 
-    # Stats
-    total_leads = Lead.objects.count()
-    new_leads = Lead.objects.filter(status=Lead.LeadStatus.NEW).count()
-    followup_leads = Lead.objects.filter(
+    if search:
+        filtered_leads = filtered_leads.filter(
+            Q(name__icontains=search) |
+            Q(email__icontains=search) |
+            Q(phone__icontains=search)
+        )
+
+    # 3️⃣ Stats (ALWAYS from all_leads)
+    total_leads = all_leads.count()
+    new_leads = all_leads.filter(status=Lead.LeadStatus.NEW).count()
+    followup_leads = all_leads.filter(
         status__in=[Lead.LeadStatus.ASSIGNED, Lead.LeadStatus.IDLE]
     ).count()
-    converted_leads = Lead.objects.filter(
+    converted_leads = all_leads.filter(
         status=Lead.LeadStatus.CONVERTED
     ).count()
 
-    courses = Course.objects.all().order_by('name')
-    status_choices = Lead.LeadStatus.choices
-    mode_choices = Lead.ModeChoice.choices
-
     context = {
-        "all_leads": all_leads,
-        "filtered_leads": filtered_leads,
+        # Tables
+        "leads": all_leads,                  # All Leads table
+        "filtered_leads": filtered_leads,    # Filtered section
         "filtered_count": filtered_leads.count(),
-        "courses": courses,
-        "status_choices": status_choices,
-        "mode_choices": mode_choices,
+
+        # Dropdowns
+        "courses": Course.objects.all().order_by('name'),
+        "status_choices": Lead.LeadStatus.choices,
+        "mode_choices": Lead.ModeChoice.choices,
+
+        # Stats
+        "total_leads": total_leads,
         "new_leads_count": new_leads,
         "followup_leads_count": followup_leads,
         "converted_leads_count": converted_leads,
-        "total_leads": total_leads,
     }
 
     return render(request, 'bdm/leads/leads.html', context)
-
 
 
 def lead_details(request, lead_id):
@@ -695,6 +727,8 @@ def create_lead(request):
             mode=request.POST.get('mode'),
             notes=request.POST.get('notes', '')
         )
+        messages.success(request, "Lead created successfully ✅")
+
     return redirect('bdm:leads')
 
 
@@ -704,7 +738,310 @@ def assign_lead(request):
         lead.assigned_to_id = request.POST.get('assigned_to')
         lead.status = Lead.LeadStatus.ASSIGNED
         lead.save()
+        messages.success(request, "Lead assigned successfully 👤")
+    return redirect('bdm:leads')
 
+
+
+# user profile view
+def user_detail(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    trainer_profile = getattr(user, "trainer", None)
+    student_profile = getattr(user, "student", None)
+
+    return render(
+        request,
+        "bdm/user/user_profile.html",
+        {
+            "user_obj": user,
+            "trainer_profile": trainer_profile,
+            "student_profile": student_profile,
+        }
+    )
+
+@login_required
+def student_admin_profile_form(request, user_id):
+    student = get_object_or_404(Student, user__id=user_id)
+
+    # ✅ DO NOT create on GET
+    admin_profile = StudentAdminProfile.objects.filter(
+        student=student
+    ).first()
+
+    is_edit = admin_profile is not None
+
+    if request.method == "POST":
+        form = StudentAdminProfileForm(request.POST, instance=admin_profile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.student = student
+
+            # ✅ Ensure student_code is set ONLY once
+            if not profile.student_code:
+                profile.student_code = f"STU{student.id:05d}"
+
+            profile.save()
+
+            messages.success(
+                request,
+                "Student admin profile updated successfully."
+                if is_edit
+                else "Student admin profile created successfully."
+            )
+            return redirect("bdm:user_profile", user_id)
+    else:
+        form = StudentAdminProfileForm(instance=admin_profile)
+
+    return render(
+        request,
+        "bdm/student/st_admin_profile_form.html",
+        {
+            "form": form,
+            "student": student,
+            "user_obj": student.user,
+            "is_edit": is_edit,
+        }
+    )
+@login_required
+def trainer_admin_profile_form(request, user_id):
+    trainer = get_object_or_404(Trainer, user__id=user_id)
+
+    admin_profile, created = TrainerAdminProfile.objects.get_or_create(
+        trainer=trainer
+    )
+
+    if request.method == "POST":
+        form = TrainerAdminProfileForm(request.POST, instance=admin_profile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.trainer = trainer   # ✅ IMPORTANT
+            profile.save()
+
+            messages.success(
+                request,
+                "Trainer admin profile created successfully."
+                if created else
+                "Trainer admin profile updated successfully."
+            )
+            return redirect("bdm:user_profile", user_id)
+    else:
+        form = TrainerAdminProfileForm(instance=admin_profile)
+
+    return render(
+        request,
+        "bdm/trainer/tr_admin_profile_form.html",
+        {
+            "form": form,
+            "trainer": trainer,
+            "user_obj": trainer.user,
+            "is_edit": not created,
+        }
+    )
+
+
+
+#batch
+
+def batch_list(request):
+    batch_qs = Batch.objects.select_related('course').order_by('-id')
+
+    active_batches_count = batch_qs.filter(is_active=True).count()
+    inactive_batches_count = batch_qs.filter(is_active=False).count()
+
+    paginator = Paginator(batch_qs, 10)
+    page_number = request.GET.get('page')
+    batches = paginator.get_page(page_number)
+
+    courses = Course.objects.all()
+    
+    # ✅ ADD THESE
+    trainers = Trainer.objects.all()
+    students = Student.objects.filter(batches__isnull=True).distinct()
+    context = {
+        'batches': batches,
+        'courses': courses,
+        'trainers': trainers,   
+        'students': students,
+        'active_batches_count': active_batches_count,
+        'inactive_batches_count': inactive_batches_count,
+    }
+    return render(request, 'bdm/batch/batch_list.html', context)
+
+def batch_detail(request, pk):
+    batch = get_object_or_404(
+        Batch.objects.select_related('course')
+        .prefetch_related('trainers', 'students'),
+        pk=pk
+    )
+
+    return render(request, 'bdm/batch/batch_detail.html', {
+        'batch': batch
+    })
+    
+def toggle_batch_extension(request, pk):
+    if request.method == "POST":
+        batch = get_object_or_404(Batch, pk=pk)
+        batch.requested_extension = not batch.requested_extension
+        batch.save()
+
+    return redirect("bdm:batch_detail", pk=pk)
+
+@login_required
+def batch_create(request):
+
+    if request.method == "POST":
+        try:
+            with transaction.atomic():
+                batch = Batch.objects.create(
+                    name=request.POST.get("name"),
+                    course_id=request.POST.get("course"),
+                    start_date=request.POST.get("start_date"),
+                    expected_finish_date=request.POST.get("expected_finish_date"),
+                    duration_months=request.POST.get("duration_months"),
+                    is_active=request.POST.get("is_active") == "on",
+                    requested_extension=request.POST.get("requested_extension") == "on",
+                )
+
+                # Trainers
+                trainer_ids = request.POST.getlist("trainers")
+                if trainer_ids:
+                    batch.trainers.add(*trainer_ids)
+
+                # Students (only unassigned)
+                student_ids = request.POST.getlist("students")
+                if student_ids:
+                    unassigned_students = Student.objects.filter(
+                        id__in=student_ids,
+                        batches__isnull=True
+                    ).distinct()
+                    batch.students.add(*unassigned_students)
+
+            messages.success(request, "Batch created successfully!")
+            return redirect("bdm:batch_list")
+
+        except Exception as e:
+            messages.error(request, f"Error creating batch: {e}")
+            return redirect("bdm:batch_list")
+
+    # 🔥 THIS PART WAS MISSING (GET request)
+    trainers = Trainer.objects.all()
+    students = Student.objects.filter(batches__isnull=True).distinct()
+    courses = Course.objects.all()
+
+    return render(request, "bdm/batch_create.html", {
+        "trainers": trainers,
+        "students": students,
+        "courses": courses,
+    })
+
+
+#payments
+
+# ================================
+# PAYMENT DASHBOARD
+# ================================
+
+@login_required
+def payments_dashboard(request):
+    payments = FeePayment.objects.select_related("student")
+
+    # ----------------------------
+    # FILTERING
+    # ----------------------------
+
+    payment_type = request.GET.get("type")
+    if payment_type:
+        payments = payments.filter(payment_type=payment_type)
+
+    status = request.GET.get("status")
+    if status:
+        payments = payments.filter(payment_status=status)
+
+    # ----------------------------
+    # SORTING
+    # ----------------------------
+
+    sort = request.GET.get("sort")
+    if sort == "amount_asc":
+        payments = payments.order_by("amount")
+    elif sort == "amount_desc":
+        payments = payments.order_by("-amount")
+    else:
+        payments = payments.order_by("-created_at")
+
+    # ----------------------------
+    # DASHBOARD CARDS DATA
+    # ----------------------------
+
+    all_payments = FeePayment.objects.all()
+
+    completed_count = all_payments.filter(
+        payment_status="completed"
+    ).count()
+
+    pending_count = all_payments.filter(
+        payment_status="pending"
+    ).count()
+
+    installment_count = all_payments.filter(
+        payment_type="installment"
+    ).count()
+
+    total_collected = all_payments.filter(
+    payment_status="completed"
+).aggregate(
+    total=Coalesce(
+        Sum("amount"),
+        Decimal("0.00"),
+        output_field=DecimalField()
+    )
+)["total"]
+
+
+    # ----------------------------
+    # CONTEXT
+    # ----------------------------
+
+    context = {
+        "recent_payments": payments,
+        "completed_count": completed_count,
+        "pending_count": pending_count,
+        "installment_count": installment_count,
+        "total_collected": total_collected,
+    }
+
+    return render(request, "bdm/payments/payments_dashboard.html", context)
+
+@login_required
+def payment_detail(request, pk):
+    payment = get_object_or_404(
+        FeePayment.objects
+        .select_related("student")
+        .prefetch_related("documents"),
+        pk=pk
+    )
+
+    return render(request, "bdm/payments/payment_detail.html", {
+        "payment": payment
+    })
+    
+def course_fee(request):
+
+    full_payments = FeePayment.objects.filter(
+        payment_type='full'
+    ).select_related('student')
+
+    emi_payments = FeePayment.objects.filter(
+        payment_type=FeePayment.PaymentType.INSTALLMENT
+        ).select_related('student')
+
+    context = {
+        'full_payments': full_payments,
+        'emi_payments': emi_payments,
+    }
+
+    return render(request, 'bdm/payments/course_fee.html', context)
     return redirect('bdm:leads')
 
 

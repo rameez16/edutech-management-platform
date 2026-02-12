@@ -1,0 +1,995 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Dashboard - Student Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: #667eea;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .stat-card.total::before {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card.completed::before {
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .stat-card.pending::before {
+            background: linear-gradient(90deg, #f6ad55 0%, #ed8936 100%);
+        }
+
+        .stat-card.collected::before {
+            background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-card.total .stat-icon {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .stat-card.completed .stat-icon {
+            background: rgba(72, 187, 120, 0.1);
+            color: #48bb78;
+        }
+
+        .stat-card.pending .stat-icon {
+            background: rgba(246, 173, 85, 0.1);
+            color: #f6ad55;
+        }
+
+        .stat-card.collected .stat-icon {
+            background: rgba(66, 153, 225, 0.1);
+            color: #4299e1;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-change.positive {
+            color: #48bb78;
+        }
+
+        .stat-change.negative {
+            color: #f56565;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-header h2 {
+            color: #2d3748;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 250px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+
+        .filter-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        /* Table */
+        .payments-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .payments-table thead tr {
+            background: #f7fafc;
+        }
+
+        .payments-table thead th {
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .payments-table thead th:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .payments-table thead th:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .payments-table tbody tr {
+            background: white;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .payments-table tbody tr:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .payments-table tbody td {
+            padding: 20px;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        .payments-table tbody td:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .payments-table tbody td:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .student-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .student-details strong {
+            display: block;
+            font-size: 15px;
+            color: #2d3748;
+            margin-bottom: 3px;
+        }
+
+        .student-details small {
+            color: #718096;
+            font-size: 12px;
+        }
+
+        .amount {
+            font-weight: 600;
+        }
+
+        .paid {
+            color: #48bb78;
+        }
+
+        .due {
+            color: #f6ad55;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.high {
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .progress-fill.medium {
+            background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        .progress-fill.low {
+            background: linear-gradient(90deg, #f6ad55 0%, #ed8936 100%);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.completed {
+            background: rgba(72, 187, 120, 0.1);
+            color: #48bb78;
+        }
+
+        .status-badge.pending {
+            background: rgba(246, 173, 85, 0.1);
+            color: #f6ad55;
+        }
+
+        .status-badge.overdue {
+            background: rgba(245, 101, 101, 0.1);
+            color: #f56565;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .btn-icon.view {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .btn-icon.edit {
+            background: rgba(66, 153, 225, 0.1);
+            color: #4299e1;
+        }
+
+        .btn-icon.download {
+            background: rgba(72, 187, 120, 0.1);
+            color: #48bb78;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 900px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .payment-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .summary-item h4 {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-item p {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .table-controls {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .payments-table {
+                font-size: 12px;
+            }
+
+            .payments-table thead {
+                display: none;
+            }
+
+            .payments-table tbody tr {
+                display: block;
+                margin-bottom: 15px;
+            }
+
+            .payments-table tbody td {
+                display: block;
+                text-align: right;
+                padding: 10px;
+                position: relative;
+                border: none;
+            }
+
+            .payments-table tbody td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                font-weight: 600;
+                color: #718096;
+            }
+        }
+  
+    </style> 
+{% endblock %}
+{% block content %}
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-money-check-alt"></i>
+                Payment Dashboard
+            </h1>
+            <div class="header-actions">
+                <button class="btn-primary">
+                    <a href="{% url 'bdm:course_fee' %}" class="btn-primary" style="text-decoration:none;">
+                    <i class="fas fa-book"></i>
+                    Course Fee Payments
+                    </a>
+                </button>
+                <button class="btn-primary" onclick="addPayment()">
+                    <a href="{% url 'bdm:payments_dashboard' %}?category=admission" class="btn-primary" style="text-decoration:none;">
+                    <i class="fas fa-user-graduate"></i>
+                    Admission Fee Payments
+                    </a>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+<div class="stats-grid">
+
+    <!-- Completed -->
+    <div class="stat-card completed">
+        <div class="stat-header">
+            <div>
+                <div class="stat-title">Payment Completed</div>
+                <div class="stat-value">{{ completed_count }}</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    Verified Payments
+                </div>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending -->
+    <div class="stat-card pending">
+        <div class="stat-header">
+            <div>
+                <div class="stat-title">Pending Payments</div>
+                <div class="stat-value">{{ pending_count }}</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-clock"></i>
+                    Awaiting Verification
+                </div>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMI / Installment -->
+    <div class="stat-card collected">
+        <div class="stat-header">
+            <div>
+                <div class="stat-title">EMI / Installment</div>
+                <div class="stat-value">{{ installment_count }}</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-credit-card"></i>
+                    Installment Payments
+                </div>
+            </div>
+            <div class="stat-icon">
+                <i class="fas fa-credit-card"></i>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+        <!-- Students Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h2>
+                    <i class="fas fa-table"></i>
+                    Recent Payments
+                </h2>
+                <div class="table-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search students..." id="searchInput">
+                    </div>
+                    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap;">
+
+    <select name="type" class="filter-btn">
+    <option value="">All Types</option>
+
+    <option value="booking" {% if request.GET.type == "booking" %}selected{% endif %}>
+        Booking Fee
+    </option>
+
+    <option value="admission" {% if request.GET.type == "admission" %}selected{% endif %}>
+        Admission Fee
+    </option>
+
+    <option value="installment" {% if request.GET.type == "installment" %}selected{% endif %}>
+        EMI / Installment
+    </option>
+
+    <option value="full" {% if request.GET.type == "full" %}selected{% endif %}>
+        Full Payment
+    </option>
+
+    <option value="late_fee" {% if request.GET.type == "late_fee" %}selected{% endif %}>
+        Late Fee
+    </option>
+
+    <option value="other" {% if request.GET.type == "other" %}selected{% endif %}>
+        Other
+    </option>
+</select>
+
+    <select name="status" class="filter-btn">
+        <option value="">All Status</option>
+        <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
+        <option value="verified" {% if request.GET.status == "verified" %}selected{% endif %}>Verified</option>
+    </select>
+
+    <select name="sort" class="filter-btn">
+        <option value="">Newest First</option>
+        <option value="amount_asc" {% if request.GET.sort == "amount_asc" %}selected{% endif %}>Amount Low → High</option>
+        <option value="amount_desc" {% if request.GET.sort == "amount_desc" %}selected{% endif %}>Amount High → Low</option>
+    </select>
+
+    <button type="submit" class="btn-primary">
+        Apply
+    </button>
+
+    <!-- RESET BUTTON -->
+    <a href="{% url 'bdm:payments_dashboard' %}" class="filter-btn">
+        Reset
+    </a>
+
+</form>
+
+
+                </div>
+            </div>
+
+            <table class="payments-table">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Transaction ID</th>
+            <th>Payment Type</th>  
+            <th>Mode of Payment</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for payment in recent_payments %}
+        <tr>
+            <!-- Student -->
+            <td data-label="Student">
+                <div class="student-info">
+                    <div class="student-avatar">
+                        {{ payment.student.full_name|slice:":1" }}
+                    </div>
+                    <div class="student-details">
+                        <strong>{{ payment.student.full_name }}</strong>
+                        <small>ID: {{ payment.student.id }}</small>
+                    </div>
+                </div>
+            </td>
+
+            <!-- Transaction -->
+            <td data-label="Transaction ID">
+                {{ payment.transaction_id }}
+            </td>
+            
+            <!-- Payment Type -->
+            <td data-label="Payment Type">
+            <span class="status-badge">
+                {{ payment.get_payment_type_display }}
+            </span>
+            </td>
+
+            <!-- Mode of Payment -->
+            <td data-label="Mode of Payment">
+                {{ payment.get_payment_method_display }}
+
+                {% if payment.payment_type == "course" %}
+                    <br>
+                    <small>
+                        {{ payment.get_payment_mode_display }}
+                        {% if payment.installment_number %}
+                            ({{ payment.installment_number }}/{{ payment.total_installments }})
+                        {% endif %}
+                    </small>
+                {% endif %}
+            </td>
+
+            <!-- Amount -->
+            <td data-label="Amount" class="amount">
+                ₹ {{ payment.amount }}
+            </td>
+
+            <td data-label="Status">
+                <span class="status-badge {{ payment.payment_status }}">
+                {{ payment.get_payment_status_display }}
+                </span>
+            </td>
+
+            <!-- Action -->
+            <td data-label="Action">
+                <a href="{% url 'bdm:payment_detail' payment.id %}" class="btn-icon view">
+                    <i class="fas fa-eye"></i>
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align:center;padding:30px;">
+                No recent payments found.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-history"></i>
+                    <span id="modalStudentName">Payment History</span>
+                </h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="payment-summary" id="paymentSummary">
+                    <!-- Summary will be populated by JavaScript -->
+                </div>
+
+                <table class="payments-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Installment</th>
+                            <th>Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentHistoryBody">
+                        <!-- Payment history will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+    <script>
+        function openPaymentHistory(studentName, totalFee, paidAmount, pendingAmount, progress) {
+            document.getElementById('modalStudentName').textContent = `Payment History - ${studentName}`;
+            
+            const summaryHTML = `
+                <div class="summary-item">
+                    <h4>Total Fee</h4>
+                    <p>₹ ${totalFee.toLocaleString('en-IN')}</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Paid Amount</h4>
+                    <p class="paid">₹ ${paidAmount.toLocaleString('en-IN')}</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Pending Amount</h4>
+                    <p class="due">₹ ${pendingAmount.toLocaleString('en-IN')}</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Progress</h4>
+                    <p>${progress}%</p>
+                </div>
+            `;
+            document.getElementById('paymentSummary').innerHTML = summaryHTML;
+            
+            // Sample payment history
+            const tbody = document.getElementById("paymentHistoryBody");
+            tbody.innerHTML = `
+                <tr>
+                    <td>15 Dec 2024</td>
+                    <td class="paid amount">₹ 15,000</td>
+                    <td>Registration</td>
+                    <td><i class="fas fa-university"></i> Bank Transfer</td>
+                    <td><span class="status-badge completed">Completed</span></td>
+                    <td>1/3</td>
+                    <td><button class="btn-icon download"><i class="fas fa-file-pdf"></i></button></td>
+                </tr>
+                <tr>
+                    <td>08 Jan 2025</td>
+                    <td class="paid amount">₹ 15,000</td>
+                    <td>Installment</td>
+                    <td><i class="fas fa-credit-card"></i> Card</td>
+                    <td><span class="status-badge completed">Completed</span></td>
+                    <td>2/3</td>
+                    <td><button class="btn-icon download"><i class="fas fa-file-pdf"></i></button></td>
+                </tr>
+                <tr>
+                    <td>08 Feb 2025</td>
+                    <td class="due amount">₹ 15,000</td>
+                    <td>Installment</td>
+                    <td>—</td>
+                    <td><span class="status-badge pending">Pending</span></td>
+                    <td>3/3</td>
+                    <td>—</td>
+                </tr>
+            `;
+            
+            document.getElementById("paymentModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("paymentModal").style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('paymentModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const tableRows = document.querySelectorAll('.table-card .payments-table tbody tr');
+
+            
+            tableRows.forEach(row => {
+                const studentInfo = row.querySelector('.student-details');
+                if (studentInfo) {
+                    const studentName = studentInfo.querySelector('strong').textContent.toLowerCase();
+                    const studentId = studentInfo.querySelector('small').textContent.toLowerCase();
+                    
+                    if (studentName.includes(searchValue) || studentId.includes(searchValue)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
+
+        function exportData() {
+            alert('Exporting payment report...\n\nThis will generate a CSV/Excel file with all payment data.');
+        }
+
+        function addPayment() {
+            alert('Opening add payment form...');
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+
+{% endblock %}
