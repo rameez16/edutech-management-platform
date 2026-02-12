@@ -1,5 +1,9 @@
 from django.db import models
 from django.conf import settings
+from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
+from cloudinary_storage.storage import MediaCloudinaryStorage
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
+from apps.student.models import StudentDocument
 
 # Create your models here.
 
@@ -86,7 +90,7 @@ class Trainer(models.Model):
     # BASIC IDENTITY (Trainer Editable)
     # --------------------------------------------------
     full_name = models.CharField(max_length=150, blank=True)
-    profile_photo = models.ImageField(upload_to="trainers/", null=True, blank=True)
+    profile_photo = models.ImageField(upload_to="trainers/", null=True, blank=True,storage=MediaCloudinaryStorage())
     gender = models.CharField(max_length=1, choices=GenderChoice.choices, blank=True)
 
     email = models.EmailField(blank=True)
@@ -236,7 +240,7 @@ class Student(models.Model):
     # BASIC IDENTITY (Student Editable)
     # --------------------------------------------------
     full_name = models.CharField(max_length=150, blank=True)
-    profile_photo = models.ImageField(upload_to="students/", null=True, blank=True)
+    profile_photo = models.ImageField(upload_to="students/", null=True, blank=True,storage=MediaCloudinaryStorage())
     gender = models.CharField(max_length=1, choices=GenderChoice.choices, blank=True)
 
     email = models.EmailField(blank=True)
@@ -280,6 +284,31 @@ class Student(models.Model):
     # PROFILE STATUS
     # --------------------------------------------------
     profile_completed = models.BooleanField(default=False)
+    
+    
+    
+    def required_documents_queryset(self):
+        return self.documents.filter(
+            document_type__in=REQUIRED_DOCUMENT_TYPES
+        )
+    
+    print(required_documents_queryset)
+
+    def all_required_documents_uploaded(self):
+        return self.required_documents_queryset().count() == len(REQUIRED_DOCUMENT_TYPES)
+
+    def all_required_documents_verified(self):
+        qs = self.required_documents_queryset()
+
+        if qs.count() != len(REQUIRED_DOCUMENT_TYPES):
+            return False
+
+        return not qs.filter(
+            verification_status__in=[
+                StudentDocument.VerificationStatus.PENDING,
+                StudentDocument.VerificationStatus.REJECTED,
+            ]
+        ).exists()
 
     # --------------------------------------------------
     # META
@@ -515,14 +544,14 @@ class PaymentDocument(models.Model):
                                    related_name='documents')
     
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
-    document_file = models.FileField(upload_to='payment_documents/%Y/%m/')
+    document_file = models.FileField(upload_to='payment_documents/%Y/%m/',storage=MediaCloudinaryStorage())
     description = models.TextField(blank=True)
     
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.fee_payment.student.name} - {self.document_type}"
+        return f"{self.fee_payment.student.full_name} - {self.document_type}"
 
 
 class PaymentReminder(models.Model):
@@ -578,7 +607,7 @@ class PaymentReminder(models.Model):
         ordering = ['due_date', '-created_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.reminder_type} - ₹{self.amount_due}"
+        return f"{self.student.full_name} - {self.reminder_type} - ₹{self.amount_due}"
 
 
 class PDCCollection(models.Model):
@@ -620,7 +649,7 @@ class PDCCollection(models.Model):
     bounce_charges = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     
     # Scanned copy
-    cheque_image = models.FileField(upload_to='pdc_cheques/', null=True, blank=True)
+    cheque_image = models.FileField(upload_to='pdc_cheques/', null=True, blank=True,storage=MediaCloudinaryStorage())
     
     remarks = models.TextField(blank=True)
     
@@ -631,7 +660,7 @@ class PDCCollection(models.Model):
         ordering = ['cheque_date']
     
     def __str__(self):
-        return f"{self.student.name} - Cheque {self.cheque_number} - ₹{self.amount}"
+        return f"{self.student.full_name} - Cheque {self.cheque_number} - ₹{self.amount}"
 
 
 class OnboardingChecklist(models.Model):
@@ -677,7 +706,7 @@ class OnboardingChecklist(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.student.name} - Onboarding Progress"
+     return f"Onboarding progress- {self.student.full_name}"
     
     @property
     def completion_percentage(self):
@@ -758,7 +787,7 @@ class StudentIssue(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.issue_type} - {self.status}"
+        return f"{self.student.full_name} - {self.issue_type} - {self.status}"
 
 
 class BatchSchedule(models.Model):

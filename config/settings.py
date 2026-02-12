@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Custom auth (ALWAYS early)
+    # Custom auth 
     'apps.accounts.apps.AccountsConfig',
 
     # Apps that depend on accounts / user
@@ -52,6 +52,9 @@ INSTALLED_APPS = [
 
     # Experimental / testing
     'apps.test_app.apps.TestAppConfig',
+    
+    "cloudinary",
+    "cloudinary_storage",
 ]
 
 MIDDLEWARE = [
@@ -62,6 +65,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    
+    
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -82,7 +88,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -163,7 +169,7 @@ STATICFILES_DIRS = [
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+
 
 
 # Default primary key field type
@@ -185,3 +191,12 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 LOGIN_URL = "/login/"
 LOGOUT_REDIRECT_URL = "/login/"
+
+
+
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": "dxj7z8eqd",
+    "API_KEY": "224736626162712",
+    "API_SECRET": "KQSdgqLQahENIi3q2VCm9Gc8Hsk",
+}

@@ -17,8 +17,11 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
-from .models import Lead, Student, Trainer, Course, Batch, TeleCallerProfile
+from .models import Lead, Student, Trainer, Course, Batch, TeleCallerProfile,OnboardingChecklist
 
+from apps.student.models import StudentDocument,EnrollmentAgreement,StudentIDCard
+
+from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
 
 @login_required
 def dashboard(request):
@@ -244,162 +247,258 @@ def create_trainer_admin_profile(request, user):
             "role": "trainer"
         }
     )   
-    
-def create_student_admin_profile(request, user):
-    student = getattr(user, "student", None)
+ 
 
-    if not student:
-        messages.error(request, "Student profile not found.")
-        return redirect("bdm:user_list")
 
-    if request.method == "POST":
-        form = StudentAdminProfileForm(request.POST)
-
-        if form.is_valid():
-            admin_profile = form.save(commit=False)
-            admin_profile.student = student
-            admin_profile.save()
-
-            messages.success(
-                request,
-                f"Student admin profile created for {student}"
-            )
-            return redirect("user_list")
-
-    else:
-        form = StudentAdminProfileForm()
-
-    return render(
-        request,
-        "bdm/student/student_profile.html",
-        {
-            "form": form,
-            "user": user,
-            "role": "student"
-        }
-    )
-   
-
-# def create_user(request):
-#     if request.method == "POST":
-#         # Get form data
-#         username = request.POST.get("username", "").strip()
-#         email = request.POST.get("email", "").strip()
-#         password = request.POST.get("password")
-#         first_name = request.POST.get("first_name", "").strip()
-#         last_name = request.POST.get("last_name", "").strip()
-#         role = request.POST.get("role")
-        
-#         # Get checkbox values
-#         is_active = request.POST.get("is_active") == "on"
-#         is_staff = request.POST.get("is_staff") == "on"
-#         is_superuser = request.POST.get("is_superuser") == "on"
-        
-#         # Get date joined (optional - defaults to now)
-#         date_joined_str = request.POST.get("date_joined")
-        
-#         # Validation
-#         errors = []
-        
-#         if not username:
-#             errors.append("Username is required")
-#         elif len(username) > 150:
-#             errors.append("Username must be 150 characters or fewer")
-#         elif User.objects.filter(username=username).exists():
-#             errors.append("Username already exists")
-        
-#         if not email:
-#             errors.append("Email address is required")
-#         elif User.objects.filter(email=email).exists():
-#             errors.append("Email address already exists")
-        
-#         if not password:
-#             errors.append("Password is required")
-#         elif len(password) < 8:
-#             errors.append("Password must be at least 8 characters")
-        
-#         if not role:
-#             errors.append("User role is required")
-        
-#         # If there are validation errors, show them and return
-#         if errors:
-#             for error in errors:
-#                 messages.error(request, error)
-#             return render(request, "bdm/user/create_user.html", {
-#                 "form_data": request.POST  # Preserve form data
-#             })
-        
-#         try:
-#             # Create the user
-#             user = User.objects.create_user(
-#                 username=username,
-#                 email=email,
-#                 password=password,
-#                 first_name=first_name,
-#                 last_name=last_name
-#             )
-            
-#             # Set additional fields
-#             user.is_active = is_active
-#             user.is_staff = is_staff
-#             user.is_superuser = is_superuser
-            
-#             # Set date joined if provided
-#             if date_joined_str:
-#                 try:
-#                     # Parse the datetime-local input format
-#                     date_joined = datetime.strptime(date_joined_str, "%Y-%m-%dT%H:%M")
-#                     user.date_joined = timezone.make_aware(date_joined)
-#                 except ValueError:
-#                     pass  # Use default if parsing fails
-            
-#             # Save the user
-#             user.save()
-            
-#             # Handle role assignment (assuming you have a role field or group)
-#             # Option 1: If role is a field on your User model or profile
-#             if hasattr(user, 'role'):
-#                 user.role = role
-#                 user.save()
-            
-#             # Option 2: If using Django groups for roles
-#             from django.contrib.auth.models import Group
-#             try:
-#                 group = Group.objects.get(name__iexact=role)
-#                 user.groups.add(group)
-#             except Group.DoesNotExist:
-#                 pass  # Handle missing group
-            
-#             messages.success(request, f"User '{username}' created successfully")
-#             return redirect("/")  # or wherever you want to redirect
-            
-#         except Exception as e:
-#             messages.error(request, f"Error creating user: {str(e)}")
-#             return render(request, "bdm/user/create_user.html", {
-#                 "form_data": request.POST
-#             })
-    
-#     # GET request - show the form
-#     return render(request, "bdm/user/create_user.html")
-
+# student-onboarding- Ramees
 
 def onboarding_view(request):
     
     return render(request,"bdm/student_onboarding/tab_view.html")
 
-def students_tab(request):
+
+def students_with_uploaded_documents(request):
+   
+    checklists = (
+        OnboardingChecklist.objects
+        .select_related("student")
+        .filter(
+            documents_uploaded=True,
+            documents_verified=False
+        )
+    )
+
+    return render(
+        request,
+        "bdm/student_onboarding/docs_verification/studentList.html",
+        {"checklists": checklists}
+    )
+    
+ 
+def student_document_review(request, student_id):
+    
+    student = get_object_or_404(Student, id=student_id)
+
+    documents = student.documents.filter(
+        document_type__in=REQUIRED_DOCUMENT_TYPES
+    )
+
+    return render(
+        request,
+        "bdm/student_onboarding/docs_verification/studentView.html",
+        {
+            "student": student,
+            "documents": documents,
+        }
+    )    
+    
+    
+    
+def verify_document(request, doc_id):
+    
+    document = get_object_or_404(StudentDocument, id=doc_id)
+    student = document.student
+    checklist = student.onboarding_checklist
+
+    document.verification_status = StudentDocument.VerificationStatus.VERIFIED
+    document.verified_by = request.user
+    document.verified_at = timezone.now()
+    document.save()
+
+    #final check
+    check=student.all_required_documents_verified()
+    print(check)
+    if student.all_required_documents_verified():
+        checklist.documents_verified = True
+        checklist.save()
+        messages.success(
+            request,
+            "All documents verified. Student ready for enrollment letter."
+        )
+
+    return redirect(
+        "bdm:student_document_review",
+        student_id=student.id
+    ) 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST    
+    
+@require_POST
+@csrf_exempt
+def reject_document(request, document_id):
+    try:
+        document = StudentDocument.objects.get(id=document_id)
+        rejection_reason = request.POST.get('rejection_reason', '')
+        notes = request.POST.get('notes', '')
+        
+        # Update document status
+        document.verification_status = 'rejected'
+        document.rejection_reason = rejection_reason
+        document.verified_by = request.user
+        document.verified_at = timezone.now()
+        document.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Document rejected successfully'
+        })
+    except StudentDocument.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Document not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=500)      
+    
+
+
+@login_required
+def enrollment_verification_list(request):
+    agreements = EnrollmentAgreement.objects.filter(
+        is_signed=True,
+        approved_by__isnull=True
+    ).select_related('student')
+    
+    print(agreements)
+
+    return render(
+        request,
+        'bdm/student_onboarding/enrollment-letter/student_list_enrollment.html',
+        {
+            'agreements': agreements
+        }
+    )
+
+
+from .utils import generate_card_number
+
+@login_required
+def approve_enrollment_agreement(request, student_id):
+    agreement = get_object_or_404(
+        EnrollmentAgreement,
+        student__id=student_id
+    )
+
+    checklist = agreement.student.onboarding_checklist
+
+    if not agreement.is_signed:
+        messages.error(request, "Agreement not signed.")
+        return redirect('enrollment_verification_list')
+
+    if request.method == "POST":
+        # ✅ Approve agreement
+        agreement.approved_by = request.user
+        agreement.approval_date = timezone.now()
+        agreement.save()
+
+        # ✅ Update checklist
+        checklist.enrollment_letter_signed = True
+        checklist.enrollment_letter_generated = True
+        checklist.save()
+
+        # ✅ AUTO CREATE ID CARD (if not exists)
+        StudentIDCard.objects.get_or_create(
+            student=agreement.student,
+            defaults={
+                'card_number': generate_card_number(agreement.student),
+                'issue_date': timezone.now().date(),
+                'expiry_date': timezone.now().date() + timedelta(days=200),
+            }
+        )
+
+        messages.success(request, "Agreement approved & ID card generated.")
+        return redirect('bdm:view_student_id_card', student_id=student_id)
+
+    return render(
+        request,
+        "bdm/student_onboarding/enrollment-letter/enrollment-letter-verification.html",
+        {"agreement": agreement}
+    )
+
+
+
+@login_required
+def view_student_id_card(request, student_id):
+    id_card = get_object_or_404(
+        StudentIDCard,
+        student__id=student_id
+    )
+
+    if request.method == "POST":
+        if "collect" in request.POST:
+            id_card.is_collected = True
+            id_card.collected_date = timezone.now().date()
+
+        if "lost" in request.POST:
+            id_card.is_lost = True
+            id_card.lost_date = timezone.now().date()
+
+        id_card.save()
+        messages.success(request, "ID card status updated.")
+
+    return render(
+        request,
+        "bdm/student_onboarding/student_id card/id_card.html",
+        {"id_card": id_card}
+    )
+
+
+
+
+
+def docsVerification_tab(request):
     students = Student.objects.all()
     return render(request, "bdm/student_onboarding/students_tab.html", {
         "students": students
     })
     
-def trainers_tab(request):
+def enrollmentLetter_tab(request):
     trainers = Trainer.objects.all()
     return render(request, "bdm/student_onboarding/trainer_tab.html", {
         "trainers": trainers
     })   
     
+
+def id_card_generation_tab(request):
+    trainers = Trainer.objects.all()
+    return render(request, "bdm/student_onboarding/trainer_tab.html", {
+        "trainers": trainers
+    })   
     
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.utils import timezone
+
+from apps.bdm.utils import render_to_pdf    
+    
+    
+def download_enrollment_letter(request):
+    student = request.user.student
+    checklist = student.onboarding_checklist
+
+    # 🔒 SECURITY CHECK
+    if not checklist.documents_verified:
+        return HttpResponseForbidden("Documents not verified yet")
+
+    # Auto-mark generated (first time only)
+    if not checklist.enrollment_letter_generated:
+        checklist.enrollment_letter_generated = True
+        checklist.save()
+
+    context = {
+        "student": student,
+        "date": timezone.now().date(),
+    }
+
+    return render_to_pdf(
+        "bdm/student_onboarding/enrollment-letter/enrollment-letter.html",
+        context,
+        filename="Enrollment_Letter.pdf"
+    )        
     
     
 
@@ -607,3 +706,8 @@ def assign_lead(request):
         lead.save()
 
     return redirect('bdm:leads')
+
+
+
+
+
