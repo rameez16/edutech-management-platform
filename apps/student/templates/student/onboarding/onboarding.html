@@ -132,14 +132,15 @@
                         <!-- COURSE FEE -->
                         <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:5px;">
                             <input type="number"
-                                   id="courseFeeInput"
-                                   name="course_fee_agreed"
-                                   min="0"
-                                   step="0.01"
-                                   placeholder="Enter course fee"
-                                   value="{{ agreement.course_fee_agreed }}"
-                                   data-url="{% url 'student:upload_signed_enrollment_letter' %}" 
-                                   style="width:80%; height:30px; display:inline-block; border-radius:8px; padding-left:5px;">
+                                id="courseFeeInput"
+                                name="course_fee_agreed"
+                                min="0"
+                                step="0.01"
+                                placeholder="Enter agreed course fee"
+                                {% if agreement.course_fee_agreed %}value="{{ agreement.course_fee_agreed }}"{% endif %}
+                                data-url="{% url 'student:upload_signed_enrollment_letter' %}" 
+                                style="width:80%; height:30px; display:inline-block; border-radius:8px; padding-left:5px;">
+
                             <button id="saveCourseFeeBtn"
                                     type="button"
                                     style="width:18%; height:30px;">
