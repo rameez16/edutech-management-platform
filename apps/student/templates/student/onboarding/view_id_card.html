@@ -9,11 +9,12 @@
         </div>
 
         <!-- Student Photo -->
-        {% if id_card.student.photo %}
-            <img src="{{ id_card.student.photo.url }}" alt="Student Photo" class="student-photo">
+        {% if photo %}
+            <img src="{{ photo.document_file.url }}" alt="Student Photo" class="student-photo">
         {% else %}
             <div class="student-photo placeholder">Photo</div>
         {% endif %}
+
 
         <!-- Student Info -->
         <p class="student-name">{{ id_card.student.full_name }}</p>

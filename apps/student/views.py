@@ -6,21 +6,16 @@ from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Sum
 
-
+from .forms import EnrollmentAgreementForm
 
 from decimal import Decimal
 import uuid, os
 
 from apps.accounts.decorators import role_required
 
-from apps.bdm.models import (
-    Student,
-    StudentAdminProfile,
-    Batch,
-    OnboardingChecklist,
-    Course,
+from apps.bdm.models import Student, StudentAdminProfile, Batch, OnboardingChecklist, Course
 
-)
+
 
 from apps.trainer.models import Module, LessonPlan
 
@@ -504,89 +499,124 @@ def upload(request):
         }
     )
 
-
 @role_required("student")
 def onboard(request):
-    student = request.user.student  # get logged-in student's object
+    student = request.user.student
     checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
 
-    # Step 1: Document Upload
+    agreement, _ = EnrollmentAgreement.objects.get_or_create(
+        student=student,
+        defaults={
+            "agreement_number": f"AGR-{student.id}",
+            "agreement_date": timezone.now().date(),
+            "course_fee_agreed": 0,
+        }
+    )
+
+    form = EnrollmentAgreementForm(instance=agreement)
+
+    # GET CHOICES PROPERLY
+    payment_plan_choices = form.fields["payment_plan"].choices
+
+    # Step logic
     completed_steps = 0
     if checklist.documents_verified:
         completed_steps += 1
 
-    # Step 2: Enrollment Letter
     enrollment_generated = checklist.enrollment_letter_generated
     enrollment_signed = checklist.enrollment_letter_signed
     if enrollment_signed:
-        completed_steps += 1  # Only count as completed if signed
+        completed_steps += 1
 
-    # Step 3: ID Card
     if getattr(checklist, "id_card_issued", False):
         completed_steps += 1
 
-    # Calculate progress percentage
     progress_percentage = (completed_steps / 3) * 100
 
-    # Pass context to template
     context = {
         "completed_steps": completed_steps,
         "progress_percentage": progress_percentage,
         "all_docs_verified": checklist.documents_verified,
         "enrollment_generated": enrollment_generated,
         "enrollment_signed": enrollment_signed,
+        "agreement": agreement,
         "checklist": checklist,
-        
+        "form": form,
+        "payment_plan_choices": payment_plan_choices,
     }
 
     return render(request, "student/onboarding/onboarding.html", context)
 
 
 
+
 @role_required("student")
-@require_POST
 def upload_signed_enrollment_letter(request):
-    checklist = request.user.student.onboarding_checklist
+    if request.method != "POST":
+        return JsonResponse({"success": False}, status=400)
 
-    if not checklist.enrollment_letter_generated:
-        return JsonResponse(
-            {"success": False, "message": "Enrollment letter not generated yet."},
-            status=400
-        )
+    student = request.user.student
+    checklist = student.onboarding_checklist
 
-    signed_file = request.FILES.get("signed_letter")
-    if not signed_file:
-        return JsonResponse(
-            {"success": False, "message": "No file selected."},
-            status=400
-        )
-
-    # Get or create agreement
     agreement, _ = EnrollmentAgreement.objects.get_or_create(
-        student=request.user.student,
-        defaults={
-            "agreement_number": f"AGR-{request.user.student.id}",
-            "agreement_date": timezone.now().date(),
-            "course_fee_agreed": 0,
-            "payment_plan": "full",
-        }
+        student=student,
+        defaults={"course_fee_agreed": 0}
     )
+    # -----------------------------
+    # 0️⃣ COURSE FEE SAVE
+    # -----------------------------
+    # -----------------------------
+# 0️⃣ COURSE FEE SAVE
+# -----------------------------
+    course_fee = request.POST.get("course_fee_agreed")
+    if course_fee:
+        try:
+            agreement.course_fee_agreed = float(course_fee)
+            agreement.save(update_fields=["course_fee_agreed"])
+            return JsonResponse({"success": True, "type": "course_fee_saved"})
+        except ValueError:
+            return JsonResponse({"success": False, "message": "Invalid fee value"})
 
-    # Save file
-    agreement.agreement_file.save(signed_file.name, signed_file)
-    agreement.is_signed = True
-    agreement.signed_at = timezone.now()
-    agreement.signature_ip = request.META.get("REMOTE_ADDR")
-    agreement.save()
 
-    # Update checklist
-    checklist.enrollment_letter_signed = True
-    checklist.save()
-    
-    return JsonResponse(
-        {"success": True, "message": "Signed enrollment letter uploaded successfully."}
-    )
+    # -----------------------------
+    # 1️⃣ PAYMENT PLAN SAVE
+    # -----------------------------
+    payment_plan = request.POST.get("payment_plan")
 
+    if payment_plan:
+        agreement.payment_plan = payment_plan
+        agreement.save(update_fields=["payment_plan"])
+
+        checklist.payment_plan_created = True
+        checklist.save(update_fields=["payment_plan_created"])
+
+        return JsonResponse({
+            "success": True,
+            "type": "payment_saved"
+        })
+
+    # -----------------------------
+    # 2️⃣ SIGNED LETTER UPLOAD
+    # -----------------------------
+    signed_file = request.FILES.get("signed_letter")
+
+    if signed_file:
+        agreement.agreement_file = signed_file
+        agreement.is_signed = True
+        agreement.signed_at = timezone.now()
+        agreement.signature_ip = request.META.get("REMOTE_ADDR")
+
+        agreement.save()
+
+        checklist.enrollment_letter_signed = True
+        checklist.save(update_fields=["enrollment_letter_signed"])
+
+        return JsonResponse({
+            "success": True,
+            "type": "file_uploaded"
+        })
+
+    return JsonResponse({"success": False}, status=400)
 
 
 @role_required("student")
@@ -614,13 +644,6 @@ def download_id_card(request):
         return redirect("student:onboarding")
 
 
-def lessonplan(request):
-    """Simple dashboard"""
-    
-    return render(request, 'student/lessonplan/lessonplan.html')
-    
-
-
 
 @role_required("student")
 def lessonplan(request):
@@ -629,7 +652,7 @@ def lessonplan(request):
     # Get the batch for this student
     batch = student.batches.first()  # Assuming one batch per student
     if not batch:
-        return render(request, 'student/lessoplan/lessonplan.html', {'error': 'No batch assigned yet.'})
+        return render(request, 'student/lessonplan/lessonplan.html', {'error': 'No batch assigned yet.'})
 
     course = batch.course
     course_name = course.name
@@ -651,30 +674,37 @@ def lessonplan(request):
 
 
 
+
 @role_required("student")
 def syllabus(request):
     student = request.user.student
-    batch = student.batches.filter(is_active=True).first()
 
-    if not batch:
-        return render(request, 'student/coursessyllabus/syllabus.html', {
-            'error': 'No active batch assigned yet.'
-        })
+    batch = student.batches.filter(is_active=True).select_related("course").first()
 
-    course = batch.course
-    print("Student:", student)
-    print("Batch:", batch)
-    print("Course:", course)
-    print("Syllabus:", course.syllabus[:100])  # first 100 chars
+    course = None
 
-    context = {
-        'course': course,
-    }
-    return render(request, 'student/coursessyllabus/syllabus.html', context)
+    if batch:
+        course = batch.course
 
+        # 🔥 Remove extra blank lines from tech_stack
+        if course.tech_stack:
+            course.tech_stack = "\n".join(
+                line.strip()
+                for line in course.tech_stack.splitlines()
+                if line.strip()
+            )
 
+        # 🔥 Remove extra blank lines from syllabus
+        if course.syllabus:
+            course.syllabus = "\n".join(
+                line.strip()
+                for line in course.syllabus.splitlines()
+                if line.strip()
+            )
 
-
+    return render(request, "student/coursesyllabus/syllabus.html", {
+        "course": course
+    })
 
 
 
@@ -682,14 +712,27 @@ def syllabus(request):
 @role_required("student")
 def view_id_card(request):
     student = request.user.student
+
+    # Try to get the student's photo document
+    try:
+        photo = student.documents.get(document_type=StudentDocument.DocumentType.PHOTO)
+    except StudentDocument.DoesNotExist:
+        photo = None
+
     try:
         id_card = student.id_card  # may not exist
-        context = {"id_card": id_card, "available": True}
+        context = {
+            "id_card": id_card,
+            "photo": photo,
+            "available": True
+        }
     except student.id_card.RelatedObjectDoesNotExist:
-        context = {"available": False}  # ID card not issued
+        context = {
+            "photo": photo,
+            "available": False
+        }
 
     return render(request, "student/onboarding/view_id_card.html", context)
-
 
 
 
@@ -722,9 +765,14 @@ def download_enrollment_letter(request):
 
 
 
-@role_required("student")
-def syllabus(request):
-    student = request.user.student
+def download_document(request, doc_id):
+    document = get_object_or_404(StudentDocument, id=doc_id)
 
-   
-    return render(request, 'student/coursesyllabus/syllabus.html')
+    if not document.document_file:
+        raise Http404("File not found.")
+
+    return FileResponse(
+        document.document_file.open('rb'),
+        as_attachment=True,
+        filename=os.path.basename(document.document_file.name)
+    )

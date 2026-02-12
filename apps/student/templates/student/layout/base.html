@@ -11,6 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'student/css/templatemo-daynight-style.css' %}">
     <link rel="stylesheet" href="{% static 'student/css/custom.css' %}">
+    
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/bootstrap.min.css"/>
+
+
 
 
 
@@ -36,8 +41,8 @@ https://templatemo.com/tm-607-glass-admin
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="logo">S</div>
-                <span class="logo-text">Student</span>
+                <div class="logo">{{ student.full_name|first }}</div>
+                <span class="logo-text">{{ student.full_name}}</span>
             </div>
 
             <ul class="nav-menu">
@@ -254,5 +259,6 @@ https://templatemo.com/tm-607-glass-admin
     </body>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'student/js/custom.js' %}"></script>
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
 
 </html>

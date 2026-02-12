@@ -46,7 +46,14 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 100px;       /* adjust height as needed */
+    overflow-y: auto;        /* vertical scroll if content exceeds height */
+    padding-right: 8px;      /* optional: prevent scrollbar from overlapping content */
 }
+
+
+
+
 
 /* Common notification box */
 .announcement-item {
@@ -233,7 +240,11 @@
                 {% if checklist %}
                     {% if checklist.enrollment_letter_generated and not checklist.enrollment_letter_signed %}
                         <div class="announcement-item info">
-                            ✉ Enrollment letter generated. Please download, sign, and upload it to complete the next step.
+                            ✉ Enrollment letter generated. Please complete following steps.
+                        </div>
+                    {% elif completed_steps == 2 and checklist.id_card_generated %}
+                        <div class="announcement-item success" style="padding-top:10px">
+                          ✔ Your student ID card has been generated. Please wait until issued.
                         </div>
                     {% elif completed_steps == 3 and checklist.id_card_issued %}
                         <div class="announcement-item success" style="padding-top:10px">

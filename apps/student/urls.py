@@ -29,10 +29,12 @@ urlpatterns = [ path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path("download-id-card/",views.download_id_card,name="id_card_download"),
                 path('onboarding/id-card/',views.view_id_card, name='view_id_card'),
                 path('stud_syllabus/',views.syllabus,name='stud_syllabus'),
-
+                
 
 
                 #only for checking logic delete later for merge
                 path("download-enrollment-letter/",views.download_enrollment_letter,name="download_enrollment_letter"),
+                path('download_document/<int:doc_id>/', views.download_document, name='download_document'),
+
 
                ]

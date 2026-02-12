@@ -8,33 +8,46 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- No extra JS needed since syllabus is fully visible -->
+<script src="{% static 'student/js/syllabus.js' %}"></script>
 {% endblock %}
+
 
 {% block content %}
 <div class="syllabus-container">
+
+
 
     <div class="syllabus-header">
         <h2>{{ course.name }}</h2>
         <p>{{ course.description }}</p>
         <p><strong>Duration:</strong> {{ course.duration }}</p>
-        <p><strong>Course Fee:</strong> ${{ course.course_fee }}</p>
+        <p><strong>Course Fee:</strong> {{ course.course_fee }}</p>
 
-        <div>
-            {% for tech in course.tech_stack_list %}
-                <span class="syllabus-tech-badge">{{ tech }}</span>
-            {% endfor %}
+        <div class="tech-stack-box">
+            {{ course.tech_stack|linebreaksbr }}
         </div>
+
     </div>
 
     <div class="syllabus-card">
-        <div class="syllabus-card-header">
-            <h4>Complete Syllabus</h4>
-        </div>
-        <div class="syllabus-content">
-            <p>{{ course.syllabus|linebreaks }}</p>
-        </div>
+
+    <div class="syllabus-card-header" id="moduleToggle">
+        <h4>Course Syllabus </h4>
+        <span class="arrow-icon" id="arrowIcon">&#9662;</span>
     </div>
+
+    <div class="syllabus-content" id="moduleContent">
+        {% if course.syllabus %}
+            {{ course.syllabus|linebreaks }}
+        {% else %}
+            <p>No syllabus content available for this course.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+
+
 
 </div>
 

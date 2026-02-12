@@ -161,6 +161,9 @@
                                     <a href="{{ docs.aadhaar.document_file.url }}"
                                        target="_blank"
                                        class="upload-btn view">View</a>
+                                    <a href="{% url 'student:download_document' docs.aadhaar.id %}" class="upload-btn download">Download</a>
+
+
                                 {% elif docs.aadhaar and docs.aadhaar.verification_status == 'pending' %}
                                     <span class="upload-btn disabled">Upload</span>
                                 {% else %}
