@@ -3,7 +3,10 @@
 {% block tab_content %}
 
 <div class="glass-card">
-    <h4 class="card-title">Students List</h4>
+    <h4 class="card-title">
+        Students ({{ batch.total_students }})
+    </h4>
+
     <div class="table-wrapper">
         <table class="data-table students-table">
             <thead>
@@ -11,30 +14,43 @@
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Status</th>
-                    <th class="text-center">Actions</th>
+                    <th class="text-center">Action</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for student in students %}
                 <tr>
-                    <td>{{ student.name }}</td>
-                    <td>{{ student.phone }}</td>
+                    <td>{{ student.full_name|default:student.user.username }}</td>
+
+                    <td>{{ student.phone|default:"—" }}</td>
+
                     <td>
-                        <span class="status-badge {% if student.status == 'Active' %}active{% else %}inactive{% endif %}">
-                            {{ student.status }}
-                        </span>
+                        {% if batch.is_active %}
+                            <span class="status-badge active">Active</span>
+                        {% else %}
+                            <span class="status-badge inactive">Inactive</span>
+                        {% endif %}
                     </td>
+
                     <td class="text-center">
-                        <a href="{% url 'trainer:student-detail' batch_id student.id %}" class="btn btn-sm btn-outline-primary">
+                        <a href="{% url 'trainer:batch-student-details' batch.id student.id %}"
+                           class="btn btn-sm">
                             View
                         </a>
                     </td>
                 </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        No students enrolled in this batch
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
+
         </table>
     </div>
 </div>
-
 
 {% endblock %}

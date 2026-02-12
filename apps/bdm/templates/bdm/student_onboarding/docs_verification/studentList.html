@@ -1,0 +1,371 @@
+<style>
+  .document-verification-container {
+      padding: 20px;
+  }
+  
+  .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+  }
+  
+  .section-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a365d;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+  }
+  
+  .section-title::before {
+      content: "📋";
+      font-size: 20px;
+  }
+  
+  .stats-summary {
+      display: flex;
+      gap: 20px;
+      background: #f0f9ff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: 1px solid #e3f2fd;
+  }
+  
+  .stat-item {
+      text-align: center;
+  }
+  
+  .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2196f3;
+  }
+  
+  .stat-label {
+      font-size: 12px;
+      color: #5a6c7d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+  }
+  
+  .verification-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e3f2fd;
+  }
+  
+  .verification-table thead {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  }
+  
+  .verification-table th {
+      padding: 18px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: #1a365d;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #90caf9;
+      position: relative;
+  }
+  
+  .verification-table th:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background: rgba(33, 150, 243, 0.2);
+  }
+  
+  .verification-table tbody tr {
+      transition: all 0.2s ease;
+      border-bottom: 1px solid #f5f5f5;
+  }
+  
+  .verification-table tbody tr:hover {
+      background-color: #f8fbff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+  }
+  
+  .verification-table td {
+      padding: 16px;
+      color: #4a5568;
+      font-size: 14px;
+      vertical-align: middle;
+  }
+  
+  .student-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+  }
+  
+  .student-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2196f3, #21cbf3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+  }
+  
+  .student-name {
+      font-weight: 500;
+      color: #2d3748;
+  }
+  
+  .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+  }
+  
+  .email, .phone {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+  }
+  
+  .email::before {
+      content: "✉️";
+      font-size: 12px;
+  }
+  
+  .phone::before {
+      content: "📱";
+      font-size: 12px;
+  }
+  
+  .domain-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #e3f2fd;
+      color: #2196f3;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      min-width: 80px;
+  }
+  
+  .doc-status {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+  }
+  
+  .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+      text-align: center;
+      min-width: 100px;
+  }
+  
+  .status-uploaded {
+      background: #e8f5e9;
+      color: #2e7d32;
+  }
+  
+  .status-pending {
+      background: #fff3e0;
+      color: #ef6c00;
+  }
+  
+  .action-btn {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #2196f3, #1976d2);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+  }
+  
+  .action-btn:hover {
+      background: linear-gradient(135deg, #1976d2, #1565c0);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+      text-decoration: none;
+      color: white;
+  }
+  
+  .action-btn::before {
+      content: "👁️";
+      font-size: 12px;
+  }
+  
+  .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #718096;
+  }
+  
+  .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+  }
+  
+  .empty-state h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: #4a5568;
+  }
+  
+  .empty-state p {
+      max-width: 400px;
+      margin: 0 auto;
+      line-height: 1.6;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 1024px) {
+      .verification-table {
+          display: block;
+          overflow-x: auto;
+      }
+      
+      .verification-table th,
+      .verification-table td {
+          white-space: nowrap;
+      }
+  }
+  
+  @media (max-width: 768px) {
+      .table-header {
+          flex-direction: column;
+          align-items: flex-start;
+      }
+      
+      .stats-summary {
+          width: 100%;
+          justify-content: space-around;
+      }
+      
+      .student-info {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+      }
+      
+      .contact-info {
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 12px;
+      }
+  }
+</style>
+
+<div class="document-verification-container">
+  <div class="table-header">
+      <h2 class="section-title">Students – Document Verification</h2>
+      <div class="stats-summary">
+          <div class="stat-item">
+              <div class="stat-value">{{ checklists|length }}</div>
+              <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-item">
+              <div class="stat-value">{{ checklists|length }}</div>
+              <div class="stat-label">Uploaded</div>
+          </div>
+          <div class="stat-item">
+              <div class="stat-value">0</div>
+              <div class="stat-label">Verified</div>
+          </div>
+      </div>
+  </div>
+  
+  {% if checklists %}
+  <table class="verification-table">
+      <thead>
+          <tr>
+              <th>Student</th>
+              <th>Contact Info</th>
+              <th>Preferred Domain</th>
+              <th>Documents Uploaded</th>
+              <th>Documents Verified</th>
+              <th>Action</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for checklist in checklists %}
+          <tr>
+              <td>
+                  <div class="student-info">
+                      <div class="student-avatar">
+                          {{ checklist.student.full_name|first|upper }}
+                      </div>
+                      <div>
+                          <div class="student-name">{{ checklist.student.full_name }}</div>
+                      </div>
+                  </div>
+              </td>
+              <td>
+                  <div class="contact-info">
+                      <div class="email">{{ checklist.student.email }}</div>
+                      <div class="phone">{{ checklist.student.phone|default:"Not provided" }}</div>
+                  </div>
+              </td>
+              <td>
+                  <span class="domain-badge">{{ checklist.student.preferred_domain }}</span>
+              </td>
+              <td>
+                  <div class="doc-status">
+                      <span class="status-badge status-uploaded">
+                          ✅ Uploaded
+                      </span>
+                  </div>
+              </td>
+              <td>
+                  <div class="doc-status">
+                      <span class="status-badge status-pending">
+                          ❌ Pending
+                      </span>
+                  </div>
+              </td>
+              <td>
+                  <a href="{% url 'bdm:student_document_review' checklist.student.id %}" class="action-btn">
+                      Review Documents
+                  </a>
+              </td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+      <div class="empty-icon">📂</div>
+      <h3>No Students Found</h3>
+      <p>There are no students pending document verification at the moment.</p>
+  </div>
+  {% endif %}
+</div>

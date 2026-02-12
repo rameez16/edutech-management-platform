@@ -8,7 +8,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.utils import timezone
-
+from cloudinary_storage.storage import MediaCloudinaryStorage
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 # =============================================
 # FINANCIAL MODELS
@@ -79,12 +80,7 @@ class FeePayment(models.Model):
         ordering = ['-payment_date']
     
     def __str__(self):
-      name = self.student.user.get_full_name()
-      if name:
-        return name
-      return self.student.user.email
-
-
+        return f"{self.student.full_name} - {self.payment_type} - ₹{self.amount}"
     
     @classmethod
     def get_payment_summary(cls, student):
@@ -130,7 +126,7 @@ class StudentDocument(models.Model):
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
     document_file = models.FileField(
         upload_to='student_documents/%Y/%m/',
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])]
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])],storage=RawMediaCloudinaryStorage()
     )
     document_number = models.CharField(max_length=100, blank=True, help_text="Aadhaar/PAN number")
     
@@ -168,7 +164,7 @@ class EnrollmentAgreement(models.Model):
         ('full', 'Full Payment'),
         ('emi', 'EMI'),
         ('pdc', 'PDC'),
-        ('Installment', 'Installment')
+        ('installment', 'Installment')
     ])
     
     # Digital signature
@@ -177,7 +173,7 @@ class EnrollmentAgreement(models.Model):
     signature_ip = models.GenericIPAddressField(null=True, blank=True)
     
     # Agreement file
-    agreement_file = models.FileField(upload_to='enrollment_agreements/', null=True, blank=True)
+    agreement_file = models.FileField(upload_to='enrollment_agreements/', null=True, blank=True,storage=RawMediaCloudinaryStorage())
     
     # Approval
     approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
@@ -186,7 +182,7 @@ class EnrollmentAgreement(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.student.student.name} - {self.agreement_number}"
+        return f"{self.student.full_name} - {self.agreement_number}"
 
 
 class StudentIDCard(models.Model):
@@ -201,7 +197,7 @@ class StudentIDCard(models.Model):
     expiry_date = models.DateField()
     
     # QR code or barcode
-    qr_code = models.ImageField(upload_to='id_cards/qr_codes/', null=True, blank=True)
+    qr_code = models.ImageField(upload_to='id_cards/qr_codes/', null=True, blank=True,storage=MediaCloudinaryStorage())
     
     # Status
     is_active = models.BooleanField(default=True)
@@ -215,7 +211,7 @@ class StudentIDCard(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.student.name} - {self.card_number}"
+        return f"{self.student.full_name} - {self.card_number}"
 
 
 # =============================================
@@ -248,7 +244,7 @@ class LeaveApplication(models.Model):
     
     # Supporting documents
     supporting_document = models.FileField(upload_to='leave_documents/', null=True, blank=True,
-                                          help_text="Medical certificate, etc.")
+                                          help_text="Medical certificate, etc.",storage=RawMediaCloudinaryStorage())
     
     # Approval
     status = models.CharField(max_length=15, choices=LeaveStatus.choices, default=LeaveStatus.PENDING)
@@ -264,7 +260,7 @@ class LeaveApplication(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.leave_type} - {self.from_date} to {self.to_date}"
+        return f"{self.student.full_name} - {self.leave_type} - {self.from_date} to {self.to_date}"
     
     def save(self, *args, **kwargs):
         # Calculate total days
@@ -325,7 +321,7 @@ class StudentFeedback(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.student.name if not self.is_anonymous else 'Anonymous'} - {self.feedback_type} - {self.overall_rating}★"
+        return f"{self.student.full_name if not self.is_anonymous else 'Anonymous'} - {self.feedback_type} - {self.overall_rating}★"
 
 
 # =============================================
@@ -368,7 +364,7 @@ class CertificationRequest(models.Model):
         ordering = ['-form_submitted_at']
     
     def __str__(self):
-        return f"{self.student.name} - Certification Request"
+        return f"{self.student.full_name} - Certification Request"
 
 
 # =============================================
@@ -393,7 +389,7 @@ class PlacementProfile(models.Model):
     consent_date = models.DateField(null=True, blank=True)
     
     # Profile details
-    resume = models.FileField(upload_to='placement/resumes/')
+    resume = models.FileField(upload_to='placement/resumes/',storage=RawMediaCloudinaryStorage())
     current_ctc = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
                                      help_text="Current CTC in lakhs")
     expected_ctc = models.DecimalField(max_digits=10, decimal_places=2, 
@@ -426,7 +422,7 @@ class PlacementProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.student.name} - Placement Profile"
+        return f"{self.student.full_name} - Placement Profile"
 
 
 class PlacementDrive(models.Model):
@@ -501,7 +497,7 @@ class PlacementApplication(models.Model):
     
     # Application
     applied_at = models.DateTimeField(auto_now_add=True)
-    resume_submitted = models.FileField(upload_to='placement/applications/')
+    resume_submitted = models.FileField(upload_to='placement/applications/',storage=RawMediaCloudinaryStorage())
     cover_letter = models.TextField(blank=True)
     
     # Status tracking
@@ -515,7 +511,7 @@ class PlacementApplication(models.Model):
     interview_feedback = models.TextField(blank=True)
     
     # Offer details
-    offer_letter = models.FileField(upload_to='placement/offers/', null=True, blank=True)
+    offer_letter = models.FileField(upload_to='placement/offers/', null=True, blank=True,storage=RawMediaCloudinaryStorage())
     offered_ctc = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     joining_date = models.DateField(null=True, blank=True)
     
@@ -529,7 +525,7 @@ class PlacementApplication(models.Model):
         ordering = ['-applied_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.placement_drive.company_name} - {self.status}"
+        return f"{self.student.full_name} - {self.placement_drive.company_name} - {self.status}"
 
 
 # =============================================
@@ -558,7 +554,7 @@ class LMSAccess(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.student.name} - LMS Access"
+        return f"{self.student.full_name} - LMS Access"
 
 
 class BookIssue(models.Model):
@@ -603,7 +599,7 @@ class BookIssue(models.Model):
         ordering = ['-issue_date']
     
     def __str__(self):
-        return f"{self.student.name} - {self.book_title} - {self.status}"
+        return f"{self.student.full_name} - {self.book_title} - {self.status}"
     
     @property
     def is_overdue(self):

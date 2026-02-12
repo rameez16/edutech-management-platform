@@ -2,6 +2,97 @@
 {% load static %}
 
 {% block title %}Student Dashboard{% endblock %}
+{% block extra_css %}
+<style>
+    /* Profile Card Custom Styles */
+    .profile-card .stat-value {
+        font-size: 20px; /* Bigger name */
+        font-weight: 600;
+        color: #111; /* You can adjust */
+    }
+
+    .profile-card .stat-change {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .profile-card .stat-change.positive {
+        color: green; /* Active Student */
+    }
+
+    .profile-card .stat-change.inactive {
+        color: red; /* Inactive Student */
+        background-color: rgba(255, 0, 0, 0.1); /* light red bg */
+    }
+
+    
+    /* Center everything inside profile card */
+    .profile-card .stat-card-inner {
+        display: flex;
+        align-items: center;        /* vertical center */
+        justify-content: center;    /* horizontal center */
+        gap: 16px;
+        
+        
+    }
+
+    /* Center text block */
+    .profile-card .stat-info {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .announcement-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 100px;       /* adjust height as needed */
+    overflow-y: auto;        /* vertical scroll if content exceeds height */
+    padding-right: 8px;      /* optional: prevent scrollbar from overlapping content */
+}
+
+
+
+
+
+/* Common notification box */
+.announcement-item {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 500;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+}
+
+.announcement-item:hover {
+    transform: translateY(-2px);
+}
+
+/* Status colors */
+.announcement-item.warning {
+    background: #fff4e5;
+    color: #a15c00;
+    border-left: 4px solid #ff9800;
+}
+
+.announcement-item.success {
+    background: #e8f7ee;
+    color: #1b7a46;
+    border-left: 4px solid #22c55e;
+}
+
+.announcement-item.info {
+    background: #eef5ff;
+    color: #1e4ed8;
+    border-left: 4px solid #3b82f6;
+}
+
+
+
+</style>
+{% endblock %}
 
 {% block content %}
 
@@ -35,6 +126,20 @@
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                         </svg>
                     </button>
+                    <div style="margin-left:14px; display:flex; align-items:center;">
+    {% if profile_photo and all_docs_verified %}
+        <img src="{{ profile_photo.document_file.url }}"
+             alt="Profile"
+             style="width:60px;height:60px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid rgba(255,255,255,0.3);">
+    {% else %}
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#06b6d4);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            {{ student.full_name|first }}
+        </div>
+    {% endif %}
+</div>
+
+
+
                 </div>
             </nav>
             
@@ -42,25 +147,36 @@
    <!-- TOP STATS GRID (ALL CARDS IN ONE ROW) -->
 <section class="stats-grid">
 
-    <!-- Student Profile Card -->
+   <!-- Student Profile Card -->
 <div class="glass-card glass-card-3d stat-card profile-card">
     <div class="stat-card-inner">
 
         <div class="stat-info">
-            <div class="stat-value">John Doe</div>
-            <h3>Student ID: STU12345</h3>
-            <span class="stat-change positive">Active Student</span>
+            <div class="stat-value">{{ student.full_name }}</div>
+
+            <h3>
+                Student ID:
+                {% if admin_profile %}
+                    {{ admin_profile.student_code }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </h3>
+
+            <span class="stat-change {% if user.is_active %}positive{% else %}inactive{% endif %}">
+                {% if user.is_active %}
+                    Active Student
+                {% else %}
+                    Inactive
+                {% endif %}
+            </span>
         </div>
 
-        <div class="stat-icon cyan">
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--emerald-light)" stroke-width="2">
-                <circle cx="12" cy="7" r="4"/>
-                <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
-            </svg>
-        </div>
+        
 
     </div>
 </div>
+
 
 
 
@@ -102,24 +218,48 @@
             </div>
         </div>
 
-    <!-- Announcements Card -->
-    <div class="glass-card glass-card-3d stat-card">
-        <div class="stat-card-inner">
-            <div class="stat-info">
-                <h3>Announcements</h3>
-                <div class="announcement-mini">
-                    <p class="announcement danger">
-                        ❗ <strong>Class Rescheduled</strong><br>
-                        <span>New time: 3 PM Today</span>
-                    </p>
-                    <p class="announcement warning">
-                        ⚠️ <strong>Payment Overdue</strong><br>
-                        <span>Please clear your dues</span>
-                    </p>
-                </div>
+ <!-- Announcements Card -->
+<div class="glass-card glass-card-3d stat-card">
+    <div class="stat-card-inner">
+        <div class="stat-info">
+            <h3>Notifications</h3>
+            <div class="announcement-mini">
+
+                <!-- 1️⃣ Onboarding Status -->
+                {% if completed_steps < 3 %}
+                    <div class="announcement-item warning">
+                        ⚠ Your onboarding is not complete. Please complete all steps.
+                    </div>
+                {% else %}
+                    <div class="announcement-item success">
+                        ✔ Onboarding process completed!
+                    </div>
+                {% endif %}
+
+                <!-- 2️⃣ Next Actionable Step -->
+                {% if checklist %}
+                    {% if checklist.enrollment_letter_generated and not checklist.enrollment_letter_signed %}
+                        <div class="announcement-item info">
+                            ✉ Enrollment letter generated. Please complete following steps.
+                        </div>
+                    {% elif completed_steps == 2 and checklist.id_card_generated %}
+                        <div class="announcement-item success" style="padding-top:10px">
+                          ✔ Your student ID card has been generated. Please wait until issued.
+                        </div>
+                    {% elif completed_steps == 3 and checklist.id_card_issued %}
+                        <div class="announcement-item success" style="padding-top:10px">
+                          ✔ Your student ID card has been issued. Please download it.
+                        </div>
+                    {% endif %}
+                {% endif %}
+
             </div>
         </div>
     </div>
+</div>
+
+
+
 
 </section>
 

@@ -3,7 +3,7 @@
 {% block content %}
 
 <h2 class="batch-title batch-header">
-    <a href="{% url 'trainer:my_batches' %}">
+    <a href="{% url 'trainer:batches' %}">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M15 18l-6-6 6-6"/>
         </svg>
@@ -13,15 +13,26 @@
 
 
 <div class="batch-tabs">
-    <a href="{% url 'trainer:batch-overview' batch_id %}"
+    <a href="{% url 'trainer:batch-overview' batch.id %}"
        class="batch-tab {% if active_tab == 'overview' %}active{% endif %}">
         Overview
     </a>
 
-    <a href="{% url 'trainer:batch-students' batch_id %}"
+    <a href="{% url 'trainer:batch-students' batch.id %}"
        class="batch-tab {% if active_tab == 'students' %}active{% endif %}">
         Students
     </a>
+
+    <a href="{% url 'trainer:batch-lesson-plan' batch.id %}"
+       class="batch-tab {% if active_tab == 'lesson_plan' %}active{% endif %}">
+        Lesson Plan
+    </a>
+
+    <a href="{% url 'trainer:batch-feedback' batch.id %}"
+       class="batch-tab {% if request.resolver_match.url_name == 'batch-feedback' %}active{% endif %}">
+        Feedback
+    </a>
+
 </div>
 
 

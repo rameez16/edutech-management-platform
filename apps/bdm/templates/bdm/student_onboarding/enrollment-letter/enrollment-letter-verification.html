@@ -1,0 +1,938 @@
+{% extends 'bdm/layout/base.html' %}
+{% load static %}
+{% load tz %}
+
+{% block content %}
+<style>
+    /* Blue Theme Styles */
+    .agreement-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 30px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(30, 136, 229, 0.12);
+    }
+
+    .agreement-header {
+        background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 12px 12px 0 0;
+        margin: -30px -30px 30px -30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .agreement-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle at 70% 20%, rgba(255,255,255,0.1) 0%, transparent 70%);
+    }
+
+    .agreement-header h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .agreement-header h1::before {
+        content: '📝';
+        font-size: 28px;
+    }
+
+    .header-subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-top: 8px;
+        font-weight: 300;
+    }
+
+    .agreement-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .info-card {
+        background: #f8fbff;
+        border: 1px solid #e3f2fd;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(30, 136, 229, 0.1);
+        border-color: #bbdefb;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e3f2fd;
+    }
+
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1565c0;
+        margin: 0;
+    }
+
+    .info-item {
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .info-label {
+        color: #546e7a;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: #0d47a1;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .fee-amount {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e88e5;
+        margin: 5px 0;
+    }
+
+    .plan-badge {
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .plan-badge::before {
+        content: '💰';
+    }
+
+    .status-section {
+        background: #f5faff;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 25px 0;
+        border: 1px solid #e3f2fd;
+    }
+
+    .status-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .status-icon {
+        font-size: 24px;
+    }
+
+    .status-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1565c0;
+        margin: 0;
+    }
+
+    .status-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 15px;
+        border: 1px solid #e3f2fd;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .signed-badge {
+        background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .signed-badge::before {
+        content: '✅';
+    }
+
+    .unsigned-badge {
+        background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .unsigned-badge::before {
+        content: '❌';
+    }
+
+    .document-section {
+        background: #f0f7ff;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 25px 0;
+        text-align: center;
+        border: 2px dashed #bbdefb;
+    }
+
+    .document-btn {
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        color: white;
+        text-decoration: none;
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        border: none;
+        cursor: pointer;
+    }
+
+    .document-btn:hover {
+        background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .document-btn::before {
+        content: '📄';
+        font-size: 18px;
+    }
+
+    /* Approval & Rejection Sections */
+    .decision-section {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-radius: 12px;
+        padding: 30px;
+        margin: 30px 0;
+        border: 2px solid #a5d6a7;
+        text-align: center;
+    }
+
+    .rejection-section {
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        border: 2px solid #ef9a9a;
+    }
+
+    .decision-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .approve-btn {
+        background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+        color: white;
+        border: none;
+        padding: 16px 32px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        flex: 1;
+        min-width: 200px;
+        justify-content: center;
+    }
+
+    .approve-btn:hover {
+        background: linear-gradient(135deg, #43a047 0%, #1b5e20 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .approve-btn::before {
+        content: '✓';
+        font-size: 18px;
+    }
+
+    .reject-btn {
+        background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+        color: white;
+        border: none;
+        padding: 16px 32px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        flex: 1;
+        min-width: 200px;
+        justify-content: center;
+    }
+
+    .reject-btn:hover {
+        background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+    }
+
+    .reject-btn::before {
+        content: '✗';
+        font-size: 18px;
+    }
+
+    .rejection-reason {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #ef9a9a;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 100px;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .rejection-reason:focus {
+        outline: none;
+        border-color: #f44336;
+        box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+    }
+
+    .rejection-reason-label {
+        display: block;
+        text-align: left;
+        margin-bottom: 10px;
+        color: #c62828;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .rejection-reason-label::before {
+        content: '💬';
+        margin-right: 8px;
+    }
+
+    /* Status Badges */
+    .approved-badge {
+        background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        display: inline-block;
+        margin: 10px 0;
+    }
+
+    .rejected-badge {
+        background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        display: inline-block;
+        margin: 10px 0;
+    }
+
+    .approver-info {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 15px;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        text-align: left;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .rejection-info {
+        background: #fff5f5;
+        border-left: 4px solid #f44336;
+    }
+
+    .rejection-reason-display {
+        margin-top: 15px;
+        padding: 15px;
+        background: #ffebee;
+        border-radius: 8px;
+        border-left: 4px solid #f44336;
+    }
+
+    .rejection-reason-display strong {
+        color: #c62828;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #2196f3;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 30px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: #f0f7ff;
+        transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+        background: #e3f2fd;
+        color: #1565c0;
+        text-decoration: none;
+        transform: translateX(-3px);
+    }
+
+    .back-link::before {
+        content: '←';
+    }
+
+    .timestamp {
+        font-size: 13px;
+        color: #78909c;
+        margin-top: 5px;
+    }
+
+    .currency-symbol {
+        font-size: 18px;
+        color: #1e88e5;
+        margin-right: 2px;
+    }
+
+    .status-notes {
+        font-size: 14px;
+        color: #546e7a;
+        margin: 10px 0;
+        line-height: 1.5;
+    }
+
+    /* Modal for Rejection */
+    .rejection-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        color: #c62828;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 20px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+        justify-content: flex-end;
+    }
+
+    .cancel-btn {
+        background: #f5f5f5;
+        color: #666;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .cancel-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .confirm-reject-btn {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .confirm-reject-btn:hover {
+        background: #d32f2f;
+    }
+
+    @media (max-width: 768px) {
+        .agreement-container {
+            padding: 20px;
+            margin: 10px;
+        }
+
+        .agreement-header {
+            padding: 20px;
+            margin: -20px -20px 20px -20px;
+        }
+
+        .agreement-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .approve-btn, .reject-btn {
+            width: 100%;
+            min-width: auto;
+        }
+
+        .modal-content {
+            padding: 20px;
+            margin: 20px;
+        }
+    }
+</style>
+
+<div class="agreement-container">
+    <!-- Header -->
+    <div class="agreement-header">
+        <h1>Enrollment Agreement Review</h1>
+        <div class="header-subtitle">Review and make decision on student enrollment agreement</div>
+    </div>
+
+    <!-- Student Information Grid -->
+    <div class="agreement-grid">
+        <!-- Student Details Card -->
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">👨‍🎓</div>
+                <h3 class="card-title">Student Details</h3>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Full Name</span>
+                <span class="info-value">{{ agreement.student.name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Student ID</span>
+                <span class="info-value">{{ agreement.student.student_id|default:"N/A" }}</span>
+            </div>
+            {% if agreement.student.email %}
+            <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ agreement.student.email }}</span>
+            </div>
+            {% endif %}
+            {% if agreement.student.phone %}
+            <div class="info-item">
+                <span class="info-label">Phone</span>
+                <span class="info-value">{{ agreement.student.phone }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Agreement Details Card -->
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">📋</div>
+                <h3 class="card-title">Agreement Details</h3>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Agreement Number</span>
+                <span class="info-value">{{ agreement.agreement_number }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Agreement Date</span>
+                <span class="info-value">{{ agreement.agreement_date }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Course Fee</span>
+                <span class="info-value fee-amount">
+                    <span class="currency-symbol">₹</span>{{ agreement.course_fee_agreed }}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Payment Plan</span>
+                <span class="info-value">
+                    <span class="plan-badge">{{ agreement.get_payment_plan_display }}</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature Status -->
+    <div class="status-section">
+        <div class="status-header">
+            <span class="status-icon">✍️</span>
+            <h3 class="status-title">Signature Status</h3>
+        </div>
+        <div class="status-card">
+            {% if agreement.is_signed %}
+            <span class="signed-badge">Signed</span>
+            <div>
+                <strong>Signed On:</strong> {{ agreement.signed_at }}
+                {% if agreement.signed_by %}
+                <div class="timestamp">By: {{ agreement.signed_by }}</div>
+                {% endif %}
+            </div>
+            {% else %}
+            <span class="unsigned-badge">Not Signed</span>
+            <div>
+                <strong>Awaiting Signature</strong>
+                <div class="timestamp">The agreement has not been signed yet</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Document Section -->
+    {% if agreement.agreement_file %}
+    <div class="document-section">
+        <h3>📑 Enrollment Agreement Document</h3>
+        <p style="color: #546e7a; margin: 15px 0;">View the complete signed agreement document</p>
+        <a href="{{ agreement.agreement_file.url }}" target="_blank" class="document-btn">
+            View Enrollment Letter
+        </a>
+        <p class="timestamp" style="margin-top: 10px;">Opens in new window</p>
+    </div>
+    {% endif %}
+
+    <!-- Decision Section -->
+    {% if agreement.is_signed and not agreement.approved_by and not agreement.rejected_by %}
+    <div class="decision-section">
+        <h3 style="color: #2e7d32; margin-bottom: 15px;">📋 Make a Decision</h3>
+        <p style="color: #546e7a; margin-bottom: 20px;">
+            Review the agreement and choose to approve or reject it.
+            {% if not agreement.agreement_file %}
+            <span style="color: #f44336; display: block; margin-top: 5px;">
+                ⚠️ No agreement document attached. Consider rejecting or requesting the document.
+            </span>
+            {% endif %}
+        </p>
+        
+        <form method="post" class="decision-form">
+            {% csrf_token %}
+            
+            <!-- Hidden field for action type -->
+            <input type="hidden" name="action" id="action-input" value="">
+            
+            <!-- Rejection Reason (initially hidden) -->
+            <div id="rejection-reason-container" style="display: none;">
+                <label class="rejection-reason-label">
+                    Reason for Rejection (Required)
+                </label>
+                <textarea 
+                    name="rejection_reason" 
+                    id="rejection-reason" 
+                    class="rejection-reason" 
+                    placeholder="Please provide the reason for rejecting this agreement. This will be shared with the student."
+                ></textarea>
+                <p class="timestamp" style="text-align: left; margin-top: 5px;">
+                    This reason will be visible to the student and recorded in the system.
+                </p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" id="approve-action-btn" class="approve-btn">
+                    Approve Agreement
+                </button>
+                <button type="button" id="reject-action-btn" class="reject-btn">
+                    Reject Agreement
+                </button>
+            </div>
+            
+            <!-- Submit button (hidden, triggered by JS) -->
+            <button type="submit" id="submit-btn" style="display: none;"></button>
+        </form>
+        
+        <p class="timestamp" style="margin-top: 15px;">
+            Once decided, the agreement will be marked accordingly and the student will be notified.
+        </p>
+    </div>
+    
+    {% elif agreement.approved_by %}
+    <!-- Already Approved -->
+    <div class="decision-section">
+        <div class="approved-badge">
+            ✅ Agreement Approved
+        </div>
+        <div class="approver-info">
+            <div><strong>Approved By:</strong> {{ agreement.approved_by }}</div>
+            <div><strong>Approval Date:</strong> {{ agreement.approval_date }}</div>
+            {% if agreement.approval_notes %}
+            <div style="margin-top: 10px;">
+                <strong>Notes:</strong> {{ agreement.approval_notes }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% elif agreement.rejected_by %}
+    <!-- Already Rejected -->
+    <div class="decision-section rejection-section">
+        <div class="rejected-badge">
+            ❌ Agreement Rejected
+        </div>
+        <div class="approver-info rejection-info">
+            <div><strong>Rejected By:</strong> {{ agreement.rejected_by }}</div>
+            <div><strong>Rejection Date:</strong> {{ agreement.rejection_date }}</div>
+            
+            {% if agreement.rejection_reason %}
+            <div class="rejection-reason-display">
+                <strong>Reason for Rejection:</strong>
+                {{ agreement.rejection_reason }}
+            </div>
+            {% endif %}
+            
+            {% if agreement.rejection_notes %}
+            <div style="margin-top: 10px;">
+                <strong>Additional Notes:</strong> {{ agreement.rejection_notes }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Option to reconsider if needed -->
+        {% if request.user.has_perm %}
+        <div style="margin-top: 20px; padding: 15px; background: #fff3e0; border-radius: 8px;">
+            <p style="color: #e65100; margin: 0; font-size: 14px;">
+                ⚠️ To reconsider this decision, please contact a system administrator.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% elif not agreement.is_signed %}
+    <!-- Awaiting Signature -->
+    <div class="status-section" style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-color: #ffb74d;">
+        <div class="status-header">
+            <span class="status-icon">⏳</span>
+            <h3 class="status-title" style="color: #e65100;">Awaiting Signature</h3>
+        </div>
+        <p style="color: #e65100; margin: 15px 0;">
+            This agreement cannot be processed until it has been signed by the student.
+            Please wait for the student to sign the agreement before proceeding.
+        </p>
+        <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
+            <p style="margin: 0; color: #546e7a; font-size: 14px;">
+                <strong>Next Steps:</strong> The student needs to sign the agreement before you can approve or reject it.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back Link -->
+    <a href="{% url 'bdm:enrollment_verification_list' %}" class="back-link">
+        Back to Pending Agreements
+    </a>
+</div>
+
+<!-- Rejection Confirmation Modal -->
+<div class="rejection-modal" id="rejectionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span style="font-size: 24px;">⚠️</span>
+            <h3>Confirm Rejection</h3>
+        </div>
+        <p style="color: #666; line-height: 1.6;">
+            Are you sure you want to reject this enrollment agreement?
+            <br><br>
+            <strong>This action will:</strong>
+        </p>
+        <ul style="color: #666; padding-left: 20px; margin: 15px 0;">
+            <li>Mark the agreement as rejected</li>
+            <li>Notify the student about the rejection</li>
+            <li>Require the student to submit a new agreement</li>
+            <li>Record the reason for rejection in the system</li>
+        </ul>
+        <p style="color: #c62828; font-weight: 600;">
+            This action cannot be undone.
+        </p>
+        <div class="modal-actions">
+            <button type="button" class="cancel-btn" onclick="closeRejectionModal()">Cancel</button>
+            <button type="button" class="confirm-reject-btn" onclick="submitRejection()">Yes, Reject Agreement</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const actionInput = document.getElementById('action-input');
+        const rejectionReasonContainer = document.getElementById('rejection-reason-container');
+        const rejectionReason = document.getElementById('rejection-reason');
+        const submitBtn = document.getElementById('submit-btn');
+        const approveBtn = document.getElementById('approve-action-btn');
+        const rejectBtn = document.getElementById('reject-action-btn');
+        const rejectionModal = document.getElementById('rejectionModal');
+        
+        // Approve button click
+        if (approveBtn) {
+            approveBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to approve this enrollment agreement?\n\nThis will mark the agreement as approved and notify the student.')) {
+                    actionInput.value = 'approve';
+                    submitBtn.click();
+                }
+            });
+        }
+        
+        // Reject button click
+        if (rejectBtn) {
+            rejectBtn.addEventListener('click', function() {
+                // Show rejection reason field first
+                rejectionReasonContainer.style.display = 'block';
+                rejectBtn.style.display = 'none';
+                approveBtn.style.display = 'none';
+                
+                // Create new button to proceed with rejection
+                const proceedBtn = document.createElement('button');
+                proceedBtn.type = 'button';
+                proceedBtn.className = 'reject-btn';
+                proceedBtn.innerHTML = 'Proceed with Rejection';
+                proceedBtn.style.marginTop = '20px';
+                
+                proceedBtn.addEventListener('click', function() {
+                    if (!rejectionReason.value.trim()) {
+                        alert('Please provide a reason for rejection.');
+                        rejectionReason.focus();
+                        return;
+                    }
+                    
+                    // Show confirmation modal
+                    rejectionModal.style.display = 'flex';
+                });
+                
+                // Create cancel button
+                const cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'approve-btn';
+                cancelBtn.innerHTML = 'Cancel Rejection';
+                cancelBtn.style.background = 'linear-gradient(135deg, #78909c 0%, #546e7a 100%)';
+                cancelBtn.style.marginTop = '10px';
+                
+                cancelBtn.addEventListener('click', function() {
+                    rejectionReasonContainer.style.display = 'none';
+                    rejectBtn.style.display = 'inline-flex';
+                    approveBtn.style.display = 'inline-flex';
+                    proceedBtn.remove();
+                    cancelBtn.remove();
+                });
+                
+                rejectBtn.parentNode.appendChild(proceedBtn);
+                rejectBtn.parentNode.appendChild(cancelBtn);
+            });
+        }
+        
+        // Add animation to cards
+        const cards = document.querySelectorAll('.info-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    });
+    
+    // Modal functions
+    function closeRejectionModal() {
+        document.getElementById('rejectionModal').style.display = 'none';
+    }
+    
+    function submitRejection() {
+        document.getElementById('action-input').value = 'reject';
+        document.getElementById('submit-btn').click();
+    }
+    
+    // Close modal on outside click
+    window.onclick = function(event) {
+        const modal = document.getElementById('rejectionModal');
+        if (event.target === modal) {
+            closeRejectionModal();
+        }
+    }
+</script>
+
+{% endblock %}

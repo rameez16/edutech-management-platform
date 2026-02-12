@@ -1,0 +1,54 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Course & Syllabus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/syllabus.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/syllabus.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="syllabus-container">
+
+
+
+    <div class="syllabus-header">
+        <h2>{{ course.name }}</h2>
+        <p>{{ course.description }}</p>
+        <p><strong>Duration:</strong> {{ course.duration }}</p>
+        <p><strong>Course Fee:</strong> {{ course.course_fee }}</p>
+
+        <div class="tech-stack-box">
+            {{ course.tech_stack|linebreaksbr }}
+        </div>
+
+    </div>
+
+    <div class="syllabus-card">
+
+    <div class="syllabus-card-header" id="moduleToggle">
+        <h4>Course Syllabus </h4>
+        <span class="arrow-icon" id="arrowIcon">&#9662;</span>
+    </div>
+
+    <div class="syllabus-content" id="moduleContent">
+        {% if course.syllabus %}
+            {{ course.syllabus|linebreaks }}
+        {% else %}
+            <p>No syllabus content available for this course.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+
+
+
+</div>
+
+{% endblock %}
