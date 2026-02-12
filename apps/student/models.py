@@ -80,7 +80,7 @@ class FeePayment(models.Model):
         ordering = ['-payment_date']
     
     def __str__(self):
-        return f"{self.student.name} - {self.payment_type} - ₹{self.amount}"
+        return f"{self.student.full_name} - {self.payment_type} - ₹{self.amount}"
     
     @classmethod
     def get_payment_summary(cls, student):
@@ -164,7 +164,7 @@ class EnrollmentAgreement(models.Model):
         ('full', 'Full Payment'),
         ('emi', 'EMI'),
         ('pdc', 'PDC'),
-        ('loan', 'Education Loan')
+        ('installment', 'Installment')
     ])
     
     # Digital signature
@@ -260,7 +260,7 @@ class LeaveApplication(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.leave_type} - {self.from_date} to {self.to_date}"
+        return f"{self.student.full_name} - {self.leave_type} - {self.from_date} to {self.to_date}"
     
     def save(self, *args, **kwargs):
         # Calculate total days
@@ -321,7 +321,7 @@ class StudentFeedback(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.student.name if not self.is_anonymous else 'Anonymous'} - {self.feedback_type} - {self.overall_rating}★"
+        return f"{self.student.full_name if not self.is_anonymous else 'Anonymous'} - {self.feedback_type} - {self.overall_rating}★"
 
 
 # =============================================
@@ -364,7 +364,7 @@ class CertificationRequest(models.Model):
         ordering = ['-form_submitted_at']
     
     def __str__(self):
-        return f"{self.student.name} - Certification Request"
+        return f"{self.student.full_name} - Certification Request"
 
 
 # =============================================
@@ -422,7 +422,7 @@ class PlacementProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.student.name} - Placement Profile"
+        return f"{self.student.full_name} - Placement Profile"
 
 
 class PlacementDrive(models.Model):
@@ -525,7 +525,7 @@ class PlacementApplication(models.Model):
         ordering = ['-applied_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.placement_drive.company_name} - {self.status}"
+        return f"{self.student.full_name} - {self.placement_drive.company_name} - {self.status}"
 
 
 # =============================================
@@ -554,7 +554,7 @@ class LMSAccess(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.student.name} - LMS Access"
+        return f"{self.student.full_name} - LMS Access"
 
 
 class BookIssue(models.Model):
@@ -599,7 +599,7 @@ class BookIssue(models.Model):
         ordering = ['-issue_date']
     
     def __str__(self):
-        return f"{self.student.name} - {self.book_title} - {self.status}"
+        return f"{self.student.full_name} - {self.book_title} - {self.status}"
     
     @property
     def is_overdue(self):
