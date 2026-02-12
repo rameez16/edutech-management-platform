@@ -79,7 +79,7 @@ class FeePayment(models.Model):
         ordering = ['-payment_date']
     
     def __str__(self):
-        return f"{self.student.full_name} - {self.payment_type} - ₹{self.amount}"
+        return f"{self.student.name} - {self.payment_type} - ₹{self.amount}"
     
     @classmethod
     def get_payment_summary(cls, student):

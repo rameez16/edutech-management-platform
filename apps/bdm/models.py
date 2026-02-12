@@ -522,7 +522,7 @@ class PaymentDocument(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.fee_payment.student.full_name} - {self.document_type}"
+        return f"{self.fee_payment.student.name} - {self.document_type}"
 
 
 class PaymentReminder(models.Model):
@@ -578,7 +578,7 @@ class PaymentReminder(models.Model):
         ordering = ['due_date', '-created_at']
     
     def __str__(self):
-        return f"{self.student.full_name} - {self.reminder_type} - ₹{self.amount_due}"
+        return f"{self.student.name} - {self.reminder_type} - ₹{self.amount_due}"
 
 
 class PDCCollection(models.Model):
