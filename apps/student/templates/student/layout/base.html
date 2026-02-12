@@ -11,6 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'student/css/templatemo-daynight-style.css' %}">
     <link rel="stylesheet" href="{% static 'student/css/custom.css' %}">
+    
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/bootstrap.min.css"/>
+
+
 
 
 
@@ -36,8 +41,8 @@ https://templatemo.com/tm-607-glass-admin
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="logo">S</div>
-                <span class="logo-text">Student</span>
+                <div class="logo">{{ student.full_name|first }}</div>
+                <span class="logo-text">{{ student.full_name}}</span>
             </div>
 
             <ul class="nav-menu">
@@ -65,7 +70,7 @@ https://templatemo.com/tm-607-glass-admin
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="courses.html" class="nav-link">
+                            <a href="{% url 'student:stud_syllabus' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                                     <path d="M4 4v15.5"/>
@@ -87,7 +92,7 @@ https://templatemo.com/tm-607-glass-admin
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="lesson-plan.html" class="nav-link">
+                            <a href="{% url 'student:stud_lessonplan' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z"></path>
                                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z"></path>
@@ -260,5 +265,6 @@ https://templatemo.com/tm-607-glass-admin
     </body>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'student/js/custom.js' %}"></script>
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
 
 </html>

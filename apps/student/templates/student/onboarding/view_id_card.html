@@ -1,0 +1,113 @@
+{% load static %}
+
+<!-- ID Card Content Only -->
+<div class="id-card-wrapper">
+    <div class="id-card">
+        <!-- Card Header / Logo -->
+        <div class="id-card-header">
+            <h3>EDUTECH ID CARD</h3>
+        </div>
+
+        <!-- Student Photo -->
+        {% if photo %}
+            <img src="{{ photo.document_file.url }}" alt="Student Photo" class="student-photo">
+        {% else %}
+            <div class="student-photo placeholder">Photo</div>
+        {% endif %}
+
+
+        <!-- Student Info -->
+        <p class="student-name">{{ id_card.student.full_name }}</p>
+        <p class="card-number">{{ id_card.card_number }}</p>
+        <div class="dates">
+            <p><strong>Issue:</strong> {{ id_card.issue_date }}</p>
+            <p><strong>Expiry:</strong> {{ id_card.expiry_date }}</p>
+        </div>
+
+        <!-- QR Code -->
+        {% if id_card.qr_code %}
+            <img src="{{ id_card.qr_code.url }}" alt="QR Code" class="id-qr">
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Wrapper */
+.id-card-wrapper {
+    display: flex;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card */
+.id-card {
+    width: 350px;
+    background: linear-gradient(135deg, #ffffff, #e0f7fa);
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    padding: 25px 20px;
+    text-align: center;
+    position: relative;
+}
+
+/* Header */
+.id-card-header {
+    background-color: #00796b;
+    color: white;
+    padding: 10px;
+    border-radius: 12px 12px 0 0;
+    margin: -20px -20px 15px -20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Student Photo */
+.student-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 10px auto;
+    border: 3px solid #00796b;
+}
+
+/* Placeholder if no photo */
+.student-photo.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #b2dfdb;
+    color: #004d40;
+    font-weight: 600;
+}
+
+/* Student Name */
+.student-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #004d40;
+    margin-bottom: 5px;
+}
+
+/* Card Number */
+.card-number {
+    font-size: 16px;
+    color: #00796b;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+/* Dates */
+.dates p {
+    margin: 3px 0;
+    font-size: 14px;
+    color: #004d40;
+}
+
+/* QR Code */
+.id-qr {
+    margin-top: 15px;
+    width: 80px;
+    height: 80px;
+}
+</style>

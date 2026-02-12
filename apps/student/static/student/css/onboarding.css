@@ -145,6 +145,8 @@
     cursor: pointer;
 }
 
+
+
 .btn.primary {
     background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
     color: white;
@@ -187,6 +189,174 @@
     font-size: 14px;
     color: var(--text-secondary);
 }
+
+
+/* FORCE View Documents button to blue */
+.step-card .btn.success {
+    background: #2563eb !important;
+    color: #ffffff !important;
+}
+
+.step-card .btn.success:hover {
+    background: #1d4ed8 !important;
+}
+
+
+/* Badge for completed steps */
+.step-card .badge.success {
+    background: rgba(34,197,94,0.15);
+    color: var(--success);
+}
+
+/* Button for View / Download actions */
+.step-card .btn.success {
+    background: #4464ce !important;  /* Blue for view/download */
+    color: #ffffff !important;
+}
+
+.step-card .btn.success:hover {
+    background: #1d4ed8 !important;
+}
+
+/* Progress status colors already handled */
+.status.completed { color: var(--success); }
+.status.pending   { color: var(--warning); }
+.status.locked    { color: var(--text-muted); }
+
+
+
+/* ===============================
+   STEP 2 ENROLLMENT LETTER BUTTONS
+================================= */
+
+
+.step2-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;           /* vertical spacing */
+    width: 100%;          /* full width inside card */
+}
+
+.step2-buttons .btn {
+    width: 100%;          /* full width buttons */
+    padding: 12px 0;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: solid 1px black !important;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+/* Download button (orange) */
+.btn-enroll-download {
+    background-color: #fcb148 !important;  /* lighter orange */
+    color: #000;
+}
+
+.btn-enroll-download:hover {
+    background-color: #da8403 !important;  /* darker hover */
+}
+
+/* Upload button (blue) */
+.btn-enroll-upload {
+    background-color: #22a155 !important;  /* blue */
+    color: #fff !important;
+}
+
+.btn-enroll-upload:hover {
+    background-color: #037233 !important;
+}
+
+/* Disabled button */
+.btn.disabled {
+    background-color: rgba(255,255,255,0.1) !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+
+/* Make link behave like button content */
+.btn-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+    pointer-events: auto;
+}
+
+/* When parent button is disabled, block link clicks */
+button:disabled .btn-link {
+    pointer-events: none;
+}
+
+
+
+/* Fullscreen modal */
+.fullscreen-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* scroll if content too tall */
+    background-color: rgba(0,0,0,0.8);
+}
+
+/* Fullscreen content */
+.modal-content-full {
+    background-color: #fff;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+/* Close button */
+.modal-content-full .close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-content-full .close:hover {
+    color: black;
+}
+
+
+/* ===============================
+   VIEW ID CARD BUTTON - FORCE STYLE
+================================== */
+.step3-card .btn-group-vertical .view-id-btn {
+    background-color: #9072e9 !important; /* green */
+    color: white !important;
+    border: solid 2px black !important;
+    border-radius: 12px !important;
+    padding: 12px 20px !important;
+    width: 100% !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.step3-card .btn-group-vertical .view-id-btn:hover {
+    background-color: #622ab7 !important; /* darker green */
+}
+
 
 
 /* RESPONSIVE */

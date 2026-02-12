@@ -1,0 +1,97 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Lesson Plan{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/lessonplan.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/lessonplan.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="lesson-plan-container">
+
+    <div class="glass-card lesson-plan-header">
+        <h2>Lesson Plan: {{ course_name }}</h2>
+        <p>Click a module to view sessions. Click a session to view its lesson plan.</p>
+    </div>
+
+    <div class="modules-grid">
+        {% for module in modules %}
+        <div class="module-card">
+
+            <!-- MODULE HEADER (clickable) -->
+            <div class="module-header">
+                <h4>Module {{ module.module_number }}: {{ module.title }}</h4>
+                <span class="toggle-icon" style="font-size:13px; line-height:1; display:inline-flex;">▶</span>
+            </div>
+
+            <!-- MODULE CONTENT -->
+            <div class="lesson-plan-content">
+
+                {% for lesson in module.lessons.all %}
+
+                    <!-- SESSION ROW (clickable) -->
+                    <div class="lesson-item">
+                        <strong>Session {{ lesson.session_number }}:</strong>
+                        {{ lesson.topic }}
+                    </div>
+
+                    <!-- SESSION DETAILS -->
+                    <div class="lesson-details">
+
+                        <p>
+                            <strong>Description</strong><br>
+                            {{ lesson.description }}
+                        </p>
+
+                        <p><strong>Subtopics</strong></p>
+                        <ul>
+                            {% for s in lesson.subtopics.splitlines %}
+                                <li>{{ s }}</li>
+                            {% endfor %}
+                        </ul>
+
+                        <p>
+                            <strong>Learning Outcomes</strong><br>
+                            {{ lesson.learning_outcomes }}
+                        </p>
+
+                        <p>
+                            <strong>Estimated Duration:</strong>
+                            {{ lesson.estimated_duration_hours }} hours
+                        </p>
+
+                        {% if lesson.reference_materials %}
+                        <p>
+                            <strong>Reference Materials</strong><br>
+                            {{ lesson.reference_materials }}
+                        </p>
+                        {% endif %}
+
+                        {% if lesson.practice_exercises %}
+                        <p>
+                            <strong>Practice Exercises</strong><br>
+                            {{ lesson.practice_exercises }}
+                        </p>
+                        {% endif %}
+
+                    </div>
+
+                {% empty %}
+                    <div class="lesson-item locked">
+                        No sessions available
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
+
