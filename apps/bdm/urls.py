@@ -26,9 +26,9 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 # path("trainer-admin/create/",views.create_trainer_admin_profile,name="trainer_admin_create" ),
                 
                 path("student_onboarding", views.onboarding_view, name="student_onboarding"),
-                path("dashboard/trainers/", views.trainers_tab, name="document_verification"),
-                path("dashboard/students/", views.students_tab, name="enrollment_letter_generation"),
-                path("dashboard/trainers/", views.trainers_tab, name="id_card_generation"),
+                # path("dashboard/trainers/", views.trainers_tab, name="document_verification"),
+                # path("dashboard/students/", views.students_tab, name="enrollment_letter_generation"),
+                # path("dashboard/trainers/", views.trainers_tab, name="id_card_generation"),
                 
                 path("users/<int:user_id>/", views.user_detail, name="user_profile"),
                 path("users/<int:user_id>/student-admin-profile/",views.student_admin_profile_form,name="student_admin_profile_form"),

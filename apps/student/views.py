@@ -49,48 +49,7 @@ def dashboard(request):
 #one time payment
 @login_required
 def payment(request):
-    student = request.user.student
-    admin_profile = getattr(student, "admin_profile", None)
-    checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
-
-    # Get latest photo document
-    profile_photo = student.documents.filter(
-        document_type=StudentDocument.DocumentType.PHOTO
-    ).order_by('-id').first()
-
-    # Only show if VERIFIED
-    if profile_photo and profile_photo.verification_status != StudentDocument.VerificationStatus.VERIFIED:
-        profile_photo = None
-
-    # Step completion logic (same as onboard)
-    completed_steps = 0
-    if checklist.documents_verified:
-        completed_steps += 1
-
-    enrollment_generated = checklist.enrollment_letter_generated
-    enrollment_signed = checklist.enrollment_letter_signed
-    if enrollment_signed:
-        completed_steps += 1
-
-    if getattr(checklist, "id_card_issued", False):
-        completed_steps += 1
-
-    # Pass context to template
-    context = {
-        "student": student,
-        "admin_profile": admin_profile,
-        "profile_photo": profile_photo,
-        "all_docs_verified": checklist.documents_verified,
-        "user": request.user,
-        "checklist": checklist,
-        "completed_steps": completed_steps,
-        "enrollment_generated": enrollment_generated,
-        "enrollment_signed": enrollment_signed,
-    }
-
-    return render(request, "student/dashboard/dashboard.html", context)
-
-
+   
     student = request.user.student
 
     if student.enrollment_agreement.payment_plan.lower() != "full":
@@ -668,39 +627,12 @@ def QR_pay(request):
 
 def onboard(request):
     
+    
+    
+    
     return render(request, 'student/dashboard/onboarding.html')
 
-    # Temporary access (no login)
-    student = Student.objects.first()
-
-    # Pending installments only
-    installments = FeePayment.objects.filter(
-        student=student,
-        payment_method=FeePayment.PaymentMethod.EMI,   # or INSTALLMENT if you use that
-        payment_status=FeePayment.PaymentStatus.PENDING
-    ).order_by('due_date')
-
-    if not installments.exists():
-        messages.info(request, "No pending installments")
-        return redirect('student:installments')
-
-    # ---------------- SUBMIT PAYMENT ----------------
-    if request.method == "POST":
-        for ins in installments:
-            ins.payment_status = FeePayment.PaymentStatus.COMPLETED
-            ins.payment_date = timezone.now()
-            ins.transaction_id = f"INST-{uuid.uuid4().hex[:10]}"
-            ins.save()
-
-        messages.success(request, "Installment payment submitted successfully")
-        return redirect('student:installments')
-
-    context = {
-        'student': student,
-        'installments': installments,
-    }
-
-    return render(request, 'student/payment/installment_qr.html', context)
+   
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
@@ -1210,3 +1142,37 @@ def download_document(request, doc_id):
         as_attachment=True,
         filename=os.path.basename(document.document_file.name)
     )
+
+
+
+#  # Temporary access (no login)
+#     student = Student.objects.first()
+
+#     # Pending installments only
+#     installments = FeePayment.objects.filter(
+#         student=student,
+#         payment_method=FeePayment.PaymentMethod.EMI,   # or INSTALLMENT if you use that
+#         payment_status=FeePayment.PaymentStatus.PENDING
+#     ).order_by('due_date')
+
+#     if not installments.exists():
+#         messages.info(request, "No pending installments")
+#         return redirect('student:installments')
+
+#     # ---------------- SUBMIT PAYMENT ----------------
+#     if request.method == "POST":
+#         for ins in installments:
+#             ins.payment_status = FeePayment.PaymentStatus.COMPLETED
+#             ins.payment_date = timezone.now()
+#             ins.transaction_id = f"INST-{uuid.uuid4().hex[:10]}"
+#             ins.save()
+
+#         messages.success(request, "Installment payment submitted successfully")
+#         return redirect('student:installments')
+
+#     context = {
+#         'student': student,
+#         'installments': installments,
+#     }
+
+#     return render(request, 'student/payment/installment_qr.html', context)
