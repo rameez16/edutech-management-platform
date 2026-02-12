@@ -1,5 +1,17 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
 
+from apps.trainer.forms import TrainerProfileForm
+
+from apps.bdm.models import Trainer, Batch, Student
+from apps.trainer.models import Module
+from apps.student.models import StudentFeedback
+
+
+
+# dashboard
 def dashboard(request):
     """Dashboard view"""
     context = {
@@ -7,85 +19,210 @@ def dashboard(request):
     }
     return render(request, 'trainer/dashboard/overview.html', context)
 
-def trainer_profile(request):
-    return render(request, "trainer/profile.html")
 
-# Static batches & students data
-BATCHES = {
-    1: {
-        "id": 1,
-        "name": "DS-433",
-        "course": "Data Science",
-        "timing": "7:00 – 8:00 AM",
-        "duration": "60 Days",
-        "start_date": "24/12/2024",
-        "end_date": "24/02/2025",
-        "classes_completed": "15 / 60",
-        "progress": 25,
-        "students": [
-            {"id": 1, "name": "Arun Kumar", "phone": "9876543210", "status": "Active", "email": "arun@gmail.com", "joined_on": "10 Jan 2025"},
-            {"id": 2, "name": "Priya Sharma", "phone": "9123456789", "status": "Active", "email": "priya@gmail.com", "joined_on": "15 Jan 2025"},
-            {"id": 3, "name": "Rahul Verma", "phone": "9012345678", "status": "Inactive", "email": "rahul@gmail.com", "joined_on": "20 Jan 2025"},
-        ]
-    },
-    2: {
-        "id": 2,
-        "name": "WD-221",
-        "course": "Web Development",
-        "timing": "10:00 – 11:30 AM",
-        "duration": "45 Days",
-        "start_date": "10/01/2025",
-        "end_date": "25/02/2025",
-        "classes_completed": "20 / 45",
-        "progress": 45,
-        "students": [
-            {"id": 4, "name": "Ankit Singh", "phone": "9011223344", "status": "Active", "email": "ankit@gmail.com", "joined_on": "11 Jan 2025"},
-            {"id": 5, "name": "Sneha Kapoor", "phone": "9988776655", "status": "Active", "email": "sneha@gmail.com", "joined_on": "13 Jan 2025"},
-            {"id": 6, "name": "Rohan Das", "phone": "9876543211", "status": "Inactive", "email": "rohan@gmail.com", "joined_on": "18 Jan 2025"},
-        ]
-    },
-}
+# my profile 
+@login_required
+def profile_view(request):
+    """Profile view"""
+    # Get trainer instance for logged-in user
+    trainer = get_object_or_404(Trainer, user=request.user)
+    return render(request, "trainer/myprofile/profile_view.html", {"trainer": trainer})
 
+
+@login_required
+def profile_edit(request):
+    """Profile edit"""
+    trainer = get_object_or_404(Trainer, user=request.user)
+
+    if request.method == "POST":
+        form = TrainerProfileForm(request.POST, request.FILES, instance=trainer)
+        if form.is_valid():
+            if form.has_changed():   
+                form.save()
+                messages.success(request, "Profile updated successfully")
+
+            return redirect("trainer:profile")
+
+    else:
+        # If full_name is blank set initial from user object like first name + lastname
+        initial_data = {}
+        if not trainer.full_name:
+            initial_data['full_name'] = request.user.get_full_name()
+
+        form = TrainerProfileForm(instance=trainer, initial=initial_data)
+
+    return render(request, "trainer/myprofile/profile_edit.html", {"form": form, "trainer": trainer})
+
+
+# my batches 
+@login_required
 def my_batches(request):
+    """
+    Display all active batches assigned to the logged-in trainer
+    """
+
+    trainer = Trainer.objects.select_related("user").get(user=request.user)
+
+    batches = (
+        Batch.objects
+        .filter(trainers=trainer, is_active=True)
+        .select_related("course")
+        .prefetch_related("students")
+        .order_by("-start_date")
+    )
+
+    today = timezone.now().date()
+    batch_list = []
+
+    for batch in batches:
+        total_days = (batch.expected_finish_date - batch.start_date).days
+        completed_days = max((today - batch.start_date).days, 0)
+
+        progress = 0
+        if total_days > 0:
+            progress = min(round((completed_days / total_days) * 100), 100)
+            
+        if progress >= 100:
+            status = "Completed"
+        elif today < batch.start_date:
+            status = "Upcoming"
+        else:
+            status = "Ongoing"
+
+        batch_list.append({
+            "id": batch.id,
+            "name": batch.name,
+            "course": batch.course.name,
+            "start_date": batch.start_date,
+            "end_date": batch.expected_finish_date,
+            "duration": f"{batch.duration_months} Months",
+            "classes_completed": completed_days,
+            "total_students": batch.students.count(),
+            "progress": progress,
+            "status": status,
+        })
+
     context = {
-        "batches": BATCHES.values()
+        "batches": batch_list
     }
+
     return render(request, "trainer/mybatches/batchlist.html", context)
 
 
+@login_required
 def batch_overview_view(request, batch_id):
-    batch = BATCHES.get(batch_id)
-    active_students = sum(1 for s in batch["students"] if s["status"] == "Active")
-    inactive_students = sum(1 for s in batch["students"] if s["status"] == "Inactive")
-    
+    """Batch overview with Summary"""
+    trainer = Trainer.objects.get(user=request.user)
+
+    batch = (
+        Batch.objects
+        .select_related("course")
+        .prefetch_related("students")
+        .get(id=batch_id, trainers=trainer)
+    )
+
+    today = timezone.now().date()
+
+    # Progress calculation
+    total_days = (batch.expected_finish_date - batch.start_date).days
+    completed_days = max((today - batch.start_date).days, 0)
+
+    progress = 0
+    if total_days > 0:
+        progress = min(round((completed_days / total_days) * 100), 100)
+
+    # Student stats
+    total_students = batch.students.count()
+    active_students = batch.students.filter(user__is_active=True).count()
+    inactive_students = batch.students.filter(user__is_active=False).count()
+
     context = {
-        "batch_id": batch_id,
         "batch": batch,
+        "progress": progress,
+        "classes_completed": completed_days,
+        "total_students": total_students,
+        "active_students": active_students,
+        "inactive_students": inactive_students,
         "active_tab": "overview",
     }
-    return render(request, "trainer/mybatches/overview.html", context)
 
+    return render(request,"trainer/mybatches/overview.html",context)
 
+@login_required
 def batch_students_view(request, batch_id):
-    batch = BATCHES.get(batch_id)
-    context = {
-        "batch_id": batch_id,
+    """Batch students list"""
+    batch = get_object_or_404(
+        Batch.objects.prefetch_related("students__user"),
+        id=batch_id
+    )
+    students = batch.students.all()
+    
+    context={
         "batch": batch,
-        "students": batch["students"],
+        "students": students,
         "active_tab": "students",
     }
+
     return render(request, "trainer/mybatches/students.html", context)
 
+@login_required
+def student_details_view(request, batch_id, student_id):
+    """Batch each student details"""
+    batch = get_object_or_404(Batch, id=batch_id)
+    student = get_object_or_404(Student, id=student_id, batches=batch)
 
-def student_detail_view(request, batch_id, student_id):
-    batch = BATCHES.get(batch_id)
-    student = next((s for s in batch["students"] if s["id"] == student_id), None)
     context = {
-        "batch_id": batch_id,
+        "batch": batch,
         "student": student,
         "active_tab": "students",
     }
-    return render(request, "trainer/mybatches/student_detail.html", context)
+    return render(request, "trainer/mybatches/student_details.html", context)
+
+
+# lesson plan 
+@login_required
+def batch_lesson_plan(request, batch_id):
+    """Batch lesson plan"""
+    batch = get_object_or_404(
+        Batch.objects.select_related("course"),
+        id=batch_id
+    )
+    modules = (
+        Module.objects
+        .filter(course=batch.course)
+        .prefetch_related('lessons')
+        .order_by('module_number')
+    )
+    context = {
+    'batch': batch,
+    'modules': modules,
+    'active_tab': 'lesson_plan',
+    }
+    
+    return render(request, 'trainer/mybatches/lesson_plan.html', context)
 
 
 
+@login_required
+def batch_feedback_view(request, batch_id):
+    trainer = request.user.trainer
+
+    # Secure batch access
+    batch = get_object_or_404(
+        Batch.objects.filter(trainers=trainer),
+        id=batch_id
+    )
+
+    feedbacks = StudentFeedback.objects.filter(
+        batch=batch,
+        trainer=trainer,
+        feedback_type__in=[
+            StudentFeedback.FeedbackType.TRAINER,
+            StudentFeedback.FeedbackType.BATCH,
+            StudentFeedback.FeedbackType.COURSE,
+        ]
+    ).select_related(
+        "student", "course", "batch"
+    ).order_by("-created_at")
+
+    return render(request,"trainer/mybatches/feedback.html",{"batch": batch,"feedbacks": feedbacks,})

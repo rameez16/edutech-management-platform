@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}GlassAdmin{% endblock %}</title>
+    <title>{% block title %}EduTech{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Fonts -->
@@ -13,7 +13,17 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'trainer/css/templatemo-glass-admin-style.css' %}">
+
+    <!-- Alertify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
+
+<!-- Alertify JS -->
+<script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+
 <body>
 
 <!-- Background Effects -->
@@ -46,5 +56,24 @@
 <button class="mobile-menu-toggle">☰</button>
 
 <script src="{% static 'trainer/js/templatemo-glass-admin-script.js' %}"></script>
+
+{% if messages %}
+<script>
+    {% for message in messages %}
+        alertify.set('notifier','position', 'top-right');
+
+        {% if message.tags == 'success' %}
+            alertify.success("{{ message|escapejs }}");
+        {% elif message.tags == 'error' %}
+            alertify.error("{{ message|escapejs }}");
+        {% elif message.tags == 'warning' %}
+            alertify.warning("{{ message|escapejs }}");
+        {% else %}
+            alertify.message("{{ message|escapejs }}");
+        {% endif %}
+    {% endfor %}
+</script>
+{% endif %}
+
 </body>
 </html>

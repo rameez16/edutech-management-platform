@@ -7,28 +7,48 @@
 {% block content %}
 
 <section class="stats-grid">
+
     {% for batch in batches %}
-    <a href="{% url 'trainer:batch-overview' batch.id %}">
+    <a href="{% url 'trainer:batch-overview' batch.id %}" class="batch-link">
+
         <div class="glass-card batch-card">
-            <h4>Batch ID: {{ batch.name }}</h4>
+
+            <div class="batch-title-bar">
+                <h4>{{ batch.name }}</h4>
+                <span class="batch-status {{ batch.status|lower }}">
+                    {{ batch.status }}
+                </span>
+            </div>
             <ul class="batch-info">
                 <li><strong>Course:</strong> {{ batch.course }}</li>
-                <li><strong>Timing:</strong> {{ batch.timing }}</li>
                 <li><strong>Duration:</strong> {{ batch.duration }}</li>
                 <li><strong>Start Date:</strong> {{ batch.start_date }}</li>
-                <li><strong>Expected End:</strong> {{ batch.end_date }}</li>
+                <li><strong>End Date:</strong> {{ batch.end_date }}</li>
+                <li><strong>Students:</strong> {{ batch.total_students }}</li>
                 <li><strong>Classes:</strong> {{ batch.classes_completed }} Completed</li>
             </ul>
+
             <div class="progress-wrapper">
-                <div class="progress-label">Progress</div>
+                <div class="progress-label">
+                    Progress — {{ batch.progress }}%
+                </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ batch.progress }}%;"></div>
+                    <div
+                        class="progress-fill"
+                        style="width: {{ batch.progress }}%;">
+                    </div>
                 </div>
             </div>
+
         </div>
     </a>
-    {% endfor %}
-</section>
 
+    {% empty %}
+        <div class="glass-card empty-state">
+            <p>No batches assigned yet.</p>
+        </div>
+    {% endfor %}
+
+</section>
 
 {% endblock %}

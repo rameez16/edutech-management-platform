@@ -1,9 +1,15 @@
 {% load static %}
 
 <nav class="navbar">
-    <h1 class="page-title">{% block page_title %}Dashboard Overview{% endblock %}</h1>
+    <h1 class="page-title">{% block page_title %}Dashboard Overview{% endblock %}
+    </h1>
+
+    <div class="navbar-date">
+    {% now "l, d M Y" %}
+</div>
 
     <div class="navbar-right">
+        <!-- Search Box -->
         <div class="search-box">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -12,6 +18,7 @@
             <input type="text" class="search-input" placeholder="Search anything...">
         </div>
 
+        <!-- Notifications -->
         <button class="nav-btn" id="notification-btn" title="Notifications">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -20,6 +27,7 @@
             <span class="notification-dot"></span>
         </button>
 
+        <!-- Theme Toggle -->
         <button class="nav-btn" id="theme-toggle" title="Toggle Theme">
             <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="5"></circle>
@@ -36,5 +44,32 @@
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
         </button>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown">
+            <button class="profile-btn">
+                <div class="profile-avatar-small">
+                    {% if request.user.trainer.profile_photo %}
+                        <img src="{{ request.user.trainer.profile_photo.url }}" alt="{{ request.user.trainer.full_name }}">
+                    {% else %}
+                        {{ request.user.trainer.full_name|slice:":1" }}
+                    {% endif %}
+                </div>
+                <span class="profile-name">{{ request.user.trainer.full_name }}</span>
+                <svg viewBox="0 0 24 24" class="dropdown-icon">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+
+            <div class="dropdown-menu">
+                <a href="{% url 'trainer:profile' %}">Profile</a>
+                <a href="{% url 'trainer:profile-edit' %}">Change Password</a>
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+
     </div>
 </nav>
