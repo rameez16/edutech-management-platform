@@ -322,3 +322,25 @@
     }
 
 })();
+
+document.addEventListener("DOMContentLoaded", function () {
+    const profileDropdown = document.querySelector(".profile-dropdown");
+    if (!profileDropdown) return; // safety check
+    const profileBtn = profileDropdown.querySelector(".profile-btn");
+    if (!profileBtn) return;
+    
+    // Toggle dropdown on click
+    profileBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        profileDropdown.classList.toggle("active");
+    });
+
+    // Close dropdown if clicked outside
+    document.addEventListener("click", function (e) {
+        if (!profileDropdown.contains(e.target)) {
+            profileDropdown.classList.remove("active");
+        }
+    });
+});
+
+

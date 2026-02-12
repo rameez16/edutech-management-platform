@@ -5,6 +5,9 @@ from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
 
+
+from cloudinary_storage.storage import MediaCloudinaryStorage
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 # Import your existing models
 
 
@@ -189,7 +192,7 @@ class SessionMaterial(models.Model):
     
     # File or link
     file = models.FileField(upload_to='session_materials/%Y/%m/', null=True, blank=True,
-                           help_text="Upload files like PDF, PPTX, ZIP, etc.")
+                           help_text="Upload files like PDF, PPTX, ZIP, etc.",storage=RawMediaCloudinaryStorage())
     external_link = models.URLField(blank=True, 
                                    help_text="YouTube, Google Drive, GitHub, etc.")
     
@@ -541,7 +544,7 @@ class Certificate(models.Model):
     issued_by = models.ForeignKey('bdm.Trainer', on_delete=models.SET_NULL, null=True)
     approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='approved_certificates')
-    certificate_file = models.FileField(upload_to='certificates/', null=True, blank=True)
+    certificate_file = models.FileField(upload_to='certificates/', null=True, blank=True,storage=RawMediaCloudinaryStorage())
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -639,7 +642,7 @@ class Task(models.Model):
     # Instructions and resources
     instructions = models.TextField()
     reference_links = models.TextField(blank=True, help_text="URLs or resource links")
-    attachment = models.FileField(upload_to='task_attachments/', null=True, blank=True)
+    attachment = models.FileField(upload_to='task_attachments/', null=True, blank=True,storage=RawMediaCloudinaryStorage())
     
     # Scoring
     total_marks = models.IntegerField(default=10)
@@ -701,7 +704,7 @@ class TaskSubmission(models.Model):
     status = models.CharField(max_length=15, choices=SubmissionStatus.choices, 
                              default=SubmissionStatus.NOT_STARTED)
     submission_text = models.TextField(blank=True)
-    submission_file = models.FileField(upload_to='task_submissions/', null=True, blank=True)
+    submission_file = models.FileField(upload_to='task_submissions/', null=True, blank=True,storage=RawMediaCloudinaryStorage())
     submission_link = models.URLField(blank=True, help_text="GitHub, CodePen, etc.")
     
     # Timestamps

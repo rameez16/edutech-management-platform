@@ -1,0 +1,73 @@
+{% extends "trainer/mybatches/base.html" %}
+
+{% block tab_content %}
+
+<div class="glass-card">
+    <h4 class="card-title">Lesson Plan</h4>
+
+    <div class="modules-accordion">
+    {% for module in modules %}
+    <details class="module-item">
+        <summary class="module-summary">
+            <h5>
+                Module {{ module.module_number }} – {{ module.title }}
+            </h5>
+            <span class="module-phase">
+                {{ module.get_phase_display }}
+            </span>
+        </summary>
+
+        <div class="module-content">
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Session</th>
+                            <th>Topic</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lesson in module.lessons.all %}
+                        <tr>
+                            <td>Session {{ lesson.session_number }}</td>
+                            <td>
+                                <strong>{{ lesson.topic }}</strong><br>
+                                <small>{{ lesson.subtopics }}</small>
+                            </td>
+                            <td class="text-right">
+                                {% if lesson.is_completed %}
+                                    <span class="status-badge completed">Completed</span>
+                                {% else %}
+                                    <form method="post" action="">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-bordered status-btn">
+                                            Mark Complete
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-muted text-center">
+                                No sessions added yet
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </details>
+
+    {% empty %}
+    <div class="empty-state text-center text-muted">
+        <p><strong>No lesson plan added yet</strong></p>
+    </div>
+    {% endfor %}
+</div>
+
+</div>
+
+{% endblock %}
