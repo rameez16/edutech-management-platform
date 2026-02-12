@@ -19,10 +19,6 @@
     <link rel="stylesheet" href="{% static 'student/css/templatemo-daynight-style.css' %}">
     <link rel="stylesheet" href="{% static 'student/css/custom.css' %}">
     
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/bootstrap.min.css"/>
-
-
 
     <!-- ALERTIFY CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css">
@@ -34,75 +30,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body>
 
-<div class="background"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
-
-<div class="dashboard">
-
-<!-- ================= SIDEBAR ================= -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="logo">S</div>
-        <span class="logo-text">Student</span>
-    </div>
-
-    <ul class="nav-menu">
-
-        <li class="nav-section">
-            <span class="nav-section-title">Main Menu</span>
-            <ul>
-
-                <li class="nav-item">
-                    <a href="{% url 'student:stud_dashboard' %}" class="nav-link active">
-                        <i class="fa-solid fa-gauge"></i><span>Dashboard</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{% url 'student:stud_profile' %}" class="nav-link">
-                        <i class="fa-solid fa-user"></i><span>Profile</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="courses.html" class="nav-link">
-                        <i class="fa-solid fa-book-open"></i><span>Course & Syllabus</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="batch-schedule.html" class="nav-link">
-                        <i class="fa-solid fa-calendar-days"></i><span>Batch & Schedule</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="lesson-plan.html" class="nav-link">
-                        <i class="fa-solid fa-clipboard-list"></i><span>Lesson Plan</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{% url 'student:lms_login' %}" class="nav-link">
-                        <i class="fa-solid fa-laptop-code"></i><span>LMS Portal</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="attendance.html" class="nav-link">
-                        <i class="fa-solid fa-calendar-check"></i><span>Attendance Calendar</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="tasks.html" class="nav-link">
-                        <i class="fa-solid fa-list-check"></i><span>Task Portal</span>
-                    </a>
-</head>
 <body>
     <!-- Animated Background -->
     <div class="background"></div>
@@ -174,7 +102,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="lms-portal.html" class="nav-link">
+                            <a href="{% url 'student:lms_login' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
                                     <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
@@ -220,7 +148,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="feedback.html" class="nav-link">
+                            <a href="{% url 'student:stud_feedback' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                                 </svg>
@@ -307,61 +235,6 @@
       
                     </ul>
                 </li>
-
-                <li class="nav-item">
-                    <a href="leave.html" class="nav-link">
-                        <i class="fa-solid fa-envelope-open-text"></i><span>Leave Application</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{% url 'student:stud_feedback' %}" class="nav-link">
-                        <i class="fa-solid fa-comment-dots"></i><span>Feedback</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="announcements.html" class="nav-link">
-                        <i class="fa-solid fa-bullhorn"></i><span>Announcements</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="notifications.html" class="nav-link">
-                        <i class="fa-solid fa-bell"></i><span>Notifications</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="evaluation.html" class="nav-link">
-                        <i class="fa-solid fa-square-poll-vertical"></i><span>Evaluation</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{% url 'student:payment' %}" class="nav-link">
-                        <i class="fa-solid fa-credit-card"></i><span>Payment Portal</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{% url 'student:stud_onboard' %}" class="nav-link">
-                        <i class="fa-solid fa-user-check"></i><span>Complete Onboarding</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="certificate.html" class="nav-link">
-                        <i class="fa-solid fa-certificate"></i><span>Certificate</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="change-password.html" class="nav-link">
-                        <i class="fa-solid fa-key"></i><span>Password Change</span>
-                    </a>
-                </li>
-
             </ul>
         </li>
 
@@ -379,7 +252,6 @@
             </ul>
         </li>
 
-    </ul>
 </aside>
 
 <main class="content">
