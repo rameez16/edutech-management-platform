@@ -181,7 +181,7 @@ class EnrollmentAgreement(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.student.full_name} - {self.agreement_number}"
+        return f"{self.student.name} - {self.agreement_number}"
 
 
 class StudentIDCard(models.Model):
@@ -210,7 +210,7 @@ class StudentIDCard(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.student.full_name} - {self.card_number}"
+        return f"{self.student.name} - {self.card_number}"
 
 
 # =============================================

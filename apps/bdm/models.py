@@ -677,7 +677,7 @@ class OnboardingChecklist(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.student.full_name} - Onboarding Progress"
+        return f"{self.student.name} - Onboarding Progress"
     
     @property
     def completion_percentage(self):
