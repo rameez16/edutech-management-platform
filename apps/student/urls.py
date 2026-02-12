@@ -23,6 +23,8 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('stud_feedback/', views.stud_feedback, name='stud_feedback'),
                path('lms_login/',views.lms_login,name='lms_login'),
                path('lms_dashboard/',views.lms_dashboard,name='lms_dashboard'),
+               path("fees/", views.payment_gateway, name="payment_gateway"),
+
                
                
 ]

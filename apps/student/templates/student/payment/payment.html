@@ -10,11 +10,10 @@
 <div class="page-center">
     <div class="payment-container glass-card">
 
-        <!-- ================= HEADER ================= -->
+        <!-- HEADER -->
         <div class="payment-header">
             <h2>Student Admission & Fee Management</h2>
 
-            <!-- ✅ STUDENT INFO (FIXED) -->
             <div class="student-info">
                 <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
                 <p><strong>Email:</strong> {{ student.user.email }}</p>
@@ -22,96 +21,97 @@
             </div>
         </div>
 
-        <!-- ================= SUMMARY ================= -->
+        <!-- SUMMARY -->
         <div class="fee-summary">
+
             <div class="fee-box">
                 <p>Total Fee</p>
-                <h3>₹{{ total_fee }}</h3>
+                <h3>₹{{ total_fee|floatformat:2 }}</h3>
             </div>
 
             <div class="fee-box">
                 <p>Paid Amount</p>
-                <h3>₹{{ paid_amount }}</h3>
+                <h3>₹{{ paid_amount|floatformat:2 }}</h3>
             </div>
 
             <div class="fee-box highlight">
                 <p>Pending Amount</p>
-                <h3>₹{{ pending_amount }}</h3>
+                <h3>₹{{ pending_amount|floatformat:2 }}</h3>
             </div>
+
         </div>
 
-        <!-- ================= SECTION TITLE ================= -->
-        <h3 class="section-title">One Time Payment</h3>
+        <!-- TITLE -->
+        <h3 class="section-title">
+            One-Time Payment
+        </h3>
 
-        <!-- ================= PAYMENT MODE TABS ================= -->
+        <!-- PAYMENT MODES -->
         <div class="payment-mode-switch">
             <span>Payment Mode:</span>
 
             <div class="mode-tabs">
-                <a href="{% url 'student:admission' %}?mode=admission"
-                   class="mode-btn">
+
+                <a href="{% url 'student:admission' %}" class="mode-btn">
                     Admission Fee
                 </a>
 
-                <a href="{% url 'student:payment' %}?mode=onetime"
-                   class="mode-btn active">
+                <a href="{% url 'student:payment' %}" class="mode-btn active">
                     One-Time Payment
                 </a>
 
-                <a href="{% url 'student:payment' %}?mode=pdc"
-                   class="mode-btn">
-                    PDC
-                </a>
-
-                <a href="{% url 'student:emi' %}?mode=emi"
-                   class="mode-btn">
+                <a href="{% url 'student:emi' %}" class="mode-btn">
                     EMI
                 </a>
 
-                <a href="{% url 'student:installments' student.id %}?mode=installment"
-                   class="mode-btn">
-                    Installment
+                <!-- ✅ FIXED -->
+                <a href="{% url 'student:pdc' %}" class="mode-btn">
+                    PDC
                 </a>
+
+                <a href="{% url 'student:installments' student.id %}" class="mode-btn">
+                    Installments
+                </a>
+
             </div>
         </div>
 
-        <!-- ================= MAIN ROW ================= -->
+        <!-- MAIN -->
         <div class="payment-row">
 
-            <!-- -------- LEFT COLUMN -------- -->
+            <!-- LEFT -->
             <div class="left-column">
                 <div class="fee-summary-box">
                     <h4>Fee Details</h4>
 
                     <div class="fee-row">
-                        <span>Admission Fee</span>
-                        <strong>₹{{ admission_fee.amount|default:"0" }}</strong>
+                        <span>Admission Fee (10%)</span>
+                        <strong>₹{{ admission_fee|floatformat:2 }}</strong>
                     </div>
 
                     <div class="fee-row">
                         <span>Course Fee</span>
-                        <strong>₹{{ course_fee }}</strong>
+                        <strong>₹{{ course_fee|floatformat:2 }}</strong>
                     </div>
 
-                    <div class="fee-row">
+                    <div class="fee-row total">
                         <span>Total Fee</span>
-                        <strong>₹{{ total_fee }}</strong>
+                        <strong>₹{{ total_fee|floatformat:2 }}</strong>
                     </div>
                 </div>
 
-                <a href="{% url 'student:onetime_view' %}" class="status-btn">View Your Status</a>
+                <a href="{% url 'student:onetime_view' %}" class="status-btn">
+                    View Your Status
+                </a>
             </div>
 
-            <!-- -------- RIGHT COLUMN -------- -->
+            <!-- RIGHT -->
             <div class="right-column">
 
-                <!-- QR + RECEIPT -->
                 <form method="POST"
                       enctype="multipart/form-data"
                       class="qr-payment-box">
                     {% csrf_token %}
-
-                    
 
                     <img src="{% static 'student/images/image.png' %}"
                          class="qr-image"
@@ -120,6 +120,7 @@
                     <p>Scan the QR code to pay</p>
 
                     {% if not existing_payment %}
+
                         <label for="receipt" class="upload-btn">
                             Upload Payment Receipt
                         </label>
@@ -135,13 +136,16 @@
                         <button type="submit" class="submit-btn">
                             Submit Payment
                         </button>
-                        <br>
+
                     {% else %}
-                        <p class="payment-status done">Payment Submitted</p>
+
+                        <p class="payment-status done">
+                            ✅ Payment Completed
+                        </p>
+
                     {% endif %}
                 </form>
 
-                <!-- REMINDERS -->
                 <div class="reminder-box">
                     <h4>Reminders</h4>
                     <label><input type="checkbox" checked> Email reminder</label>
@@ -152,7 +156,7 @@
             </div>
         </div>
 
-        <!-- ================= NOTE ================= -->
+        <!-- NOTE -->
         <div class="note">
             <p><strong>Note:</strong> One-time payment only. Non-refundable.</p>
         </div>
@@ -160,7 +164,6 @@
     </div>
 </div>
 
-<!-- ================= FILE NAME PREVIEW ================= -->
 <script>
 document.getElementById("receipt")?.addEventListener("change", function () {
     document.getElementById("file-name").innerText =

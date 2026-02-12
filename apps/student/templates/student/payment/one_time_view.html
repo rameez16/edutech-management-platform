@@ -1,5 +1,6 @@
 {% extends 'student/layout/base.html' %}
 {% load static %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'student/css/onetime_view.css' %}">
 {% endblock %}
@@ -12,35 +13,69 @@
         <h2>Fee Payment & Admission</h2>
         <p class="subtitle">One-Time Payment Summary</p>
 
-        <p><strong>Student ID:</strong> {{ student.id }}</p>
-        <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
-        <p><strong>Email:</strong> {{ student.user.email }}</p>
+        <div class="summary-row">
+            <span class="label">Student ID:</span>
+            <span class="value">{{ student.id }}</span>
+        </div>
 
-        <p>
-            <strong>Payment Mode:</strong>
-            <span class="pill">One Time Payment</span>
-        </p>
+        <div class="summary-row">
+            <span class="label">Name:</span>
+            <span class="value">{{ student.user.get_full_name }}</span>
+        </div>
 
-        
+        <div class="summary-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ student.user.email }}</span>
+        </div>
 
-        <p>Admission Fee <span>₹ {{ admission_fee }}</span></p>
-        <p>Course Fee <span>₹ {{ course_fee }}</span></p>
-        <p class="total">Total Fee <span>₹ {{ admission_fee|add:course_fee }}</span></p>
-        <p>
-    <strong>Payment Status:</strong>
-    {{ payment_status|title }}
-</p>
+        <div class="summary-row">
+            <span class="label">Payment Mode:</span>
+            <span class="value">
+                <span class="pill">One Time Payment</span>
+            </span>
+        </div>
 
-<p>
-    <strong>Payment Date:</strong>
-    {% if payment_date %}
-        {{ payment_date|date:"d M Y, h:i A" }}
-    {% else %}
-        --
-    {% endif %}
-</p>
+        <div class="divider"></div>
 
-        
+        <!-- FEES -->
+
+        <div class="summary-row">
+            <span class="label">Admission Fee (10%):</span>
+            <span class="value">₹ {{ admission_fee|floatformat:2 }}</span>
+        </div>
+
+        <div class="summary-row">
+            <span class="label">Course Fee:</span>
+            <span class="value">₹ {{ course_fee|floatformat:2 }}</span>
+        </div>
+
+        <!-- ✅ FIXED TOTAL -->
+        <div class="summary-row total">
+            <span class="label">Total Fee:</span>
+            <span class="value">₹ {{ total_fee|floatformat:2 }}</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- STATUS -->
+
+        <div class="summary-row">
+            <span class="label">Payment Status:</span>
+            <span class="value status">
+                {{ payment_status|title }}
+            </span>
+        </div>
+
+        <div class="summary-row">
+            <span class="label">Payment Date:</span>
+            <span class="value">
+                {% if payment_date %}
+                    {{ payment_date|date:"d M Y, h:i A" }}
+                {% else %}
+                    --
+                {% endif %}
+            </span>
+        </div>
 
         <a href="{% url 'student:payment' %}" class="back-link">
             ← Back to Payment Page

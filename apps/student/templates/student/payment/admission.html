@@ -7,53 +7,72 @@
 <div class="qr-wrapper">
     <div class="qr-card">
 
+        <!-- TITLE -->
         <h2 class="qr-title">Scan & Pay Admission Fee</h2>
+
+        <!-- ✅ COURSE -->
+        <div class="course-name">
+            <p><strong>Course:</strong> {{ course.name }}</p>
+            <p><strong>Batch:</strong> {{ batch.name }}</p>
+        </div>
 
         <!-- STUDENT INFO -->
         <div class="student-info">
-            <p><strong>Name:</strong> {{ user.get_full_name }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ student.user.email }}</p>
             <p><strong>Student ID:</strong> {{ student.id }}</p>
         </div>
 
-        <!-- QR IMAGE -->
+        <!-- FEES -->
+        <div class="fee-box">
+            <p>
+                <strong>Course Fee:</strong>
+                ₹{{ course_fee|floatformat:2 }}
+            </p>
+
+            <p>
+                <strong>Admission Fee (10%):</strong>
+                ₹{{ admission_amount|floatformat:2 }}
+            </p>
+        </div>
+
+        <!-- QR -->
         <div class="qr-image">
             <img src="{% static 'student/images/image.png' %}" alt="QR Code">
         </div>
 
-        <!-- PAYMENT INFO -->
+        <!-- STATUS -->
         <div class="qr-info">
             <p>
-                <strong>Admission Fee:</strong>
-                ₹{{ admission_fee.amount|default:admission_amount }}
-            </p>
-
-            <p>
                 <strong>Status:</strong>
+
                 {% if admission_fee and admission_fee.payment_status == 'completed' %}
-                    <span class="text-success">Paid</span>
+                    <span class="status-paid">✅ Paid</span>
                 {% else %}
-                    <span class="text-warning">Pending</span>
+                    <span class="status-pending">⏳ Pending</span>
                 {% endif %}
             </p>
         </div>
 
-        <!-- PAYMENT SECTION -->
+        <!-- PAYMENT RESULT -->
         {% if admission_fee and admission_fee.payment_status == 'completed' %}
 
-            <p class="paid-msg">✅ Admission fee paid</p>
+            <div class="paid-box">
+                <p>🎉 Admission fee successfully paid</p>
+                <p><strong>Receipt No:</strong> {{ admission_fee.receipt_number }}</p>
+                <p><strong>Transaction ID:</strong> {{ admission_fee.transaction_id }}</p>
+            </div>
 
         {% else %}
 
+            <!-- PAYMENT FORM -->
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
-                <!-- UPLOAD BUTTON -->
                 <label class="upload-btn" for="receiptInput">
-                    Upload Receipt
+                    📤 Upload Payment Receipt
                 </label>
 
-                <!-- HIDDEN FILE INPUT -->
                 <input type="file"
                        id="receiptInput"
                        name="receipt"
@@ -62,14 +81,12 @@
                        required
                        onchange="previewReceipt(event)">
 
-                <!-- IMAGE PREVIEW -->
-                <div id="receiptPreview" class="receipt-preview" style="display:none;">
+                <div id="receiptPreview" class="receipt-preview">
                     <img id="previewImg" alt="Receipt Preview">
                 </div>
 
-                <!-- SUBMIT -->
                 <button type="submit" class="submit-btn">
-                    Submit Payment
+                    ✅ Submit Payment
                 </button>
 
             </form>
@@ -77,30 +94,31 @@
         {% endif %}
 
         <!-- BACK -->
-        <a href="{% url 'student:installments' student.id %}" class="back-btn">
+        <a href="{% url 'student:payment_gateway' %}" class="back-btn">
             ← Back
         </a>
 
     </div>
 </div>
 
-<!-- IMAGE PREVIEW SCRIPT -->
 <script>
 function previewReceipt(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-        alert("Please upload an image file only");
+        alert("Please upload image only");
         event.target.value = "";
         return;
     }
 
     const reader = new FileReader();
+
     reader.onload = function () {
         document.getElementById("previewImg").src = reader.result;
         document.getElementById("receiptPreview").style.display = "block";
     };
+
     reader.readAsDataURL(file);
 }
 </script>

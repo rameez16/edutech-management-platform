@@ -168,7 +168,7 @@ class EnrollmentAgreement(models.Model):
         ('full', 'Full Payment'),
         ('emi', 'EMI'),
         ('pdc', 'PDC'),
-        ('loan', 'Education Loan')
+        ('Installment', 'Installment')
     ])
     
     # Digital signature
