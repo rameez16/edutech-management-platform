@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
 from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
-
+from cloudinary_storage.storage import MediaCloudinaryStorage
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 from apps.student.models import StudentDocument
 
 # Create your models here.
@@ -89,7 +90,7 @@ class Trainer(models.Model):
     # BASIC IDENTITY (Trainer Editable)
     # --------------------------------------------------
     full_name = models.CharField(max_length=150, blank=True)
-    profile_photo = models.ImageField(upload_to="trainers/", null=True, blank=True)
+    profile_photo = models.ImageField(upload_to="trainers/", null=True, blank=True,storage=MediaCloudinaryStorage())
     gender = models.CharField(max_length=1, choices=GenderChoice.choices, blank=True)
 
     email = models.EmailField(blank=True)
@@ -239,7 +240,7 @@ class Student(models.Model):
     # BASIC IDENTITY (Student Editable)
     # --------------------------------------------------
     full_name = models.CharField(max_length=150, blank=True)
-    profile_photo = models.ImageField(upload_to="students/", null=True, blank=True)
+    profile_photo = models.ImageField(upload_to="students/", null=True, blank=True,storage=MediaCloudinaryStorage())
     gender = models.CharField(max_length=1, choices=GenderChoice.choices, blank=True)
 
     email = models.EmailField(blank=True)
@@ -543,7 +544,7 @@ class PaymentDocument(models.Model):
                                    related_name='documents')
     
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
-    document_file = models.FileField(upload_to='payment_documents/%Y/%m/')
+    document_file = models.FileField(upload_to='payment_documents/%Y/%m/',storage=MediaCloudinaryStorage())
     description = models.TextField(blank=True)
     
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
@@ -648,7 +649,7 @@ class PDCCollection(models.Model):
     bounce_charges = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     
     # Scanned copy
-    cheque_image = models.FileField(upload_to='pdc_cheques/', null=True, blank=True)
+    cheque_image = models.FileField(upload_to='pdc_cheques/', null=True, blank=True,storage=MediaCloudinaryStorage())
     
     remarks = models.TextField(blank=True)
     

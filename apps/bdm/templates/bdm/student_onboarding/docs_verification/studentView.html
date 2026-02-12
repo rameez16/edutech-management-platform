@@ -614,7 +614,7 @@
                 </td>
                 <td>
                     {% if doc.document_file %}
-                    <a href="{{ doc.document_file.url }}" target="_blank" class="btn-download">
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="btn-download" download>
                         Download
                     </a>
                     {% else %}
@@ -653,7 +653,7 @@
     <div class="verification-complete">
         <div class="completion-message">
             <span class="completion-icon">✅</span>
-            All documents verified. {{student.full_name}} can now download enrollment letter from his account.
+            All documents verified. {{student.full_name}} can now access&download enrollment agreement.
         </div>
     
     </div>

@@ -8,7 +8,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.utils import timezone
-
+from cloudinary_storage.storage import MediaCloudinaryStorage
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 # =============================================
 # FINANCIAL MODELS
@@ -125,7 +126,7 @@ class StudentDocument(models.Model):
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
     document_file = models.FileField(
         upload_to='student_documents/%Y/%m/',
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])]
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])],storage=RawMediaCloudinaryStorage()
     )
     document_number = models.CharField(max_length=100, blank=True, help_text="Aadhaar/PAN number")
     
@@ -172,7 +173,7 @@ class EnrollmentAgreement(models.Model):
     signature_ip = models.GenericIPAddressField(null=True, blank=True)
     
     # Agreement file
-    agreement_file = models.FileField(upload_to='enrollment_agreements/', null=True, blank=True)
+    agreement_file = models.FileField(upload_to='enrollment_agreements/', null=True, blank=True,storage=RawMediaCloudinaryStorage())
     
     # Approval
     approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
@@ -196,7 +197,7 @@ class StudentIDCard(models.Model):
     expiry_date = models.DateField()
     
     # QR code or barcode
-    qr_code = models.ImageField(upload_to='id_cards/qr_codes/', null=True, blank=True)
+    qr_code = models.ImageField(upload_to='id_cards/qr_codes/', null=True, blank=True,storage=MediaCloudinaryStorage())
     
     # Status
     is_active = models.BooleanField(default=True)
@@ -243,7 +244,7 @@ class LeaveApplication(models.Model):
     
     # Supporting documents
     supporting_document = models.FileField(upload_to='leave_documents/', null=True, blank=True,
-                                          help_text="Medical certificate, etc.")
+                                          help_text="Medical certificate, etc.",storage=RawMediaCloudinaryStorage())
     
     # Approval
     status = models.CharField(max_length=15, choices=LeaveStatus.choices, default=LeaveStatus.PENDING)
@@ -388,7 +389,7 @@ class PlacementProfile(models.Model):
     consent_date = models.DateField(null=True, blank=True)
     
     # Profile details
-    resume = models.FileField(upload_to='placement/resumes/')
+    resume = models.FileField(upload_to='placement/resumes/',storage=RawMediaCloudinaryStorage())
     current_ctc = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
                                      help_text="Current CTC in lakhs")
     expected_ctc = models.DecimalField(max_digits=10, decimal_places=2, 
@@ -496,7 +497,7 @@ class PlacementApplication(models.Model):
     
     # Application
     applied_at = models.DateTimeField(auto_now_add=True)
-    resume_submitted = models.FileField(upload_to='placement/applications/')
+    resume_submitted = models.FileField(upload_to='placement/applications/',storage=RawMediaCloudinaryStorage())
     cover_letter = models.TextField(blank=True)
     
     # Status tracking
@@ -510,7 +511,7 @@ class PlacementApplication(models.Model):
     interview_feedback = models.TextField(blank=True)
     
     # Offer details
-    offer_letter = models.FileField(upload_to='placement/offers/', null=True, blank=True)
+    offer_letter = models.FileField(upload_to='placement/offers/', null=True, blank=True,storage=RawMediaCloudinaryStorage())
     offered_ctc = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     joining_date = models.DateField(null=True, blank=True)
     
