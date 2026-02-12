@@ -1,6 +1,7 @@
 from django import forms
+from django.db.models import Count
 from django.contrib.auth import get_user_model
-from apps.bdm.models import TrainerAdminProfile, Trainer,StudentAdminProfile
+from apps.bdm.models import TrainerAdminProfile, Trainer,StudentAdminProfile ,Course ,Batch
 
 User = get_user_model()
 
@@ -57,31 +58,34 @@ class CreateUserForm(forms.ModelForm):
             user.save()
         return user
 
-
 class TrainerAdminProfileForm(forms.ModelForm):
 
     class Meta:
         model = TrainerAdminProfile
         fields = [
-            "trainer",
             "salary",
-            "batches_assigned",
             "performance_rating",
             "background_verified",
             "profile_verified",
             "is_active",
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Show only trainers without admin profile (optional but recommended)
-        self.fields["trainer"].queryset = Trainer.objects.filter(
-            admin_profile__isnull=True
-        )
-
 
 class StudentAdminProfileForm(forms.ModelForm):
+
+    enrolled_course = forms.ModelChoiceField(
+        queryset=Course.objects.all(),
+        empty_label="Select Course",
+        required=True
+    )
+
+    batch_assigned = forms.ModelChoiceField(
+        queryset=Batch.objects.annotate(
+            student_count=Count("students")
+        ),
+        empty_label="Select Batch",
+        required=True
+    )
 
     class Meta:
         model = StudentAdminProfile
@@ -94,9 +98,9 @@ class StudentAdminProfileForm(forms.ModelForm):
             "is_active",
         ]
 
-        widgets = {
-            "booking_fee_paid": forms.NumberInput(
-                attrs={"placeholder": "Booking fee paid"}
-            ),
-        }
-        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["batch_assigned"].label_from_instance = (
+            lambda batch: f"{batch.name} (Students: {batch.student_count})"
+        )

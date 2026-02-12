@@ -123,37 +123,65 @@
                             </div>
                         </td>
                         <td class="actions-cell">
-                            <div class="action-buttons">
-                                <a href="{% url 'bdm:trainer_admin_create' %}" class="action-btn btn-add" title="Add Trainer Profile">
-                                    <i class="btn-icon">➕</i>
-                                    <span class="btn-text">Add Profile</span>
-                                </a>
-                                <a href="#" class="action-btn btn-view" title="View Details">
-                                    <i class="btn-icon">👁️</i>
-                                    <span class="btn-text">View</span>
-                                </a>
-                                <div class="action-dropdown">
-                                    <button class="action-menu-btn">
-                                        <i class="menu-icon">⋯</i>
-                                    </button>
-                                    <div class="action-menu">
-                                        <a href="#" class="menu-item">
-                                            <i class="menu-icon">✏️</i>
-                                            Edit User
-                                        </a>
-                                        <a href="#" class="menu-item">
-                                            <i class="menu-icon">🔑</i>
-                                            Reset Password
-                                        </a>
-                                        <div class="menu-divider"></div>
-                                        <a href="#" class="menu-item text-danger">
-                                            <i class="menu-icon">🚫</i>
-                                            Deactivate
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
+    <div class="action-buttons">
+
+        {# ---------- ADD / EDIT ADMIN PROFILE ---------- #}
+        {% if user.role == "trainer" and user.trainer %}
+    <a href="{% url 'bdm:trainer_admin_profile_form' user.id %}"
+       class="action-btn btn-add"
+       title="{% if user.trainer.admin_profile_id %}Edit Trainer Profile{% else %}Add Trainer Profile{% endif %}">
+        <i class="btn-icon">➕</i>
+        <span class="btn-text">
+            {% if user.trainer.admin_profile_id %}Edit Profile{% else %}Add Profile{% endif %}
+        </span>
+    </a>
+{% endif %}
+
+
+        {% if user.role == "student" and user.student %}
+            <a href="{% url 'bdm:student_admin_profile_form' user.id %}"
+               class="action-btn btn-add"
+               title="{% if user.student.admin_profile %}Edit Student Profile{% else %}Add Student Profile{% endif %}">
+                <i class="btn-icon">➕</i>
+                <span class="btn-text">
+                    {% if user.student.admin_profile %}Edit Profile{% else %}Add Profile{% endif %}
+                </span>
+            </a>
+        {% endif %}
+
+        {# ---------- VIEW USER ---------- #}
+        <a href="{% url 'bdm:user_profile' user.id %}"
+           class="action-btn btn-view"
+           title="View Details">
+            <i class="btn-icon">👁️</i>
+            <span class="btn-text">View</span>
+        </a>
+
+        {# ---------- DROPDOWN (UNCHANGED) ---------- #}
+        <div class="action-dropdown">
+            <button class="action-menu-btn">
+                <i class="menu-icon">⋯</i>
+            </button>
+            <div class="action-menu">
+                <a href="#" class="menu-item">
+                    <i class="menu-icon">✏️</i>
+                    Edit User
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="menu-icon">🔑</i>
+                    Reset Password
+                </a>
+                <div class="menu-divider"></div>
+                <a href="#" class="menu-item text-danger">
+                    <i class="menu-icon">🚫</i>
+                    Deactivate
+                </a>
+            </div>
+        </div>
+
+    </div>
+</td>
+
                     </tr>
                     {% empty %}
                     <tr class="empty-row">

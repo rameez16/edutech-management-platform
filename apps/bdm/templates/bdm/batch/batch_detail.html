@@ -1,0 +1,640 @@
+{% extends "bdm/layout/base.html" %}
+{% block title %}Batch Details{% endblock %}
+{% block content %}
+
+<div class="batch-detail-container">
+    <!-- Header Section -->
+    <div class="batch-header">
+        <div class="header-left">
+            <div class="batch-icon">📘</div>
+            <div class="header-info">
+                <h1 class="batch-title">{{ batch.name }}</h1>
+                <p class="batch-course">{{ batch.course.name }}</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge {% if batch.is_active %}status-active{% else %}status-inactive{% endif %}">
+                <span class="status-dot"></span>
+                {% if batch.is_active %}Active{% else %}Inactive{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Basic Information Card -->
+        <div class="info-card">
+            <div class="card-header">
+                <i class="card-icon">ℹ️</i>
+                <h2 class="card-title">Basic Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="label-icon">📝</i>
+                        Batch Name
+                    </span>
+                    <span class="info-value">{{ batch.name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="label-icon">📚</i>
+                        Course
+                    </span>
+                    <span class="info-value">{{ batch.course.name }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="label-icon">📊</i>
+                        Status
+                    </span>
+                    <span class="info-value">
+                        {% if batch.is_active %}
+                            <span class="status-badge-small status-active">
+                                <span class="status-dot-small"></span>
+                                Active
+                            </span>
+                        {% else %}
+                            <span class="status-badge-small status-inactive">
+                                <span class="status-dot-small"></span>
+                                Inactive
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Card -->
+        <div class="info-card">
+            <div class="card-header">
+                <i class="card-icon">📅</i>
+                <h2 class="card-title">Schedule</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="label-icon">🚀</i>
+                        Start Date
+                    </span>
+                    <span class="info-value">{{ batch.start_date|date:"d M Y"|default:"—" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="label-icon">🏁</i>
+                        Expected Finish
+                    </span>
+                    <span class="info-value">{{ batch.expected_finish_date|date:"d M Y"|default:"—" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="label-icon">⏱️</i>
+                        Duration
+                    </span>
+                    <span class="info-value">{{ batch.duration_months }} months</span>
+                </div>
+                <div class="info-row">
+    <span class="info-label">
+        <i class="label-icon">📈</i>
+        Extension
+    </span>
+
+    <span class="info-value" style="display:flex; align-items:center; gap:10px;">
+        {% if batch.requested_extension %}
+            <span class="badge badge-warning">
+                <i class="badge-icon">⚠️</i>
+                Yes
+            </span>
+        {% else %}
+            <span class="badge badge-success">
+                <i class="badge-icon">✓</i>
+                No
+            </span>
+        {% endif %}
+
+        {% if batch.is_active %}
+        <form method="post"
+              action="{% url 'bdm:toggle_batch_extension' batch.id %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="edit-btn"
+                    title="Toggle extension">
+                ✏️
+            </button>
+        </form>
+        {% endif %}
+    </span>
+</div>
+
+            </div>
+        </div>
+
+        <!-- Trainers Card -->
+        <div class="info-card">
+            <div class="card-header">
+                <i class="card-icon">👨‍🏫</i>
+                <h2 class="card-title">Trainers</h2>
+                <span class="count-badge">{{ batch.trainers.count }}</span>
+            </div>
+            <div class="card-body">
+                {% if batch.trainers.all %}
+                    <div class="members-list">
+                        {% for trainer in batch.trainers.all %}
+                        <div class="member-item">
+                            <div class="member-avatar">
+                                {{ trainer.user.get_full_name|default:trainer.user.username|first|upper }}
+                            </div>
+                            <span class="member-name">
+                                {{ trainer.user.get_full_name|default:trainer.user.username }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-message">
+                        <i class="empty-icon">👨‍🏫</i>
+                        <p>No trainers assigned</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Students Card -->
+        <div class="info-card">
+            <div class="card-header">
+                <i class="card-icon">👥</i>
+                <h2 class="card-title">Students</h2>
+                <span class="count-badge">{{ batch.students.count }}</span>
+            </div>
+            <div class="card-body">
+                {% if batch.students.all %}
+                    <div class="members-list">
+                        {% for student in batch.students.all %}
+                        <div class="member-item">
+                            <div class="member-avatar">
+                                {{ student.user.get_full_name|default:student.user.username|first|upper }}
+                            </div>
+                            <span class="member-name">
+                                {{ student.user.get_full_name|default:student.user.username }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-message">
+                        <i class="empty-icon">👥</i>
+                        <p>No students enrolled</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="actions-footer">
+        <a href="{% url 'bdm:batch_list' %}" class="btn-back">
+            <i class="btn-icon">←</i>
+            Back to Batches
+        </a>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #0077cc;
+        --light-blue: #e6f2ff;
+        --lighter-blue: #f0f8ff;
+        --blue-hover: #005fa3;
+        --border-color: #d0e7ff;
+        --text-dark: #1a365d;
+        --text-light: #4a5568;
+        --text-lighter: #718096;
+        --success: #38a169;
+        --success-light: #e6fffa;
+        --success-border: #81e6d9;
+        --warning: #d69e2e;
+        --warning-light: #fef3e2;
+        --warning-border: #fbd38d;
+        --danger: #e53e3e;
+        --white: #ffffff;
+        --gray-light: #f7fafc;
+        --gray-border: #e2e8f0;
+        --shadow: 0 4px 12px rgba(0, 119, 204, 0.08);
+        --shadow-hover: 0 8px 24px rgba(0, 119, 204, 0.15);
+    }
+
+    .batch-detail-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    /* Header Section */
+    .batch-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 24px;
+        margin-bottom: 32px;
+        border-bottom: 2px solid var(--light-blue);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .batch-icon {
+        font-size: 48px;
+        line-height: 1;
+    }
+
+    .batch-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 4px 0;
+    }
+
+    .batch-course {
+        font-size: 16px;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 24px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: var(--success-light);
+        color: #234e52;
+        border: 1px solid var(--success-border);
+    }
+
+    .status-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+        border: 1px solid #fc8181;
+    }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-active .status-dot {
+        background: var(--success);
+        box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
+    }
+
+    .status-inactive .status-dot {
+        background: var(--danger);
+        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+    }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    /* Info Cards */
+    .info-card {
+        background: var(--lighter-blue);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .card-header {
+        background: var(--white);
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-icon {
+        font-size: 20px;
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+        flex: 1;
+    }
+
+    .count-badge {
+        background: var(--primary-blue);
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 12px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    /* Info Rows */
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .info-row:first-child {
+        padding-top: 0;
+    }
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-light);
+    }
+
+    .label-icon {
+        font-size: 16px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-dark);
+        text-align: right;
+    }
+
+    /* Status Badge Small (for info row) */
+    .status-badge-small {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-badge-small.status-active {
+        background: var(--success-light);
+        color: #234e52;
+        border: 1px solid var(--success-border);
+    }
+
+    .status-badge-small.status-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+        border: 1px solid #fc8181;
+    }
+
+    .status-dot-small {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-badge-small.status-active .status-dot-small {
+        background: var(--success);
+    }
+
+    .status-badge-small.status-inactive .status-dot-small {
+        background: var(--danger);
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: var(--success-light);
+        color: #234e52;
+        border: 1px solid var(--success-border);
+    }
+
+    .badge-warning {
+        background: var(--warning-light);
+        color: #744210;
+        border: 1px solid var(--warning-border);
+    }
+
+    .badge-icon {
+        font-size: 12px;
+    }
+
+    /* Members List */
+    .members-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .member-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .member-item:hover {
+        background: var(--light-blue);
+        transform: translateX(4px);
+    }
+
+    .member-avatar {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #0077cc, #00b4d8);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .member-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    /* Empty Message */
+    .empty-message {
+        text-align: center;
+        padding: 32px 20px;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        opacity: 0.3;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    .empty-message p {
+        font-size: 14px;
+        color: var(--text-lighter);
+        margin: 0;
+        font-style: italic;
+    }
+
+    /* Footer Actions */
+    .actions-footer {
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .btn-icon {
+        font-size: 14px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .batch-detail-container {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .batch-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .header-left {
+            width: 100%;
+        }
+
+        .batch-icon {
+            font-size: 36px;
+        }
+
+        .batch-title {
+            font-size: 22px;
+        }
+
+        .content-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .info-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .info-value {
+            text-align: left;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .batch-detail-container {
+            margin: 10px;
+            padding: 16px;
+        }
+
+        .header-left {
+            gap: 12px;
+        }
+
+        .batch-icon {
+            font-size: 32px;
+        }
+
+        .batch-title {
+            font-size: 20px;
+        }
+
+        .batch-course {
+            font-size: 14px;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
+    }
+</style>
+
+{% endblock %}

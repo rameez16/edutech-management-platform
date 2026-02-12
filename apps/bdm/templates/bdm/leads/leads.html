@@ -680,6 +680,18 @@ View, assign, and manage all leads
             }
         }
 
+
+        /* Mobile fix for Create Lead modal */
+@media (max-width: 640px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+}
+
         .modal-overlay {
     display: none;
     position: fixed;
@@ -692,11 +704,13 @@ View, assign, and manage all leads
 
 .modal-card {
     background: #fff;
-    width: 520px;
+    width: 100%;
+    max-width: 600px;   /* slightly wider */
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.2);
 }
+
 
 .modal-header {
     display: flex;
@@ -735,10 +749,13 @@ View, assign, and manage all leads
 .form-group input,
 .form-group select,
 .form-group textarea {
-    padding: 8px 10px;
+    width: 100%;
+    padding: 10px 12px;
     border: 1px solid #ddd;
     border-radius: 6px;
+    font-size: 14px;
 }
+
 .form-select {
             flex: 1;
             min-width: 180px;

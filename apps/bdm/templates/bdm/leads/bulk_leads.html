@@ -374,7 +374,7 @@ Select and manage multiple leads at once
 {% endblock %}
 
 {% block page_actions %}
-    <a href="{% url 'leads' %}" class="btn btn-secondary">
+    <a href="{% url 'bdm:leads' %}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i>
         Back to Leads
     </a>
@@ -382,7 +382,7 @@ Select and manage multiple leads at once
 
 {% block breadcrumbs %}
 
-<a href="{% url 'leads' %}">Leads</a>
+<a href="{% url 'bdm:leads' %}">Leads</a>
 
 <span>Bulk Actions</span>
 {% endblock %}
@@ -426,7 +426,7 @@ Select and manage multiple leads at once
             </div>
         </div>
 
-        <form method="post" action="{% url 'bulk_action' %}" id="bulkForm">
+        <form method="post" action="{% url 'bdm:bulk_action' %}" id="bulkForm">
             {% csrf_token %}
             
             <!-- Bulk Header -->

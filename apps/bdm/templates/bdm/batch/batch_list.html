@@ -1,0 +1,1566 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+
+{% if messages %}
+<div class="alert-container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+
+<div class="batches-container">
+    <div class="batches-header">
+        <div class="header-content">
+            <h1 class="page-title">
+                <i class="header-icon">📚</i>
+                Batch Management
+            </h1>
+            <p class="page-subtitle">View and manage training batches</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-create" id="createBatchBtn">
+                <i class="create-icon">➕</i>
+                Create Batch
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="header-stats">
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-info">
+                <div class="stat-number">{{ batches|length }}</div>
+                <div class="stat-label">Total Batches</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <div class="stat-number">{{ active_batches_count }}</div>
+                <div class="stat-label">Active Batches</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⏸️</div>
+            <div class="stat-info">
+                <div class="stat-number">{{ inactive_batches_count }}</div>
+                <div class="stat-label">Inactive Batches</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="batches-table-container">
+        <div class="table-header">
+            <div class="table-actions">
+                <div class="search-box">
+                    <i class="search-icon">🔍</i>
+                    <input type="text" placeholder="Search batches..." class="search-input" id="batchSearch">
+                </div>
+                <div class="filter-dropdown">
+                    <select class="filter-select" id="courseFilter">
+                        <option value="">All Courses</option>
+                        {% for course in courses %}
+                            <option value="{{ course.name|lower }}">
+                                {{ course.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-dropdown">
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="active">Active Only</option>
+                        <option value="inactive">Inactive Only</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="batches-table">
+                <thead>
+                    <tr>
+                        <th class="batch-col">
+                            <div class="table-header-cell">
+                                <span>Batch Name</span>
+                                <i class="sort-icon">↓</i>
+                            </div>
+                        </th>
+                        <th class="course-col">
+                            <div class="table-header-cell">
+                                <span>Course</span>
+                            </div>
+                        </th>
+                        <th class="status-col">
+                            <div class="table-header-cell">
+                                <span>Status</span>
+                            </div>
+                        </th>
+                        <th class="duration-col">
+                            <div class="table-header-cell">
+                                <span>Duration</span>
+                            </div>
+                        </th>
+                        <th class="actions-col">
+                            <div class="table-header-cell">
+                                <span>Actions</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for batch in batches %}
+                    <tr class="batch-row" 
+                        data-course="{{ batch.course.name|lower }}" 
+                        data-status="{% if batch.is_active %}active{% else %}inactive{% endif %}">
+                        <td class="batch-info-cell">
+                            <div class="batch-info">
+                                <div class="batch-avatar">
+                                    {{ batch.name|first|upper }}
+                                </div>
+                                <div class="batch-details">
+                                    <div class="batch-name">{{ batch.name }}</div>
+                                    <div class="batch-meta">{{ batch.batch_code }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td class="course-cell">
+                            <div class="course-badge">
+                                {{ batch.course.name }}
+                            </div>
+                        </td>
+                        
+                        <td class="status-cell">
+                            <div class="status-badge {% if batch.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                <span class="status-dot"></span>
+                                {% if batch.is_active %}Active{% else %}Inactive{% endif %}
+                            </div>
+                        </td>
+                        
+                        <td class="duration-cell">
+                            <div class="duration-info">
+                                <div class="duration-length">
+                                    {{ batch.duration_months }} months
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td class="actions-cell">
+                            <div class="action-buttons">
+                                <a href="{% url 'bdm:batch_detail' batch.id %}" 
+                                   class="action-btn btn-view"
+                                   title="View Details">
+                                    <i class="btn-icon">👁️</i>
+                                    <span class="btn-text">View</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="empty-row">
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon">📚</div>
+                                <h3>No Batches Found</h3>
+                                <p>There are no batches in the system yet.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if batches.has_other_pages %}
+        <div class="pagination">
+            {% if batches.has_previous %}
+            <a href="?page={{ batches.previous_page_number }}" class="page-link prev">
+                <i class="pagination-icon">←</i>
+                Previous
+            </a>
+            {% endif %}
+            
+            <div class="page-numbers">
+                {% for i in batches.paginator.page_range %}
+                    {% if batches.number == i %}
+                    <span class="page-number active">{{ i }}</span>
+                    {% else %}
+                    <a href="?page={{ i }}" class="page-number">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            {% if batches.has_next %}
+            <a href="?page={{ batches.next_page_number }}" class="page-link next">
+                Next
+                <i class="pagination-icon">→</i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Create Batch Modal -->
+<div class="modal-overlay" id="createBatchModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2 class="modal-title">
+                <i class="modal-icon">📚</i>
+                Create New Batch
+            </h2>
+            <button class="modal-close" id="closeModalBtn">
+                <i>✕</i>
+            </button>
+        </div>
+        
+        <form method="post" action="{% url 'bdm:batch_create' %}" class="batch-form" id="batchForm">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <!-- Batch Name -->
+                <div class="form-group full-width">
+                    <label class="form-label required">
+                        <i class="label-icon">📝</i>
+                        Batch Name
+                    </label>
+                    <input type="text" name="name" class="form-input" 
+                           placeholder="e.g., MERN-FULLSTACK-BATCH-00003" required>
+                </div>
+
+                <!-- Course -->
+                <div class="form-group">
+                    <label class="form-label required">
+                        <i class="label-icon">📚</i>
+                        Course
+                    </label>
+                    <select name="course" class="form-select" required>
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Duration -->
+                <div class="form-group">
+                    <label class="form-label required">
+                        <i class="label-icon">⏱️</i>
+                        Duration (Months)
+                    </label>
+                    <input type="number" name="duration_months" class="form-input" 
+                           placeholder="6" min="1" max="24" required>
+                </div>
+
+                <!-- Start Date -->
+                <div class="form-group">
+                    <label class="form-label required">
+                        <i class="label-icon">📅</i>
+                        Start Date
+                    </label>
+                    <input type="date" name="start_date" class="form-input" required>
+                </div>
+
+                <!-- Expected Finish Date -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="label-icon">🏁</i>
+                        Expected Finish Date
+                    </label>
+                    <input type="date" name="expected_finish_date" class="form-input">
+                </div>
+
+                <!-- Trainers -->
+                <div class="form-group full-width">
+                    <label class="form-label">
+                        <i class="label-icon">👨‍🏫</i>
+                        Select Trainers
+                    </label>
+                    <div class="selection-info">
+                        <span id="trainer-count">0 selected</span>
+                    </div>
+                    <div class="checklist-container">
+                        {% for trainer in trainers %}
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="trainers" value="{{ trainer.id }}" class="checkbox-input trainer-checkbox">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label-text">
+                                    <span class="person-name">{{ trainer.user.get_full_name|default:trainer.user.username }}</span>
+                                    {% if trainer.primary_domain %}
+                                        <span class="person-meta">{{ trainer.primary_domain }}</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                        {% empty %}
+                            <div class="empty-message">
+                                <i class="empty-icon">👨‍🏫</i>
+                                <p>No trainers available</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                </div>
+
+                <!-- Students -->
+                <div class="form-group full-width">
+                    <label class="form-label">
+                        <i class="label-icon">👥</i>
+                        Select Students
+                    </label>
+                    <div class="selection-info">
+                        <span id="student-count">0 selected</span>
+                    </div>
+                    <div class="checklist-container">
+                        {% for student in students %}
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="students" value="{{ student.id }}" class="checkbox-input student-checkbox">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label-text">
+                                    <span class="person-name">{{ student.user.get_full_name }}</span>
+                                    {% if student.admin_profile.student_code %}
+                                        <span class="person-meta">{{ student.admin_profile.student_code }}</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                        {% empty %}
+                            <div class="empty-message">
+                                <i class="empty-icon">👥</i>
+                                <p>No unassigned students available</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <small class="form-hint">Only students not assigned to other batches are shown</small>
+                </div>
+
+                <!-- Is Active -->
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="is_active" checked class="normal-checkbox">
+                        <span class="checkbox-text">
+                            <i class="checkbox-icon">✅</i>
+                            Set batch as active
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Requested Extension -->
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="requested_extension" class="checkbox-input">
+                        <span class="checkbox-text">
+                            <i class="checkbox-icon">📊</i>
+                            Request extension
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" id="cancelBtn">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-submit">
+                    <i class="btn-icon">✓</i>
+                    Create Batch
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #0077cc;
+        --light-blue: #e6f2ff;
+        --lighter-blue: #f0f8ff;
+        --blue-hover: #005fa3;
+        --border-color: #d0e7ff;
+        --text-dark: #1a365d;
+        --text-light: #4a5568;
+        --text-lighter: #718096;
+        --success: #38a169;
+        --warning: #d69e2e;
+        --danger: #e53e3e;
+        --white: #ffffff;
+        --gray-light: #f7fafc;
+        --gray-border: #e2e8f0;
+        --shadow: 0 4px 12px rgba(0, 119, 204, 0.08);
+        --shadow-hover: 0 8px 24px rgba(0, 119, 204, 0.15);
+    }
+
+    .batches-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    .batches-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--light-blue);
+    }
+
+    .page-title {
+        color: var(--text-dark);
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-icon {
+        font-size: 36px;
+    }
+
+    .page-subtitle {
+        color: var(--text-light);
+        margin: 8px 0 0 0;
+        font-size: 16px;
+    }
+
+    /* Create Button */
+    .header-actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-create {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 119, 204, 0.2);
+    }
+
+    .btn-create:hover {
+        background: var(--blue-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .create-icon {
+        font-size: 16px;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background: var(--lighter-blue);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+        font-size: 32px;
+        color: var(--primary-blue);
+    }
+
+    .stat-number {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--text-light);
+        margin-top: 4px;
+    }
+
+    .batches-table-container {
+        background: var(--white);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px;
+        background: var(--lighter-blue);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: var(--text-lighter);
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 44px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--white);
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    }
+
+    .filter-dropdown {
+        min-width: 150px;
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--white);
+        color: var(--text-dark);
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230077cc' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 12px;
+        transition: all 0.3s;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        margin: 0;
+    }
+
+    .batches-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .batches-table thead {
+        background: var(--lighter-blue);
+    }
+
+    .batches-table th {
+        padding: 16px 20px;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 14px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .table-header-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sort-icon {
+        font-size: 12px;
+        opacity: 0.5;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+
+    .sort-icon:hover {
+        opacity: 1;
+    }
+
+    .batches-table td {
+        padding: 20px;
+        border-bottom: 1px solid var(--gray-border);
+        vertical-align: middle;
+    }
+
+    .batches-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .batches-table tbody tr:hover {
+        background: var(--lighter-blue);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 119, 204, 0.1);
+    }
+
+    .batch-info-cell {
+        min-width: 280px;
+    }
+
+    .batch-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .batch-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #0077cc, #00b4d8);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .batch-name {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+        font-size: 15px;
+    }
+
+    .batch-meta {
+        font-size: 12px;
+        color: var(--text-lighter);
+    }
+
+    .course-cell {
+        min-width: 180px;
+    }
+
+    .course-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        background: #ebf8ff;
+        color: #2c5282;
+        border: 1px solid #90cdf4;
+    }
+
+    .status-cell {
+        min-width: 120px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #e6fffa;
+        color: #234e52;
+        border: 1px solid #81e6d9;
+    }
+
+    .status-inactive {
+        background: #fed7d7;
+        color: #742a2a;
+        border: 1px solid #fc8181;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-active .status-dot {
+        background: #38a169;
+    }
+
+    .status-inactive .status-dot {
+        background: #e53e3e;
+    }
+
+    .duration-cell {
+        min-width: 120px;
+    }
+
+    .duration-info {
+        font-size: 13px;
+    }
+
+    .duration-length {
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .actions-cell {
+        min-width: 120px;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-view {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-view:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .btn-icon {
+        font-size: 14px;
+    }
+
+    .btn-text {
+        display: inline;
+    }
+
+    .empty-row {
+        text-align: center;
+    }
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        color: var(--text-dark);
+        margin: 0 0 12px 0;
+        font-size: 20px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        padding: 30px 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .page-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: var(--primary-blue);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .page-link:hover {
+        background: var(--light-blue);
+        transform: translateY(-2px);
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 8px;
+    }
+
+    .page-number {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .page-number:hover {
+        background: var(--light-blue);
+    }
+
+    .page-number.active {
+        background: var(--primary-blue);
+        color: white;
+    }
+
+    .pagination-icon {
+        font-size: 14px;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal-container {
+        background: var(--white);
+        border-radius: 16px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 30px;
+        border-bottom: 2px solid var(--border-color);
+        background: var(--lighter-blue);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .modal-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .modal-icon {
+        font-size: 24px;
+    }
+
+    .modal-close {
+        background: transparent;
+        border: none;
+        font-size: 24px;
+        color: var(--text-lighter);
+        cursor: pointer;
+        padding: 4px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.3s;
+    }
+
+    .modal-close:hover {
+        background: var(--light-blue);
+        color: var(--text-dark);
+    }
+
+    /* Form Styles */
+    .batch-form {
+        padding: 30px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 10px;
+    }
+
+    .form-label.required::after {
+        content: '*';
+        color: var(--danger);
+        margin-left: 4px;
+    }
+
+    .label-icon {
+        font-size: 16px;
+    }
+
+    .form-input,
+    .form-select {
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        color: var(--text-dark);
+        transition: all 0.3s;
+        font-family: inherit;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    }
+
+    .form-hint {
+        font-size: 12px;
+        color: var(--text-lighter);
+        margin-top: 8px;
+        font-style: italic;
+    }
+
+    /* Selection Counter */
+    .selection-info {
+        background: var(--lighter-blue);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: var(--primary-blue);
+        font-weight: 600;
+    }
+
+    /* Checklist Container */
+    .checklist-container {
+        background: var(--gray-light);
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        padding: 12px;
+        max-height: 250px;
+        overflow-y: auto;
+        transition: all 0.3s;
+    }
+
+    .checklist-container:focus-within {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    }
+
+    /* Custom Scrollbar */
+    .checklist-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .checklist-container::-webkit-scrollbar-track {
+        background: var(--light-blue);
+        border-radius: 4px;
+    }
+
+    .checklist-container::-webkit-scrollbar-thumb {
+        background: var(--primary-blue);
+        border-radius: 4px;
+    }
+
+    .checklist-container::-webkit-scrollbar-thumb:hover {
+        background: var(--blue-hover);
+    }
+
+    /* Checkbox Item */
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        background: var(--white);
+        border: 1px solid var(--gray-border);
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .checkbox-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .checkbox-item:hover {
+        background: var(--lighter-blue);
+        border-color: var(--primary-blue);
+        transform: translateX(4px);
+    }
+
+    .checkbox-item:has(.checkbox-input:checked) {
+        background: var(--light-blue);
+        border-color: var(--primary-blue);
+        box-shadow: 0 2px 4px rgba(0, 119, 204, 0.1);
+    }
+
+    /* Hide Default Checkbox */
+    .checkbox-input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        width: 0;
+        height: 0;
+    }
+
+    /* Custom Checkbox */
+    .checkbox-custom {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--white);
+        flex-shrink: 0;
+        transition: all 0.2s;
+    }
+
+    .checkbox-input:checked + .checkbox-custom {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+/* Normal form checkboxes (Is Active, Extension) */
+.normal-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary-blue);
+    position: static;
+    opacity: 1;
+}
+
+    .checkbox-input:checked + .checkbox-custom::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Checkbox Label Text */
+    .checkbox-label-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .person-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .person-meta {
+        font-size: 12px;
+        color: var(--text-lighter);
+    }
+
+    /* Empty Message */
+    .empty-message {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-lighter);
+    }
+
+    .empty-message .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.4;
+    }
+
+    .empty-message p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    /* Regular Checkbox Group */
+    .checkbox-group {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: var(--primary-blue);
+    }
+
+    .checkbox-text {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--text-dark);
+    }
+
+    .checkbox-icon {
+        font-size: 16px;
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding-top: 24px;
+        margin-top: 24px;
+        border-top: 1px solid var(--border-color);
+        position: sticky;
+        bottom: 0;
+        background: var(--white);
+        padding-bottom: 0;
+    }
+
+    .btn-cancel {
+        padding: 12px 24px;
+        background: var(--gray-light);
+        color: var(--text-dark);
+        border: 1px solid var(--gray-border);
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-cancel:hover {
+        background: var(--light-blue);
+        border-color: var(--border-color);
+    }
+
+    .btn-submit {
+        padding: 12px 24px;
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-submit:hover {
+        background: var(--blue-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .batches-container {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .batches-header {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .header-stats {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1 1 calc(50% - 10px);
+            min-width: 0;
+        }
+
+        .table-actions {
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            max-width: 100%;
+            flex: 100%;
+        }
+
+        .filter-dropdown {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-text {
+            display: none;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .modal-container {
+            width: 95%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header-stats {
+            flex-direction: column;
+        }
+
+        .stat-card {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .header-icon {
+            font-size: 28px;
+        }
+
+        .duration-col,
+        .duration-cell {
+            display: none;
+        }
+
+        .batch-form {
+            padding: 20px;
+        }
+
+        .checklist-container {
+            max-height: 200px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .batches-container {
+            margin: 10px;
+            padding: 15px;
+        }
+
+        .course-col,
+        .course-cell {
+            display: none;
+        }
+
+        .batches-table th,
+        .batches-table td {
+            padding: 12px 8px;
+            font-size: 12px;
+        }
+
+        .modal-container {
+            max-height: 95vh;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+        }
+
+        .checkbox-item {
+            padding: 10px 12px;
+        }
+
+        .person-name {
+            font-size: 13px;
+        }
+
+        .person-meta {
+            font-size: 11px;
+        }
+    }
+
+
+    .alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.alert {
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    animation: slideIn 0.4s ease;
+}
+
+/* Success */
+.alert-success {
+    background: #e6fffa;
+    color: #065f46;
+    border: 1px solid #81e6d9;
+}
+
+/* Error */
+.alert-error {
+    background: #fee2e2;
+    color: #7f1d1d;
+    border: 1px solid #fca5a5;
+}
+
+/* Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal Controls
+        const createBatchBtn = document.getElementById('createBatchBtn');
+        const createBatchModal = document.getElementById('createBatchModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        createBatchBtn.addEventListener('click', function() {
+            createBatchModal.classList.add('active');
+        });
+
+        closeModalBtn.addEventListener('click', function() {
+            createBatchModal.classList.remove('active');
+        });
+
+        cancelBtn.addEventListener('click', function() {
+            createBatchModal.classList.remove('active');
+        });
+
+        // Close modal when clicking outside
+        createBatchModal.addEventListener('click', function(e) {
+            if (e.target === createBatchModal) {
+                createBatchModal.classList.remove('active');
+            }
+        });
+
+        // Selection Counter for Trainers
+        const trainerCheckboxes = document.querySelectorAll('.trainer-checkbox');
+        const trainerCount = document.getElementById('trainer-count');
+        
+        function updateTrainerCount() {
+            const selected = document.querySelectorAll('.trainer-checkbox:checked').length;
+            trainerCount.textContent = `${selected} selected`;
+        }
+        
+        trainerCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateTrainerCount);
+        });
+
+        // Selection Counter for Students
+        const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+        const studentCount = document.getElementById('student-count');
+        
+        function updateStudentCount() {
+            const selected = document.querySelectorAll('.student-checkbox:checked').length;
+            studentCount.textContent = `${selected} selected`;
+        }
+        
+        studentCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateStudentCount);
+        });
+
+        // Filter functionality
+        const batchSearch = document.getElementById('batchSearch');
+        const courseFilter = document.getElementById('courseFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const batchRows = document.querySelectorAll('.batch-row');
+        
+        function filterBatches() {
+            const searchTerm = batchSearch.value.toLowerCase();
+            const courseValue = courseFilter.value.toLowerCase();
+            const statusValue = statusFilter.value;
+            
+            batchRows.forEach(row => {
+                const batchName = row.querySelector('.batch-name').textContent.toLowerCase();
+                const batchCode = row.querySelector('.batch-meta').textContent.toLowerCase();
+                const course = row.dataset.course;
+                const status = row.dataset.status;
+                
+                const matchesSearch = batchName.includes(searchTerm) || batchCode.includes(searchTerm);
+                const matchesCourse = !courseValue || course === courseValue;
+                const matchesStatus = !statusValue || status === statusValue;
+                
+                if (matchesSearch && matchesCourse && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            const visibleRows = Array.from(batchRows).filter(row => row.style.display !== 'none');
+            let emptyRow = document.querySelector('.empty-row.search-empty');
+            
+            if (visibleRows.length === 0 && batchRows.length > 0) {
+                if (!emptyRow) {
+                    const tbody = document.querySelector('.batches-table tbody');
+                    const newEmptyRow = document.createElement('tr');
+                    newEmptyRow.className = 'empty-row search-empty';
+                    newEmptyRow.innerHTML = `
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon">🔍</div>
+                                <h3>No Matching Batches</h3>
+                                <p>Try adjusting your search or filters</p>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(newEmptyRow);
+                }
+            } else if (emptyRow && visibleRows.length > 0) {
+                emptyRow.remove();
+            }
+        }
+        
+        batchSearch.addEventListener('input', filterBatches);
+        courseFilter.addEventListener('change', filterBatches);
+        statusFilter.addEventListener('change', filterBatches);
+    });
+
+
+setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => {
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 500);
+    });
+}, 3000);
+
+
+</script>
+
+{% endblock %}
