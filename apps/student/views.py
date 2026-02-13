@@ -742,11 +742,55 @@ def payment_gateway(request):
 
 
 
+
+
+
+
+
 @role_required("student")
 def dashboard(request):
-    """Simple dashboard"""
-    
-    return render(request, 'student/dashboard/dashboard.html')
+    student = request.user.student
+    admin_profile = getattr(student, "admin_profile", None)
+    checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
+
+    # Get latest photo document
+    profile_photo = student.documents.filter(
+        document_type=StudentDocument.DocumentType.PHOTO
+    ).order_by('-id').first()
+
+    # Only show if VERIFIED
+    if profile_photo and profile_photo.verification_status != StudentDocument.VerificationStatus.VERIFIED:
+        profile_photo = None
+
+    # Step completion logic (same as onboard)
+    completed_steps = 0
+    if checklist.documents_verified:
+        completed_steps += 1
+
+    enrollment_generated = checklist.enrollment_letter_generated
+    enrollment_signed = checklist.enrollment_letter_signed
+    if enrollment_signed:
+        completed_steps += 1
+
+    if getattr(checklist, "id_card_issued", False):
+        completed_steps += 1
+
+    # Pass context to template
+    context = {
+        "student": student,
+        "admin_profile": admin_profile,
+        "profile_photo": profile_photo,
+        "all_docs_verified": checklist.documents_verified,
+        "user": request.user,
+        "checklist": checklist,
+        "completed_steps": completed_steps,
+        "enrollment_generated": enrollment_generated,
+        "enrollment_signed": enrollment_signed,
+    }
+
+    return render(request, "student/dashboard/dashboard.html", context)
+
+
 
 
 
@@ -767,21 +811,6 @@ def upload(request):
     }
 
     onboarding, _ = OnboardingChecklist.objects.get_or_create(student=student)
-
-    # Existing documents mapped by document_type
-    existing_docs = {
-        doc.document_type: doc
-        for doc in StudentDocument.objects.filter(student=student)
-    }
-
-# Lock uploads if ANY document is pending or verified
-    locked = any(
-        doc.verification_status in [
-            StudentDocument.VerificationStatus.PENDING,
-            StudentDocument.VerificationStatus.VERIFIED
-        ]
-        for doc in existing_docs.values()
-    )
 
     # =====================================
     # Get latest document per type
@@ -898,6 +927,7 @@ def upload(request):
 
 
 
+
 @role_required("student")
 def onboard(request):
     student = request.user.student
@@ -945,6 +975,8 @@ def onboard(request):
     }
 
     return render(request, "student/onboarding/onboarding.html", context)
+
+
 
 
 
@@ -1022,6 +1054,7 @@ def upload_signed_enrollment_letter(request):
 
 
 
+
 @role_required("student")
 def download_id_card(request):
     checklist = request.user.student.onboarding_checklist
@@ -1083,6 +1116,8 @@ def lessonplan(request):
 
 
 
+
+
 @role_required("student")
 def syllabus(request):
     student = request.user.student
@@ -1119,6 +1154,7 @@ def syllabus(request):
 
 
 
+
 @role_required("student")
 def view_id_card(request):
     student = request.user.student
@@ -1147,6 +1183,7 @@ def view_id_card(request):
 
 
 
+
 #when merging delete this view this is for just check logic correct or not
 
 @role_required("student")
@@ -1170,18 +1207,6 @@ def download_enrollment_letter(request):
 
 
 
-
-def download_document(request, doc_id):
-    document = get_object_or_404(StudentDocument, id=doc_id)
-
-    if not document.document_file:
-        raise Http404("File not found.")
-
-    return FileResponse(
-        document.document_file.open('rb'),
-        as_attachment=True,
-        filename=os.path.basename(document.document_file.name)
-    )
 
 
 

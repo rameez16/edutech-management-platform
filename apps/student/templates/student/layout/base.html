@@ -42,9 +42,10 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="logo">{{ student.full_name|first }}</div>
-                <span class="logo-text">{{ student.full_name}}</span>
-            </div>
+                <div class="logo">{{ request.user.student.full_name|first }}</div>
+                    <span class="logo-text">{{ request.user.student.full_name }}</span>
+                </div>
+
 
             <ul class="nav-menu">
                 <li class="nav-section">
@@ -62,7 +63,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'student:stud_profile' %}" class="nav-link">
+                            <a href="{% url 'student:overview' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                                     <circle cx="12" cy="7" r="4"/>
@@ -223,12 +224,7 @@
                                 </svg>
                                 Password Change
                             </a>
-                        </li>
-
-                        <li>
-                            <a href="{% url 'bdm:download_enrollment_letter' %}" class="btn">
-                                ⬇ Download Enrollment Letter
-                              </a>
+                    
                         </li>
                         
 
