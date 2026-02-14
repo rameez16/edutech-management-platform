@@ -1,0 +1,174 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}
+Batch Details
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/batch.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/batch.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="batch-container">
+
+    {% if batch %}
+    <div class="batch-header">
+        <h2>{{ batch.name }}</h2>
+        <p style="font-weight: bold; font-size: 16px; color:darkblue;">
+            Course: {{ batch.course.name }}
+        </p>
+        <p class="batch-duration" style="font-weight: bold; font-size: 16px; color:darkblue;">
+            Duration: {{ batch.duration_months }} months
+        </p>
+    </div>
+
+    <!-- WRAPPER CARD WITH BACKGROUND -->
+    <div class="batch-wrapper-card">
+
+        <!-- BATCH SCHEDULE CARD -->
+        <div class="batch-card">
+            <div class="batch-card-header" id="scheduleToggle">
+                <h4>Batch Schedule</h4>
+                <span class="arrow-icon" id="scheduleArrowIcon">&#9662;</span>
+            </div>
+
+            <div class="batch-content" id="scheduleContent">
+                <p>
+                    <strong style="color: #6366f1;">Start Date:</strong>
+                    {{ batch.start_date|date:"F d, Y" }}
+                </p>
+
+                <p>
+                    <strong style="color: #6366f1;">Expected Finish Date:</strong>
+                    {{ batch.expected_finish_date|date:"F d, Y" }}
+                </p>
+
+                <p>
+                    <strong style="color: #6366f1;">Duration:</strong>
+                    {{ batch.duration_months }} months
+                </p>
+
+                <p>
+                    <strong style="color: #6366f1;">Status:</strong>
+                    {% if batch.is_completed %}
+                        <span style="color: #28a745;">Completed</span>
+                    {% elif batch.start_date > today %}
+                        <span style="color: #ff9800;">Upcoming</span>
+                    {% else %}
+                        <span style="color: #007bff;">Ongoing</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- TRAINERS CARD -->
+        <div class="batch-card">
+            <div class="batch-card-header" id="trainersToggle">
+                <h4>Assigned Trainer</h4>
+                <span class="arrow-icon" id="trainersArrowIcon">&#9662;</span>
+            </div>
+
+            <div class="batch-content" id="trainersContent">
+                {% if batch.trainers.exists %}
+                <ul style="margin-left: 0; margin-top: 8px; list-style-type: none; padding-left: 0;">
+                    {% for trainer in batch.trainers.all %}
+                    <li style="margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+
+                            {% if trainer.profile_photo %}
+                            <img src="{{ trainer.profile_photo.url }}"
+                                 alt="{{ trainer.full_name }}"
+                                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                            {% else %}
+                            <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px;">
+                                {{ trainer.full_name|first|upper|default:trainer.user.username|first|upper }}
+                            </div>
+                            {% endif %}
+
+                            <div>
+                                <strong style="font-size: 16px; color: #333;">
+                                    {{ trainer.full_name|default:trainer.user.get_full_name|default:trainer.user.username }}
+                                </strong>
+
+                                {% if trainer.primary_domain %}
+                                <br>
+                                <span style="color: #6366f1; font-size: 13px;">
+                                    🎯 {{ trainer.primary_domain }}
+                                </span>
+                                {% endif %}
+
+                                {% if trainer.email %}
+                                <br>
+                                <span style="color: #666; font-size: 14px;">
+                                    📧 {{ trainer.email }}
+                                </span>
+                                {% endif %}
+
+                                {% if trainer.phone %}
+                                <br>
+                                <span style="color: #666; font-size: 14px;">
+                                    📱 {{ trainer.phone }}
+                                </span>
+                                {% endif %}
+
+                                {% if trainer.experience_years %}
+                                <br>
+                                <span style="color: #666; font-size: 13px;">
+                                    💼 {{ trainer.experience_years }} years experience
+                                </span>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No trainers assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- BATCH STATISTICS CARD -->
+        <div class="batch-card">
+            <div class="batch-card-header" id="statsToggle">
+                <h4>Batch Statistics</h4>
+                <span class="arrow-icon" id="statsArrowIcon">&#9662;</span>
+            </div>
+
+            <div class="batch-content" id="statsContent">
+                <p>
+                    <strong style="color: #6366f1;">Total Students:</strong>
+                    {{ batch.total_students }}
+                </p>
+
+                {% if batch.requested_extension %}
+                <p>
+                    <strong style="color: #6366f1;">Extension Status:</strong>
+                    <span style="color: #ffc107;">Extension Requested</span>
+                </p>
+                {% endif %}
+
+                <p>
+                    <strong style="color: #6366f1;">Created On:</strong>
+                    {{ batch.created_at|date:"F d, Y" }}
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    {% else %}
+    <div class="batch-header">
+        <h2>No Active Batch</h2>
+        <p>You are not currently enrolled in any active batch.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 /* ===============================
    Container
    =============================== */
-.syllabus-container {
+.batch-container {
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 20px 40px;
@@ -10,9 +10,9 @@
 
 
 /* ===============================
-   Course Header Section
+   Batch Header Section
    =============================== */
-.syllabus-container .syllabus-header {
+.batch-container .batch-header {
     padding: 32px;
     margin-bottom: 30px;
     background: linear-gradient(135deg, #ffffff, #f4f6ff);
@@ -20,14 +20,14 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
 }
 
-.syllabus-container .syllabus-header h2 {
+.batch-container .batch-header h2 {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 12px;
     color: #2d2d2d;
 }
 
-.syllabus-container .syllabus-header p {
+.batch-container .batch-header p {
     font-size: 15px;
     color: #555;
     margin-bottom: 8px;
@@ -35,31 +35,22 @@
 
 
 /* ===============================
-   Tech Stack Box (Nested Inside Header)
+   Wrapper Card with Background
    =============================== */
-.syllabus-container .syllabus-header .tech-stack-box {
-    margin-top: 18px;
-    padding: 20px;
-    background: linear-gradient(135deg, #f3eef8, #e0cff8);
-    border-radius: 14px;
-    font-size: 15px;
-    line-height: 1.8;
-    color: #333;
-    border-left: 5px solid #6366f1;
-    white-space: normal; /* Important */
-}
-
-/* Remove extra spacing from linebreaksbr */
-.syllabus-container .syllabus-header .tech-stack-box br {
-    content: "";
+.batch-container .batch-wrapper-card {
+    padding: 30px;
+    background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
 
 /* ===============================
-   Syllabus Card Section
+   Batch Card Section
    =============================== */
-.syllabus-container .syllabus-card {
+.batch-container .batch-card {
     padding: 28px;
+    margin-bottom: 25px;
     border-radius: 18px;
     background: #ffffff;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
@@ -68,7 +59,11 @@
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.syllabus-container .syllabus-card:hover {
+.batch-container .batch-card:last-child {
+    margin-bottom: 0;
+}
+
+.batch-container .batch-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
 }
@@ -77,83 +72,79 @@
 /* ===============================
    Card Header
    =============================== */
-.syllabus-container .syllabus-card-header {
+.batch-container .batch-card-header {
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 2px solid #f1f1f1;
     color: #333;
-}
-
-
-/* ===============================
-   Syllabus Content
-   =============================== */
-.syllabus-container .syllabus-content {
-    font-size: 15px;
-    line-height: 1.7;
-    color: #444;
-}
-
-.syllabus-container .syllabus-content p {
-    margin-bottom: 12px;
-}
-
-
-/* Make header clickable */
-.syllabus-card-header {
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* Hide content initially */
-#moduleContent {
+
+/* ===============================
+   Batch Content
+   =============================== */
+.batch-container .batch-content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #444;
     display: none;
     margin-top: 15px;
-}
-
-/* Smooth animation effect */
-.syllabus-content {
     transition: all 0.3s ease;
     background-color: #f6ecff;
     padding: 20px;
+    border-radius: 10px;
 }
 
-/* Arrow styling */
+.batch-container .batch-content p {
+    margin-bottom: 12px;
+}
+
+.batch-container .batch-content ul {
+    list-style-type: disc;
+    color: #444;
+}
+
+.batch-container .batch-content ul li {
+    margin-bottom: 6px;
+}
+
+
+/* ===============================
+   Arrow styling
+   =============================== */
 .arrow-icon {
     font-size: 18px;
     transition: transform 0.3s ease;
 }
 
-/* Rotate arrow when active */
 .arrow-icon.rotate {
     transform: rotate(180deg);
 }
-
-.syllabus-header .titleduration{
-    font-weight: 600px;
-}
-
-
 
 
 /* ===============================
    Responsive
    =============================== */
 @media (max-width: 768px) {
-
-    .syllabus-container .syllabus-header {
+    .batch-container .batch-header {
         padding: 22px;
     }
 
-    .syllabus-container .syllabus-card {
+    .batch-container .batch-wrapper-card {
         padding: 20px;
     }
 
-    .syllabus-container .syllabus-header h2 {
+    .batch-container .batch-card {
+        padding: 20px;
+    }
+
+    .batch-container .batch-header h2 {
         font-size: 22px;
     }
 }

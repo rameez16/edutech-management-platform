@@ -34,6 +34,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path('stud_syllabus/',views.syllabus,name='stud_syllabus'),
                 #only for checking logic delete later for merge
                 path("download-enrollment-letter/",views.download_enrollment_letter,name="download_enrollment_letter"),
+                path('batch_details/', views.batch_details, name='batch_details'),
 
                
                

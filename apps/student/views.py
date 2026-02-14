@@ -747,11 +747,73 @@ def payment_gateway(request):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @role_required("student")
 def dashboard(request):
     student = request.user.student
     admin_profile = getattr(student, "admin_profile", None)
     checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
+    batch = student.batches.filter(is_active=True).select_related("course").prefetch_related("trainers__user").first()
 
     # Get latest photo document
     profile_photo = student.documents.filter(
@@ -782,6 +844,8 @@ def dashboard(request):
         "profile_photo": profile_photo,
         "all_docs_verified": checklist.documents_verified,
         "user": request.user,
+        "batch": batch,  
+        "today": timezone.now().date(),
         "checklist": checklist,
         "completed_steps": completed_steps,
         "enrollment_generated": enrollment_generated,
@@ -1206,7 +1270,15 @@ def download_enrollment_letter(request):
     return response
 
 
+@role_required("student")
+def batch_details(request):
+    student = request.user.student
 
+    batch = student.batches.filter(is_active=True).select_related("course").prefetch_related("trainers__user").first()
+
+    return render(request, "student/batch/batch.html", {
+        "batch": batch
+    })
 
 
 
