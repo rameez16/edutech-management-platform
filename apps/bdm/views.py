@@ -6,7 +6,13 @@ from django.db import transaction
 from decimal import Decimal
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
+from django.db.models import Max
 
+from django.db.models import Prefetch
+
+from django.db import models
+
+from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.utils import timezone
@@ -17,7 +23,7 @@ from .form import StudentAdminProfileForm, TrainerAdminProfileForm
 from django.db.models import Sum
 
 from apps.student.models import FeePayment
-from apps.bdm.models import Student
+from apps.bdm.models import Student ,PaymentDocument
 
 
 # Create your views here.
@@ -1013,38 +1019,321 @@ def payments_dashboard(request):
 
     return render(request, "bdm/payments/payments_dashboard.html", context)
 
+
+
+
 @login_required
 def payment_detail(request, pk):
     payment = get_object_or_404(
         FeePayment.objects
-        .select_related("student")
-        .prefetch_related("documents"),
+        .select_related("student", "received_by")
+        .prefetch_related("documents", "student__batches__course"),
         pk=pk
     )
 
-    return render(request, "bdm/payments/payment_detail.html", {
-        "payment": payment
-    })
-    
-def course_fee(request):
+    student = payment.student
+    batch = student.batches.first()
+    course = batch.course if batch else None
 
-    full_payments = FeePayment.objects.filter(
-        payment_type='full'
-    ).select_related('student')
+    # ─────────────────────────────
+    # HANDLE STATUS UPDATE FROM DROPDOWN
+    # ─────────────────────────────
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+        if new_status in dict(FeePayment.PaymentStatus.choices).keys():
+            payment.payment_status = new_status
+            payment.save()
+        return redirect("bdm:payment_detail", pk=payment.pk)
 
-    emi_payments = FeePayment.objects.filter(
-        payment_type=FeePayment.PaymentType.INSTALLMENT
-        ).select_related('student')
+    # ─────────────────────────────
+    # GET TOTAL COURSE FEE
+    # ─────────────────────────────
+    total_fee = course.course_fee if course else Decimal("0.00")
+
+    # ─────────────────────────────
+    # CALCULATE TOTALS
+    # ─────────────────────────────
+    total_paid = (
+        FeePayment.objects
+        .filter(student=student, payment_status=FeePayment.PaymentStatus.COMPLETED)
+        .aggregate(total=Sum("amount"))["total"]
+        or Decimal("0.00")
+    )
+
+    total_pending = (
+        FeePayment.objects
+        .filter(student=student, payment_status=FeePayment.PaymentStatus.PENDING)
+        .aggregate(total=Sum("amount"))["total"]
+        or Decimal("0.00")
+    )
+
+    balance = total_fee - total_paid
+
+    # ─────────────────────────────
+    # EMI INSTALLMENTS
+    # ─────────────────────────────
+    all_installments = []
+    if payment.payment_type == FeePayment.PaymentType.INSTALLMENT:
+        all_installments = (
+            FeePayment.objects
+            .filter(student=student, payment_type=FeePayment.PaymentType.INSTALLMENT)
+            .order_by("installment_number")
+        )
+
+    # ─────────────────────────────
+    # ALL PAYMENTS OF STUDENT
+    # ─────────────────────────────
+    all_student_payments = FeePayment.objects.filter(student=student).order_by("-payment_date")
 
     context = {
-        'full_payments': full_payments,
-        'emi_payments': emi_payments,
+        "payment": payment,
+        "student": payment.student,
+        "course": course,
+        "batch": batch,
+        "all_installments": all_installments,
+        "all_student_payments": all_student_payments,
+        "total_fee": total_fee,
+        "total_paid": total_paid,
+        "total_pending": total_pending,
+        "balance": balance,
+        "today": timezone.now().date(),
+        # ✅ send payment status choices to template
+        "payment_status_choices": FeePayment.PaymentStatus.choices,
     }
 
-    return render(request, 'bdm/payments/course_fee.html', context)
-    return redirect('bdm:leads')
+    return render(request, "bdm/payments/payment_detail.html", context)
 
+def course_fee(request):
 
+    # ✅ Only students who have at least one payment
+    students = (
+        Student.objects
+        .filter(fee_payments__isnull=False)
+        .prefetch_related('fee_payments', 'batches__course')
+        .distinct()
+    )
 
+    search = request.GET.get("search")
+    status_filter = request.GET.get("status")
 
+    if search:
+        students = students.filter(full_name__icontains=search)
 
+    student_data = []
+
+    for student in students:
+
+        batch = student.batches.first()
+        course = batch.course if batch else None
+        course_fee = course.course_fee if course else Decimal("0.00")
+
+        payments = student.fee_payments.all()
+
+        # =====================================================
+        # 🔹 ADMISSION STATUS
+        # =====================================================
+
+        admission_payments = payments.filter(
+            payment_type=FeePayment.PaymentType.ADMISSION
+        )
+
+        if not admission_payments.exists():
+            admission_status = "UNPAID"
+
+        elif admission_payments.filter(
+            payment_status=FeePayment.PaymentStatus.COMPLETED
+        ).exists():
+            admission_status = "PAID"
+
+        elif admission_payments.filter(
+            payment_status=FeePayment.PaymentStatus.PENDING
+        ).exists():
+            admission_status = "PENDING"
+
+        else:
+            admission_status = "UNPAID"
+
+        # =====================================================
+        # 🔹 COURSE FEE STATUS
+        # =====================================================
+
+        # 1️⃣ FULL PAYMENT (Status Based)
+        full_payment = payments.filter(
+            payment_type=FeePayment.PaymentType.FULL_PAYMENT
+        ).order_by('-payment_date').first()
+
+        if full_payment:
+            if full_payment.payment_status == FeePayment.PaymentStatus.COMPLETED:
+                course_status = "COMPLETED"
+            elif full_payment.payment_status == FeePayment.PaymentStatus.PENDING:
+                course_status = "PENDING"
+            else:
+                course_status = "UNPAID"
+
+        else:
+            # 2️⃣ INSTALLMENT LOGIC (Installment-number Based)
+            installments = payments.filter(
+                payment_type=FeePayment.PaymentType.INSTALLMENT
+            )
+
+            if not installments.exists():
+                course_status = "UNPAID"
+
+            else:
+                # If ANY installment is pending → PENDING
+                if installments.filter(
+                    payment_status=FeePayment.PaymentStatus.PENDING
+                ).exists():
+                    course_status = "PENDING"
+
+                else:
+                    # Get latest completed installment
+                    latest_completed = installments.filter(
+                        payment_status=FeePayment.PaymentStatus.COMPLETED
+                    ).order_by('-installment_number').first()
+
+                    if not latest_completed:
+                        course_status = "UNPAID"
+
+                    else:
+                        latest_number = latest_completed.installment_number or 0
+                        total_installments = latest_completed.total_installments or 0
+
+                        if total_installments > 0 and latest_number == total_installments:
+                            course_status = "COMPLETED"
+                        else:
+                            course_status = "IN PROGRESS"
+
+        # =====================================================
+        # 🔹 STATUS FILTER
+        # =====================================================
+
+        if status_filter and course_status != status_filter:
+            continue
+
+        student_data.append({
+            "id": student.id,
+            "name": student.full_name,
+            "course": course.name if course else "—",
+            "course_fee": course_fee,
+            "admission_status": admission_status,
+            "course_status": course_status,
+        })
+
+    return render(request, "bdm/payments/course_fee.html", {
+        "students": student_data
+    })
+    
+ 
+def payment_history(request, student_id):
+    # ================= GET STUDENT =================
+    student = get_object_or_404(Student, id=student_id)
+
+    # ================= HANDLE STATUS UPDATE =================
+    if request.method == "POST":
+        payment_id = request.POST.get("payment_id")
+        new_status = request.POST.get("status")
+
+        payment = get_object_or_404(FeePayment, id=payment_id, student=student)
+        if new_status in dict(FeePayment.PaymentStatus.choices).keys():
+            payment.payment_status = new_status
+            payment.save()
+            messages.success(request, f"Payment status updated to {payment.get_payment_status_display()}.")
+        else:
+            messages.error(request, "Invalid status selected.")
+
+        return redirect("bdm:payment_history", student_id=student.id)
+
+    # ================= GET BATCH & COURSE =================
+    batch = student.batches.first()
+    course = batch.course if batch else None
+    course_fee = course.course_fee if course else Decimal("0.00")
+
+    # ================= PREFETCH PAYMENTS =================
+    payments = FeePayment.objects.filter(student=student).prefetch_related(
+        Prefetch('documents', queryset=PaymentDocument.objects.all())
+    )
+
+    # ================= PAYMENT TYPES =================
+    admission_payments = payments.filter(payment_type=FeePayment.PaymentType.ADMISSION)
+    booking_payments = payments.filter(payment_type=FeePayment.PaymentType.BOOKING)
+    installments = payments.filter(payment_type=FeePayment.PaymentType.INSTALLMENT)
+    full_payment = payments.filter(payment_type=FeePayment.PaymentType.FULL_PAYMENT).first()
+    late_fees = payments.filter(payment_type=FeePayment.PaymentType.LATE_FEE)
+    other_payments = payments.filter(payment_type=FeePayment.PaymentType.OTHER)
+
+    # ================= ADMISSION STATUS =================
+    if not admission_payments.exists():
+        admission_status = "UNPAID"
+    elif admission_payments.filter(payment_status=FeePayment.PaymentStatus.COMPLETED).exists():
+        admission_status = "PAID"
+    elif admission_payments.filter(payment_status=FeePayment.PaymentStatus.PENDING).exists():
+        admission_status = "PENDING"
+    else:
+        admission_status = "UNPAID"
+
+    # ================= PAYMENT SUMMARY =================
+    # Default summary values
+    total_paid = Decimal("0.00")
+    balance = course_fee
+    progress = 0
+
+    # Only include course-related payments: installments + full payment
+    course_payments = payments.filter(
+        payment_type__in=[FeePayment.PaymentType.INSTALLMENT, FeePayment.PaymentType.FULL_PAYMENT]
+    )
+
+    # Sum only COMPLETED payments
+    total_paid = sum(p.amount for p in course_payments if p.payment_status == FeePayment.PaymentStatus.COMPLETED)
+
+    # Calculate balance and progress
+    balance = course_fee - total_paid
+    progress = int((total_paid / course_fee) * 100) if course_fee else 0
+
+    # ================= COURSE FEE STATUS =================
+    if full_payment:
+        if full_payment.payment_status == FeePayment.PaymentStatus.COMPLETED:
+            course_status = "COMPLETED"
+        elif full_payment.payment_status == FeePayment.PaymentStatus.PENDING:
+            course_status = "PENDING"
+        else:
+            course_status = "UNPAID"
+    else:
+        if not installments.exists():
+            course_status = "UNPAID"
+        elif installments.filter(payment_status=FeePayment.PaymentStatus.PENDING).exists():
+            course_status = "PENDING"
+        else:
+            latest_completed = installments.filter(
+                payment_status=FeePayment.PaymentStatus.COMPLETED
+            ).order_by('-installment_number').first()
+            if not latest_completed:
+                course_status = "UNPAID"
+            else:
+                latest_number = latest_completed.installment_number or 0
+                total_installments = latest_completed.total_installments or 0
+                if total_installments > 0 and latest_number == total_installments:
+                    course_status = "COMPLETED"
+                else:
+                    course_status = "IN PROGRESS"
+
+    # ================= CONTEXT =================
+    context = {
+        "student": student,
+        "course": course,
+        "course_fee": course_fee,
+        "total_paid": total_paid,
+        "balance": balance,
+        "admission_payments": admission_payments,
+        "booking_payments": booking_payments,
+        "installments": installments,
+        "full_payment": full_payment,
+        "late_fees": late_fees,
+        "other_payments": other_payments,
+        "admission_status": admission_status,
+        "course_status": course_status,
+        "progress": progress,
+        "payment_status_choices": FeePayment.PaymentStatus.choices,
+    }
+
+    return render(request, "bdm/payments/payment_history.html", context)

@@ -42,6 +42,7 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("payments/",views.payments_dashboard,name="payments_dashboard"),
                 path("payments/<int:pk>/",views.payment_detail,name="payment_detail"),
                 path('course-fee/', views.course_fee, name='course_fee'),
+                path("payment-history/<int:student_id>/", views.payment_history, name="payment_history"),
 
 
 

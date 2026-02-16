@@ -1,0 +1,787 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sora:wght@400;600;700&display=swap');
+
+  :root {
+    --white:        #ffffff;
+    --off-white:    #f7f9fc;
+    --surface:      #ffffff;
+    --border:       #e4eaf2;
+    --border-light: #eef2f7;
+
+    --text-primary:   #1a2135;
+    --text-secondary: #5a6882;
+    --text-muted:     #8fa0ba;
+
+    --blue-50:  #eef5ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+
+    --green-50:  #ecfdf5;
+    --green-600: #16a34a;
+    --green-700: #15803d;
+
+    --amber-50:  #fefce8;
+    --amber-700: #92400e;
+
+    --red-50:  #fef2f2;
+    --red-700: #b91c1c;
+
+    --shadow-sm: 0 1px 3px rgba(30,60,120,.06), 0 1px 2px rgba(30,60,120,.04);
+    --shadow-md: 0 4px 16px rgba(30,60,120,.08), 0 1px 4px rgba(30,60,120,.04);
+    --shadow-lg: 0 8px 32px rgba(30,60,120,.10), 0 2px 8px rgba(30,60,120,.06);
+
+    --radius-sm:   8px;
+    --radius-md:   12px;
+    --radius-lg:   16px;
+    --radius-pill: 999px;
+  }
+
+  /* ─── Base ─────────────────────────────────────── */
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--text-primary);
+  }
+
+  /* ─── Wrapper ───────────────────────────────────── */
+  .ph-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* ─── Section fade-in ───────────────────────────── */
+  @keyframes ph-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+  .ph-section {
+    animation: ph-fade-up .35s ease both;
+  }
+  .ph-section:nth-child(1) { animation-delay: .04s; }
+  .ph-section:nth-child(2) { animation-delay: .09s; }
+  .ph-section:nth-child(3) { animation-delay: .14s; }
+  .ph-section:nth-child(4) { animation-delay: .19s; }
+  .ph-section:nth-child(5) { animation-delay: .24s; }
+  .ph-section:nth-child(6) { animation-delay: .29s; }
+
+  /* ─── Student header card ───────────────────────── */
+  .ph-header-card {
+    background: var(--white);
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 1.6rem 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .ph-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: var(--blue-50);
+    border: 2px solid var(--blue-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ph-avatar svg {
+    color: var(--blue-500);
+  }
+
+  .ph-student-name {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -.35px;
+    color: var(--text-primary);
+    margin: 0 0 .35rem;
+    line-height: 1.2;
+  }
+
+  .ph-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+  }
+
+  .ph-meta-item {
+    font-size: .84rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+  }
+
+  .ph-meta-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* ─── Section card ──────────────────────────────── */
+  .ph-card {
+    background: var(--white);
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .ph-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .9rem 1.5rem;
+    background: var(--off-white);
+    border-bottom: 1.5px solid var(--border-light);
+  }
+
+  .ph-card-title {
+    font-family: 'Sora', sans-serif;
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -.15px;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .ph-card-title svg {
+    color: var(--blue-500);
+    flex-shrink: 0;
+  }
+
+  .ph-card-body {
+    padding: 1.25rem 1.5rem;
+  }
+
+  /* ─── Table ─────────────────────────────────────── */
+  .ph-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .875rem;
+  }
+
+  .ph-table thead th {
+    background: var(--off-white);
+    font-size: .73rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--text-muted);
+    padding: .7rem 1rem;
+    border-bottom: 1.5px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .ph-table thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+  .ph-table thead th:last-child  { border-radius: 0 var(--radius-sm) 0 0; }
+
+  .ph-table tbody tr {
+    transition: background .12s;
+  }
+  .ph-table tbody tr:hover { background: #f4f8ff; }
+
+  .ph-table tbody td {
+    padding: .8rem 1rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+  }
+
+  .ph-table tbody tr:last-child td { border-bottom: none; }
+
+  .ph-table .amount-cell {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .ph-table .amount-cell .cur {
+    font-size: .75rem;
+    color: var(--text-muted);
+    margin-right: 1px;
+    font-weight: 400;
+  }
+
+  /* Doc links */
+  .ph-doc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .8rem;
+    color: var(--blue-600);
+    text-decoration: none;
+    padding: .2rem .5rem;
+    border-radius: 5px;
+    transition: background .12s;
+  }
+  .ph-doc-link:hover { background: var(--blue-50); text-decoration: none; }
+
+  /* ─── Badges ────────────────────────────────────── */
+  .ph-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .28rem;
+    padding: .26rem .72rem;
+    border-radius: var(--radius-pill);
+    font-size: .74rem;
+    font-weight: 600;
+    letter-spacing: .15px;
+    white-space: nowrap;
+  }
+  .ph-badge::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ph-badge.success { background: var(--green-50);  color: var(--green-700); }
+  .ph-badge.success::before { background: #22c55e; }
+  .ph-badge.info    { background: var(--blue-50);   color: var(--blue-700);  }
+  .ph-badge.info::before    { background: var(--blue-500); }
+  .ph-badge.warning { background: var(--amber-50);  color: var(--amber-700); }
+  .ph-badge.warning::before { background: #f59e0b; }
+  .ph-badge.danger  { background: var(--red-50);    color: var(--red-700);   }
+  .ph-badge.danger::before  { background: #ef4444; }
+
+  /* ─── Inline status form ────────────────────────── */
+  .ph-status-form {
+    display: flex;
+    gap: .4rem;
+    align-items: center;
+  }
+
+  .ph-status-form .form-select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .8rem;
+    color: var(--text-primary);
+    background: var(--off-white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .3rem .6rem;
+    height: 34px;
+    min-width: 120px;
+    transition: border-color .14s, box-shadow .14s;
+    cursor: pointer;
+  }
+
+  .ph-status-form .form-select:focus {
+    border-color: var(--blue-400);
+    box-shadow: 0 0 0 3px rgba(96,165,250,.18);
+    outline: none;
+    background: var(--white);
+  }
+
+  .btn-update {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    padding: 0 .9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--white);
+    background: var(--blue-500);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background .16s, box-shadow .16s, transform .12s;
+    box-shadow: 0 2px 6px rgba(59,130,246,.28);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-update:hover {
+    background: var(--blue-600);
+    box-shadow: 0 3px 10px rgba(59,130,246,.36);
+    transform: translateY(-1px);
+  }
+
+  .btn-update:active { transform: translateY(0); }
+
+  /* ─── Full payment alert box ────────────────────── */
+  .ph-full-payment-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: var(--blue-50);
+    border: 1.5px solid var(--blue-100);
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.4rem;
+  }
+
+  .ph-full-payment-box .fp-detail {
+    font-size: .875rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .ph-full-payment-box .fp-detail strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* ─── Not paid notice ───────────────────────────── */
+  .ph-not-paid {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    font-size: .875rem;
+    color: var(--red-700);
+    font-weight: 500;
+  }
+
+  /* ─── Summary card ──────────────────────────────── */
+  .ph-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ph-stat {
+    background: var(--off-white);
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    text-align: center;
+  }
+
+  .ph-stat .stat-label {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--text-muted);
+    margin-bottom: .35rem;
+  }
+
+  .ph-stat .stat-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    line-height: 1;
+  }
+
+  .ph-stat .stat-value .cur {
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-right: 2px;
+  }
+
+  .ph-stat.total   .stat-value { color: var(--text-primary); }
+  .ph-stat.paid    .stat-value { color: var(--green-600);    }
+  .ph-stat.balance .stat-value { color: var(--red-700);      }
+
+  /* ─── Progress bar ──────────────────────────────── */
+  .ph-progress-wrap {
+    background: var(--border-light);
+    border-radius: var(--radius-pill);
+    height: 10px;
+    overflow: hidden;
+  }
+
+  .ph-progress-bar {
+    height: 100%;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(90deg, var(--blue-500), var(--blue-400));
+    transition: width .6s cubic-bezier(.4,0,.2,1);
+    position: relative;
+  }
+
+  .ph-progress-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.25) 50%, transparent 100%);
+    animation: ph-shimmer 1.8s infinite;
+  }
+
+  @keyframes ph-shimmer {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
+  }
+
+  .ph-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: .78rem;
+    color: var(--text-muted);
+    margin-top: .4rem;
+    font-weight: 500;
+  }
+
+  /* ─── Responsive ────────────────────────────────── */
+  @media (max-width: 680px) {
+    .ph-wrapper        { padding: 1.25rem .75rem 3rem; }
+    .ph-header-card    { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .ph-summary-grid   { grid-template-columns: 1fr; }
+    .ph-card-body      { padding: 1rem; }
+    .ph-card-header    { padding: .8rem 1rem; }
+    .ph-full-payment-box { flex-direction: column; }
+  }
+</style>
+
+
+<div class="ph-wrapper">
+<!-- ── BACK BUTTON ─────────────────────────────── -->
+  <div class="ph-section" style="margin-bottom: 1rem;">
+    <a href="{% url 'bdm:course_fee' %}" class="btn-update" style="background: #6b7280;">&larr; Back to Previous Page</a>
+
+    <!-- Back to Dashboard -->
+  <a href="{% url 'bdm:payments_dashboard' %}" 
+     class="btn-update" 
+     style="background: #2563eb;">
+     ⬅ Back to Dashboard
+  </a>
+  </div>
+
+  <!-- ── STUDENT HEADER ──────────────────────────── -->
+  <div class="ph-header-card ph-section">
+    <div class="ph-avatar">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </div>
+    <div>
+      <h4 class="ph-student-name">{{ student.full_name }}</h4>
+      <div class="ph-meta">
+        <span class="ph-meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <strong>{{ course.name }}</strong>
+        </span>
+        <span class="ph-meta-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Total Fee: <strong>₹ {{ course_fee }}</strong>
+        </span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── BOOKING FEE ──────────────────────────────── -->
+  {% if booking_payments %}
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M2 9.5h20"/></svg>
+        Booking Fee
+      </span>
+    </div>
+    <div class="ph-card-body" style="padding:0;">
+      <div class="table-responsive">
+        <table class="ph-table">
+          <thead>
+            <tr>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Documents</th>
+              <th>Due / Payment Date</th>
+              <th>Update Status</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in booking_payments %}
+            <tr>
+              <td class="amount-cell"><span class="cur">₹</span>{{ payment.amount }}</td>
+              <td>{{ payment.get_payment_method_display }}</td>
+              <td>
+                {% if payment.documents.all %}
+                  {% for doc in payment.documents.all %}
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="ph-doc-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {{ doc.get_document_type_display }}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:var(--text-muted);font-size:.8rem;">—</span>
+                {% endif %}
+              </td>
+              <td>{{ payment.payment_date }}</td>
+              <td>
+                <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                  <select name="status" class="form-select">
+                    {% for key, value in payment_status_choices %}
+                      <option value="{{ key }}" {% if payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-update">Verify</button>
+                </form>
+                
+              </td>
+              <td>
+  <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+    View
+  </a>
+</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ── ADMISSION FEE ────────────────────────────── -->
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        Admission Fee
+      </span>
+      {% if admission_status == "PAID" %}
+        <span class="ph-badge success">{{ admission_status }}</span>
+      {% elif admission_status == "PENDING" %}
+        <span class="ph-badge warning">{{ admission_status }}</span>
+      {% else %}
+        <span class="ph-badge danger">{{ admission_status }}</span>
+      {% endif %}
+    </div>
+
+    <div class="ph-card-body" style="padding:0;">
+      {% if admission_payments %}
+      <div class="table-responsive">
+        <table class="ph-table">
+          <thead>
+            <tr>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Documents</th>
+              <th>Payment Date</th>
+              <th>Update Status</th>
+               <th>View</th> 
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in admission_payments %}
+            <tr>
+              <td class="amount-cell"><span class="cur">₹</span>{{ payment.amount }}</td>
+              <td>{{ payment.get_payment_method_display }}</td>
+              <td>
+                {% if payment.documents.all %}
+                  {% for doc in payment.documents.all %}
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="ph-doc-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {{ doc.get_document_type_display }}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:var(--text-muted);font-size:.8rem;">—</span>
+                {% endif %}
+              </td>
+              <td>{{ payment.payment_date }}</td>
+              <td>
+                <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                  <select name="status" class="form-select">
+                    {% for key, value in payment_status_choices %}
+                      <option value="{{ key }}" {% if payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-update">Verify</button>
+                </form>
+              </td>
+              <td>
+  <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+    View
+  </a>
+</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="ph-card-body">
+          <div class="ph-not-paid">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Admission fee has not been paid yet.
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <!-- ── EMI / INSTALLMENTS ───────────────────────── -->
+  {% if installments %}
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        EMI / Installments
+      </span>
+    </div>
+    <div class="ph-card-body" style="padding:0;">
+      <div class="table-responsive">
+        <table class="ph-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Due Date</th>
+              <th>Payment Date</th>
+              <th>Documents</th>
+              <th>Update Status</th>
+               <th>View</th> 
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in installments %}
+            <tr>
+              <td style="font-weight:600;color:var(--text-primary);">
+                {{ payment.installment_number }}<span style="color:var(--text-muted);font-weight:400;">/{{ payment.total_installments }}</span>
+              </td>
+              <td class="amount-cell"><span class="cur">₹</span>{{ payment.amount }}</td>
+              <td>{{ payment.get_payment_method_display }}</td>
+              <td>{{ payment.due_date }}</td>
+              <td>{{ payment.payment_date }}</td>
+              <td>
+                {% if payment.documents.all %}
+                  {% for doc in payment.documents.all %}
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="ph-doc-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {{ doc.get_document_type_display }}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:var(--text-muted);font-size:.8rem;">—</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                  <select name="status" class="form-select">
+                    {% for key, value in payment_status_choices %}
+                      <option value="{{ key }}" {% if payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-update">Verify</button>
+                </form>
+              </td>
+              <td>
+  <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+    View
+  </a>
+</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ── FULL PAYMENT ──────────────────────────────── -->
+  {% if full_payment %}
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Full Payment
+      </span>
+    </div>
+    <div class="ph-card-body">
+      <div class="ph-full-payment-box">
+        <div class="fp-detail">
+          <div><strong>Amount:</strong> ₹ {{ full_payment.amount }}</div>
+          <div><strong>Status:</strong> {{ full_payment.get_payment_status_display }}</div>
+        </div>
+        <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+          {% csrf_token %}
+          <input type="hidden" name="payment_id" value="{{ full_payment.id }}">
+          <select name="status" class="form-select">
+            {% for key, value in payment_status_choices %}
+              <option value="{{ key }}" {% if full_payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn-update">Verify</button>
+        </form>
+        <!-- VIEW button -->
+      <a href="{% url 'bdm:payment_detail' full_payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+        View
+      </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ── COURSE FEE SUMMARY ───────────────────────── -->
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Course Fee Summary
+      </span>
+    </div>
+    <div class="ph-card-body">
+
+      <div class="ph-summary-grid">
+        <div class="ph-stat total">
+          <div class="stat-label">Total Fee</div>
+          <div class="stat-value"><span class="cur">₹</span>{{ course_fee }}</div>
+        </div>
+        <div class="ph-stat paid">
+          <div class="stat-label">Total Paid</div>
+          <div class="stat-value"><span class="cur">₹</span>{{ total_paid }}</div>
+        </div>
+        <div class="ph-stat balance">
+          <div class="stat-label">Balance</div>
+          <div class="stat-value"><span class="cur">₹</span>{{ balance }}</div>
+        </div>
+      </div>
+
+      {% if progress %}
+      <div>
+        <div class="ph-progress-wrap">
+          <div class="ph-progress-bar" style="width: {{ progress }}%;"></div>
+        </div>
+        <div class="ph-progress-label">
+          <span>0%</span>
+          <span>{{ progress|floatformat:0 }}% paid</span>
+          <span>100%</span>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
