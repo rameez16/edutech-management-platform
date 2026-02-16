@@ -2457,23 +2457,34 @@ a:hover {
 }
 
 /* Status badges */
+/* Status badges (adapted for experience_level) */
 .status {
     display: inline-block;
     padding: 4px 10px;
     font-size: 0.85rem;
     font-weight: 500;
     border-radius: 12px;
-    color: #fff;
+    color: var(--text-primary); /* consistent text */
     text-align: center;
+    min-width: 70px;
 }
 
-.status.active {
-    background: var(--success);
+/* Professional color mapping for experience level */
+.status.beginner {
+    background: var(--info);
+    color: var(--bg-dark); /* blue */
 }
 
-.status.inactive {
-    background: var(--danger);
+.status.intermediate {
+    background: var(--warning); /* yellow/orange */
+    color: var(--text-primary);
 }
+
+.status.advanced {
+    background: var(--success); /* green */
+}
+
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -3180,4 +3191,582 @@ details[open] .module-summary {
     font-size: 0.7rem;
     margin-top: 8px;
     color: var(--text-secondary);
+}
+
+
+/* ===============================
+   ATTENDANCE BATCH CARDS
+================================ */
+
+/* Grid layout */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 20px;
+}
+
+/* Card style */
+.batch-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+    min-height: 320px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.batch-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+/* Title bar */
+.batch-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.batch-title-bar h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.batch-status {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.batch-status.ongoing { background-color: var(--accent); }
+.batch-status.completed { background-color: var(--success); }
+.batch-status.upcoming { background-color: var(--warning); }
+
+/* Batch info */
+.batch-info {
+    list-style: none;
+    padding: 0;
+    margin: 0.6rem 0;
+    flex-grow: 1;
+}
+
+.batch-info li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    gap: 10px;
+}
+
+.batch-info li strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Highlight attendance numbers */
+.batch-info li .highlight {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+/* Actions */
+.attendance-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 0.75rem;
+}
+
+.btn-primary, .btn-secondary {
+    text-decoration: none;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #3578e5;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+}
+
+.btn-secondary:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 180px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .batch-card { min-height: auto; }
+}
+
+@media (min-width: 1400px) {
+    .stats-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+
+/* ===============================
+   ATTENDANCE SESSIONS
+================================ */
+
+/* Glass card specifically for attendance sessions */
+.attendance-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.batch-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.05);
+    transition: background 0.2s ease;
+}
+
+.back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-primary);
+}
+
+.back-btn:hover {
+    background: var(--glass-hover);
+    cursor: pointer;
+}
+
+
+/* Scoped table for attendance sessions */
+.attendance-sessions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Table header */
+.attendance-sessions-table thead {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.attendance-sessions-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+/* Table body */
+.attendance-sessions-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 500;
+}
+
+/* Hover effect */
+.attendance-sessions-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: background 0.3s ease;
+}
+
+/* Buttons specific for attendance actions */
+.attendance-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: var(--primary);
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+/* Status badges scoped */
+.status-badge.attendance-active {
+    background: var(--success);
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.status-badge.attendance-inactive {
+    background: var(--danger);
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+/* Search bar container */
+.attendance-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+/* Search input */
+/* Search wrapper to position icon inside input */
+.search-wrapper {
+    position: relative;
+    display: inline-block;
+    float: right; /* keep it aligned to right */
+}
+
+/* Input field styling */
+.attendance-search {
+    padding: 8px 12px 8px 36px; /* left padding for icon */
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+    font-size: 0.9rem; /* increased font size */
+    width: 220px;
+    transition: all 0.2s ease;
+}
+
+.attendance-search::placeholder {
+    color: var(--text-secondary);
+}
+
+.attendance-search:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.1);
+}
+
+/* SVG icon inside input */
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px; /* distance from left edge */
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    stroke: var(--text-secondary);
+    pointer-events: none; /* input is still clickable */
+}
+
+/* Optional: hover effect for input */
+.attendance-search:hover {
+    border-color: var(--accent);
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .attendance-sessions-table th,
+    .attendance-sessions-table td {
+        padding: 10px 8px;
+    }
+}
+
+/* ===============================
+   ATTENDANCE MARK
+================================ */
+/* Glass card for mark attendance */
+.attendance-mark-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-top: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+/* Table */
+.attendance-mark-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    margin-top: 0.5rem;
+}
+
+.attendance-mark-table th, 
+.attendance-mark-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.attendance-mark-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: left;
+}
+
+.attendance-mark-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: background 0.3s ease;
+}
+
+/* Checkbox styling */
+.attendance-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+/* Buttons */
+.form-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--accent);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--primary);
+}
+
+.btn-secondary:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* Back button inside header */
+.batch-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.batch-header .back-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--accent);
+    cursor: pointer;
+}
+
+.session-info {
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ===============================
+   Late Toggle Switch
+================================ */
+.late-toggle-wrapper {
+    display: inline-block;
+    position: relative;
+    width: 50px;
+    height: 24px;
+}
+
+.late-toggle-wrapper input {
+    display: none;
+}
+
+.late-toggle-wrapper .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.15);
+    transition: 0.4s;
+    border-radius: 24px;
+    border: 1px solid var(--accent);
+}
+
+.late-toggle-wrapper .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.late-toggle-wrapper input:checked + .slider {
+    background-color: var(--accent);
+}
+
+.late-toggle-wrapper input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+
+
+/* // */
+
+/* Glass card for summary & table */
+.attendance-summary, .attendance-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+/* Summary list */
+.attendance-summary ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.attendance-summary li {
+    margin-bottom: 6px;
+}
+
+.attendance-summary li strong {
+    color: var(--text-accent);
+}
+
+/* Table styling */
+.attendance-sessions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.attendance-sessions-table th,
+.attendance-sessions-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.attendance-sessions-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: background 0.3s ease;
+}
+
+/* Status badges */
+.status-badge.attendance-active {
+    background: var(--success);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.status-badge.attendance-inactive {
+    background: var(--danger);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.status-badge.attendance-warning {
+    background: var(--warning);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.status-badge.attendance-neutral {
+    background: var(--accent);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+/* Back button inside header */
+.batch-title.batch-header a.back-btn {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    color: var(--text-primary);
+}
+.batch-title.batch-header a.back-btn svg {
+    width: 20px;
+    height: 20px;
 }

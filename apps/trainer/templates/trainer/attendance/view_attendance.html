@@ -1,0 +1,61 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h2 class="batch-title batch-header">
+    <a href="{% url 'trainer:attendance-sessions' session.batch.id %}" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+    Attendance Details - {{ session.batch.name }}
+</h2>
+
+<div class="glass-card attendance-summary">
+    <h3>Session Summary</h3>
+    <ul>
+        <li><strong>Session:</strong> {{ session.lesson_plan.session_number }}</li>
+        <li><strong>Date:</strong> {{ session.actual_date }}</li>
+        <li><strong>Total Students:</strong> {{ total_students }}</li>
+        <li><strong>Present:</strong> {{ present_count }}</li>
+        <li><strong>Absent:</strong> {{ absent_count }}</li>
+    </ul>
+</div>
+
+<div class="glass-card attendance-card">
+    <div class="table-wrapper">
+        <table class="data-table attendance-sessions-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance_records %}
+                <tr>
+                    <td>{{ record.student.full_name }}</td>
+                    <td>
+                        {% if record.status == "present" %}
+                            <span class="status-badge attendance-active">Present</span>
+                        {% elif record.status == "absent" %}
+                            <span class="status-badge attendance-inactive">Absent</span>
+                        {% elif record.status == "late" %}
+                            <span class="status-badge attendance-warning">Late</span>
+                        {% elif record.status == "excused" %}
+                            <span class="status-badge attendance-neutral">Excused</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No attendance marked yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

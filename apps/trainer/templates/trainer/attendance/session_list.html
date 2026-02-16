@@ -1,0 +1,81 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+<h2 class="batch-title batch-header">
+    <a href="{% url 'trainer:attendance-batch-list' %}" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+    Sessions : {{ batch.name }}
+</h2>
+
+
+<div class="glass-card attendance-card">
+
+    <!-- Search bar container -->
+    <div class="attendance-header">
+        <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="sessionSearch" placeholder="Search sessions..." class="attendance-search">
+        </div>
+    </div>
+
+
+    <div class="table-wrapper">
+        <table class="data-table attendance-sessions-table" id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Session</th>
+                    <th>Planned Date</th>
+                    <th>Completion Date</th>
+                    <th>Status</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in sessions %}
+                <tr>
+                    <td>Session {{ session.lesson_plan.session_number }}</td>
+                    <td>{{ session.planned_date }}</td>
+                    <td>
+                        {% if session.actual_date %}
+                            {{ session.actual_date }}
+                        {% else %}
+                            <span class="text-muted">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if session.status == "completed" %}
+                            <span class="status-badge attendance-active">Completed</span>
+                        {% else %}
+                            <span class="status-badge attendance-inactive">{{ session.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if session.status == "completed" %}
+                            <a href="{% url 'trainer:attendance-mark' session.id %}" class="attendance-btn">Mark</a>
+                            |
+                            <a href="{% url 'trainer:attendance-view' session.id %}" class="attendance-btn">View</a>
+                        {% else %}
+                            <span class="text-muted">Not Available</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        No sessions scheduled
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

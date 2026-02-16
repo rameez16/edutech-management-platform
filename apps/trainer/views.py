@@ -6,7 +6,7 @@ from django.utils import timezone
 from apps.trainer.forms import TrainerProfileForm
 
 from apps.bdm.models import Trainer, Batch, Student
-from apps.trainer.models import Module
+from apps.trainer.models import Module, Attendance, LessonSession
 from apps.student.models import StudentFeedback
 
 
@@ -226,3 +226,131 @@ def batch_feedback_view(request, batch_id):
     ).order_by("-created_at")
 
     return render(request,"trainer/mybatches/feedback.html",{"batch": batch,"feedbacks": feedbacks,})
+
+@login_required
+def attendance_batch_list(request):
+    # Get the logged-in trainer
+    trainer = request.user.trainer  # adjust if your User model is linked differently
+
+    # Fetch only batches assigned to this trainer
+    batches = Batch.objects.filter(trainers=trainer)
+    batch_data = []
+
+    for batch in batches:
+        total_sessions = batch.lesson_sessions.count()
+        classes_completed = batch.lesson_sessions.filter(status='completed').count()
+
+        # Sessions where attendance is fully marked
+        completed_attendance = Attendance.objects.filter(
+            batch=batch,
+            lesson_session__status='completed'
+        ).values('lesson_session').distinct().count()
+
+        pending_attendance = classes_completed - completed_attendance
+
+        # Next upcoming session
+        next_session = batch.lesson_sessions.filter(
+            status='planned'
+        ).order_by('planned_date').first()
+
+        batch_data.append({
+            'id': batch.id,
+            'name': batch.name,
+            'status': 'ongoing',  # Or compute based on start/end
+            'total_students': batch.students.count(),
+            'total_sessions': total_sessions,
+            'classes_completed': classes_completed,
+            'completed_attendance': completed_attendance,
+            'pending_attendance': pending_attendance,
+            'next_session': next_session.planned_date if next_session else None,
+        })
+
+    return render(request, "trainer/attendance/batch_list.html", {
+        "batches": batch_data
+    })
+
+
+    
+def attendance_session_list(request, batch_id):
+    batch = get_object_or_404(Batch, id=batch_id)
+
+    sessions = LessonSession.objects.filter(
+        batch=batch,
+        status=LessonSession.SessionStatus.COMPLETED
+    ).select_related("lesson_plan").order_by("-lesson_plan__session_number")
+
+    return render(request, "trainer/attendance/session_list.html", {
+        "batch": batch,
+        "sessions": sessions
+    })
+    
+@login_required
+def attendance_mark(request, session_id):
+    session = get_object_or_404(LessonSession, id=session_id)
+    batch = session.batch
+
+    # Only allow completed sessions
+    if session.status != LessonSession.SessionStatus.COMPLETED:
+        messages.error(
+            request,
+            "Attendance can only be marked for completed sessions."
+        )
+        return redirect("trainer:attendance-sessions", batch_id=batch.id)
+
+    students = batch.students.all()
+
+    if request.method == "POST":
+        for student in students:
+            is_checked = request.POST.get(f"student_{student.id}") == "on"
+
+            Attendance.objects.update_or_create(
+                student=student,
+                batch=batch,
+                date=session.actual_date,
+                defaults={
+                    "lesson_session": session,
+                    "status": "present" if is_checked else "absent",
+                    "marked_by": session.trainer,
+                    "remarks": ""
+                }
+            )
+
+        messages.success(request, "Attendance saved successfully.")
+        return redirect("trainer:attendance-sessions", batch_id=batch.id)
+
+    # Prefill existing attendance: list of student IDs marked present
+    existing_attendance_students = Attendance.objects.filter(
+        batch=batch,
+        date=session.actual_date,
+        status='present'
+    ).values_list('student_id', flat=True)
+
+    return render(request, "trainer/attendance/mark_attendance.html", {
+        "session": session,
+        "students": students,
+        "existing_attendance_students": existing_attendance_students
+    })
+
+
+def attendance_view(request, session_id):
+    session = get_object_or_404(LessonSession, id=session_id)
+    batch = session.batch
+
+    attendance_records = Attendance.objects.filter(
+        batch=batch,
+        date=session.actual_date
+    ).select_related("student")
+
+    total_students = batch.students.count()
+    present_count = attendance_records.filter(status="present").count()
+    absent_count = attendance_records.filter(status="absent").count()
+
+    return render(request, "trainer/attendance/view_attendance.html", {
+        "session": session,
+        "attendance_records": attendance_records,
+        "total_students": total_students,
+        "present_count": present_count,
+        "absent_count": absent_count,
+    })
+
+

@@ -323,6 +323,10 @@
 
 })();
 
+// ============================================
+// Profile Dropdown - Inside Header
+// ============================================
+
 document.addEventListener("DOMContentLoaded", function () {
     const profileDropdown = document.querySelector(".profile-dropdown");
     if (!profileDropdown) return; // safety check
@@ -344,3 +348,29 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// ====================================
+// Attendance Section Search Option 
+// ====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("sessionSearch");
+    const table = document.getElementById("attendanceTable");
+    const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+    searchInput.addEventListener("keyup", function () {
+        const filter = searchInput.value.toLowerCase();
+
+        for (let row of rows) {
+            // Get the text content of the session column (first <td>)
+            const sessionCell = row.getElementsByTagName("td")[0];
+            if (!sessionCell) continue; // skip empty rows
+
+            const text = sessionCell.textContent.toLowerCase();
+            if (text.indexOf(filter) > -1) {
+                row.style.display = ""; // show row
+            } else {
+                row.style.display = "none"; // hide row
+            }
+        }
+    });
+});
