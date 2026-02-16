@@ -386,31 +386,31 @@
         <div class="donut-chart">
             <svg width="140" height="140" viewBox="0 0 140 140">
 
+                <!-- Present -->
                 <circle
+                    id="presentRing"
                     class="donut-segment"
                     cx="70"
                     cy="70"
                     r="54"
                     stroke="var(--emerald-light)"
-                    stroke-dasharray="203.6 339.3"
-                    stroke-dashoffset="0"
                 />
 
+                <!-- Absent -->
                 <circle
+                    id="absentRing"
                     class="donut-segment"
                     cx="70"
                     cy="70"
                     r="54"
                     stroke="var(--gold)"
-                    stroke-dasharray="135.7 339.3"
-                    stroke-dashoffset="-203.6"
                 />
 
             </svg>
 
             <div class="donut-center">
-                <div class="donut-value">%</div>
-                <div class="donut-label">Attendent</div>
+                <div id="attendanceValue" class="donut-value">0%</div>
+                <div class="donut-label">Attendance</div>
             </div>
         </div>
 

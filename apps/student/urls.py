@@ -22,6 +22,8 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('lms_login/',views.lms_login,name='lms_login'),
                path('lms_dashboard/',views.lms_dashboard,name='lms_dashboard'),
                path("fees/", views.payment_gateway, name="payment_gateway"),
+               path("student_attendance/", views.student_attendance, name="student_attendance"),
+               path("student_leave/", views.student_leave, name="student_leave"),
                
                
                

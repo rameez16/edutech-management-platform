@@ -2036,3 +2036,72 @@ a {
     box-sizing: border-box;
     overflow-x: hidden;
 }
+.donut-container {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.donut-chart {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.donut-chart svg {
+    transform: rotate(-90deg);
+}
+
+.donut-segment {
+    fill: none;
+}
+
+.donut-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.donut-value {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.donut-label {
+    font-size: 13px;
+    opacity: 0.6;
+}
+
+.donut-subtext {
+    font-size: 11px;
+    opacity: 0.5;
+}
+
+.donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legend-color.cyan {
+    background: var(--emerald-light);
+}
+
+.legend-color.magenta {
+    background: var(--gold);
+}

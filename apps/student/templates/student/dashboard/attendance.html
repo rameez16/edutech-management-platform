@@ -1,0 +1,143 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'student/css/attendance.css' %}?v=5">
+
+<div class="page-center">
+
+    <div class="attendance-container">
+
+        <!-- HEADER -->
+        <div class="attendance-header">
+            <h1>Track Your Attendance</h1>
+            <h3>Monitor your class participation</h3>
+        </div>
+
+        <!-- STUDENT INFO -->
+        <div class="student-info-card">
+
+            <div class="student-info-item">
+                <label>Student ID</label>
+                <span>{{ student.id }}</span>
+            </div>
+
+            <div class="student-info-item">
+                <label>Name</label>
+                <span>
+                    {{ student.full_name|default:student.user.get_full_name|default:student.user.username }}
+                </span>
+            </div>
+
+            <div class="student-info-item">
+                <label>Email</label>
+                <span>{{ student.user.email }}</span>
+            </div>
+
+            <div class="student-info-item">
+                <label>Batch</label>
+                <span>{{ batch.name|default:"Not Assigned" }}</span>
+            </div>
+
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-grid">
+
+            <div class="summary-card gradient-main">
+                <h3>{{ percentage }}%</h3>
+                <p>Overall</p>
+            </div>
+
+            <div class="summary-card gradient-present">
+                <h3>{{ present_days }}</h3>
+                <p>Present</p>
+            </div>
+
+            <div class="summary-card gradient-absent">
+                <h3>{{ absent_days }}</h3>
+                <p>Absent</p>
+            </div>
+
+            <div class="summary-card gradient-excused">
+                <h3>{{ excused_days }}</h3>
+                <p>Excused</p>
+            </div>
+
+        </div>
+
+        <!-- PROGRESS BAR -->
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ percentage }}%;"></div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="attendance-table-card">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Session</th>
+                        <th>Trainer</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for record in attendance_records %}
+                    <tr>
+
+                        <td>{{ record.date|date:"M. d, Y" }}</td>
+
+                        <td>
+                            {% if record.lesson_session %}
+                                <span class="session-pill">
+                                    Session {{ record.lesson_session.lesson_plan.session_number }}
+                                </span>
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if record.marked_by %}
+                                {{ record.marked_by.full_name|default:record.marked_by.user.get_full_name|default:record.marked_by.user.username }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="badge {{ record.status }}">
+                                {{ record.status|title }}
+                            </span>
+                        </td>
+
+                        <td class="remarks-cell">
+                            {{ record.remarks|default:"—" }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            No attendance records yet 😎
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

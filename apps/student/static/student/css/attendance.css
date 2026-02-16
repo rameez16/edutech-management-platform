@@ -1,0 +1,192 @@
+/* ================= PAGE LAYOUT ================= */
+
+.page-center {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+   
+    min-height: 100vh;
+}
+
+/* ================= CONTAINER ================= */
+
+.attendance-container {
+    width: 100%;
+    max-width: 1100px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(18px);
+    border-radius: 26px;
+    padding: 35px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* ================= HEADER ================= */
+
+.attendance-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.attendance-header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: white;
+}
+
+.attendance-header h3 {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ================= STUDENT INFO ================= */
+
+.student-info-card {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.student-info-item {
+    background: white;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.06);
+}
+
+.student-info-item label {
+    font-size: 12px;
+    color: #888;
+}
+
+.student-info-item span {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* ================= SUMMARY ================= */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    border-radius: 18px;
+    padding: 20px;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.summary-card h3 {
+    font-size: 24px;
+}
+
+.summary-card p {
+    font-size: 13px;
+}
+
+/* COLORS */
+
+.gradient-main { background: linear-gradient(135deg, #5f2cff, #7a5cff); }
+.gradient-present { background: linear-gradient(135deg, #00c853, #00e676); }
+.gradient-absent { background: linear-gradient(135deg, #ff1744, #ff5252); }
+.gradient-excused { background: linear-gradient(135deg, #00b0ff, #40c4ff); }
+
+/* ================= PROGRESS BAR ================= */
+
+.progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffcc00, #ffb300);
+}
+
+/* ================= TABLE ================= */
+
+.attendance-table-card {
+    background: white;
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+th {
+    font-size: 12px;
+    color: #777;
+    padding: 14px;
+    text-align: left;
+}
+
+td {
+    padding: 18px 14px;
+    border-top: 1px solid #f1f1f1;
+    font-size: 14px;
+}
+
+/* SESSION */
+
+.session-pill {
+    background: #f5f5f5;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* BADGES */
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.badge.present { background: #00c853; }
+.badge.absent { background: #ff1744; }
+.badge.late { background: #ffcc00; color: black; }
+.badge.excused { background: #00b0ff; }
+
+/* REMARKS FIX */
+
+.remarks-cell {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.5;
+    color: #666;
+}
+
+/* EMPTY */
+
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .student-info-card,
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

@@ -115,14 +115,14 @@
 
 
                         <li class="nav-item">
-                            <a href="attendance.html" class="nav-link">
+                            <a href="{% url 'student:student_attendance' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                                     <path d="M16 2v4M8 2v4"/>
                                     <path d="M3 10h18"/>
                                     <path d="M9 16l2 2 4-4"/>
                                 </svg>
-                                Attendance Calendar
+                                Attendance Tracking
                             </a>
                         </li>
 
@@ -139,7 +139,7 @@
                         
 
                         <li class="nav-item">
-                            <a href="leave.html" class="nav-link">
+                            <a href="{% url 'student:student_leave' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 2v20"/>
                                     <path d="M2 12h20"/>
