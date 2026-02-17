@@ -22,7 +22,7 @@ from .form import StudentAdminProfileForm, TrainerAdminProfileForm
 
 from django.db.models import Sum
 
-from apps.student.models import FeePayment
+from apps.student.models import FeePayment ,LeaveApplication
 from apps.bdm.models import Student ,PaymentDocument
 
 
@@ -1337,3 +1337,58 @@ def payment_history(request, student_id):
     }
 
     return render(request, "bdm/payments/payment_history.html", context)
+
+
+
+#leave section-aleena
+
+def leave_view(request):
+    status_filter = request.GET.get('status', 'all')
+
+    leaves = LeaveApplication.objects.select_related(
+        'student', 'batch', 'approved_by'
+    ).all()
+
+    # Apply filtering
+    if status_filter != 'all':
+        leaves = leaves.filter(status=status_filter)
+
+    context = {
+        'leaves': leaves,
+        'total_count': LeaveApplication.objects.count(),
+        'pending_count': LeaveApplication.objects.filter(status='pending').count(),
+        'approved_count': LeaveApplication.objects.filter(status='approved').count(),
+        'rejected_count': LeaveApplication.objects.filter(status='rejected').count(),
+        'active_status': status_filter,
+    }
+
+    return render(request, 'bdm/leave/leave.html', context)
+
+@login_required
+def leave_detail(request, pk):
+    leave = get_object_or_404(
+        LeaveApplication.objects.select_related(
+            'student', 'batch', 'approved_by'
+        ),
+        pk=pk
+    )
+
+    student = leave.student
+
+    leave_stats = LeaveApplication.objects.filter(student=student).aggregate(
+        total_count=Count('id'),
+        approved_count=Count('id', filter=Q(status='approved')),
+        pending_count=Count('id', filter=Q(status='pending')),
+        rejected_count=Count('id', filter=Q(status='rejected')),
+
+        # 👇 Rename this
+        total_days_sum=Sum('total_days'),
+        approved_days_sum=Sum('total_days', filter=Q(status='approved')),
+        pending_days_sum=Sum('total_days', filter=Q(status='pending')),
+        rejected_days_sum=Sum('total_days', filter=Q(status='rejected')),
+    )
+
+    return render(request, 'bdm/leave/leave_detail.html', {
+        'leave': leave,
+        'leave_stats': leave_stats
+    })

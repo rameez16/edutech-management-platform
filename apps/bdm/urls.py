@@ -57,6 +57,10 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path('bdm/student/<int:student_id>',views.view_student_id_card,name='view_student_id_card'),
                  
                 path('document/<int:document_id>/reject/', views.reject_document, name='reject_document'),
+                
+                
+                path('leave/', views.leave_view, name='leave'),
+                path('leave/<int:pk>/', views.leave_detail, name='leave_detail'),
                 ]
 
 

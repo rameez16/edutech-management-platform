@@ -1171,6 +1171,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                         <span class="sidebar-link-text">Student Onboarding</span>
                     </a>
+                    <a href="{% url 'bdm:leave' %}" class="sidebar-link {% if 'leave' in request.resolver_match.url_name %}active{% endif %}">
+                        <div class="sidebar-link-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span class="sidebar-link-text">Leave</span>
+                    </a>
                     
                     <a href="" class="sidebar-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
                         <div class="sidebar-link-icon">
@@ -1475,7 +1481,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </div>
                                 <span class="sidebar-link-text">Student Onboarding</span>
                             </a>
-                            
+                            <a href="{% url 'bdm:leave' %}" class="sidebar-link {% if 'leave' in request.resolver_match.url_name %}active{% endif %}">
+                            <div class="sidebar-link-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <span class="sidebar-link-text">Leave</span>
+                            </a>
                             <a href="{% url 'bdm:payments_dashboard' %}" class="sidebar-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
                                 <div class="sidebar-link-icon">
                                     <i class="fas fa-credit-card"></i>

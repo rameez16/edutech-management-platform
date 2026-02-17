@@ -1,0 +1,547 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg:             #f4f5f7;
+    --surface:        #ffffff;
+    --border:         #e2e5ea;
+    --divider:        #edf0f4;
+    --text-primary:   #1a1f2e;
+    --text-secondary: #5a6378;
+    --text-muted:     #9aa0b0;
+
+    --accent:         #2563eb;
+    --accent-light:   #eff4ff;
+    --accent-mid:     #bfcffd;
+
+    --success:        #16a34a;
+    --success-bg:     #f0fdf4;
+    --success-border: #bbf7d0;
+
+    --warning:        #d97706;
+    --warning-bg:     #fffbeb;
+    --warning-border: #fde68a;
+
+    --danger:         #dc2626;
+    --danger-bg:      #fef2f2;
+    --danger-border:  #fecaca;
+
+    --purple:         #7c3aed;
+    --purple-bg:      #f5f3ff;
+    --purple-border:  #ddd6fe;
+
+    --radius:    8px;
+    --shadow:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Page Layout ── */
+  .dashboard-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    letter-spacing: -0.2px;
+  }
+
+  .header h1 i {
+    color: var(--accent);
+    font-size: 15px;
+    background: var(--accent-light);
+    padding: 7px;
+    border-radius: 6px;
+    border: 1px solid var(--accent-mid);
+  }
+
+  /* ── Stats Grid ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  /* <a> wrapper — makes the whole card clickable */
+  .stat-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+    cursor: pointer;
+  }
+
+  .stat-link:hover .stat-card {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  /* left accent stripe */
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 8px 0 0 8px;
+  }
+
+  .stat-card.total::before    { background: var(--accent); }
+  .stat-card.pending::before  { background: var(--warning); }
+  .stat-card.completed::before{ background: var(--success); }
+  .stat-card.collected::before{ background: var(--danger); }
+
+  /* active / selected state */
+  .stat-card.active-card {
+    border-width: 1.5px;
+    box-shadow: var(--shadow-md);
+  }
+  .stat-card.total.active-card    { border-color: var(--accent-mid);     background: var(--accent-light); }
+  .stat-card.pending.active-card  { border-color: var(--warning-border); background: var(--warning-bg); }
+  .stat-card.completed.active-card{ border-color: var(--success-border); background: var(--success-bg); }
+  .stat-card.collected.active-card{ border-color: var(--danger-border);  background: var(--danger-bg); }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .stat-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .stat-card.total    .stat-icon { background: var(--accent-light);  color: var(--accent);  border: 1px solid var(--accent-mid); }
+  .stat-card.pending  .stat-icon { background: var(--warning-bg);    color: var(--warning); border: 1px solid var(--warning-border); }
+  .stat-card.completed .stat-icon{ background: var(--success-bg);    color: var(--success); border: 1px solid var(--success-border); }
+  .stat-card.collected .stat-icon{ background: var(--danger-bg);     color: var(--danger);  border: 1px solid var(--danger-border); }
+
+  /* ── Table Card ── */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--divider);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .table-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .table-header h2 i {
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  /* ── Table ── */
+  .payments-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .payments-table thead tr {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .payments-table thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.65px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .payments-table tbody tr {
+    border-bottom: 1px solid var(--divider);
+    transition: background 0.1s;
+  }
+
+  .payments-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .payments-table tbody tr:hover {
+    background: #fafbfd;
+  }
+
+  .payments-table td {
+    padding: 11px 14px;
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+
+  /* ── Student Cell ── */
+  .student-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .student-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    border: 1.5px solid var(--accent-mid);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .student-details strong {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .student-details small {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── Date cells ── */
+  .date-cell {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* ── Days badge ── */
+  .days-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    padding: 2px 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Status Badge ── */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+
+  .status-badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .status-badge.approved  { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+  .status-badge.rejected  { background: var(--danger-bg);  color: var(--danger);  border-color: var(--danger-border); }
+  .status-badge.pending   { background: var(--purple-bg);  color: var(--purple);  border-color: var(--purple-border); }
+
+  /* ── Action Button ── */
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .btn-icon.view:hover {
+    background: var(--accent-light);
+    border-color: var(--accent-mid);
+    color: var(--accent);
+  }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-muted);
+  }
+
+  .empty-state i {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+    display: block;
+  }
+
+  .empty-state p {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 480px) {
+    .dashboard-container { padding: 14px 12px 32px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-value { font-size: 22px; }
+    .payments-table thead th,
+    .payments-table td { padding: 9px 10px; }
+  }
+</style>
+
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>
+      <i class="fas fa-calendar-check"></i>
+      Leave Dashboard
+    </h1>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+
+    <a href="{% url 'bdm:leave' %}?status=all" class="stat-link">
+      <div class="stat-card total {% if active_status == 'all' %}active-card{% endif %}">
+        <div class="stat-header">
+          <div>
+            <div class="stat-title">Total Applications</div>
+            <div class="stat-value">{{ total_count }}</div>
+          </div>
+          <div class="stat-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <a href="{% url 'bdm:leave' %}?status=pending" class="stat-link">
+      <div class="stat-card pending {% if active_status == 'pending' %}active-card{% endif %}">
+        <div class="stat-header">
+          <div>
+            <div class="stat-title">Pending</div>
+            <div class="stat-value">{{ pending_count }}</div>
+          </div>
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <a href="{% url 'bdm:leave' %}?status=approved" class="stat-link">
+      <div class="stat-card completed {% if active_status == 'approved' %}active-card{% endif %}">
+        <div class="stat-header">
+          <div>
+            <div class="stat-title">Approved</div>
+            <div class="stat-value">{{ approved_count }}</div>
+          </div>
+          <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <a href="{% url 'bdm:leave' %}?status=rejected" class="stat-link">
+      <div class="stat-card collected {% if active_status == 'rejected' %}active-card{% endif %}">
+        <div class="stat-header">
+          <div>
+            <div class="stat-title">Rejected</div>
+            <div class="stat-value">{{ rejected_count }}</div>
+          </div>
+          <div class="stat-icon">
+            <i class="fas fa-times-circle"></i>
+          </div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Leave Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <h2>
+        <i class="fas fa-table"></i>
+        Leave Applications
+      </h2>
+    </div>
+
+    <table class="payments-table">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Batch</th>
+          <th>Leave Type</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Days</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for leave in leaves %}
+        <tr>
+
+          <td>
+            <div class="student-info">
+              <div class="student-avatar">
+                {{ leave.student.full_name|slice:":1" }}
+              </div>
+              <div class="student-details">
+                <strong>{{ leave.student.full_name }}</strong>
+                <small>ID: {{ leave.student.id }}</small>
+              </div>
+            </div>
+          </td>
+
+          <td>{{ leave.batch.name }}</td>
+          <td>{{ leave.get_leave_type_display }}</td>
+          <td><span class="date-cell">{{ leave.from_date|date:"d M Y" }}</span></td>
+          <td><span class="date-cell">{{ leave.to_date|date:"d M Y" }}</span></td>
+          <td><span class="days-badge">{{ leave.total_days }}d</span></td>
+
+          <td>
+            <span class="status-badge {{ leave.status }}">
+              {{ leave.get_status_display }}
+            </span>
+          </td>
+
+          <td>
+            <a href="{% url 'bdm:leave_detail' leave.id %}" class="btn-icon view" title="View Details">
+              <i class="fas fa-eye"></i>
+            </a>
+          </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8">
+            <div class="empty-state">
+              <i class="fas fa-calendar-times"></i>
+              <p>No leave applications found.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
+{% endblock %}
