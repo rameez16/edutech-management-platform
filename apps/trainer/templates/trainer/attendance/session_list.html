@@ -50,11 +50,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if session.status == "completed" %}
-                            <span class="status-badge attendance-active">Completed</span>
-                        {% else %}
-                            <span class="status-badge attendance-inactive">{{ session.get_status_display }}</span>
-                        {% endif %}
+                        <span class="status-badge attendance-active">Completed</span>
                     </td>
                     <td class="text-center">
                         {% if session.status == "completed" %}

@@ -3523,48 +3523,115 @@ details[open] .module-summary {
 /* ===============================
    ATTENDANCE MARK
 ================================ */
-/* Glass card for mark attendance */
-.attendance-mark-card {
+/* ===============================
+   ATTENDANCE MARK - PROFESSIONAL
+================================ */
+
+/* Glass card container */
+.attendance-card {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    padding: 1rem 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    padding: 1.5rem 2rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
     backdrop-filter: blur(10px);
 }
 
-/* Table */
+/* Header / Batch Title */
+.batch-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.batch-header .back-btn svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--accent);
+    cursor: pointer;
+}
+
+/* Session info above table */
+.session-info {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Attendance table */
 .attendance-mark-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-primary);
-    margin-top: 0.5rem;
 }
 
 .attendance-mark-table th, 
 .attendance-mark-table td {
-    padding: 10px 12px;
+    padding: 12px 15px;
     border-bottom: 1px solid var(--glass-border);
+    vertical-align: middle;
 }
 
+/* Table header alignment */
 .attendance-mark-table th {
     font-weight: 600;
     color: var(--text-secondary);
+    text-align: center; /* center the heading over radio buttons */
+    vertical-align: middle;
+}
+
+/* Keep Student column left-aligned */
+.attendance-mark-table th:first-child {
     text-align: left;
 }
 
+/* Center all cells in Status column */
+.attendance-mark-table td:nth-child(2) {
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+/* Hover row highlight */
 .attendance-mark-table tbody tr:hover {
-    background: var(--glass-hover);
+    background: rgba(255, 255, 255, 0.08);
     transition: background 0.3s ease;
 }
 
-/* Checkbox styling */
-.attendance-checkbox {
-    width: 18px;
-    height: 18px;
+/* ===============================
+   Radio buttons - vertical stack
+================================ */
+.radio-status-group {
+    display: flex;
+    justify-content: center; /* center in cell */
+    align-items: flex-start;
+    gap: 60px; /* horizontal space between each option */
+}
+
+.radio-option {
+    display: flex;
+    flex-direction: column; /* stack label below circle */
+    align-items: center;
     cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.radio-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
     accent-color: var(--accent);
+    margin-bottom: 6px;
+}
+
+.radio-option span {
+    text-align: center;
 }
 
 /* Buttons */
@@ -3572,13 +3639,13 @@ details[open] .module-summary {
     margin-top: 1rem;
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 12px;
 }
 
 .btn-primary, .btn-secondary {
-    padding: 6px 14px;
+    padding: 8px 18px;
     border-radius: 6px;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-decoration: none;
     text-align: center;
@@ -3605,71 +3672,17 @@ details[open] .module-summary {
     color: #fff;
 }
 
-/* Back button inside header */
-.batch-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .radio-status-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .attendance-mark-table th, .attendance-mark-table td {
+        padding: 8px 10px;
+    }
 }
 
-.batch-header .back-btn svg {
-    width: 20px;
-    height: 20px;
-    stroke: var(--accent);
-    cursor: pointer;
-}
-
-.session-info {
-    margin-top: 0.3rem;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-/* ===============================
-   Late Toggle Switch
-================================ */
-.late-toggle-wrapper {
-    display: inline-block;
-    position: relative;
-    width: 50px;
-    height: 24px;
-}
-
-.late-toggle-wrapper input {
-    display: none;
-}
-
-.late-toggle-wrapper .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(255, 255, 255, 0.15);
-    transition: 0.4s;
-    border-radius: 24px;
-    border: 1px solid var(--accent);
-}
-
-.late-toggle-wrapper .slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: #fff;
-    transition: 0.4s;
-    border-radius: 50%;
-}
-
-.late-toggle-wrapper input:checked + .slider {
-    background-color: var(--accent);
-}
-
-.late-toggle-wrapper input:checked + .slider:before {
-    transform: translateX(26px);
-}
 
 
 

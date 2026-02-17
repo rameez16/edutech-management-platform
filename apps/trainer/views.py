@@ -277,7 +277,8 @@ def attendance_session_list(request, batch_id):
     sessions = LessonSession.objects.filter(
         batch=batch,
         status=LessonSession.SessionStatus.COMPLETED
-    ).select_related("lesson_plan").order_by("-lesson_plan__session_number")
+    ).select_related("lesson_plan").order_by("-lesson_plan__session_number","-planned_date")
+
 
     return render(request, "trainer/attendance/session_list.html", {
         "batch": batch,
@@ -288,20 +289,16 @@ def attendance_session_list(request, batch_id):
 def attendance_mark(request, session_id):
     session = get_object_or_404(LessonSession, id=session_id)
     batch = session.batch
-
-    # Only allow completed sessions
-    if session.status != LessonSession.SessionStatus.COMPLETED:
-        messages.error(
-            request,
-            "Attendance can only be marked for completed sessions."
-        )
-        return redirect("trainer:attendance-sessions", batch_id=batch.id)
-
     students = batch.students.all()
+
+    if session.status != LessonSession.SessionStatus.COMPLETED:
+        messages.error(request, "Attendance can only be marked for completed sessions.")
+        return redirect("trainer:attendance-sessions", batch_id=batch.id)
 
     if request.method == "POST":
         for student in students:
-            is_checked = request.POST.get(f"student_{student.id}") == "on"
+            # Get single status from radio buttons (default absent)
+            status = request.POST.get(f"status_{student.id}", "absent")
 
             Attendance.objects.update_or_create(
                 student=student,
@@ -309,7 +306,7 @@ def attendance_mark(request, session_id):
                 date=session.actual_date,
                 defaults={
                     "lesson_session": session,
-                    "status": "present" if is_checked else "absent",
+                    "status": status,
                     "marked_by": session.trainer,
                     "remarks": ""
                 }
@@ -318,20 +315,26 @@ def attendance_mark(request, session_id):
         messages.success(request, "Attendance saved successfully.")
         return redirect("trainer:attendance-sessions", batch_id=batch.id)
 
-    # Prefill existing attendance: list of student IDs marked present
-    existing_attendance_students = Attendance.objects.filter(
+    # Prefill existing attendance
+    existing_attendance = Attendance.objects.filter(
         batch=batch,
-        date=session.actual_date,
-        status='present'
-    ).values_list('student_id', flat=True)
+        date=session.actual_date
+    ).values_list('student_id', 'status')
+
+    # Students who are present or late
+    existing_attendance_students = [s for s, status in existing_attendance if status in ['present', 'late']]
+    # Students who are late
+    existing_late_students = [s for s, status in existing_attendance if status == 'late']
 
     return render(request, "trainer/attendance/mark_attendance.html", {
         "session": session,
         "students": students,
-        "existing_attendance_students": existing_attendance_students
+        "existing_attendance_students": existing_attendance_students,
+        "existing_late_students": existing_late_students
     })
 
 
+@login_required
 def attendance_view(request, session_id):
     session = get_object_or_404(LessonSession, id=session_id)
     batch = session.batch
@@ -343,6 +346,7 @@ def attendance_view(request, session_id):
 
     total_students = batch.students.count()
     present_count = attendance_records.filter(status="present").count()
+    late_count = attendance_records.filter(status="late").count()
     absent_count = attendance_records.filter(status="absent").count()
 
     return render(request, "trainer/attendance/view_attendance.html", {
@@ -351,6 +355,7 @@ def attendance_view(request, session_id):
         "total_students": total_students,
         "present_count": present_count,
         "absent_count": absent_count,
+        "late_count": late_count,
     })
 
-
+# // 

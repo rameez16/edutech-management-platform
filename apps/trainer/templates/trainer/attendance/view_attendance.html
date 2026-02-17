@@ -19,6 +19,7 @@
         <li><strong>Date:</strong> {{ session.actual_date }}</li>
         <li><strong>Total Students:</strong> {{ total_students }}</li>
         <li><strong>Present:</strong> {{ present_count }}</li>
+        <li><strong>Late:</strong> {{ late_count }}</li>
         <li><strong>Absent:</strong> {{ absent_count }}</li>
     </ul>
 </div>
@@ -38,13 +39,11 @@
                     <td>{{ record.student.full_name }}</td>
                     <td>
                         {% if record.status == "present" %}
-                            <span class="status-badge attendance-active">Present</span>
-                        {% elif record.status == "absent" %}
-                            <span class="status-badge attendance-inactive">Absent</span>
+                            <span class="status-badge attendance-active" style="background-color: #4CAF50; color:white;">Present</span>
                         {% elif record.status == "late" %}
-                            <span class="status-badge attendance-warning">Late</span>
-                        {% elif record.status == "excused" %}
-                            <span class="status-badge attendance-neutral">Excused</span>
+                            <span class="status-badge attendance-warning" style="background-color: #FF9800; color:white;">Late</span>
+                        {% elif record.status == "absent" %}
+                            <span class="status-badge attendance-inactive" style="background-color: #F44336; color:white;">Absent</span>
                         {% endif %}
                     </td>
                 </tr>
