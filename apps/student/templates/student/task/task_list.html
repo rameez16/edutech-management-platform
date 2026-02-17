@@ -1,0 +1,128 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Tasks{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/task.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="task-container">
+
+    <!-- Header Section -->
+    <div class="task-header">
+        {% if batch %}
+            <h2>Tasks - {{ batch.name }}</h2>
+            <p>View and complete your assigned tasks before deadline.</p>
+        {% else %}
+            <h2>No Active Batch</h2>
+            <p>You are not assigned to any active batch.</p>
+        {% endif %}
+    </div>
+
+    {% if batch and tasks %}
+    <div class="task-wrapper-card">
+
+        {% for task in tasks %}
+        <div class="task-card">
+
+            <!-- Card Header -->
+            <div class="task-card-header">
+                <div class="task-title">
+                    {{ task.title }}
+                </div>
+
+                <div class="task-type">
+                    {{ task.get_task_type_display }}
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="task-body">
+
+                <p>
+                    <strong>Difficulty:</strong>
+                    {{ task.get_difficulty_level_display }}
+                </p>
+
+                <p>
+                    <strong>Due Date:</strong>
+                    {{ task.due_date|date:"M d, Y" }}
+                </p>
+
+                {% if task.lesson_session %}
+                <p>
+                    <strong>Session:</strong>
+                    {{ task.lesson_session.title }}
+                </p>
+                {% endif %}
+
+            </div>
+
+            <!-- Card Footer -->
+            <div class="task-footer">
+
+                <!-- STATUS SECTION -->
+                {% if task.student_submission %}
+                    
+                    {% if task.student_submission.status == "submitted" %}
+                        <span class="status status-submitted">
+                            Submitted
+                        </span>
+
+                    {% elif task.student_submission.status == "evaluated" %}
+                        <span class="status status-evaluated">
+                            Evaluated
+                        </span>
+
+                    {% elif task.student_submission.status == "resubmit" %}
+                        <span class="status status-resubmit">
+                            Resubmit Required
+                        </span>
+
+                    {% elif task.student_submission.status == "in_progress" %}
+                        <span class="status status-in_progress">
+                            In Progress
+                        </span>
+
+                    {% else %}
+                        <span class="status status-not_started">
+                            Not Started
+                        </span>
+                    {% endif %}
+
+                {% else %}
+                    
+                    {% if task.is_overdue %}
+                        <span class="status overdue">
+                            Overdue
+                        </span>
+                    {% else %}
+                        <span class="status status-not_started">
+                            Not Started
+                        </span>
+                    {% endif %}
+
+                {% endif %}
+
+                <!-- View Button -->
+                <a href="{% url 'student:task_detail' task.id %}" 
+                   class="view-btn">
+                    View Task
+                </a>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+        <div class="no-task">
+            No tasks available.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

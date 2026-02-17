@@ -14,9 +14,9 @@ from apps.bdm.models import PaymentDocument
 
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_POST
-from .forms import EnrollmentAgreementForm
+from .forms import EnrollmentAgreementForm, TaskSubmissionForm
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan
+from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task
 from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
 
 
@@ -1282,4 +1282,112 @@ def batch_details(request):
 
 
 
+@role_required("student")
+def student_tasks(request):
+    student = request.user.student
+
+    batch = student.batches.filter(is_active=True).first()
+    tasks = None
+
+    if batch:
+        tasks = batch.tasks.select_related(
+            "lesson_session",
+            "lesson_session__lesson_plan"
+        ).all()
+
+        # Get submissions for this student
+        submissions = TaskSubmission.objects.filter(student=student)
+
+        # Convert to dictionary {task_id: submission}
+        submission_map = {
+            sub.task_id: sub
+            for sub in submissions
+        }
+
+        # Attach submission to each task
+        for task in tasks:
+            task.student_submission = submission_map.get(task.id)
+
+    return render(request, "student/task/task_list.html", {
+        "batch": batch,
+        "tasks": tasks
+    })
+
+
+@role_required("student")
+def task_detail(request, task_id):
+    student = request.user.student
+
+    # Get active batch
+    batch = student.batches.filter(is_active=True).first()
+
+    # Get task only from that batch
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        batch=batch
+    )
+
+    # Get student submission (if exists)
+    submission = TaskSubmission.objects.filter(
+        task=task,
+        student=student
+    ).first()
+
+    return render(request, "student/task/task_detail.html", {
+        "task": task,
+        "batch": batch,
+        "submission": submission
+    })
    
+
+
+@role_required("student")
+def do_task(request, task_id):
+    student = request.user.student
+    task = get_object_or_404(Task, id=task_id)
+
+    submission, created = TaskSubmission.objects.get_or_create(
+        task=task,
+        student=student
+    )
+
+    # If first time opening
+    if created:
+        submission.status = TaskSubmission.SubmissionStatus.IN_PROGRESS
+        submission.started_at = timezone.now()
+        submission.save()
+
+    if request.method == "POST":
+        submission.submission_text = request.POST.get("submission_text", "").strip()
+        submission.submission_link = request.POST.get("submission_link", "").strip()
+
+        if request.FILES.get("submission_file"):
+            submission.submission_file = request.FILES["submission_file"]
+
+        # Prevent empty submission
+        if not submission.submission_text and not submission.submission_link and not submission.submission_file:
+            messages.error(request, "Please provide at least one submission method.")
+        else:
+            submission.submit()
+            messages.success(request, "Task submitted successfully.")
+            return redirect("student:task_detail", task_id=task.id)
+
+    return render(request, "student/task/do_task.html", {
+        "task": task,
+        "submission": submission
+    })
+
+
+def clean(self):
+    cleaned_data = super().clean()
+    text = cleaned_data.get("submission_text")
+    file = cleaned_data.get("submission_file")
+    link = cleaned_data.get("submission_link")
+
+    if not text and not file and not link:
+        raise forms.ValidationError(
+            "You must provide at least one submission method."
+        )
+
+    return cleaned_data

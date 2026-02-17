@@ -1,5 +1,6 @@
 from django import forms
 from apps.student.models import EnrollmentAgreement
+from apps.trainer.models import TaskSubmission
 
 class EnrollmentAgreementForm(forms.ModelForm):
     class Meta:
@@ -16,5 +17,30 @@ class EnrollmentAgreementForm(forms.ModelForm):
             }),
             "is_signed": forms.CheckboxInput(attrs={
                 "class": "form-check-input"
+            }),
+        }
+
+
+
+
+
+class TaskSubmissionForm(forms.ModelForm):
+    class Meta:
+        model = TaskSubmission
+        fields = [
+            "submission_text",
+            "submission_file",
+            "submission_link",
+        ]
+
+        widgets = {
+            "submission_text": forms.Textarea(attrs={
+                "rows": 5,
+                "class": "form-control",
+                "placeholder": "Describe your work..."
+            }),
+            "submission_link": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "GitHub / Live Project URL"
             }),
         }

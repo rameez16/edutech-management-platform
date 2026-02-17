@@ -1,0 +1,92 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Task Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/task_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="task-detail-container">
+
+    <!-- Header -->
+    <div class="task-detail-header">
+        <h2>{{ task.title }}</h2>
+        <p>
+            {{ task.get_task_type_display }} |
+            Difficulty: {{ task.get_difficulty_level_display }}
+        </p>
+    </div>
+
+    <!-- Wrapper -->
+    <div class="task-detail-wrapper">
+
+        <div class="task-detail-card">
+
+            <div class="task-section">
+    <h4>Description</h4>
+    <p>{{ task.description|linebreaksbr }}</p>
+</div>
+
+<div class="task-section">
+    <h4>Instructions</h4>
+    <p>{{ task.instructions|linebreaksbr }}</p>
+</div>
+
+{% if task.reference_links %}
+<div class="task-section">
+    <h4>Reference Links</h4>
+    <p>{{ task.reference_links|linebreaksbr }}</p>
+</div>
+{% endif %}
+
+
+            {% if task.attachment %}
+            <div class="task-section">
+                <h4>Attachment</h4>
+                <a href="{{ task.attachment.url }}" target="_blank" class="download-btn">
+                    Download File
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="task-section task-meta-info">
+                <div>
+                    <strong>Total Marks:</strong> {{ task.total_marks }}
+                </div>
+                <div>
+                    <strong>Passing Marks:</strong> {{ task.passing_marks }}
+                </div>
+                <div>
+                    <strong>Due Date:</strong> {{ task.due_date }}
+                </div>
+
+                {% if task.is_overdue %}
+                    <span class="status overdue">Overdue</span>
+                {% else %}
+                    <span class="status active">Active</span>
+                {% endif %}
+            </div>
+
+            <!-- Back Button -->
+            <div class="task-detail-footer">
+                {% if not task.is_overdue %}
+        <a href="{% url 'student:do_task' task.id %}" 
+           class="do-task-btn">
+            Do This Task
+        </a>
+    {% else %}
+        <span class="status overdue">Submission Closed</span>
+    {% endif %}
+                <a href="{% url 'student:student_tasks' %}" class="back-btn">
+                    ← Back to Tasks
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
