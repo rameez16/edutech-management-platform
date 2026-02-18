@@ -80,25 +80,28 @@
     align-items: center;
 }
 
-/* ===============================
-   Status Badge
-================================ */
-.status {
+.task-meta-info .status {
     padding: 6px 14px;
-    border-radius: 8px;
+    border-radius: 20px;
     font-size: 13px;
     font-weight: 600;
 }
 
-.status.active {
+.task-meta-info .status.active {
     background-color: #e4ffe8;
     color: #0b8f2d;
 }
 
-.status.overdue {
+.task-meta-info .status.overdue {
     background-color: #ffe5e5;
     color: #c40000;
 }
+
+
+
+
+
+
 
 /* ===============================
    Buttons
@@ -120,7 +123,7 @@
 
 .back-btn {
     display: inline-block;
-    margin-top: 20px;
+    
     padding: 8px 18px;
     background: #e4e8ff;
     color: #4a6cf7;
@@ -155,5 +158,40 @@
    Footer
 ================================ */
 .task-detail-footer {
-    margin-top: 20px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  /* pushes back button to right */
+}
+
+
+
+/* ===============================
+   Status Badge
+================================ */
+
+.task-detail-footer .status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.task-detail-footer .status.submitted {
+    background: linear-gradient(135deg, #28bd2f, #00aa14);
+    color: #ffffff;
+}
+
+.task-detail-footer .status.resubmit {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+}
+
+.task-detail-footer .status.overdue {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #ffffff;
 }

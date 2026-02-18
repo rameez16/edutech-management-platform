@@ -71,18 +71,61 @@
 
             <!-- Back Button -->
             <div class="task-detail-footer">
-                {% if not task.is_overdue %}
-        <a href="{% url 'student:do_task' task.id %}" 
-           class="do-task-btn">
-            Do This Task
-        </a>
-    {% else %}
-        <span class="status overdue">Submission Closed</span>
-    {% endif %}
-                <a href="{% url 'student:student_tasks' %}" class="back-btn">
-                    ← Back to Tasks
+
+    {% if submission %}
+
+        {% if submission.status == "submitted" %}
+            <span class="status submitted">
+                Task Already Submitted
+            </span>
+
+        {% elif submission.status == "evaluated" %}
+            <span class="status evaluated">
+                Evaluated
+            </span>
+
+        {% elif submission.status == "resubmit" %}
+            <span class="status resubmit">
+                Resubmit Required
+            </span>
+
+            {% if not task.is_overdue %}
+                <a href="{% url 'student:do_task' task.id %}" 
+                   class="do-task-btn">
+                    Resubmit Task
                 </a>
-            </div>
+            {% endif %}
+
+        {% elif submission.status == "in_progress" %}
+            <a href="{% url 'student:do_task' task.id %}" 
+               class="do-task-btn">
+                Continue Task
+            </a>
+
+        {% endif %}
+
+    {% else %}
+
+        {% if task.is_overdue %}
+            <span class="status overdue">
+                Submission Closed
+            </span>
+        {% else %}
+            <a href="{% url 'student:do_task' task.id %}" 
+               class="do-task-btn">
+                Do This Task
+            </a>
+        {% endif %}
+
+    {% endif %}
+
+    <a href="{% url 'student:student_tasks' %}" 
+       class="back-btn">
+        ← Back to Tasks
+    </a>
+
+</div>
+
 
         </div>
 
