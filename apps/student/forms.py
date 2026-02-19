@@ -1,7 +1,12 @@
 from django import forms
+<<<<<<< HEAD
 from apps.student.models import EnrollmentAgreement,LeaveApplication
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+=======
+from apps.student.models import EnrollmentAgreement
+from apps.trainer.models import TaskSubmission
+>>>>>>> 99cee30b609e5646544f0a245ebfb4b12b802ef6
 
 class EnrollmentAgreementForm(forms.ModelForm):
     class Meta:
@@ -25,6 +30,7 @@ class EnrollmentAgreementForm(forms.ModelForm):
 
 
 
+<<<<<<< HEAD
 
 class LeaveApplicationForm(forms.ModelForm):
 
@@ -85,3 +91,25 @@ class LeaveApplicationForm(forms.ModelForm):
 
 
 
+=======
+class TaskSubmissionForm(forms.ModelForm):
+    class Meta:
+        model = TaskSubmission
+        fields = [
+            "submission_text",
+            "submission_file",
+            "submission_link",
+        ]
+
+        widgets = {
+            "submission_text": forms.Textarea(attrs={
+                "rows": 5,
+                "class": "form-control",
+                "placeholder": "Describe your work..."
+            }),
+            "submission_link": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "GitHub / Live Project URL"
+            }),
+        }
+>>>>>>> 99cee30b609e5646544f0a245ebfb4b12b802ef6

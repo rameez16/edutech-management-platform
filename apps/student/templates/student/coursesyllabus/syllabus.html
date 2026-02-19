@@ -20,8 +20,8 @@
     <div class="syllabus-header">
         <h2>{{ course.name }}</h2>
         <p>{{ course.description }}</p>
-        <p><strong>Duration:</strong> {{ course.duration }}</p>
-        <p><strong>Course Fee:</strong> {{ course.course_fee }}</p>
+        <p class="titleduration" style="font-weight: bold; font-size: 16px; color:darkblue;">Duration : {{  course.duration }}</p>
+        <p class="titlefees" style="font-weight: bold; font-size: 16px; color:darkblue;">Course Fee : {{  course.course_fee }}</p>
 
         <div class="tech-stack-box">
             {{ course.tech_stack|linebreaksbr }}

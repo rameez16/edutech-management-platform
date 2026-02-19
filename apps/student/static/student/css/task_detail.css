@@ -1,0 +1,197 @@
+/* ===============================
+   Container
+================================ */
+.task-detail-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px 40px;
+    box-sizing: border-box;
+}
+
+/* ===============================
+   Header
+================================ */
+.task-detail-header {
+    padding: 32px;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #ffffff, #f4f6ff);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.task-detail-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.task-detail-header p {
+    color: #555;
+    font-size: 15px;
+}
+
+/* ===============================
+   Wrapper Background
+================================ */
+.task-detail-wrapper {
+    padding: 30px;
+    background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ===============================
+   Card
+================================ */
+.task-detail-card {
+    padding: 30px;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
+}
+
+/* ===============================
+   Sections
+================================ */
+.task-section {
+    margin-bottom: 25px;
+}
+
+.task-section h4 {
+    margin-bottom: 8px;
+    font-size: 18px;
+    color: #333;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 6px;
+}
+
+.task-section p {
+    color: #555;
+    line-height: 1.7;
+}
+
+/* ===============================
+   Meta Info
+================================ */
+.task-meta-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
+
+.task-meta-info .status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.task-meta-info .status.active {
+    background-color: #e4ffe8;
+    color: #0b8f2d;
+}
+
+.task-meta-info .status.overdue {
+    background-color: #ffe5e5;
+    color: #c40000;
+}
+
+
+
+
+
+
+
+/* ===============================
+   Buttons
+================================ */
+.download-btn {
+    display: inline-block;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #4a6cf7, #6a82fb);
+    color: #ffffff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s ease;
+}
+
+.download-btn:hover {
+    opacity: 0.85;
+}
+
+.back-btn {
+    display: inline-block;
+    
+    padding: 8px 18px;
+    background: #e4e8ff;
+    color: #4a6cf7;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    background: #d5dcff;
+}
+
+.do-task-btn {
+    display: inline-block !important;
+    padding: 10px 22px !important;
+    background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.do-task-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+
+/* ===============================
+   Footer
+================================ */
+.task-detail-footer {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  /* pushes back button to right */
+}
+
+
+
+/* ===============================
+   Status Badge
+================================ */
+
+.task-detail-footer .status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.task-detail-footer .status.submitted {
+    background: linear-gradient(135deg, #28bd2f, #00aa14);
+    color: #ffffff;
+}
+
+.task-detail-footer .status.resubmit {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+}
+
+.task-detail-footer .status.overdue {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #ffffff;
+}
