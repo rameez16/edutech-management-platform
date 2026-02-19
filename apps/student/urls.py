@@ -10,7 +10,6 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('emi/', views.emi, name='emi'),
                path("installments/<int:student_id>/",views.installments, name="installments"),
                path('onetime_view/', views.onetime_view, name='onetime_view'),
-               
                path('stud_profile/', views.stud_profile, name='stud_profile'),
                path('overview/', views.overview, name='overview'),
                path('password/', views.password, name='password'),
@@ -30,7 +29,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                
                
                
-                
+                #niranjana
                 path('stud_onboard/',views.onboard,name='stud_onboard'),
                 path('stud_upload/',views.upload,name='stud_upload'),
                 path('stud_lessonplan/',views.lessonplan,name='stud_lessonplan'),
