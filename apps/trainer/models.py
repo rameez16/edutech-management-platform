@@ -735,7 +735,7 @@ class TaskSubmission(models.Model):
         ordering = ['-submitted_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.task.title} - {self.status}"
+        return f"{self.student.full_name} - {self.task.title} - {self.status}"
     
     def submit(self):
         """Mark task as submitted"""

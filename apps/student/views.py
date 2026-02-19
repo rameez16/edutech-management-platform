@@ -6,13 +6,11 @@ from django.db.models import Sum
 from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist
 from django.contrib.auth import update_session_auth_hash
 import uuid, os
-
 from . import views
 from django.contrib.auth.decorators import login_required
 import uuid
 from apps.bdm.models import PaymentDocument
-
-from apps.trainer.models import Attendance,LessonSession
+from apps.trainer.models import Attendance,LessonSession,Task,TaskSubmission
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_POST
 from .forms import EnrollmentAgreementForm
@@ -22,15 +20,13 @@ from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDC
 from apps.student.forms import LeaveApplicationForm
 from apps.student.models import LeaveApplication
 
-
-
-
 #one time payment
 @login_required
 def payment(request):
 
     student = request.user.student
 
+    # ✅ Payment Plan Check
     if student.enrollment_agreement.payment_plan.lower() != "full":
         messages.error(request, "Full payment not allowed")
         return redirect("student:payment_gateway")
@@ -41,22 +37,34 @@ def payment(request):
         messages.error(request, "No batch assigned.")
         return redirect("student:dashboard")
 
+    # =====================================
+    # ✅ FEES
+    # =====================================
     course_fee = batch.course.course_fee
 
+    # ✅ FIXED 🔥🔥🔥 (THIS WAS MISSING)
+    admission_fee = course_fee * Decimal("0.10")
+
+    total_fee = course_fee   # Full payment → no addition
+
+    # =====================================
+    # ✅ PAYMENTS
+    # =====================================
     payments = FeePayment.objects.filter(student=student)
 
     paid_amount = payments.filter(
         payment_status=FeePayment.PaymentStatus.COMPLETED
     ).aggregate(Sum("amount"))["amount__sum"] or Decimal("0.00")
 
-    total_fee = course_fee
     pending_amount = max(total_fee - paid_amount, Decimal("0.00"))
 
     existing_payment = payments.filter(
         payment_type=FeePayment.PaymentType.FULL_PAYMENT
     ).first()
 
+    # =====================================
     # ✅ PAYMENT SUBMISSION
+    # =====================================
     if request.method == "POST":
 
         if existing_payment:
@@ -83,7 +91,9 @@ def payment(request):
             receipt_number=receipt_no
         )
 
-        # ✅ SAVE FULL DETAILS TO BDM DOCUMENT 🔥🔥🔥
+        # =====================================
+        # ✅ SAVE DOCUMENT 🔥
+        # =====================================
         PaymentDocument.objects.create(
             fee_payment=payment,
             document_type=PaymentDocument.DocumentType.RECEIPT,
@@ -95,6 +105,7 @@ def payment(request):
                 f"Student: {student.full_name}\n"
                 f"Batch: {batch.name}\n"
                 f"Course Fee: ₹{course_fee}\n"
+                f"Admission Fee (10%): ₹{admission_fee}\n"
                 f"Paid Amount: ₹{paid_amount}\n"
                 f"Pending Paid: ₹{pending_amount}\n"
                 f"Receipt No: {receipt_no}\n"
@@ -105,9 +116,13 @@ def payment(request):
         messages.success(request, "✅ Receipt uploaded successfully")
         return redirect("student:payment")
 
+    # =====================================
+    # ✅ RENDER
+    # =====================================
     return render(request, "student/payment/payment.html", {
         "student": student,
         "course_fee": course_fee,
+        "admission_fee": admission_fee,   # ✅ FIXED
         "total_fee": total_fee,
         "paid_amount": paid_amount,
         "pending_amount": pending_amount,
@@ -117,8 +132,6 @@ def payment(request):
 
 
 #admission fee
-
-
 @login_required
 def admission(request):
 
@@ -192,11 +205,6 @@ def admission(request):
         "admission_fee": admission_fee,
         "active_tab": "admission",
     })
-
-
-
-
-
 @login_required
 def pdc(request):
 
@@ -242,8 +250,6 @@ def pdc(request):
         "pending_amount": pending_amount,
         "pdc_payments": pdc_payments,
     })
-
-
 
 
 #EMI
@@ -462,39 +468,6 @@ def install_qr(request, installment_id):
     )
 
 
-
-
-@login_required
-def installments_view(request):
-    # logged-in student
-    student = get_object_or_404(Student, user=request.user)
-
-    # fetch installments
-    installments = FeePayment.objects.filter(
-        student=student,
-        payment_type=FeePayment.PaymentType.INSTALLMENT
-    ).order_by("installment_number")
-
-    context = {
-        "student": student,
-        "installments": installments,
-    }
-
-    return render(
-        request,
-        "student/payment/install_view.html",
-        context
-    )
-
-
-
-
-
-def pdc_view(request):
-    return render(request, 'student/payment/pdc_view.html')
-
-
-
 @login_required
 def onetime_view(request):
 
@@ -530,12 +503,6 @@ def onetime_view(request):
         request,
         "student/payment/one_time_view.html",
         context)
-
-
-
-def emi_view(request):
-    return render(request, 'student/payment/emi_view.html')
-
 
 
 
@@ -712,17 +679,8 @@ def stud_feedback(request):
     return render(request, "student/dashboard/stud_feedback.html", context)
 
 
-
 def lms_login(request):
     return render(request,'student/LMS/lms_login.html')
-
-
-
-def lms_dashboard(request):
-    return render(request, 'student/LMS//lms_dashboard.html')
-
-
-
 
 
 @login_required
@@ -844,8 +802,8 @@ def student_leave(request):
             leave.batch = batch
             leave.save()
 
-            messages.success(request, "Leave submitted successfully 😎")
-            return redirect("student_leave")
+            messages.success(request, "Leave submitted successfully")
+            return redirect("student:student_leave")
 
     else:
         form = LeaveApplicationForm()
@@ -866,6 +824,75 @@ def student_leave(request):
     return render(request, "student/dashboard/leaves.html", context)
 
 
+
+@login_required
+def student_evaluation(request):
+
+    student = request.user.student
+    submission_id = request.GET.get("submission")
+
+    # ✅ PAGE 2 → INDIVIDUAL EVALUATION 🔥
+    if submission_id:
+
+        submission = (
+            TaskSubmission.objects
+            .select_related(
+                "student",
+                "student__user",
+                "task",
+                "task__batch",
+                "task__lesson_session",
+                "task__lesson_session__trainer",
+                "task__lesson_session__lesson_plan",
+            )
+            .filter(
+                id=submission_id,
+                student=student
+            )
+            .first()
+        )
+
+        return render(
+            request,
+            "student/dashboard/individual_evaluation.html",
+            {"submission": submission}
+        )
+
+    # ✅ PAGE 1 → LIST PAGE 🔥
+    submissions = (
+        TaskSubmission.objects
+        .select_related("task", "task__batch")
+        .filter(student=student)
+        .order_by("-submitted_at")
+    )
+
+    totals = submissions.filter(
+        marks_obtained__isnull=False
+    ).aggregate(
+        obtained=Sum("marks_obtained"),
+        total=Sum("task__total_marks")
+    )
+
+    obtained_marks = totals["obtained"] or 0
+    total_marks = totals["total"] or 0
+
+    percentage = 0
+    if total_marks > 0:
+        percentage = (obtained_marks / total_marks) * 100
+
+    context = {
+        "student": student,
+        "submissions": submissions,
+        "obtained_marks": obtained_marks,
+        "total_marks": total_marks,
+        "percentage": round(percentage, 2),
+    }
+
+    return render(
+        request,
+        "student/dashboard/Evaluation.html",
+        context
+    )
 
 
 

@@ -1,0 +1,280 @@
+/* 🔥 FONT RESET (CRITICAL) */
+.evaluation-page {
+    font-size: 16px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+/* ✅ CONTAINER */
+.evaluation-container {
+    width: 100%;
+    max-width: 1050px;
+    background:wheat;
+    border-radius: 24px;
+    padding: 35px 45px;
+}
+
+/* ✅ BLOCK */
+.evaluation-block {
+    margin-bottom: 35px;
+}
+
+/* ✅ HEADER */
+.evaluation-header h1 {
+    font-size: 2rem;
+    color: blue;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* ✅ SECTION TITLES */
+.evaluation-block h3 {
+    font-size: 1.1rem;
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+/* ✅ GRIDS */
+.evaluation-student-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.evaluation-submission-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+/* ✅ CARDS */
+.evaluation-card {
+    background: white;
+    padding: 16px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* 🔥 LABEL FIX */
+.evaluation-container .evaluation-card label {
+    font-size: 18px;
+    color: #9ca3af;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* 🔥 VALUE SIZE FIX (CRITICAL 🔥🔥🔥) */
+.evaluation-container .evaluation-card p {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* 🔥 LINK SIZE FIX */
+.evaluation-container .evaluation-card a {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4f46e5;
+}
+
+.evaluation-container .evaluation-card shows a:hover {
+    text-decoration: underline;
+}
+
+/* ✅ TOPIC */
+.evaluation-topic {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: blue;
+    margin-bottom: 6px;
+}
+
+.evaluation-topic span {
+    color: #6b7280;
+}
+
+/* ✅ META */
+.evaluation-meta {
+    font-size: 1rem;
+    margin-top: 4px;
+    color: #111827;
+}
+
+.evaluation-meta span {
+    font-weight: 600;
+    color: #6b7280;
+}
+
+/* ✅ RESULT */
+.evaluation-result {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.evaluation-result-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 90px;
+    flex-wrap: wrap;
+}
+
+/* ✅ LEFT COLUMN */
+.evaluation-score-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ✅ SCORE CIRCLE 🔥 */
+.evaluation-score-circle {
+    --percentage: calc((var(--score) / var(--total)) * 100);
+
+    width: 200px;
+    height: 200px;
+
+    border-radius: 50%;
+    background: conic-gradient(
+        #22c55e calc(var(--percentage) * 1%),
+        #e5e7eb 0
+    );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    isolation: isolate;
+}
+
+/* Inner white circle */
+.evaluation-score-circle::before {
+    content: "";
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background: white;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* Circle content */
+.evaluation-circle-content {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+}
+
+/* Score text 🔥 */
+.evaluation-score-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+/* Score label */
+.evaluation-score-label {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+/* ✅ PASS / FAIL */
+.evaluation-badge {
+    padding: 10px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+    margin-top: 18px;
+    font-size: 15px;
+}
+
+.evaluation-badge.pass {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.evaluation-badge.fail {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* ✅ DETAILS */
+.evaluation-score-details {
+    text-align: left;
+}
+
+.evaluation-score-details p {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.evaluation-score-details span {
+    font-weight: 600;
+    color: black;
+}
+
+/* ✅ VERIFIED DATE */
+.evaluation-verified-date {
+    margin-top: 30px;
+    font-size: 16px;
+    color: black;
+}
+
+.evaluation-verified-date span {
+    font-weight: 600;
+    color: black;
+}
+
+/* ✅ FEEDBACK */
+.evaluation-feedback-box {
+    background: #f9fafb;
+    padding: 18px;
+    border-radius: 12px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* ✅ MUTED */
+.evaluation-muted {
+    font-size: 14px;
+    color: black;
+}
+
+/* ✅ EMPTY */
+.evaluation-empty {
+    text-align: center;
+    padding: 40px 0;
+}
+
+/* ✅ RESPONSIVE */
+@media (max-width: 768px) {
+
+    .evaluation-student-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .evaluation-submission-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .evaluation-result-layout {
+        gap: 35px;
+    }
+
+    .evaluation-score-circle {
+        width: 170px;
+        height: 170px;
+    }
+
+    .evaluation-score-circle::before {
+        width: 130px;
+        say-height: 130px;
+    }
+
+    .evaluation-score-text {
+        font-size: 1.3rem;
+    }
+}
+
+
+
