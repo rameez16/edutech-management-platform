@@ -104,3 +104,19 @@ class StudentAdminProfileForm(forms.ModelForm):
         self.fields["batch_assigned"].label_from_instance = (
             lambda batch: f"{batch.name} (Students: {batch.student_count})"
         )
+        
+        
+
+from apps.trainer.models import LessonSession
+
+class LessonSessionForm(forms.ModelForm):
+    class Meta:
+        model = LessonSession
+        fields = [
+            "planned_date",
+            "trainer"
+        ]
+        widgets = {
+            "planned_date": forms.DateInput(attrs={"type": "date"})
+        }
+        

@@ -1,0 +1,778 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<div class="dashboard-container">
+    <!-- Header with Back Button -->
+    <div class="dashboard-header">
+        <a href="{% url 'bdm:batch_list' %}" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            <span>Back to Batches</span>
+        </a>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <div class="batch-badge">{{ batch.course.name }}</div>
+            <h1 class="batch-title">{{ batch.name }}</h1>
+            <div class="batch-meta">
+                <span class="meta-item">
+                    <i class="bi bi-calendar3"></i>
+                    {{ batch.start_date|date:"M d, Y" }} - {{ batch.expected_finish_date|date:"M d, Y" }}
+                </span>
+                <span class="meta-divider">•</span>
+                <span class="meta-item">
+                    <i class="bi bi-clock"></i>
+                    {{ batch.duration_months }} months
+                </span>
+            </div>
+        </div>
+        <div class="hero-progress">
+            <div class="progress-ring">
+                <svg class="progress-ring-svg" width="120" height="120">
+                    <circle class="progress-ring-circle-bg" cx="60" cy="60" r="54" fill="none"/>
+                    <circle class="progress-ring-circle" cx="60" cy="60" r="54" fill="none" 
+                            stroke-dasharray="339.292" 
+                            stroke-dashoffset="{{ progress_circle_offset }}"
+                            style="--progress: {{ progress.progress_percentage }}"/>
+                </svg>
+                <div class="progress-text">
+                    <span class="progress-value">{{ progress.progress_percentage }}%</span>
+                    <span class="progress-label">Complete</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #e6f2ff, #cce6ff);">
+                <i class="bi bi-journal-bookmark-fill" style="color: #0077cc;"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Total Modules</span>
+                <span class="stat-value">{{ modules|length }}</span>
+                <span class="stat-trend positive">Course curriculum</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #e6f9e6, #ccf2cc);">
+                <i class="bi bi-calendar-check" style="color: #28a745;"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Total Sessions</span>
+                <span class="stat-value">{{ total_sessions|default:"0" }}</span>
+                <span class="stat-trend">Across all modules</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #fff2e6, #ffe6cc);">
+                <i class="bi bi-trophy" style="color: #ff9900;"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Completed</span>
+                <span class="stat-value">{{ progress.completed|default:"0" }}</span>
+                <span class="stat-trend positive">{{ progress.progress_percentage }}% done</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #e6f0ff, #d9e6ff);">
+                <i class="bi bi-hourglass-split" style="color: #6c757d;"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Pending</span>
+                <span class="stat-value">{{ progress.pending|default:"0" }}</span>
+         
+            </div>
+        </div>
+    </div>
+
+    <!-- Modules Section -->
+    <div class="modules-section">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <h2>Course Modules</h2>
+            </div>
+            <div class="section-actions">
+                <span class="modules-count">{{ modules|length }} modules</span>
+            </div>
+        </div>
+
+        {% if modules %}
+        <div class="modules-grid">
+            {% for module in modules %}
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-badge">Module {{ module.module_number }}</div>
+                    <div class="module-phase phase-{{ module.phase }}">
+                        <i class="bi {% if module.phase == 'phase1' %}bi-arrow-up{% elif module.phase == 'phase2' %}bi-arrow-right{% else %}bi-check-circle{% endif %}"></i>
+                        {{ module.get_phase_display }}
+                    </div>
+                </div>
+                
+                <h3 class="module-title">{{ module.title }}</h3>
+                
+                {% if module.description %}
+                <p class="module-description">{{ module.description|truncatechars:100 }}</p>
+                {% endif %}
+                
+                <div class="module-stats">
+                    <div class="module-stat">
+                        <i class="bi bi-calendar2-week"></i>
+                        <span>{{ module.total_sessions }} Sessions</span>
+                    </div>
+                    {% if module.prerequisites %}
+                    <div class="module-stat">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>Prerequisites included</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Mini Progress -->
+                {% if module.progress is not None %}
+                <div class="module-progress">
+                    <div class="progress-info">
+                        <span class="progress-label">Progress</span>
+                        <span class="progress-value">{{ module.progress }}%</span>
+                    </div>
+                    <div class="progress-bar-mini">
+                        <div class="progress-fill" style="width: {{ module.progress }}%"></div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="module-footer">
+                    <a href="{% url 'bdm:module_detail' batch.id module.id %}" class="module-link">
+                        <span>View Lesson Plans</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-grid-3x3-gap"></i>
+            </div>
+            <h3>No Modules Created</h3>
+            <p>This course doesn't have any modules configured yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary: #0077cc;
+        --primary-dark: #005fa3;
+        --primary-light: #e6f2ff;
+        --success: #28a745;
+        --success-light: #e6ffe6;
+        --warning: #ff9900;
+        --warning-light: #fff2e6;
+        --danger: #dc3545;
+        --danger-light: #ffe6e6;
+        --gray-100: #f8f9fa;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-400: #ced4da;
+        --gray-500: #adb5bd;
+        --gray-600: #6c757d;
+        --gray-700: #495057;
+        --gray-800: #343a40;
+        --gray-900: #212529;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --border-color: #e9ecef;
+        --white: #ffffff;
+        --shadow: 0 10px 40px rgba(0, 119, 204, 0.08);
+        --shadow-hover: 0 20px 50px rgba(0, 119, 204, 0.15);
+        --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.03);
+        --shadow-card-hover: 0 8px 30px rgba(0, 119, 204, 0.12);
+        --gradient-blue: linear-gradient(135deg, var(--primary), #0099ff);
+        --gradient-light: linear-gradient(135deg, var(--white), var(--gray-100));
+    }
+
+    .dashboard-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 30px 24px;
+    }
+
+    /* Header */
+    .dashboard-header {
+        margin-bottom: 30px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 40px;
+        color: var(--gray-600);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateX(-4px);
+    }
+
+    .back-link i {
+        font-size: 16px;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: var(--gradient-light);
+        border-radius: 24px;
+        padding: 40px;
+        margin-bottom: 40px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: var(--gradient-blue);
+        opacity: 0.03;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero-content {
+        flex: 1;
+    }
+
+    .batch-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        background: var(--primary-light);
+        color: var(--primary);
+        border-radius: 40px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        border: 1px solid rgba(0, 119, 204, 0.2);
+    }
+
+    .batch-title {
+        font-size: 42px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 16px 0;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+    }
+
+    .batch-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--gray-600);
+        font-size: 15px;
+    }
+
+    .meta-item i {
+        color: var(--primary);
+        font-size: 16px;
+    }
+
+    .meta-divider {
+        color: var(--gray-400);
+        font-weight: 600;
+    }
+
+    .hero-progress {
+        position: relative;
+    }
+
+    .progress-ring {
+        position: relative;
+        width: 120px;
+        height: 120px;
+    }
+
+    .progress-ring-svg {
+        transform: rotate(-90deg);
+        width: 120px;
+        height: 120px;
+    }
+
+    .progress-ring-circle-bg {
+        stroke: var(--gray-200);
+        stroke-width: 8;
+    }
+
+    .progress-ring-circle {
+        stroke: var(--primary);
+        stroke-width: 8;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 0.5s ease;
+        filter: drop-shadow(0 4px 6px rgba(0, 119, 204, 0.3));
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .progress-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+        display: block;
+        line-height: 1;
+    }
+
+    .progress-label {
+        font-size: 11px;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-bottom: 50px;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-card-hover);
+        border-color: var(--primary);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+        display: block;
+        line-height: 1.2;
+        margin-bottom: 4px;
+    }
+
+    .stat-trend {
+        font-size: 12px;
+        color: var(--gray-500);
+        display: block;
+    }
+
+    .stat-trend.positive {
+        color: var(--success);
+    }
+
+    .stat-trend.warning {
+        color: var(--warning);
+    }
+
+    /* Modules Section */
+    .modules-section {
+        margin-top: 20px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title i {
+        font-size: 28px;
+        color: var(--primary);
+        background: var(--primary-light);
+        padding: 8px;
+        border-radius: 12px;
+    }
+
+    .section-title h2 {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .modules-count {
+        background: var(--gray-200);
+        padding: 6px 14px;
+        border-radius: 40px;
+        font-size: 14px;
+        color: var(--gray-700);
+        font-weight: 500;
+    }
+
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 24px;
+    }
+
+    /* Module Card */
+    .module-card {
+        background: var(--white);
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        padding: 24px;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-card);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .module-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-blue);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .module-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-card-hover);
+    }
+
+    .module-card:hover::before {
+        opacity: 1;
+    }
+
+    .module-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .module-badge {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .module-phase {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .module-phase.phase-phase1 {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .module-phase.phase-phase2 {
+        background: var(--warning-light);
+        color: var(--warning);
+    }
+
+    .module-phase.phase-phase3 {
+        background: var(--success-light);
+        color: var(--success);
+    }
+
+    .module-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0 0 12px 0;
+        line-height: 1.4;
+    }
+
+    .module-description {
+        font-size: 14px;
+        color: var(--gray-600);
+        margin: 0 0 16px 0;
+        line-height: 1.6;
+    }
+
+    .module-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .module-stat {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--gray-600);
+    }
+
+    .module-stat i {
+        color: var(--primary);
+        font-size: 14px;
+        width: 18px;
+    }
+
+    /* Module Progress */
+    .module-progress {
+        margin: 16px 0 20px;
+    }
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .progress-info .progress-label {
+        font-size: 12px;
+        color: var(--gray-500);
+        text-transform: none;
+    }
+
+    .progress-info .progress-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .progress-bar-mini {
+        height: 4px;
+        background: var(--gray-200);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--gradient-blue);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+
+    .module-footer {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .module-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .module-link:hover {
+        gap: 8px;
+        color: var(--primary-dark);
+    }
+
+    .module-link i {
+        transition: transform 0.3s ease;
+    }
+
+    .module-link:hover i {
+        transform: translateX(4px);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--gray-100);
+        border-radius: 24px;
+        border: 2px dashed var(--gray-300);
+    }
+
+    .empty-icon {
+        font-size: 64px;
+        color: var(--gray-400);
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0 0 8px 0;
+    }
+
+    .empty-state p {
+        font-size: 15px;
+        color: var(--gray-500);
+        margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .hero-section {
+            flex-direction: column;
+            text-align: center;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .batch-meta {
+            justify-content: center;
+        }
+
+        .hero-progress {
+            margin-top: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 20px 16px;
+        }
+
+        .batch-title {
+            font-size: 32px;
+        }
+
+        .modules-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-section {
+            padding: 24px 20px;
+        }
+
+        .batch-title {
+            font-size: 28px;
+        }
+
+        .batch-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .meta-divider {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    // Calculate circle offset for progress ring
+    document.addEventListener('DOMContentLoaded', function() {
+        const circle = document.querySelector('.progress-ring-circle');
+        if (circle) {
+            const radius = 54;
+            const circumference = 2 * Math.PI * radius;
+            const progress = {{ progress.progress_percentage }} / 100;
+            const offset = circumference * (1 - progress);
+            circle.style.strokeDasharray = `${circumference}`;
+            circle.style.strokeDashoffset = offset;
+        }
+    });
+</script>
+
+{% endblock %}

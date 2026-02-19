@@ -19,8 +19,19 @@ from django.db.models import Sum
 from apps.student.models import FeePayment
 from apps.bdm.models import Student
 
+from apps.trainer.models import Module
+
 
 # Create your views here.
+
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+    View
+)
 
 
 
@@ -874,10 +885,13 @@ def batch_detail(request, pk):
         .prefetch_related('trainers', 'students'),
         pk=pk
     )
+    
 
     return render(request, 'bdm/batch/batch_detail.html', {
         'batch': batch
     })
+ 
+     
     
 def toggle_batch_extension(request, pk):
     if request.method == "POST":
@@ -1045,6 +1059,135 @@ def course_fee(request):
     return redirect('bdm:leads')
 
 
+#lesson-plan-Ramees
 
+
+class BatchListView(ListView):
+    model = Batch
+    template_name = "bdm/academics/batchview.html"
+    context_object_name = "batches"
+    
+
+class BatchAcademicDashboardView(DetailView):
+    model = Batch
+    template_name = "bdm/academics/batch_dashboard.html"
+    context_object_name = "batch"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        batch = self.object
+        context["modules"] = batch.course.modules.all()
+        # context["progress"] = LessonSession.get_batch_progress(batch)
+        return context    
+    
+from django.shortcuts import get_object_or_404
+from django.views.generic import DetailView
+from .models import  Batch
+from apps.trainer.models import Module
+
+class ModuleDetailView(DetailView):
+    model = Module
+    template_name = "bdm/academics/module_detail.html"
+    context_object_name = "module"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.batch = get_object_or_404(Batch, id=kwargs["batch_id"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        lesson_plans = self.object.lessons.all()
+        context["batch"] = self.batch
+
+        sessions = LessonSession.objects.filter(
+            batch=self.batch,
+            lesson_plan__module=self.object
+        ).select_related("trainer")
+
+        session_map = {s.lesson_plan_id: s for s in sessions}
+
+        # Attach session to each lesson plan
+        for plan in lesson_plans:
+            plan.assigned_session = session_map.get(plan.id)
+
+        context["lesson_plans"] = lesson_plans
+
+        return context
+    
+    
+from django.views.generic import CreateView
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from .models import Batch
+from apps.trainer.models import LessonPlan, LessonSession
+from .form import LessonSessionForm
+
+
+class AssignLessonSessionView(CreateView):
+    model = LessonSession
+    form_class = LessonSessionForm
+    template_name = "bdm/academics/assign_lesson_session.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.batch = get_object_or_404(Batch, id=kwargs["batch_id"])
+        self.lesson_plan = get_object_or_404(LessonPlan, id=kwargs["plan_id"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.batch = self.batch
+        form.instance.lesson_plan = self.lesson_plan
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "bdm:module_detail",
+            kwargs={
+                "batch_id": self.batch.id,
+                "pk": self.lesson_plan.module.id
+            }
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["batch"] = self.batch
+        context["lesson_plan"] = self.lesson_plan
+        return context      
+    
+
+    
+class LessonSessionUpdateView(UpdateView):
+    model = LessonSession
+    form_class = LessonSessionForm
+    template_name = "bdm/academics/assign_lesson_session.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["batch"] = self.object.batch
+        context["lesson_plan"] = self.object.lesson_plan
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "bdm:module_detail",
+            kwargs={
+                "batch_id": self.object.batch.id,
+                "pk": self.object.lesson_plan.module.id
+            }
+        )
+
+class LessonSessionDeleteView(DeleteView):
+    model = LessonSession
+    template_name = "bdm/academics/session_confirm_delete.html"
+
+    def get_success_url(self):
+        return reverse(
+            "bdm:module_detail",
+            kwargs={
+                "batch_id": self.object.batch.id,
+                "pk": self.object.lesson_plan.module.id
+            }
+        )
 
 
