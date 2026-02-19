@@ -61,6 +61,9 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 
                 path('leave/', views.leave_view, name='leave'),
                 path('leave/<int:pk>/', views.leave_detail, name='leave_detail'),
+                
+                
+                path('student_feedback/', views.student_feedback, name='student_feedback'),
                 ]
 
 

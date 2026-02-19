@@ -20,9 +20,9 @@ from datetime import datetime
 from .models import StudentAdminProfile, TrainerAdminProfile
 from .form import StudentAdminProfileForm, TrainerAdminProfileForm
 
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 
-from apps.student.models import FeePayment ,LeaveApplication
+from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
 from apps.bdm.models import Student ,PaymentDocument
 
 
@@ -1344,14 +1344,35 @@ def payment_history(request, student_id):
 
 def leave_view(request):
     status_filter = request.GET.get('status', 'all')
+    student_name = request.GET.get('student')
+    leave_type = request.GET.get('leave_type')
+    from_date = request.GET.get('from_date')
+    to_date = request.GET.get('to_date')
 
     leaves = LeaveApplication.objects.select_related(
         'student', 'batch', 'approved_by'
     ).all()
 
-    # Apply filtering
+    # Status filter
     if status_filter != 'all':
         leaves = leaves.filter(status=status_filter)
+
+    # Student name filter
+    if student_name:
+        leaves = leaves.filter(
+            student__full_name__icontains=student_name
+        )
+
+    # Leave type filter
+    if leave_type:
+        leaves = leaves.filter(leave_type=leave_type)
+
+    # Date range filter
+    if from_date:
+        leaves = leaves.filter(from_date__gte=from_date)
+
+    if to_date:
+        leaves = leaves.filter(to_date__lte=to_date)
 
     context = {
         'leaves': leaves,
@@ -1360,6 +1381,7 @@ def leave_view(request):
         'approved_count': LeaveApplication.objects.filter(status='approved').count(),
         'rejected_count': LeaveApplication.objects.filter(status='rejected').count(),
         'active_status': status_filter,
+        'leave_types': LeaveApplication.LeaveType.choices,
     }
 
     return render(request, 'bdm/leave/leave.html', context)
@@ -1392,3 +1414,33 @@ def leave_detail(request, pk):
         'leave': leave,
         'leave_stats': leave_stats
     })
+
+
+#student_feedback section-aleena
+
+@login_required
+def student_feedback(request):
+    feedback_type = request.GET.get('type', 'all')
+
+    feedbacks = StudentFeedback.objects.select_related(
+        'student', 'trainer', 'course', 'batch'
+    )
+
+    if feedback_type != 'all':
+        feedbacks = feedbacks.filter(feedback_type=feedback_type)
+
+    stats = StudentFeedback.objects.aggregate(
+        total_feedback=Count('id'),
+        avg_rating=Avg('overall_rating'),
+        avg_content=Avg('content_quality'),
+        avg_teaching=Avg('teaching_methodology'),
+        avg_responsiveness=Avg('responsiveness'),
+    )
+
+    context = {
+        'feedbacks': feedbacks,
+        'stats': stats,
+        'active_type': feedback_type,
+    }
+
+    return render(request, 'bdm/student_feedback/student_feedback.html', context)

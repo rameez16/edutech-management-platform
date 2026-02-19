@@ -180,6 +180,96 @@
   .stat-card.completed .stat-icon{ background: var(--success-bg);    color: var(--success); border: 1px solid var(--success-border); }
   .stat-card.collected .stat-icon{ background: var(--danger-bg);     color: var(--danger);  border: 1px solid var(--danger-border); }
 
+
+  /* ── Filter Section ── */
+.filter-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+
+.filter-form {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  align-items: end;
+}
+
+.filter-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-group input,
+.filter-group select {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-filter {
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--accent-mid);
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.btn-filter:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-reset {
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-reset:hover {
+  background: var(--bg);
+}
+
+@media (max-width: 768px) {
+  .filter-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+
   /* ── Table Card ── */
   .table-card {
     background: var(--surface);
@@ -469,6 +559,61 @@
     </a>
 
   </div>
+
+
+<!-- Filter Section -->
+<div class="filter-card">
+  <form method="get" class="filter-form">
+
+    <!-- Keep status in query -->
+    <input type="hidden" name="status" value="{{ active_status }}">
+
+    <div class="filter-group">
+      <label>Student Name</label>
+      <input type="text" name="student" placeholder="Search by name"
+             value="{{ request.GET.student }}">
+    </div>
+
+    <div class="filter-group">
+      <label>Leave Type</label>
+      <select name="leave_type">
+        <option value="">All</option>
+        {% for value, label in leave_types %}
+          <option value="{{ value }}"
+            {% if request.GET.leave_type == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>From Date</label>
+      <input type="date" name="from_date"
+             value="{{ request.GET.from_date }}">
+    </div>
+
+    <div class="filter-group">
+      <label>To Date</label>
+      <input type="date" name="to_date"
+             value="{{ request.GET.to_date }}">
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-actions">
+        <button type="submit" class="btn-filter">
+          <i class="fas fa-filter"></i> Apply
+        </button>
+        <a href="{% url 'bdm:leave' %}?status={{ active_status }}"
+           class="btn-reset">
+          Reset
+        </a>
+      </div>
+    </div>
+
+  </form>
+</div>
+
 
   <!-- Leave Table -->
   <div class="table-card">

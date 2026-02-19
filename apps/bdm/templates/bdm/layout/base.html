@@ -1526,7 +1526,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="sidebar-section">
                             <h4 class="sidebar-section-title">Feedbacks</h4>
                             
-                            <a href="" class="sidebar-link {% if 'feedback' in request.resolver_match.url_name %}active{% endif %}">
+                            <a href="{% url 'bdm:student_feedback' %}" class="sidebar-link {% if 'feedback' in request.resolver_match.url_name %}active{% endif %}">
                                 <div class="sidebar-link-icon">
                                     <i class="fas fa-comment-alt"></i>
                                 </div>
