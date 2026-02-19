@@ -2190,7 +2190,7 @@ BATCH CARD
 }
 
 /* ===============================
-   LINK STYLING (Remove underlines)
+   LINK STYLING 
 ================================ */
 
 a {
@@ -2469,7 +2469,7 @@ a:hover {
     min-width: 70px;
 }
 
-/* Professional color mapping for experience level */
+/* color mapping */
 .status.beginner {
     background: var(--info);
     color: var(--bg-dark); /* blue */
@@ -3523,9 +3523,6 @@ details[open] .module-summary {
 /* ===============================
    ATTENDANCE MARK
 ================================ */
-/* ===============================
-   ATTENDANCE MARK - PROFESSIONAL
-================================ */
 
 /* Glass card container */
 .attendance-card {
@@ -3685,8 +3682,9 @@ details[open] .module-summary {
 
 
 
-
-/* // */
+/* ===============================
+   Attendance View
+================================ */
 
 /* Glass card for summary & table */
 .attendance-summary, .attendance-card {
@@ -3783,3 +3781,351 @@ details[open] .module-summary {
     width: 20px;
     height: 20px;
 }
+
+/* ===============================
+   LEAVE DASHBOARD & TABLE STYLES
+=============================== */
+
+/* ===============================
+   LEAVE DASHBOARD & TABLE STYLES
+=============================== */
+
+/* ===== Page Title ===== */
+.leave-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 18px;
+}
+
+/* ===== Leave Summary Row ===== */
+.leave-summary {
+    background: #ffffff;
+    padding: 14px 22px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #374151;
+}
+
+.leave-summary ul {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+}
+
+.leave-summary li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.leave-summary li strong {
+    color: #111827;
+    min-width: 65px;
+}
+
+/* ===== Card Wrapper ===== */
+.leave-card-wrapper {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    margin-top: 18px;
+}
+
+/* ===== Leave Table ===== */
+.leave-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.leave-table th,
+.leave-table td {
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.leave-table th {
+    font-size: 12px;
+    color: #4b5563;
+    text-transform: uppercase;
+    background: #f9fafb;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+.leave-table td {
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Clickable Row */
+.clickable-row {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.clickable-row:hover {
+    background-color: #f3f4f6;
+}
+
+/* Excluded Columns */
+.no-row-click {
+    cursor: default !important;
+}
+
+/* ===== Student Name (Neutral) ===== */
+.leave-table td:first-child {
+    white-space: nowrap;
+    min-width: 150px;
+    font-weight: 500;
+    color: #111827;
+}
+
+/* ===== Date Formatting ===== */
+.date-to {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* ===== Document Link ===== */
+.document-link {
+    font-size: 12px;
+    color: #374151;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.document-link:hover {
+    text-decoration: underline;
+}
+
+/* ===== Status Badges ===== */
+.status-badge {
+    padding: 3px 8px;
+    font-size: 11px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-approved { background: #d1fae5; color: #065f46; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+
+/* ===== Compact Uniform Buttons ===== */
+.btn-approve,
+.btn-reject,
+.btn-reapprove {
+    font-size: 12px;
+    padding: 4px 10px;
+    min-width: 80px;
+    height: 30px;
+    border-radius: 5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    box-sizing: border-box;
+    transition: 0.2s ease-in-out;
+}
+
+.btn-approve { background: #16a34a; color: #fff; }
+.btn-approve:hover { background: #15803d; }
+
+.btn-reject { background: #dc2626; color: #fff; }
+.btn-reject:hover { background: #b91c1c; }
+
+.btn-reapprove { background: #f59e0b; color: #fff; }
+.btn-reapprove:hover { background: #d97706; }
+
+/* Button spacing */
+.leave-table td .btn-approve,
+.leave-table td .btn-reject,
+.leave-table td .btn-reapprove {
+    margin-bottom: 4px;
+}
+
+/* ===== Textarea Styling ===== */
+textarea.form-control {
+    padding: 5px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    width: 100%;
+    resize: none;
+}
+
+/* Form alignment inside table cells */
+.leave-table td form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0;
+}
+
+/* Small text */
+.leave-table td small {
+    font-size: 10.5px;
+    color: #6b7280;
+}
+
+/* Empty row */
+.empty-row {
+    text-align: center;
+    font-style: italic;
+    color: #6b7280;
+    padding: 16px 0;
+}
+
+/* ===== Leave Header (Search Container) ===== */
+.leave-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+}
+
+/* Search Wrapper */
+.leave-search-wrapper {
+    position: relative;
+    width: 260px;
+}
+
+/* Search Input */
+.leave-search {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    font-size: 13px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+}
+
+.leave-search::placeholder {
+    color: #9ca3af;
+}
+
+.leave-search:focus {
+    outline: none;
+    border-color: #374151;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(55, 65, 81, 0.08);
+}
+
+/* Search Icon */
+.leave-search-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    stroke: #9ca3af;
+    pointer-events: none;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+
+    .leave-summary {
+        gap: 15px;
+        font-size: 12px;
+    }
+
+    .leave-table th,
+    .leave-table td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+
+    .btn-approve,
+    .btn-reject,
+    .btn-reapprove {
+        min-width: 70px;
+        height: 28px;
+        font-size: 11px;
+    }
+}
+
+/* ///  */
+
+
+/* Leave Sections in Detail Page */
+.leave-section {
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.leave-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 6px;
+}
+
+.actions {
+    margin-top: 12px;
+}
+
+/* Empty Row */
+.empty-row {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+}
+
+
+.leave-section.actions form {
+    display: inline-block;
+    margin: 0 8px 4px 0; /* compact spacing between buttons */
+}
+
+.leave-section.actions textarea.form-control {
+    width: 100%;
+    margin-bottom: 4px; /* less vertical spacing */
+}
+
+.leave-title {
+    display: flex;                 /* make horizontal */
+    align-items: center;           /* vertical align */
+    justify-content: flex-start;   /* force left */
+    gap: 8px;                      /* space between icon & text */
+    font-size: 22px;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 16px;
+    text-align: left;              /* prevent center shift */
+}
+
+/* back button */
+.leave-title .back-btn {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.leave-title .back-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* // / */
+/* // changable  */ 

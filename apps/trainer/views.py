@@ -7,7 +7,7 @@ from apps.trainer.forms import TrainerProfileForm
 
 from apps.bdm.models import Trainer, Batch, Student
 from apps.trainer.models import Module, Attendance, LessonSession
-from apps.student.models import StudentFeedback
+from apps.student.models import StudentFeedback, LeaveApplication
 
 
 
@@ -227,6 +227,8 @@ def batch_feedback_view(request, batch_id):
 
     return render(request,"trainer/mybatches/feedback.html",{"batch": batch,"feedbacks": feedbacks,})
 
+
+# attendance
 @login_required
 def attendance_batch_list(request):
     # Get the logged-in trainer
@@ -270,7 +272,7 @@ def attendance_batch_list(request):
     })
 
 
-    
+@login_required  
 def attendance_session_list(request, batch_id):
     batch = get_object_or_404(Batch, id=batch_id)
 
@@ -289,15 +291,16 @@ def attendance_session_list(request, batch_id):
 def attendance_mark(request, session_id):
     session = get_object_or_404(LessonSession, id=session_id)
     batch = session.batch
-    students = batch.students.all()
+    students = batch.students.all().order_by("full_name")
 
+    # Only allow marking if session is completed
     if session.status != LessonSession.SessionStatus.COMPLETED:
         messages.error(request, "Attendance can only be marked for completed sessions.")
         return redirect("trainer:attendance-sessions", batch_id=batch.id)
 
+    # When form is submitted
     if request.method == "POST":
         for student in students:
-            # Get single status from radio buttons (default absent)
             status = request.POST.get(f"status_{student.id}", "absent")
 
             Attendance.objects.update_or_create(
@@ -316,22 +319,22 @@ def attendance_mark(request, session_id):
         return redirect("trainer:attendance-sessions", batch_id=batch.id)
 
     # Prefill existing attendance
-    existing_attendance = Attendance.objects.filter(
-        batch=batch,
-        date=session.actual_date
-    ).values_list('student_id', 'status')
+    existing_attendance = dict(
+        Attendance.objects.filter(
+            batch=batch,
+            date=session.actual_date
+        ).values_list("student_id", "status")
+    )
 
-    # Students who are present or late
-    existing_attendance_students = [s for s, status in existing_attendance if status in ['present', 'late']]
-    # Students who are late
-    existing_late_students = [s for s, status in existing_attendance if status == 'late']
+    # Attach status to each student
+    for student in students:
+        student.current_status = existing_attendance.get(student.id, "absent")
 
     return render(request, "trainer/attendance/mark_attendance.html", {
         "session": session,
         "students": students,
-        "existing_attendance_students": existing_attendance_students,
-        "existing_late_students": existing_late_students
     })
+
 
 
 @login_required
@@ -359,3 +362,100 @@ def attendance_view(request, session_id):
     })
 
 # // 
+
+# leave
+
+@login_required
+def leave_dashboard(request):
+    trainer = request.user.trainer
+
+    leave_applications = LeaveApplication.objects.filter(
+        batch__trainers=trainer
+    ).select_related("student", "batch", "approved_by").distinct()
+
+    # Precompute counts
+    pending_count = leave_applications.filter(status='pending').count()
+    approved_count = leave_applications.filter(status='approved').count()
+    rejected_count = leave_applications.filter(status='rejected').count()
+
+    return render(request, "trainer/leave/leave_dashboard.html", {
+        "leave_applications": leave_applications,
+        "pending_count": pending_count,
+        "approved_count": approved_count,
+        "rejected_count": rejected_count,
+    })
+
+
+@login_required
+def leave_detail(request, leave_id):
+    """
+    Trainer can view a single leave application in detail
+    """
+    leave = get_object_or_404(LeaveApplication, id=leave_id)
+    trainer = request.user.trainer
+
+    if not leave.batch.trainers.filter(id=trainer.id).exists():
+        messages.error(request, "You are not authorized to view this leave.")
+        return redirect("trainer:leave-dashboard")
+
+    return render(request, "trainer/leave/leave_detail.html", {"leave": leave})
+
+
+@login_required
+def process_leave(request, leave_id):
+    """
+    Approve or Reject leave applications
+    """
+    leave = get_object_or_404(LeaveApplication, id=leave_id)
+    trainer = request.user.trainer
+
+    if not leave.batch.trainers.filter(id=trainer.id).exists():
+        messages.error(request, "You are not authorized to process this leave.")
+        return redirect("trainer:leave-dashboard")
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "approve":
+            leave.status = LeaveApplication.LeaveStatus.APPROVED
+            leave.approved_by = trainer
+            leave.approval_date = timezone.now()
+            leave.save()
+            messages.success(request, f"Leave approved for {leave.student.full_name}")
+
+        elif action == "reject":
+            reason = request.POST.get("rejection_reason", "").strip()
+            if not reason:
+                messages.error(request, "Rejection reason is required.")
+                return redirect("trainer:leave-dashboard")
+
+            leave.status = LeaveApplication.LeaveStatus.REJECTED
+            leave.rejection_reason = reason
+            leave.approved_by = trainer
+            leave.approval_date = timezone.now()
+            leave.save()
+            messages.success(request, f"Leave rejected for {leave.student.full_name}")
+
+    return redirect("trainer:leave-dashboard")
+
+@login_required
+def leave_reapprove(request, leave_id):
+    """
+    Allow trainer to re-open a leave for approval (Approved/Rejected -> Pending)
+    """
+    leave = get_object_or_404(LeaveApplication, id=leave_id)
+    trainer = request.user.trainer
+
+    if not leave.batch.trainers.filter(id=trainer.id).exists():
+        messages.error(request, "You are not authorized to re-approve this leave.")
+        return redirect("trainer:leave-dashboard")
+
+    if request.method == "POST":
+        leave.status = LeaveApplication.LeaveStatus.PENDING
+        leave.rejection_reason = ""  # clear previous rejection reason
+        leave.approved_by = None
+        leave.approval_date = None
+        leave.save()
+        messages.success(request, f"Leave for {leave.student.full_name} is now pending again.")
+    
+    return redirect("trainer:leave-dashboard")

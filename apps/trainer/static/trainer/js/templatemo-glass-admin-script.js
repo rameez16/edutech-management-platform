@@ -374,3 +374,128 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+// ====================================
+// Attendance Mark Search Option
+// ====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const studentSearch = document.getElementById("studentSearch");
+    const attendanceTableBody = document.querySelector(".attendance-mark-table tbody");
+
+    // Stop if elements not found (VERY IMPORTANT)
+    if (!studentSearch || !attendanceTableBody) return;
+
+    studentSearch.addEventListener("keyup", function () {
+        const filter = this.value.toLowerCase();
+
+        attendanceTableBody.querySelectorAll("tr").forEach(row => {
+
+            const firstCell = row.querySelector("td");
+            if (!firstCell) return;
+
+            const studentName = firstCell.textContent.toLowerCase();
+
+            row.style.display = studentName.includes(filter) ? "" : "none";
+        });
+    });
+
+});
+
+
+
+// ====================================
+// Attendance View Search
+// ====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const attendanceSearch = document.getElementById("attendanceSearch");
+    const attendanceTable = document.querySelector(".attendance-sessions-table");
+
+    if (!attendanceSearch || !attendanceTable) return;
+
+    const tableBody = attendanceTable.querySelector("tbody");
+
+    attendanceSearch.addEventListener("keyup", function () {
+
+        const filter = this.value.toLowerCase();
+        const rows = tableBody.querySelectorAll("tr");
+
+        rows.forEach(function (row) {
+
+            // Skip empty row message
+            if (row.querySelector(".text-muted")) return;
+
+            const rowText = row.textContent.toLowerCase();
+
+            row.style.display = rowText.includes(filter) ? "" : "none";
+        });
+    });
+
+});
+
+
+// ====================================
+// Leave Dashboard Search Option
+// ====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const leaveSearch = document.getElementById("leaveSearch");
+    const leaveTable = document.getElementById("leaveTable");
+
+    if (!leaveSearch || !leaveTable) return;
+
+    leaveSearch.addEventListener("keyup", function () {
+
+        const filter = this.value.toLowerCase();
+        const rows = leaveTable.querySelectorAll("tbody tr");
+
+        rows.forEach(function (row) {
+
+            // Skip empty message row
+            if (row.querySelector(".empty-row")) return;
+
+            let matchFound = false;
+
+            const cells = row.querySelectorAll("td");
+
+            cells.forEach(function (cell) {
+
+                // Ignore Action column (last column)
+                if (cell.closest("td:last-child")) return;
+
+                const text = cell.textContent.trim().toLowerCase();
+
+                if (text.includes(filter)) {
+                    matchFound = true;
+                }
+            });
+
+            row.style.display = matchFound ? "" : "none";
+        });
+    });
+
+});
+
+// ====================================
+// Leave Dashboard Row Clickable
+// ====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+    const rows = document.querySelectorAll(".clickable-row");
+
+    rows.forEach(row => {
+        row.addEventListener("click", function (e) {
+
+            // If clicked inside excluded column
+            if (e.target.closest(".no-row-click")) {
+                return;
+            }
+
+            window.location = this.dataset.href;
+        });
+    });
+});
