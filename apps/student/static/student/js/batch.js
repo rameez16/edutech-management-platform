@@ -1,52 +1,32 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Schedule toggle
-    const scheduleToggle = document.getElementById('scheduleToggle');
-    const scheduleContent = document.getElementById('scheduleContent');
-    const scheduleArrowIcon = document.getElementById('scheduleArrowIcon');
+// Collapsible Cards - using inline style to avoid CSS specificity issues
+document.querySelectorAll('.batch-card-header').forEach(header => {
+    header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        const arrow = header.querySelector('.arrow-icon');
 
-    if (scheduleToggle && scheduleContent && scheduleArrowIcon) {
-        scheduleToggle.addEventListener('click', function() {
-            if (scheduleContent.style.display === 'none' || scheduleContent.style.display === '') {
-                scheduleContent.style.display = 'block';
-                scheduleArrowIcon.classList.add('rotate');
-            } else {
-                scheduleContent.style.display = 'none';
-                scheduleArrowIcon.classList.remove('rotate');
-            }
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+            if (arrow) arrow.style.transform = '';
+        } else {
+            content.style.display = 'block';
+            if (arrow) arrow.style.transform = 'rotate(180deg)';
+        }
+    });
+});
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        const target = btn.dataset.tab;
+        const parentCard = btn.closest('.batch-card');
+
+        parentCard.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        parentCard.querySelectorAll('.tab-content').forEach(tc => {
+            tc.classList.toggle('active', tc.dataset.tab === target);
         });
-    }
-
-    // Trainers toggle
-    const trainersToggle = document.getElementById('trainersToggle');
-    const trainersContent = document.getElementById('trainersContent');
-    const trainersArrowIcon = document.getElementById('trainersArrowIcon');
-
-    if (trainersToggle && trainersContent && trainersArrowIcon) {
-        trainersToggle.addEventListener('click', function() {
-            if (trainersContent.style.display === 'none' || trainersContent.style.display === '') {
-                trainersContent.style.display = 'block';
-                trainersArrowIcon.classList.add('rotate');
-            } else {
-                trainersContent.style.display = 'none';
-                trainersArrowIcon.classList.remove('rotate');
-            }
-        });
-    }
-
-    // Statistics toggle
-    const statsToggle = document.getElementById('statsToggle');
-    const statsContent = document.getElementById('statsContent');
-    const statsArrowIcon = document.getElementById('statsArrowIcon');
-
-    if (statsToggle && statsContent && statsArrowIcon) {
-        statsToggle.addEventListener('click', function() {
-            if (statsContent.style.display === 'none' || statsContent.style.display === '') {
-                statsContent.style.display = 'block';
-                statsArrowIcon.classList.add('rotate');
-            } else {
-                statsContent.style.display = 'none';
-                statsArrowIcon.classList.remove('rotate');
-            }
-        });
-    }
+    });
 });

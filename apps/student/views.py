@@ -16,7 +16,7 @@ from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_POST
 from .forms import EnrollmentAgreementForm, TaskSubmissionForm
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task
+from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession
 from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
 
 
@@ -1375,14 +1375,53 @@ def download_enrollment_letter(request):
     return response
 
 
+
+
+
 @role_required("student")
 def batch_details(request):
     student = request.user.student
 
-    batch = student.batches.filter(is_active=True).select_related("course").prefetch_related("trainers__user").first()
+    batch = student.batches.filter(
+        is_active=True
+    ).select_related(
+        "course"
+    ).prefetch_related(
+        "trainers__user"
+    ).first()
+
+    completed_sessions = []
+    planned_sessions = []
+    pending_sessions = []
+    skipped_sessions = []
+
+    if batch:
+        completed_sessions = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.COMPLETED
+        ).select_related("lesson_plan")
+
+        planned_sessions = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.PLANNED
+        ).select_related("lesson_plan")
+
+        pending_sessions = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.PENDING
+        ).select_related("lesson_plan")
+
+        skipped_sessions = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.SKIPPED
+        ).select_related("lesson_plan")
 
     return render(request, "student/batch/batch.html", {
-        "batch": batch
+        "batch": batch,
+        "completed_sessions": completed_sessions,
+        "planned_sessions": planned_sessions,
+        "pending_sessions": pending_sessions,
+        "skipped_sessions": skipped_sessions,
     })
 
 

@@ -1,6 +1,4 @@
-/* ===============================
-   Container
-   =============================== */
+/* Container */
 .batch-container {
     max-width: 1200px;
     margin: 40px auto;
@@ -8,11 +6,8 @@
     box-sizing: border-box;
 }
 
-
-/* ===============================
-   Batch Header Section
-   =============================== */
-.batch-container .batch-header {
+/* Batch Header */
+.batch-header {
     padding: 32px;
     margin-bottom: 30px;
     background: linear-gradient(135deg, #ffffff, #f4f6ff);
@@ -20,106 +15,140 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
 }
 
-.batch-container .batch-header h2 {
+.batch-title {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 12px;
     color: #2d2d2d;
 }
 
-.batch-container .batch-header p {
+/* WITH this */
+.batch-course, .batch-duration {
     font-size: 15px;
-    color: #555;
+    font-weight: 600;
+    color: #6366f1;
     margin-bottom: 8px;
 }
 
-
-/* ===============================
-   Wrapper Card with Background
-   =============================== */
-.batch-container .batch-wrapper-card {
+/* Wrapper Card */
+.batch-wrapper-card {
     padding: 30px;
     background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
     border-radius: 18px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-
-/* ===============================
-   Batch Card Section
-   =============================== */
-.batch-container .batch-card {
-    padding: 28px;
+/* Batch Card */
+.batch-card {
+    padding: 0;
     margin-bottom: 25px;
     border-radius: 18px;
-    background: #ffffff;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
-    display: flex;
-    flex-direction: column;
+    background: #fff;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.07);
+    overflow: hidden;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.batch-container .batch-card:last-child {
-    margin-bottom: 0;
+.batch-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 45px rgba(0,0,0,0.12);
 }
 
-.batch-container .batch-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
-}
-
-
-/* ===============================
-   Card Header
-   =============================== */
-.batch-container .batch-card-header {
+/* Card Header */
+.batch-card-header {
     font-size: 20px;
     font-weight: 600;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
+    padding: 20px 28px;
     border-bottom: 2px solid #f1f1f1;
     color: #333;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background 0.2s ease;
 }
 
+.batch-card-header:hover {
+    background: #fafafa;
+}
 
-/* ===============================
-   Batch Content
-   =============================== */
-.batch-container .batch-content {
+/* Batch Content */
+.batch-content {
     font-size: 15px;
     line-height: 1.7;
     color: #444;
     display: none;
-    margin-top: 15px;
-    transition: all 0.3s ease;
-    background-color: #f6ecff;
+    padding: 20px 28px 28px;
+    animation: fadeDown 0.25s ease;
+}
+
+.batch-content.open {
+    display: block;
+}
+
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Trainer List */
+.trainer-list {
+    list-style: none;
+    margin: 0;
     padding: 20px;
+    background-color: #f6ecff;
     border-radius: 10px;
 }
 
-.batch-container .batch-content p {
-    margin-bottom: 12px;
+.trainer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
 }
 
-.batch-container .batch-content ul {
-    list-style-type: disc;
-    color: #444;
+.trainer-item:last-child {
+    margin-bottom: 0;
 }
 
-.batch-container .batch-content ul li {
-    margin-bottom: 6px;
+.trainer-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
+.trainer-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    flex-shrink: 0;
+}
 
-/* ===============================
-   Arrow styling
-   =============================== */
+.trainer-info { font-size: 14px; color: #333; }
+.trainer-domain { color: #6366f1; font-size: 13px; }
+.trainer-email, .trainer-phone, .trainer-exp { color: #666; font-size: 13px; }
+
+.no-trainers {
+    font-style: italic;
+    color: #888;
+    background-color: #f6ecff;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 0;
+}
+
+/* Arrow Icon */
 .arrow-icon {
     font-size: 18px;
+    display: inline-block;
     transition: transform 0.3s ease;
 }
 
@@ -127,24 +156,119 @@
     transform: rotate(180deg);
 }
 
+/* Tabs */
+.status-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
 
-/* ===============================
-   Responsive
-   =============================== */
+.tab-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #e0e7ff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.tab-btn.active {
+    background: #6366f1;
+    color: #fff;
+}
+
+/* Tab Contents wrapper */
+.tab-contents {
+    background-color: #faf5ff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content > p {
+    font-style: italic;
+    color: #888;
+    margin: 0;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* ── Session Card ───────────────────────────────────── */
+.session-card {
+    background: #fff;
+    border-radius: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.08);
+    border: 1px solid #ede9ff;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+
+.session-card:last-child {
+    margin-bottom: 0;
+}
+
+.session-card:hover {
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Session number header bar */
+.session-card h5 {
+    margin: 0;
+    padding: 10px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #6366f1;
+    background: linear-gradient(135deg, #ede9ff, #e0e7ff);
+    border-bottom: 1px solid #ddd6fe;
+}
+
+/* Session body */
+.session-card p {
+    margin: 0;
+    padding: 10px 18px;
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+    border-bottom: 1px solid #f5f3ff;
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.session-card p:last-child {
+    border-bottom: none;
+}
+
+.session-card p strong {
+    color: #374151;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .batch-container .batch-header {
-        padding: 22px;
-    }
-
-    .batch-container .batch-wrapper-card {
-        padding: 20px;
-    }
-
-    .batch-container .batch-card {
-        padding: 20px;
-    }
-
-    .batch-container .batch-header h2 {
-        font-size: 22px;
-    }
+    .batch-header { padding: 22px; }
+    .batch-wrapper-card { padding: 20px; }
+    .batch-card-header { padding: 16px 20px; font-size: 17px; }
+    .batch-content { padding: 16px 20px 22px; }
+    .batch-title { font-size: 22px; }
+    .session-card p strong { min-width: 100px; }
 }

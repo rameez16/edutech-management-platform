@@ -1,12 +1,10 @@
 {% extends 'student/layout/base.html' %}
 {% load static %}
 
-{% block title %}
-Batch Details
-{% endblock %}
+{% block title %}Batch Details{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'student/css/batch.css' %}">
+<link rel="stylesheet" href="{% static 'student/css/batch.css' %}?v=2">
 {% endblock %}
 
 {% block extra_js %}
@@ -17,147 +15,113 @@ Batch Details
 <div class="batch-container">
 
     {% if batch %}
+    <!-- BATCH HEADER -->
     <div class="batch-header">
-        <h2>{{ batch.name }}</h2>
-        <p style="font-weight: bold; font-size: 16px; color:darkblue;">
-            Course: {{ batch.course.name }}
-        </p>
-        <p class="batch-duration" style="font-weight: bold; font-size: 16px; color:darkblue;">
-            Duration: {{ batch.duration_months }} months
-        </p>
+        <h2 class="batch-title">{{ batch.name }}</h2>
+        <p class="batch-course">Course: {{ batch.course.name }}</p>
+        <p class="batch-duration">Duration: {{ batch.duration_months }} months</p>
     </div>
 
-    <!-- WRAPPER CARD WITH BACKGROUND -->
+    <!-- WRAPPER CARD -->
     <div class="batch-wrapper-card">
-
-        <!-- BATCH SCHEDULE CARD -->
-        <div class="batch-card">
-            <div class="batch-card-header" id="scheduleToggle">
-                <h4>Batch Schedule</h4>
-                <span class="arrow-icon" id="scheduleArrowIcon">&#9662;</span>
-            </div>
-
-            <div class="batch-content" id="scheduleContent">
-                <p>
-                    <strong style="color: #6366f1;">Start Date:</strong>
-                    {{ batch.start_date|date:"F d, Y" }}
-                </p>
-
-                <p>
-                    <strong style="color: #6366f1;">Expected Finish Date:</strong>
-                    {{ batch.expected_finish_date|date:"F d, Y" }}
-                </p>
-
-                <p>
-                    <strong style="color: #6366f1;">Duration:</strong>
-                    {{ batch.duration_months }} months
-                </p>
-
-                <p>
-                    <strong style="color: #6366f1;">Status:</strong>
-                    {% if batch.is_completed %}
-                        <span style="color: #28a745;">Completed</span>
-                    {% elif batch.start_date > today %}
-                        <span style="color: #ff9800;">Upcoming</span>
-                    {% else %}
-                        <span style="color: #007bff;">Ongoing</span>
-                    {% endif %}
-                </p>
-            </div>
-        </div>
 
         <!-- TRAINERS CARD -->
         <div class="batch-card">
             <div class="batch-card-header" id="trainersToggle">
-                <h4>Assigned Trainer</h4>
+                <h4>Assigned Trainers</h4>
                 <span class="arrow-icon" id="trainersArrowIcon">&#9662;</span>
             </div>
-
             <div class="batch-content" id="trainersContent">
-                {% if batch.trainers.exists %}
-                <ul style="margin-left: 0; margin-top: 8px; list-style-type: none; padding-left: 0;">
+                {% if batch.trainers.count %}
+                <ul class="trainer-list">
                     {% for trainer in batch.trainers.all %}
-                    <li style="margin-bottom: 15px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-
-                            {% if trainer.profile_photo %}
-                            <img src="{{ trainer.profile_photo.url }}"
-                                 alt="{{ trainer.full_name }}"
-                                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
-                            {% else %}
-                            <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px;">
-                                {{ trainer.full_name|first|upper|default:trainer.user.username|first|upper }}
-                            </div>
-                            {% endif %}
-
-                            <div>
-                                <strong style="font-size: 16px; color: #333;">
-                                    {{ trainer.full_name|default:trainer.user.get_full_name|default:trainer.user.username }}
-                                </strong>
-
-                                {% if trainer.primary_domain %}
-                                <br>
-                                <span style="color: #6366f1; font-size: 13px;">
-                                    🎯 {{ trainer.primary_domain }}
-                                </span>
-                                {% endif %}
-
-                                {% if trainer.email %}
-                                <br>
-                                <span style="color: #666; font-size: 14px;">
-                                    📧 {{ trainer.email }}
-                                </span>
-                                {% endif %}
-
-                                {% if trainer.phone %}
-                                <br>
-                                <span style="color: #666; font-size: 14px;">
-                                    📱 {{ trainer.phone }}
-                                </span>
-                                {% endif %}
-
-                                {% if trainer.experience_years %}
-                                <br>
-                                <span style="color: #666; font-size: 13px;">
-                                    💼 {{ trainer.experience_years }} years experience
-                                </span>
-                                {% endif %}
-                            </div>
-
+                    <li class="trainer-item">
+                        {% if trainer.profile_photo %}
+                        <img src="{{ trainer.profile_photo.url }}" alt="{{ trainer.full_name }}" class="trainer-photo">
+                        {% else %}
+                        <div class="trainer-placeholder">
+                            {{ trainer.full_name|first|upper|default:trainer.user.username|first|upper }}
+                        </div>
+                        {% endif %}
+                        <div class="trainer-info">
+                            <strong>{{ trainer.full_name|default:trainer.user.get_full_name|default:trainer.user.username }}</strong>
+                            {% if trainer.primary_domain %}<br><span class="trainer-domain">🎯 {{ trainer.primary_domain }}</span>{% endif %}
+                            {% if trainer.email %}<br><span class="trainer-email">📧 {{ trainer.email }}</span>{% endif %}
+                            {% if trainer.phone %}<br><span class="trainer-phone">📱 {{ trainer.phone }}</span>{% endif %}
+                            {% if trainer.experience_years %}<br><span class="trainer-exp">💼 {{ trainer.experience_years }} yrs experience</span>{% endif %}
                         </div>
                     </li>
                     {% endfor %}
                 </ul>
                 {% else %}
-                <p>No trainers assigned yet.</p>
+                <p class="no-trainers">No trainers assigned yet.</p>
                 {% endif %}
             </div>
         </div>
 
-        <!-- BATCH STATISTICS CARD -->
+        <!-- BATCH DETAILS CARD -->
         <div class="batch-card">
-            <div class="batch-card-header" id="statsToggle">
-                <h4>Batch Statistics</h4>
-                <span class="arrow-icon" id="statsArrowIcon">&#9662;</span>
+            <div class="batch-card-header">
+                <h4>Batch Details</h4>
+                <span class="arrow-icon">&#9662;</span>
             </div>
 
-            <div class="batch-content" id="statsContent">
-                <p>
-                    <strong style="color: #6366f1;">Total Students:</strong>
-                    {{ batch.total_students }}
-                </p>
+            <!-- Removed 'open' class so it starts closed, consistent with Trainers card -->
+            <div class="batch-content">
 
-                {% if batch.requested_extension %}
-                <p>
-                    <strong style="color: #6366f1;">Extension Status:</strong>
-                    <span style="color: #ffc107;">Extension Requested</span>
-                </p>
-                {% endif %}
+                <!-- STATUS TABS -->
+                <div class="status-tabs">
+                    <button class="tab-btn active" data-tab="completed">Completed</button>
+                    <button class="tab-btn" data-tab="planned">Planned</button>
+                    <button class="tab-btn" data-tab="pending">Pending</button>
+                    <button class="tab-btn" data-tab="skipped">Skipped</button>
+                </div>
 
-                <p>
-                    <strong style="color: #6366f1;">Created On:</strong>
-                    {{ batch.created_at|date:"F d, Y" }}
-                </p>
+                <div class="tab-contents">
+                    <!-- COMPLETED -->
+                    <div class="tab-content active" data-tab="completed">
+                        {% for session in completed_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                            <p><strong>Topics Covered:</strong> {{ session.topics_covered|linebreaksbr }}</p>
+                            {% if session.homework_assigned %}<p><strong>Homework:</strong> {{ session.homework_assigned|linebreaksbr}}</p>{% endif %}
+                            
+                        </div>
+                        {% empty %}<p>No completed sessions.</p>{% endfor %}
+                    </div>
+
+                    <!-- PLANNED -->
+                    <div class="tab-content" data-tab="planned">
+                        {% for session in planned_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No planned sessions.</p>{% endfor %}
+                    </div>
+
+                    <!-- PENDING -->
+                    <div class="tab-content" data-tab="pending">
+                        {% for session in pending_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No pending sessions.</p>{% endfor %}
+                    </div>
+
+                    <!-- SKIPPED -->
+                    <div class="tab-content" data-tab="skipped">
+                        {% for session in skipped_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No skipped sessions.</p>{% endfor %}
+                    </div>
+                </div>
+
             </div>
         </div>
 
