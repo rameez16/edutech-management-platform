@@ -52,7 +52,13 @@ from apps.student.models import StudentDocument,EnrollmentAgreement,StudentIDCar
 
 from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
 
+
+from .utils import role_required
+
+
+
 @login_required
+# @role_required('Admin')
 def dashboard(request):
     """
     Dashboard view with comprehensive statistics and latest data
@@ -241,86 +247,6 @@ def create_admin_profile(request, user_id):
         return redirect("bdm:user_list")
     
     
-    
-    
-# def create_trainer_admin_profile(request, user):
-#     trainer = getattr(user, "trainer", None)
-
-#     if not trainer:
-#         messages.error(request, "Trainer profile not found.")
-#         return redirect("user_list")
-
-#     if request.method == "POST":
-#         form = TrainerAdminProfileForm(request.POST)
-
-#         if form.is_valid():
-#             admin_profile = form.save(commit=False)
-#             admin_profile.trainer = trainer
-#             admin_profile.save()
-
-#             messages.success(
-#                 request,
-#                 f"Trainer admin profile created for {trainer}"
-#             )
-#             return redirect("bdm:user_list")
-
-#     else:
-#         form = TrainerAdminProfileForm()
-
-#     return render(
-#         request,
-#         "bdm/trainer/trainer_profile.html",
-#         {
-#             "form": form,
-#             "user": user,
-#             "role": "trainer"
-#         }
-#     )   
-    
-# def create_student_admin_profile(request, user):
-#     student = getattr(user, "student", None)
-
-#     if not student:
-#         messages.error(request, "Student profile not found.")
-#         return redirect("bdm:user_list")
-
-#     if request.method == "POST":
-#         form = StudentAdminProfileForm(request.POST)
-
-#         if form.is_valid():
-#             admin_profile = form.save(commit=False)
-#             admin_profile.student = student
-#             admin_profile.save()
-
-#             messages.success(
-#                 request,
-#                 f"Student admin profile created for {student}"
-#             )
-#             return redirect("user_list")
-
-#     else:
-#         form = StudentAdminProfileForm()
-
-#     return render(
-#         request,
-#         "bdm/student/student_profile.html",
-#         {
-#             "form": form,
-#             "user": user,
-#             "role": "student"
-#         }
-#     )
-   
-    return render(
-        request,
-        "bdm/trainer/trainer_profile.html",
-        {
-            "form": form,
-            "user": user,
-            "role": "trainer"
-        }
-    )   
- 
 
 
 # student-onboarding- Ramees
@@ -1352,9 +1278,6 @@ def payment_history(request, student_id):
 
     return render(request, "bdm/payments/payment_history.html", context)
 
-
-#lesson-plan-Ramees
-
 #leave section-aleena
 
 def leave_view(request):
@@ -1429,6 +1352,10 @@ def leave_detail(request, pk):
         'leave': leave,
         'leave_stats': leave_stats
     })
+
+
+#lesson-plan-Ramees
+
 
 class BatchListView(ListView):
     model = Batch

@@ -23,6 +23,7 @@ def setup_user_role(sender, instance, created, **kwargs):
     # GROUP ASSIGNMENT
     # -------------------------
     group_map = {
+        "admin":"Admin",
         "trainer": "Trainer",
         "student": "Student",
         "telecaller": "TeleCaller",
