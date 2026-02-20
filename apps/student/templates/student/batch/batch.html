@@ -1,0 +1,138 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Batch Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/batch.css' %}?v=2">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/batch.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="batch-container">
+
+    {% if batch %}
+    <!-- BATCH HEADER -->
+    <div class="batch-header">
+        <h2 class="batch-title">{{ batch.name }}</h2>
+        <p class="batch-course">Course: {{ batch.course.name }}</p>
+        <p class="batch-duration">Duration: {{ batch.duration_months }} months</p>
+    </div>
+
+    <!-- WRAPPER CARD -->
+    <div class="batch-wrapper-card">
+
+        <!-- TRAINERS CARD -->
+        <div class="batch-card">
+            <div class="batch-card-header" id="trainersToggle">
+                <h4>Assigned Trainers</h4>
+                <span class="arrow-icon" id="trainersArrowIcon">&#9662;</span>
+            </div>
+            <div class="batch-content" id="trainersContent">
+                {% if batch.trainers.count %}
+                <ul class="trainer-list">
+                    {% for trainer in batch.trainers.all %}
+                    <li class="trainer-item">
+                        {% if trainer.profile_photo %}
+                        <img src="{{ trainer.profile_photo.url }}" alt="{{ trainer.full_name }}" class="trainer-photo">
+                        {% else %}
+                        <div class="trainer-placeholder">
+                            {{ trainer.full_name|first|upper|default:trainer.user.username|first|upper }}
+                        </div>
+                        {% endif %}
+                        <div class="trainer-info">
+                            <strong>{{ trainer.full_name|default:trainer.user.get_full_name|default:trainer.user.username }}</strong>
+                            {% if trainer.primary_domain %}<br><span class="trainer-domain">🎯 {{ trainer.primary_domain }}</span>{% endif %}
+                            {% if trainer.email %}<br><span class="trainer-email">📧 {{ trainer.email }}</span>{% endif %}
+                            {% if trainer.phone %}<br><span class="trainer-phone">📱 {{ trainer.phone }}</span>{% endif %}
+                            {% if trainer.experience_years %}<br><span class="trainer-exp">💼 {{ trainer.experience_years }} yrs experience</span>{% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="no-trainers">No trainers assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- BATCH DETAILS CARD -->
+        <div class="batch-card">
+            <div class="batch-card-header">
+                <h4>Batch Details</h4>
+                <span class="arrow-icon">&#9662;</span>
+            </div>
+
+            <!-- Removed 'open' class so it starts closed, consistent with Trainers card -->
+            <div class="batch-content">
+
+                <!-- STATUS TABS -->
+                <div class="status-tabs">
+                    <button class="tab-btn active" data-tab="completed">Completed</button>
+                    <button class="tab-btn" data-tab="planned">Planned</button>
+                    <button class="tab-btn" data-tab="pending">Pending</button>
+                    <button class="tab-btn" data-tab="skipped">Skipped</button>
+                </div>
+
+                <div class="tab-contents">
+                    <!-- COMPLETED -->
+                    <div class="tab-content active" data-tab="completed">
+                        {% for session in completed_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                            <p><strong>Topics Covered:</strong> {{ session.topics_covered|linebreaksbr }}</p>
+                            {% if session.homework_assigned %}<p><strong>Homework:</strong> {{ session.homework_assigned|linebreaksbr}}</p>{% endif %}
+                            
+                        </div>
+                        {% empty %}<p>No completed sessions.</p>{% endfor %}
+                    </div>
+
+                    <!-- PLANNED -->
+                    <div class="tab-content" data-tab="planned">
+                        {% for session in planned_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No planned sessions.</p>{% endfor %}
+                    </div>
+
+                    <!-- PENDING -->
+                    <div class="tab-content" data-tab="pending">
+                        {% for session in pending_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No pending sessions.</p>{% endfor %}
+                    </div>
+
+                    <!-- SKIPPED -->
+                    <div class="tab-content" data-tab="skipped">
+                        {% for session in skipped_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No skipped sessions.</p>{% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    {% else %}
+    <div class="batch-header">
+        <h2>No Active Batch</h2>
+        <p>You are not currently enrolled in any active batch.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
