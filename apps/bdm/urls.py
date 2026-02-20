@@ -44,6 +44,7 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("payments/",views.payments_dashboard,name="payments_dashboard"),
                 path("payments/<int:pk>/",views.payment_detail,name="payment_detail"),
                 path('course-fee/', views.course_fee, name='course_fee'),
+                path("payment-history/<int:student_id>/", views.payment_history, name="payment_history"),
 
 
 
@@ -70,6 +71,15 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 
 
                 
+                path('leave/', views.leave_view, name='leave'),
+                path('leave/<int:pk>/', views.leave_detail, name='leave_detail'),
+                
+                
+                path('student_feedback/', views.student_feedback, name='student_feedback'),
+                
+                path('courses/', views.course_list_view, name='course_list'),
+                path('courses/<int:pk>/', views.course_detail_view, name='course_detail'),
+                path('module/<int:pk>/', views.module_detail_view, name='module_detail'),
                 ]
 
 

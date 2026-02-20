@@ -1,116 +1,519 @@
 {% extends "bdm/layout/base.html" %}
+
 {% block content %}
 
-<div class="dashboard-container">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap');
 
-    <!-- Header -->
-    <div class="header">
-        <h1>
-            <i class="fas fa-money-check-alt"></i>
-            Course Fee Payments
-        </h1>
+  :root {
+    --white:         #ffffff;
+    --off-white:     #f7f9fc;
+    --surface:       #ffffff;
+    --border:        #e4eaf2;
+    --border-light:  #eef2f7;
+    --text-primary:  #1a2135;
+    --text-secondary:#5a6882;
+    --text-muted:    #8fa0ba;
+    --blue-50:       #eef5ff;
+    --blue-100:      #dbeafe;
+    --blue-400:      #60a5fa;
+    --blue-500:      #3b82f6;
+    --blue-600:      #2563eb;
+    --blue-700:      #1d4ed8;
+    --shadow-sm:     0 1px 3px rgba(30,60,120,.06), 0 1px 2px rgba(30,60,120,.04);
+    --shadow-md:     0 4px 16px rgba(30,60,120,.08), 0 1px 4px rgba(30,60,120,.04);
+    --shadow-lg:     0 8px 32px rgba(30,60,120,.10), 0 2px 8px rgba(30,60,120,.06);
+    --radius-sm:     8px;
+    --radius-md:     12px;
+    --radius-lg:     16px;
+    --radius-pill:   999px;
+  }
 
-        <a href="#" class="btn-create">
-            <i class="fas fa-plus-circle"></i>
-            Create Payment Notification
-        </a>
+  /* ─── Base ─────────────────────────────────────── */
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--text-primary);
+  }
+
+  /* ─── Page wrapper ─────────────────────────────── */
+  .cp-wrapper {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* ─── Header ───────────────────────────────────── */
+  .cp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.25rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .cp-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -.4px;
+    margin: 0 0 .25rem;
+    line-height: 1.2;
+  }
+
+  .cp-subtitle {
+    font-size: .85rem;
+    color: var(--text-muted);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  /* ─── Back button ──────────────────────────────── */
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .5rem 1.15rem;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all .18s ease;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+  }
+
+  .btn-back:hover {
+    background: var(--off-white);
+    border-color: #c5d3e4;
+    color: var(--text-primary);
+    text-decoration: none;
+    transform: translateX(-2px);
+  }
+
+  .btn-back svg {
+    flex-shrink: 0;
+    opacity: .65;
+  }
+
+  /* ─── Filter bar ───────────────────────────────── */
+  .cp-filters {
+    background: var(--white);
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1.15rem 1.4rem;
+    margin-bottom: 1.75rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .cp-filters .filter-group {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .cp-filters label {
+    display: block;
+    font-size: .76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--text-muted);
+    margin-bottom: .4rem;
+  }
+
+  .cp-filters .form-control,
+  .cp-filters .form-select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    color: var(--text-primary);
+    background: var(--off-white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .5rem .85rem;
+    transition: border-color .15s, box-shadow .15s;
+    box-shadow: none;
+    height: 40px;
+  }
+
+  .cp-filters .form-control:focus,
+  .cp-filters .form-select:focus {
+    border-color: var(--blue-400);
+    box-shadow: 0 0 0 3px rgba(96,165,250,.18);
+    outline: none;
+    background: var(--white);
+  }
+
+  .cp-filters .form-control::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* ─── Filter button ────────────────────────────── */
+  .btn-filter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    height: 40px;
+    padding: 0 1.4rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    font-weight: 600;
+    color: var(--white);
+    background: var(--blue-500);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background .18s, transform .14s, box-shadow .18s;
+    box-shadow: 0 2px 8px rgba(59,130,246,.30);
+    white-space: nowrap;
+    align-self: flex-end;
+    flex-shrink: 0;
+  }
+
+  .btn-filter:hover {
+    background: var(--blue-600);
+    box-shadow: 0 4px 14px rgba(59,130,246,.38);
+    transform: translateY(-1px);
+  }
+
+  .btn-filter:active {
+    transform: translateY(0);
+  }
+
+  /* ─── Table card ───────────────────────────────── */
+  .cp-card {
+    background: var(--white);
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ─── Table ─────────────────────────────────────── */
+  .cp-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+  }
+
+  .cp-table thead th {
+    background: var(--off-white);
+    font-size: .74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .65px;
+    color: var(--text-muted);
+    padding: .85rem 1.25rem;
+    border-bottom: 1.5px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .cp-table thead th:first-child { border-radius: 0; }
+
+  .cp-table tbody tr {
+    transition: background .13s;
+  }
+
+  .cp-table tbody tr:hover {
+    background: #f4f8ff;
+  }
+
+  .cp-table tbody td {
+    padding: .9rem 1.25rem;
+    font-size: .9rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+  }
+
+  .cp-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Student name */
+  .cp-table .student-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: .925rem;
+  }
+
+  /* Course fee */
+  .cp-table .fee-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -.2px;
+  }
+
+  .cp-table .fee-value .currency {
+    font-size: .78rem;
+    color: var(--text-muted);
+    margin-right: 1px;
+  }
+
+  /* ─── Status badges ─────────────────────────────── */
+  .cp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .28rem .75rem;
+    border-radius: var(--radius-pill);
+    font-size: .76rem;
+    font-weight: 600;
+    letter-spacing: .2px;
+    white-space: nowrap;
+  }
+
+  .cp-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cp-badge.success  { background: #ecfdf5; color: #15803d; }
+  .cp-badge.success::before  { background: #22c55e; }
+
+  .cp-badge.info     { background: var(--blue-50); color: var(--blue-700); }
+  .cp-badge.info::before     { background: var(--blue-500); }
+
+  .cp-badge.warning  { background: #fefce8; color: #92400e; }
+  .cp-badge.warning::before  { background: #f59e0b; }
+
+  .cp-badge.danger   { background: #fef2f2; color: #b91c1c; }
+  .cp-badge.danger::before   { background: #ef4444; }
+
+  /* ─── Action / View button ──────────────────────── */
+  .btn-view {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .38rem .95rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--blue-600);
+    background: var(--blue-50);
+    border: 1.5px solid var(--blue-100);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all .16s ease;
+    white-space: nowrap;
+  }
+
+  .btn-view:hover {
+    background: var(--blue-100);
+    border-color: var(--blue-400);
+    color: var(--blue-700);
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(59,130,246,.18);
+    transform: translateY(-1px);
+  }
+
+  .btn-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 1.2rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all .18s ease;
+  white-space: nowrap;
+}
+
+.btn-reset:hover {
+  background: var(--off-white);
+  border-color: var(--blue-400);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+  /* ─── Empty state ───────────────────────────────── */
+  .cp-empty {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    color: var(--text-muted);
+  }
+
+  .cp-empty svg {
+    margin-bottom: 1rem;
+    opacity: .35;
+  }
+
+  .cp-empty p {
+    margin: 0;
+    font-size: .9rem;
+  }
+
+  /* ─── Responsive ────────────────────────────────── */
+  @media (max-width: 640px) {
+    .cp-wrapper      { padding: 1.25rem .75rem 3rem; }
+    .cp-title        { font-size: 1.3rem; }
+    .cp-filters      { flex-direction: column; }
+    .cp-filters .filter-group { min-width: 100%; }
+    .btn-filter      { width: 100%; }
+  }
+</style>
+
+
+<div class="cp-wrapper">
+
+  <!-- HEADER -->
+  <div class="cp-header">
+    <div>
+      <h3 class="cp-title">Course Payment Overview</h3>
+      <p class="cp-subtitle">List of students with payment records</p>
     </div>
 
+    <a href="{% url 'bdm:payments_dashboard' %}" class="btn-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back to Dashboard
+    </a>
+  </div>
 
-    <!-- FULL PAYMENT SECTION -->
-    <div class="table-card">
-        <h3>Full Payments</h3>
 
-        <table class="custom-table">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Course</th>
-                    <th>Total Fee</th>
-                    <th>Paid Amount</th>
-                    <th>Status</th>
-                    <th>View</th>
-                </tr>
-            </thead>
+  <!-- FILTERS -->
+  <form method="get" class="cp-filters">
 
-            <tbody>
-                {% for payment in full_payments %}
-                <tr>
-                    <td>
-                        {{ payment.student.full_name }} <br>
-                        <small>ID: {{ payment.student.id }}</small>
-                    </td>
-                    <td>{{ payment.student.selected_course.name }}</td>
-                    <td class="text-muted">Not Assigned</td>
-                    <td>₹ {{ payment.amount }}</td>
-                    <td>
-                        <span class="status-badge {{ payment.payment_status }}">
-                            {{ payment.get_payment_status_display }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{% url 'bdm:payment_detail' payment.id %}" class="btn-view">
-                            View
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6">No full payments available.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="filter-group">
+      <label for="search-input">Search</label>
+      <input
+        id="search-input"
+        type="text"
+        name="search"
+        class="form-control"
+        placeholder="Student name..."
+        value="{{ request.GET.search }}"
+      >
     </div>
 
-
-    <!-- EMI SECTION -->
-    <div class="table-card">
-        <h3>Installment / EMI Payments</h3>
-
-        <table class="custom-table">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Course</th>
-                    <th>Total Fee</th>
-                    <th>Installment</th>
-                    <th>Paid Amount</th>
-                    <th>Status</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for payment in emi_payments %}
-                <tr>
-                    <td>
-                        {{ payment.student.full_name }} <br>
-                        <small>ID: {{ payment.student.id }}</small>
-                    </td>
-                    <td>{{ payment.student.selected_course.name }}</td>
-                    <td>₹ {{ payment.student.selected_course.total_fee }}</td>
-                    <td>{{ payment.installment_number }}/{{ payment.total_installments }}</td>
-                    <td>₹ {{ payment.amount }}</td>
-                    <td>
-                        <span class="status-badge {{ payment.payment_status }}">
-                            {{ payment.get_payment_status_display }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{% url 'bdm:payment_detail' payment.id %}" class="btn-view">
-                            View
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7">No EMI payments available.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="filter-group">
+      <label for="status-select">Course Fee Status</label>
+      <select id="status-select" name="status" class="form-select">
+        <option value="">All Statuses</option>
+        <option value="COMPLETED"  {% if request.GET.status == "COMPLETED"  %}selected{% endif %}>Completed</option>
+        <option value="IN PROGRESS"{% if request.GET.status == "IN PROGRESS"%}selected{% endif %}>In Progress</option>
+        <option value="PENDING"    {% if request.GET.status == "PENDING"    %}selected{% endif %}>Pending</option>
+        <option value="UNPAID"     {% if request.GET.status == "UNPAID"     %}selected{% endif %}>Unpaid</option>
+      </select>
     </div>
+
+    <button type="submit" class="btn-filter">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      Filter
+    </button>
+    <a href="{% url 'bdm:course_fee' %}" class="btn-reset">
+      Reset
+    </a>
+  </form>
+
+
+  <!-- TABLE -->
+  <div class="cp-card">
+    <div class="table-responsive">
+      <table class="cp-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Course Fee</th>
+            <th>Admission Fee</th>
+            <th>Course Fee Status</th>
+            <th style="text-align:center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for student in students %}
+          <tr>
+            <td><span class="student-name">{{ student.name }}</span></td>
+
+            <td>{{ student.course }}</td>
+
+            <td>
+              <span class="fee-value">
+                <span class="currency">₹</span>{{ student.course_fee }}
+              </span>
+            </td>
+
+            <!-- Admission fee status -->
+            <td>
+              {% if student.admission_status == "PAID" %}
+                <span class="cp-badge success">Paid</span>
+              {% elif student.admission_status == "PENDING" %}
+                <span class="cp-badge warning">Pending</span>
+              {% else %}
+                <span class="cp-badge danger">Unpaid</span>
+              {% endif %}
+            </td>
+
+            <!-- Course fee status -->
+            <td>
+              {% if student.course_status == "COMPLETED" %}
+                <span class="cp-badge success">Completed</span>
+              {% elif student.course_status == "IN PROGRESS" %}
+                <span class="cp-badge info">In Progress</span>
+              {% elif student.course_status == "PENDING" %}
+                <span class="cp-badge warning">Pending</span>
+              {% else %}
+                <span class="cp-badge danger">Unpaid</span>
+              {% endif %}
+            </td>
+
+            <td style="text-align:center">
+              <a href="{% url 'bdm:payment_history' student.id %}" class="btn-view">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                View
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="cp-empty">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <p>No payment records found.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    </div>
+  </div>
 
 </div>
 

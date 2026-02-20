@@ -2,6 +2,7 @@ from django import forms
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from apps.bdm.models import TrainerAdminProfile, Trainer,StudentAdminProfile ,Course ,Batch
+from apps.trainer.models import Module ,LessonPlan
 
 User = get_user_model()
 
@@ -120,3 +121,35 @@ class LessonSessionForm(forms.ModelForm):
             "planned_date": forms.DateInput(attrs={"type": "date"})
         }
         
+class ModuleForm(forms.ModelForm):
+
+    class Meta:
+        model = Module
+        fields = [
+            'title',
+            'description',
+            'module_number',
+            'total_sessions',
+            'phase',
+            'learning_objectives',
+            'prerequisites'
+        ]
+
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'learning_objectives': forms.Textarea(attrs={'rows': 3}),
+            'prerequisites': forms.Textarea(attrs={'rows': 2}),
+        }
+        
+
+class LessonPlanForm(forms.ModelForm):
+    class Meta:
+        model = LessonPlan
+        exclude = ['course', 'module']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'subtopics': forms.Textarea(attrs={'rows': 3}),
+            'learning_outcomes': forms.Textarea(attrs={'rows': 3}),
+            'reference_materials': forms.Textarea(attrs={'rows': 2}),
+            'practice_exercises': forms.Textarea(attrs={'rows': 2}),
+        }
