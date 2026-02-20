@@ -31,5 +31,12 @@ urlpatterns = [
     path("leaves/<int:leave_id>/", views.leave_detail, name="leave-detail"),
     path("leaves/<int:leave_id>/process/", views.process_leave, name="leave-process"),
     path('leave/<int:leave_id>/reapprove/', views.leave_reapprove, name='leave-reapprove'),
+    
+    # Task Management
+    path("tasks/", views.task_dashboard, name="task-dashboard"),
+    path("tasks/create/", views.task_create, name="task-create"),
+    path("tasks/list/", views.task_list, name="task-list"),
+    path("tasks/submissions/", views.task_submissions, name="task-submissions"),
+    path("tasks/evaluate/<int:submission_id>/",views.evaluate_submission,name="task-evaluate"),
 
 ]

@@ -3,11 +3,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 
-from apps.trainer.forms import TrainerProfileForm
+from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm
 
 from apps.bdm.models import Trainer, Batch, Student
-from apps.trainer.models import Module, Attendance, LessonSession
+from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission
 from apps.student.models import StudentFeedback, LeaveApplication
+
 
 
 
@@ -201,8 +202,6 @@ def batch_lesson_plan(request, batch_id):
     
     return render(request, 'trainer/mybatches/lesson_plan.html', context)
 
-
-
 @login_required
 def batch_feedback_view(request, batch_id):
     trainer = request.user.trainer
@@ -335,8 +334,6 @@ def attendance_mark(request, session_id):
         "students": students,
     })
 
-
-
 @login_required
 def attendance_view(request, session_id):
     session = get_object_or_404(LessonSession, id=session_id)
@@ -360,8 +357,6 @@ def attendance_view(request, session_id):
         "absent_count": absent_count,
         "late_count": late_count,
     })
-
-# // 
 
 # leave
 
@@ -459,3 +454,109 @@ def leave_reapprove(request, leave_id):
         messages.success(request, f"Leave for {leave.student.full_name} is now pending again.")
     
     return redirect("trainer:leave-dashboard")
+
+#task
+@login_required
+def task_dashboard(request):
+    trainer = request.user.trainer
+
+    tasks = Task.objects.filter(created_by=trainer)
+    submissions = TaskSubmission.objects.filter(task__created_by=trainer)
+
+    total_tasks = tasks.count()
+    active_tasks = tasks.filter(due_date__gte=timezone.now().date()).count()
+    overdue_tasks = tasks.filter(due_date__lt=timezone.now().date()).count()
+
+    pending_evaluations = submissions.filter(
+        status=TaskSubmission.SubmissionStatus.SUBMITTED
+    ).count()
+
+    context = {
+        "total_tasks": total_tasks,
+        "active_tasks": active_tasks,
+        "overdue_tasks": overdue_tasks,
+        "pending_evaluations": pending_evaluations,
+        "active_tab": "dashboard",
+    }
+
+    return render(request, "trainer/tasks/dashboard.html", context)
+
+
+@login_required
+def task_create(request):
+    trainer = request.user.trainer
+
+    if request.method == "POST":
+        form = TaskForm(request.POST, request.FILES)
+        form.fields["lesson_session"].queryset = LessonSession.objects.filter(
+            trainer=trainer
+        )
+
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.created_by = trainer
+            task.batch = task.lesson_session.batch
+            task.save()
+            messages.success(request, "Task created successfully.")
+            return redirect("trainer:task-list")
+    else:
+        form = TaskForm()
+        form.fields["lesson_session"].queryset = LessonSession.objects.filter(
+            trainer=trainer
+        )
+
+    return render(request, "trainer/tasks/create.html", {
+        "form": form,
+        "active_tab": "create"
+    })
+
+@login_required
+def task_list(request):
+    tasks = Task.objects.filter(created_by=request.user.trainer)
+
+    return render(request, "trainer/tasks/list.html", {
+        "tasks": tasks,
+        "active_tab": "list"
+    })
+
+
+@login_required
+def task_submissions(request):
+    submissions = TaskSubmission.objects.filter(
+        task__created_by=request.user.trainer
+    ).select_related("student", "task")
+
+    return render(request, "trainer/tasks/submissions.html", {
+        "submissions": submissions,
+        "active_tab": "submissions"
+    })
+    
+    
+def evaluate_submission(request, submission_id):
+    submission = get_object_or_404(TaskSubmission, id=submission_id)
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "evaluate":
+            marks = request.POST.get("marks")
+            feedback = request.POST.get("feedback")
+
+            submission.marks_obtained = marks
+            submission.feedback = feedback
+            submission.status = TaskSubmission.SubmissionStatus.EVALUATED
+            submission.needs_revision = False
+            submission.save()
+
+        elif action == "resubmit":
+            feedback = request.POST.get("feedback")
+            submission.request_resubmission(feedback)
+
+        return redirect("trainer:task-submissions")
+
+    return render(request, "trainer/tasks/evaluate.html", {
+        "submission": submission,
+        "active_tab": "submissions"
+    })
+    
+    

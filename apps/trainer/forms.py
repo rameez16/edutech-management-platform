@@ -1,5 +1,7 @@
 from django import forms
 from apps.bdm.models import Trainer
+from apps.trainer.models import Task, TaskSubmission
+from django.utils import timezone
 
 class TrainerProfileForm(forms.ModelForm):
     class Meta:
@@ -24,4 +26,56 @@ class TrainerProfileForm(forms.ModelForm):
             'frameworks': forms.TextInput(attrs={'placeholder': 'Django, DRF'}),
             'experience_years': forms.NumberInput(attrs={'min': 0,'placeholder': 'Total industry experience'}),
             'teaching_experience_years': forms.NumberInput(attrs={'min': 0,'placeholder': 'Years of teaching experience'}),
+        }
+
+
+
+class TaskForm(forms.ModelForm):
+
+    class Meta:
+        model = Task
+        fields = [
+            "lesson_session",
+            "title",
+            "task_type",
+            "difficulty_level",
+            "description",
+            "instructions",
+            "reference_links",
+            "attachment",
+            "total_marks",
+            "passing_marks",
+            "due_date",
+            "is_mandatory",
+        ]
+
+        widgets = {
+            "due_date": forms.DateInput(attrs={"type": "date"}),
+            "description": forms.Textarea(attrs={"rows": 3}),
+            "instructions": forms.Textarea(attrs={"rows": 4}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        total = cleaned_data.get("total_marks")
+        passing = cleaned_data.get("passing_marks")
+        due = cleaned_data.get("due_date")
+
+        if passing and total and passing > total:
+            raise forms.ValidationError("Passing marks cannot exceed total marks.")
+
+        if due and due < timezone.now().date():
+            raise forms.ValidationError("Due date cannot be in the past.")
+
+        return cleaned_data
+
+
+class EvaluationForm(forms.ModelForm):
+
+    class Meta:
+        model = TaskSubmission
+        fields = ["marks_obtained", "feedback"]
+
+        widgets = {
+            "feedback": forms.Textarea(attrs={"rows": 3}),
         }

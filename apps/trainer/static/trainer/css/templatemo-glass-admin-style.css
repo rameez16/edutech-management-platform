@@ -3786,10 +3786,6 @@ details[open] .module-summary {
    LEAVE DASHBOARD & TABLE STYLES
 =============================== */
 
-/* ===============================
-   LEAVE DASHBOARD & TABLE STYLES
-=============================== */
-
 /* ===== Page Title ===== */
 .leave-title {
     font-size: 24px;
@@ -4058,10 +4054,11 @@ textarea.form-control {
     }
 }
 
-/* ///  */
+/* ===============================
+   LEAVE Sections in Detail 
+=============================== */
 
 
-/* Leave Sections in Detail Page */
 .leave-section {
     margin-bottom: 18px;
     padding-bottom: 12px;
@@ -4093,24 +4090,24 @@ textarea.form-control {
 
 .leave-section.actions form {
     display: inline-block;
-    margin: 0 8px 4px 0; /* compact spacing between buttons */
+    margin: 0 8px 4px 0; 
 }
 
 .leave-section.actions textarea.form-control {
     width: 100%;
-    margin-bottom: 4px; /* less vertical spacing */
+    margin-bottom: 4px; 
 }
 
 .leave-title {
-    display: flex;                 /* make horizontal */
-    align-items: center;           /* vertical align */
-    justify-content: flex-start;   /* force left */
-    gap: 8px;                      /* space between icon & text */
+    display: flex;                 
+    align-items: center;           
+    justify-content: flex-start;   
+    gap: 8px;                      
     font-size: 22px;
     font-weight: 600;
     color: #1e3a8a;
     margin-bottom: 16px;
-    text-align: left;              /* prevent center shift */
+    text-align: left;              
 }
 
 /* back button */
@@ -4127,5 +4124,392 @@ textarea.form-control {
 }
 
 
-/* // / */
-/* // changable  */ 
+/* ==========================================
+   TASK MODULE – HEADER & TABS
+============================================= */
+
+/* Task Header */
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.task-header svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.task-header svg:hover {
+    transform: translateX(-3px);
+}
+
+.task-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* Task Tabs Container */
+.task-tabs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+/* Individual Task Tab */
+.task-tab {
+    min-width: 130px;
+    height: 40px;
+    padding: 0 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+
+    color: var(--text-secondary);
+    transition: all 0.25s ease;
+}
+
+.task-tab:hover {
+    background: var(--glass-hover);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.task-tab.active {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .task-tab {
+        min-width: 100px;
+        font-size: 0.85rem;
+        height: 44px;
+    }
+}
+/* ==========================================
+   TASK DASHBOARD SUMMARY CARD
+============================================= */
+
+.task-summary-card {
+    padding: 1.25rem;
+}
+
+.task-summary-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.task-summary-card .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.task-summary-card .card-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Stats Grid */
+.task-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.task-stat-box {
+    padding: 0.8rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    text-align: center;
+}
+
+[data-theme="light"] .task-stat-box {
+    background: #f8fafc;
+}
+
+.task-stat-box .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.task-stat-box .stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .task-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* ==========================================
+   TASK TABLE
+============================================= */
+
+.task-table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.task-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.task-table thead {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.task-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.task-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 500;
+}
+
+.task-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: background 0.3s ease;
+}
+/* ========================
+   TASK STATUS BADGES
+============================ */
+
+.task-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 70px;
+}
+
+/* Status Colors */
+.task-badge.active {
+    background: var(--info);
+    color: var(--bg-dark);
+}
+
+.task-badge.overdue {
+    background: var(--danger);
+    color: #fff;
+}
+
+.task-badge.submitted {
+    background: var(--warning);
+    color: var(--bg-dark);
+}
+
+.task-badge.evaluated {
+    background: var(--success);
+    color: var(--bg-dark);
+}
+
+.task-badge.late {
+    background: #b91c1c;
+    color: #fff;
+}
+/* ======================
+   TASK PROFESSIONAL FORM
+========================= */
+
+.professional-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.professional-form label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.professional-form input,
+.professional-form select,
+.professional-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.professional-form input:focus,
+.professional-form select:focus,
+.professional-form textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.task-btn-primary {
+    padding: 8px 18px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.task-btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+.task-btn-warning {
+    padding: 8px 18px;
+    border-radius: 8px;
+    background: var(--warning);
+    color: var(--bg-dark);
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.task-btn-warning:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+.re-eval-alert {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+}
+
+.revision-info {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+/* =================
+   EVALUATION PAGE 
+====================*/
+
+.evaluation-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.evaluation-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.evaluation-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    background: transparent;
+}
+
+.evaluation-back-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-secondary);
+}
+
+.evaluation-form {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.evaluation-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.evaluation-form input,
+.evaluation-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+}
+
+.evaluation-form textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.evaluation-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.submission-info{
+    margin-bottom: 10px;
+}
