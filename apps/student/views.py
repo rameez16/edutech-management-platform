@@ -1543,7 +1543,6 @@ def download_enrollment_letter(request):
 
 
 
-
 @role_required("student")
 def batch_details(request):
     student = request.user.student
@@ -1556,39 +1555,70 @@ def batch_details(request):
         "trainers__user"
     ).first()
 
+    modules_data       = []
     completed_sessions = []
-    planned_sessions = []
-    pending_sessions = []
-    skipped_sessions = []
+    planned_sessions   = []
+    pending_sessions   = []
+    skipped_sessions   = []
 
     if batch:
-        completed_sessions = LessonSession.objects.filter(
-            batch=batch,
-            status=LessonSession.SessionStatus.COMPLETED
-        ).select_related("lesson_plan")
+        # One query — all sessions for this batch, with module info
+        # Chain: LessonSession → lesson_plan → module
+        all_sessions = list(
+            LessonSession.objects.filter(batch=batch)
+            .select_related("lesson_plan__module")
+            .order_by(
+                "lesson_plan__module__module_number",
+                "lesson_plan__session_number",
+            )
+        )
 
-        planned_sessions = LessonSession.objects.filter(
-            batch=batch,
-            status=LessonSession.SessionStatus.PLANNED
-        ).select_related("lesson_plan")
+        # All modules for this batch's course, in order
+        modules = Module.objects.filter(
+            course=batch.course
+        ).order_by("module_number")
 
-        pending_sessions = LessonSession.objects.filter(
-            batch=batch,
-            status=LessonSession.SessionStatus.PENDING
-        ).select_related("lesson_plan")
+        # Build a dict per module — filter sessions in Python (no extra queries)
+        for module in modules:
+            module_sessions = [
+                s for s in all_sessions
+                if s.lesson_plan.module_id == module.id
+            ]
 
-        skipped_sessions = LessonSession.objects.filter(
-            batch=batch,
-            status=LessonSession.SessionStatus.SKIPPED
-        ).select_related("lesson_plan")
+            completed = [s for s in module_sessions if s.status == LessonSession.SessionStatus.COMPLETED]
+            planned   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.PLANNED]
+            pending   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.PENDING]
+            skipped   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.SKIPPED]
+
+            modules_data.append({
+                "module":          module,
+                "completed":       completed,
+                "planned":         planned,
+                "pending":         pending,
+                "skipped":         skipped,
+                "completed_count": len(completed),
+                "planned_count":   len(planned),
+                "pending_count":   len(pending),
+                "skipped_count":   len(skipped),
+                "total":           len(module_sessions),
+            })
+
+        # Flat lists for fallback (template uses these only when modules is empty)
+        completed_sessions = [s for s in all_sessions if s.status == LessonSession.SessionStatus.COMPLETED]
+        planned_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.PLANNED]
+        pending_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.PENDING]
+        skipped_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.SKIPPED]
 
     return render(request, "student/batch/batch.html", {
-        "batch": batch,
-        "completed_sessions": completed_sessions,
-        "planned_sessions": planned_sessions,
-        "pending_sessions": pending_sessions,
-        "skipped_sessions": skipped_sessions,
+        "batch":              batch,
+        "modules":            modules_data,       # list of dicts — one per module
+        "completed_sessions": completed_sessions,  # flat fallback
+        "planned_sessions":   planned_sessions,
+        "pending_sessions":   pending_sessions,
+        "skipped_sessions":   skipped_sessions,
     })
+
+
 
 
 
@@ -1596,31 +1626,82 @@ def batch_details(request):
 def student_tasks(request):
     student = request.user.student
 
-    batch = student.batches.filter(is_active=True).first()
-    tasks = None
+    batch = student.batches.filter(
+        is_active=True
+    ).select_related("course").first()
+
+    modules = []
 
     if batch:
-        tasks = batch.tasks.select_related(
-            "lesson_session",
-            "lesson_session__lesson_plan"
-        ).all()
+        # One query: all tasks for this batch with full chain prefetched
+        # Task → lesson_session → lesson_plan → module
+        all_tasks = list(
+            Task.objects.filter(batch=batch)
+            .select_related(
+                "lesson_session__lesson_plan__module",
+                "lesson_session__lesson_plan",
+            )
+            .prefetch_related("submissions")
+            .order_by(
+                "lesson_session__lesson_plan__module__module_number",
+                "lesson_session__lesson_plan__session_number",
+                "due_date",
+            )
+        )
 
-        # Get submissions for this student
-        submissions = TaskSubmission.objects.filter(student=student)
+        # Attach student_submission to each task so template can use task.student_submission
+        for task in all_tasks:
+            task.student_submission = task.submissions.filter(
+                student=student
+            ).first()
 
-        # Convert to dictionary {task_id: submission}
-        submission_map = {
-            sub.task_id: sub
-            for sub in submissions
-        }
+        # Get all modules for this batch's course
+        raw_modules = Module.objects.filter(
+            course=batch.course
+        ).order_by("module_number")
 
-        # Attach submission to each task
-        for task in tasks:
-            task.student_submission = submission_map.get(task.id)
+        for module in raw_modules:
+            # Tasks belonging to this module
+            module_tasks = [
+                t for t in all_tasks
+                if t.lesson_session.lesson_plan.module_id == module.id
+            ]
+
+            if not module_tasks:
+                continue  # skip modules with no tasks
+
+            # Group module tasks by lesson_session
+            sessions_dict = {}
+            for task in module_tasks:
+                session = task.lesson_session
+                if session.id not in sessions_dict:
+                    sessions_dict[session.id] = {
+                        "session": session,
+                        "tasks": [],
+                    }
+                sessions_dict[session.id]["tasks"].append(task)
+
+            # Build sessions list, add task_count
+            sessions_list = []
+            for sd in sessions_dict.values():
+                sd["task_count"] = len(sd["tasks"])
+                sessions_list.append(sd)
+
+            # Sort sessions by session_number
+            sessions_list.sort(
+                key=lambda s: s["session"].lesson_plan.session_number
+            )
+
+            modules.append({
+                "module":        module,
+                "sessions":      sessions_list,
+                "session_count": len(sessions_list),
+                "task_count":    len(module_tasks),
+            })
 
     return render(request, "student/task/task_list.html", {
-        "batch": batch,
-        "tasks": tasks
+        "batch":   batch,
+        "modules": modules,
     })
 
 

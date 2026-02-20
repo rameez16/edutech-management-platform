@@ -23,10 +23,11 @@
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 10px;
+    color: #45007a;
 }
 
 .task-detail-header p {
-    color: #555;
+    color: #4c3b65;
     font-size: 15px;
 }
 
@@ -182,7 +183,7 @@
 }
 
 .task-detail-footer .status.submitted {
-    background: linear-gradient(135deg, #28bd2f, #00aa14);
+    background: linear-gradient(135deg, #383fc1, #0b2be2);
     color: #ffffff;
 }
 
@@ -193,5 +194,10 @@
 
 .task-detail-footer .status.overdue {
     background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #ffffff;
+}
+
+.task-detail-footer .status.evaluated {
+    background: linear-gradient(135deg, #0edd5a, #35bc42);
     color: #ffffff;
 }
