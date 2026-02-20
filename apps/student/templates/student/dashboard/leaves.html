@@ -1,0 +1,198 @@
+{% extends "student/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'student/css/leaves.css' %}">
+
+<div class="leave-container">
+
+    <!-- ✅ STUDENT INFO CARD -->
+    <div class="student-info-card">
+
+        <div class="student-avatar">
+            {{ student.full_name|slice:":1" }}
+        </div>
+
+        <div class="student-details">
+            <h3>{{ student.full_name }}</h3>
+
+            <p><strong>ID:</strong> {{ student.id }}</p>
+            <p><strong>Email:</strong> {{ request.user.email }}</p>
+
+            {% if batch %}
+                <p><strong>Batch:</strong> {{ batch.name }}</p>
+            {% else %}
+                <p><strong>Batch:</strong> <span class="muted">Not Assigned</span></p>
+            {% endif %}
+
+            <p>
+                <strong>Trainer:</strong>
+
+                {% if trainer %}
+                    {{ trainer.full_name }}
+                {% else %}
+                    <span class="muted">Not Assigned</span>
+                {% endif %}
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ✅ PAGE HEADER -->
+    <div class="page-header">
+        <h2>Leave Application</h2>
+        <p>Submit your leave request</p>
+    </div>
+
+    <!-- ✅ STATS -->
+    <div class="stats-row">
+
+        <div class="stat-card">
+            <h4>{{ total_leaves }}</h4>
+            <p>Total Leaves</p>
+        </div>
+
+        <div class="stat-card">
+            <h4>{{ pending_leaves }}</h4>
+            <p>Pending</p>
+        </div>
+
+        <div class="stat-card">
+            <h4>{{ approved_leaves }}</h4>
+            <p>Approved</p>
+        </div>
+
+        <div class="stat-card">
+            <h4>{{ rejected_leaves }}</h4>
+            <p>Rejected</p>
+        </div>
+
+    </div>
+
+    <!-- ✅ DJANGO MESSAGES -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- ✅ APPLY LEAVE -->
+    <div class="section-card">
+
+        <h3>Apply Leave</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="grid">
+
+                <div>
+                    <label>Leave Type</label>
+                    {{ form.leave_type }}
+                </div>
+
+                <div>
+                    <label>Total Days</label>
+                    <input type="text" id="total_days" class="input" readonly>
+                </div>
+
+                <div>
+                    <label>From Date</label>
+                    {{ form.from_date }}
+                </div>
+
+                <div>
+                    <label>To Date</label>
+                    {{ form.to_date }}
+                </div>
+
+            </div>
+
+            <label>Reason</label>
+            {{ form.reason }}
+
+            <label>Supporting Document</label>
+            {{ form.supporting_document }}
+
+            <button type="submit">Submit Leave</button>
+        </form>
+
+    </div>
+
+    <!-- ✅ LEAVE HISTORY -->
+    <div class="section-card">
+
+        <h3>Leave History</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Dates</th>
+                    <th>Days</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for leave in leaves %}
+                <tr>
+                    <td>{{ leave.leave_type }}</td>
+                    <td>{{ leave.from_date }} → {{ leave.to_date }}</td>
+                    <td>{{ leave.total_days }}</td>
+                    <td>
+                        <span class="badge {{ leave.status }}">
+                            {{ leave.status }}
+                        </span>
+                    </td>
+                </tr>
+
+                {% if leave.status == "rejected" %}
+                <tr class="reason-row">
+                    <td colspan="4">
+                        <strong>Rejected Reason:</strong> {{ leave.rejection_reason }}
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="no-records">
+                        No leave records yet 😎
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<!-- ✅ TOTAL DAYS SCRIPT -->
+<script>
+document.getElementById("from_date").addEventListener("change", calculateDays);
+document.getElementById("to_date").addEventListener("change", calculateDays);
+
+function calculateDays() {
+
+    let fromDate = document.getElementById("from_date").value;
+    let toDate = document.getElementById("to_date").value;
+
+    if (fromDate && toDate) {
+
+        let start = new Date(fromDate);
+        let end = new Date(toDate);
+
+        let diff = (end - start) / (1000 * 60 * 60 * 24) + 1;
+
+        document.getElementById("total_days").value = diff > 0 ? diff : '';
+    }
+}
+</script>
+
+{% endblock %}

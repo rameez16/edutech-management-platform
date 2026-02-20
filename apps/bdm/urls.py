@@ -39,9 +39,12 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("batches/<int:pk>/toggle-extension/",views.toggle_batch_extension,name="toggle_batch_extension"),
                 path('batches/create/', views.batch_create, name='batch_create'),
                 
+                
+                
                 path("payments/",views.payments_dashboard,name="payments_dashboard"),
                 path("payments/<int:pk>/",views.payment_detail,name="payment_detail"),
                 path('course-fee/', views.course_fee, name='course_fee'),
+                path("payment-history/<int:student_id>/", views.payment_history, name="payment_history"),
 
 
 
@@ -53,9 +56,30 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path(   'bdm/enrollments/pending-verification/', views.enrollment_verification_list, name='enrollment_verification_list'),
                 path("student_onboarding/enrollment_letter/<int:student_id>/", views.approve_enrollment_agreement, name="approve_enrollment_agreement"),
                 
-                path('bdm/student/<int:student_id>',views.view_student_id_card,name='view_student_id_card'),
-                 
+                path('bdm/student/<int:student_id>',views.view_student_id_card,name='view_student_id_card'),      
                 path('document/<int:document_id>/reject/', views.reject_document, name='reject_document'),
+                
+                
+                #ramees-lession-plan
+                
+                path('academics/batches/', views.BatchListView.as_view(), name='batch_list') ,
+                path('academics/batch/<int:pk>/', views.BatchAcademicDashboardView.as_view(), name='batch_academic_dashboard'),
+                path("academics/batch/<int:batch_id>/module/<int:pk>/",views.ModuleDetailView.as_view(),name="module_detail"),          
+                path("academics/batch/<int:batch_id>/lesson-plan/<int:plan_id>/assign/",views.AssignLessonSessionView.as_view(),name="assign_lesson_session"),
+                path("academics/session/<int:pk>/edit/",views.LessonSessionUpdateView.as_view(), name="edit_lesson_session"),
+                path("academics/session/<int:pk>/delete/",views.LessonSessionDeleteView.as_view(),name="delete_lesson_session"),
+                
+
+                
+                path('leave/', views.leave_view, name='leave'),
+                path('leave/<int:pk>/', views.leave_detail, name='leave_detail'),
+                
+                
+                path('student_feedback/', views.student_feedback, name='student_feedback'),
+                
+                path('courses/', views.course_list_view, name='course_list'),
+                path('courses/<int:pk>/', views.course_detail_view, name='course_detail'),
+                path('module/<int:pk>/', views.module_detail_view, name='module_detail'),
                 ]
 
 

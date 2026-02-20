@@ -1,0 +1,128 @@
+{% extends "student/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'student/css/evaluation.css' %}">
+
+<div class="evaluation-page">
+
+    <div class="evaluation-container">
+
+        <!-- ✅ HEADER -->
+        <div class="student-header">
+
+            <div class="student-info">
+                <h2>{{ request.user.get_full_name }}</h2>
+                <br>
+                <p>{{ request.user.email }}</p>
+            </div>
+
+            <div class="batch-pill">
+                {{ student.batches.first.name }}
+            </div>
+
+        </div>
+
+        <!-- ✅ SUMMARY -->
+        <div class="summary-section">
+
+            <div class="summary-card">
+                <p>Total Marks</p>
+                <h2>{{ obtained_marks }} / {{ total_marks }}</h2>
+            </div>
+
+            <div class="summary-card">
+                <p>Percentage</p>
+                <h2>{{ percentage }}%</h2>
+            </div>
+
+        </div>
+
+        <!-- ✅ TITLE -->
+        <h3 class="section-title">Task List</h3>
+
+        <!-- ✅ TABLE -->
+        <div class="table-wrapper">
+            <table class="evaluation-table">
+
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Marks</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Verified</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for submission in submissions %}
+                    <tr>
+
+                        <!-- ✅ TASK -->
+                        <td>{{ submission.task.title }}</td>
+
+                        <!-- ✅ MARKS -->
+                        <td>
+                            {% if submission.marks_obtained %}
+                                {{ submission.marks_obtained }} / {{ submission.task.total_marks }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <!-- ✅ STATUS -->
+                        <td>
+                            <span class="status-badge status-{{ submission.status|lower }}">
+                                {{ submission.status }}
+                            </span>
+                        </td>
+
+                        <!-- ✅ SUBMITTED -->
+                        <td>
+                            {% if submission.submitted_at %}
+                                {{ submission.submitted_at|date:"d M Y" }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <!-- ✅ VERIFIED -->
+                        <td>
+                            {% if submission.evaluated_at %}
+                                {{ submission.evaluated_at|date:"d M Y" }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <!-- ✅ ACTION -->
+                        <td>
+                            <a href="?submission={{ submission.id }}" class="view-btn">
+                                View
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty-row">
+                            No evaluations available
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

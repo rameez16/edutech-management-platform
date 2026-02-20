@@ -1,0 +1,68 @@
+{% extends "student/layout/base.html" %}
+{% load static %}
+
+{% block title %}Submit Task{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/do_task.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="do-task-container">
+
+    <!-- Header -->
+    <div class="do-task-header">
+        <h2>{{ task.title }}</h2>
+        <p>Submit your work before {{ task.due_date }}</p>
+    </div>
+
+    <!-- Card -->
+    <div class="do-task-wrapper">
+        <div class="do-task-card">
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Submission Text -->
+                <div class="task-section">
+                    <h4>Submission Description</h4>
+                    <textarea name="submission_text" rows="5"
+                        placeholder="Describe your work here...">{{ submission.submission_text }}</textarea>
+                </div>
+
+                <!-- Link -->
+                <div class="task-section">
+                    <h4>Project Link</h4>
+                    <input type="url" name="submission_link"
+                        placeholder="GitHub / Live URL"
+                        value="{{ submission.submission_link }}">
+                </div>
+
+                <!-- File -->
+                <div class="task-section">
+                    <h4>Upload File</h4>
+                    <input type="file" name="submission_file">
+                </div>
+
+                <!-- Buttons -->
+                <div class="do-task-footer">
+                    <button type="submit" class="submit-task-btn">
+                         Submit Task
+                    </button>
+
+                    <button type="reset" class="cancel-btn">
+    Cancel
+</button>
+                <a href="{% url 'student:task_detail' task.id%}" class="back-btn">
+                    ← Back to Tasks
+                </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

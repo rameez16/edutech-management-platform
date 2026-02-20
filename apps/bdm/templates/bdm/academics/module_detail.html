@@ -1,0 +1,926 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<div class="lesson-plans-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <a href="{% url 'bdm:batch_academic_dashboard' batch.id %}" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            <span>Back to Batch Dashboard</span>
+        </a>
+        
+        <div class="header-content">
+            <div class="header-left">
+                <div class="batch-badge">
+                    <i class="bi bi-book"></i>
+                    {{ batch.course.name }}
+                </div>
+                <h1 class="page-title">Lesson Plans</h1>
+                <p class="page-subtitle">
+                    <i class="bi bi-calendar-check"></i>
+                    {{ lesson_plans|length }} sessions • {{ batch.name }}
+                </p>
+            </div>
+            
+            <div class="header-stats">
+                <div class="stat-pill">
+                    <span class="stat-label">Assigned</span>
+                    <span class="stat-value">{{ assigned_count }}/{{ lesson_plans|length }}</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-label">Total Hours</span>
+                    <span class="stat-value">{{ total_duration }} hrs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">
+                <i class="bi bi-grid"></i>
+                <h3>Session Schedule</h3>
+            </div>
+            
+            <div class="table-filters">
+                <div class="filter-group">
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Sessions</option>
+                        <option value="assigned">Assigned</option>
+                        <option value="unassigned">Unassigned</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Search topics..." id="searchInput">
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="modern-table" id="lessonTable">
+                <thead>
+                    <tr>
+                        <th width="80">
+                            <div class="th-content">
+                                <i class="bi bi-hash"></i>
+                                Session
+                            </div>
+                        </th>
+                        <th>
+                            <div class="th-content">
+                                <i class="bi bi-bookmark"></i>
+                                Topic
+                            </div>
+                        </th>
+                        <th width="100">
+                            <div class="th-content">
+                                <i class="bi bi-clock"></i>
+                                Duration
+                            </div>
+                        </th>
+                        <th width="120">
+                            <div class="th-content">
+                                <i class="bi bi-calendar"></i>
+                                Planned Date
+                            </div>
+                        </th>
+                        <th width="150">
+                            <div class="th-content">
+                                <i class="bi bi-person"></i>
+                                Trainer
+                            </div>
+                        </th>
+                        <th width="100">
+                            <div class="th-content">
+                                <i class="bi bi-flag"></i>
+                                Status
+                            </div>
+                        </th>
+                        <th width="160">
+                            <div class="th-content">
+                                <i class="bi bi-gear"></i>
+                                Actions
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plan in lesson_plans %}
+                    <tr class="lesson-row {% if plan.assigned_session %}assigned{% else %}unassigned{% endif %}">
+                        <td>
+                            <span class="session-badge">S{{ plan.session_number }}</span>
+                        </td>
+                        <td>
+                            <div class="topic-cell">
+                                <strong class="topic-title">{{ plan.topic }}</strong>
+                                {% if plan.description %}
+                                <span class="topic-desc">{{ plan.description|truncatechars:60 }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="duration-badge">
+                                <i class="bi bi-hourglass"></i>
+                                {{ plan.estimated_duration_hours }} hrs
+                            </span>
+                        </td>
+                        <td>
+                            {% if plan.assigned_session %}
+                            <div class="date-info">
+                                <span class="date-value">{{ plan.assigned_session.planned_date|date:"d M Y" }}</span>
+                                {% if plan.assigned_session.actual_date %}
+                                <span class="date-badge actual">
+                                    <i class="bi bi-check"></i>
+                                    {{ plan.assigned_session.actual_date|date:"d M" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="placeholder-text">— Not scheduled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if plan.assigned_session and plan.assigned_session.trainer %}
+                            <div class="trainer-info">
+                                <div class="trainer-avatar">
+                                    {{ plan.assigned_session.trainer.full_name|first|upper }}
+                                </div>
+                                <span class="trainer-name">{{ plan.assigned_session.trainer.full_name }}</span>
+                            </div>
+                            {% else %}
+                            <span class="placeholder-text">— Not assigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if plan.assigned_session %}
+                            <span class="status-badge status-assigned">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Assigned
+                            </span>
+                            {% else %}
+                            <span class="status-badge status-unassigned">
+                                <i class="bi bi-exclamation-circle"></i>
+                                Not Assigned
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                {% if plan.assigned_session %}
+                                    <a href="{% url 'bdm:edit_lesson_session' plan.assigned_session.id %}" class="action-btn edit-btn" title="Edit Session">
+                                        <i class="bi bi-pencil"></i>
+                                        <span>Edit</span>
+                                    </a>
+                                    
+                                    <a href="{% url 'bdm:delete_lesson_session' plan.assigned_session.id %}" class="action-btn delete-btn" title="Unassign Session" onclick="return confirm('Are you sure you want to unassign this session?');">
+                                        <i class="bi bi-trash"></i>
+                                        <span>Unassign</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'bdm:assign_lesson_session' batch.id plan.id %}" class="action-btn assign-btn" title="Assign Session">
+                                        <i class="bi bi-plus-circle"></i>
+                                        <span>Assign</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-content">
+                                <i class="bi bi-journal-x"></i>
+                                <h4>No Lesson Plans Found</h4>
+                                <p>There are no lesson plans available for this batch.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Table Footer -->
+        <div class="table-footer">
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-dot assigned"></span>
+                    <span class="legend-label">Assigned</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot unassigned"></span>
+                    <span class="legend-label">Unassigned</span>
+                </div>
+            </div>
+            
+            <div class="table-info">
+                Showing <span class="info-highlight">{{ lesson_plans|length }}</span> sessions
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary: #0077cc;
+        --primary-dark: #005fa3;
+        --primary-light: #e6f2ff;
+        --primary-extra-light: #f0f8ff;
+        --success: #28a745;
+        --success-light: #d4edda;
+        --warning: #ffc107;
+        --warning-light: #fff3cd;
+        --danger: #dc3545;
+        --danger-light: #f8d7da;
+        --orange: #fd7e14;
+        --orange-light: #ffe5d0;
+        --info: #17a2b8;
+        --info-light: #d1ecf1;
+        --gray-100: #f8f9fa;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-400: #ced4da;
+        --gray-500: #adb5bd;
+        --gray-600: #6c757d;
+        --gray-700: #495057;
+        --gray-800: #343a40;
+        --gray-900: #212529;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --border-color: #e9ecef;
+        --white: #ffffff;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.02);
+        --shadow-md: 0 4px 20px rgba(0, 119, 204, 0.08);
+        --shadow-lg: 0 8px 30px rgba(0, 119, 204, 0.12);
+        --gradient-primary: linear-gradient(135deg, var(--primary), #0099ff);
+        --gradient-light: linear-gradient(135deg, var(--white), var(--gray-100));
+    }
+
+    .lesson-plans-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 30px 24px;
+    }
+
+    /* Header Styles */
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 40px;
+        color: var(--gray-600);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .back-link:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateX(-4px);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .header-left {
+        flex: 1;
+    }
+
+    .batch-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: var(--primary-light);
+        color: var(--primary);
+        border-radius: 40px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        border: 1px solid rgba(0, 119, 204, 0.2);
+    }
+
+    .page-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 8px 0;
+        letter-spacing: -0.3px;
+    }
+
+    .page-subtitle {
+        font-size: 15px;
+        color: var(--gray-600);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .page-subtitle i {
+        color: var(--primary);
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 12px;
+    }
+
+    .stat-pill {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 40px;
+        padding: 8px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--gray-600);
+    }
+
+    .stat-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    /* Table Card */
+    .table-card {
+        background: var(--white);
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .table-card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    .table-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        background: var(--gradient-light);
+    }
+
+    .table-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-title i {
+        font-size: 22px;
+        color: var(--primary);
+        background: var(--primary-light);
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .table-title h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .table-filters {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .filter-group {
+        position: relative;
+    }
+
+    .filter-select {
+        padding: 8px 30px 8px 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 30px;
+        font-size: 13px;
+        color: var(--gray-700);
+        background: var(--white);
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 14px;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 14px;
+        color: var(--gray-500);
+        font-size: 14px;
+    }
+
+    .search-box input {
+        padding: 8px 16px 8px 40px;
+        border: 1px solid var(--border-color);
+        border-radius: 30px;
+        font-size: 13px;
+        width: 200px;
+        transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+        width: 250px;
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .modern-table th {
+        text-align: left;
+        padding: 16px 20px;
+        background: var(--gray-100);
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--gray-700);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .th-content {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .th-content i {
+        color: var(--primary);
+        font-size: 14px;
+    }
+
+    .modern-table td {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 14px;
+        color: var(--gray-700);
+        transition: background 0.3s ease;
+    }
+
+    .lesson-row {
+        transition: all 0.3s ease;
+    }
+
+    .lesson-row:hover {
+        background: var(--primary-extra-light);
+    }
+
+    .lesson-row.assigned:hover {
+        background: var(--success-light);
+    }
+
+    .lesson-row.unassigned:hover {
+        background: var(--orange-light);
+    }
+
+    /* Session Badge */
+    .session-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: var(--primary-light);
+        color: var(--primary);
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Topic Cell */
+    .topic-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .topic-title {
+        color: var(--text-dark);
+        font-size: 15px;
+    }
+
+    .topic-desc {
+        font-size: 12px;
+        color: var(--gray-500);
+        display: block;
+    }
+
+    /* Duration Badge */
+    .duration-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--gray-100);
+        border-radius: 20px;
+        font-size: 13px;
+        color: var(--gray-700);
+    }
+
+    .duration-badge i {
+        color: var(--primary);
+    }
+
+    /* Date Info */
+    .date-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .date-value {
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .date-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        background: var(--info-light);
+        color: var(--info);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        width: fit-content;
+    }
+
+    .date-badge.actual {
+        background: var(--success-light);
+        color: var(--success);
+    }
+
+    .placeholder-text {
+        color: var(--gray-400);
+        font-style: italic;
+    }
+
+    /* Trainer Info */
+    .trainer-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .trainer-avatar {
+        width: 32px;
+        height: 32px;
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .trainer-name {
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        width: fit-content;
+        white-space: nowrap;
+    }
+
+    .status-badge.status-assigned {
+        background: var(--success-light);
+        color: var(--success);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .status-badge.status-unassigned {
+        background: var(--orange-light);
+        color: var(--orange);
+        border: 1px solid rgba(253, 126, 20, 0.3);
+    }
+
+    .status-badge i {
+        font-size: 14px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+        white-space: nowrap;
+    }
+
+    .action-btn i {
+        font-size: 14px;
+    }
+
+    .action-btn.edit-btn {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: rgba(0, 119, 204, 0.3);
+    }
+
+    .action-btn.edit-btn:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 119, 204, 0.3);
+    }
+
+    .action-btn.delete-btn {
+        background: var(--danger-light);
+        color: var(--danger);
+        border-color: rgba(220, 53, 69, 0.3);
+    }
+
+    .action-btn.delete-btn:hover {
+        background: var(--danger);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+
+    .action-btn.assign-btn {
+        background: var(--primary);
+        color: white;
+        padding: 6px 18px;
+    }
+
+    .action-btn.assign-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 119, 204, 0.4);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-content {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .empty-content i {
+        font-size: 64px;
+        color: var(--gray-400);
+        margin-bottom: 16px;
+    }
+
+    .empty-content h4 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0 0 8px 0;
+    }
+
+    .empty-content p {
+        font-size: 14px;
+        color: var(--gray-500);
+        margin: 0;
+    }
+
+    /* Table Footer */
+    .table-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--gray-100);
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .legend {
+        display: flex;
+        gap: 20px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .legend-dot.assigned {
+        background: var(--success);
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+    }
+
+    .legend-dot.unassigned {
+        background: var(--orange);
+        box-shadow: 0 0 0 3px rgba(253, 126, 20, 0.2);
+    }
+
+    .legend-label {
+        font-size: 13px;
+        color: var(--gray-600);
+    }
+
+    .table-info {
+        font-size: 13px;
+        color: var(--gray-600);
+    }
+
+    .info-highlight {
+        font-weight: 600;
+        color: var(--primary);
+        background: var(--primary-light);
+        padding: 2px 8px;
+        border-radius: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .table-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .table-filters {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
+
+        .search-box input:focus {
+            width: 100%;
+        }
+
+        .filter-select {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .lesson-plans-container {
+            padding: 20px 16px;
+        }
+
+        .page-title {
+            font-size: 28px;
+        }
+
+        .modern-table td,
+        .modern-table th {
+            padding: 12px 16px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .table-footer {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .header-stats {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .stat-pill {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .legend {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+
+<script>
+    // Simple filter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusFilter = document.getElementById('statusFilter');
+        const searchInput = document.getElementById('searchInput');
+        const table = document.getElementById('lessonTable');
+        const rows = table.querySelectorAll('tbody tr');
+
+        function filterTable() {
+            const statusValue = statusFilter.value;
+            const searchValue = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                let show = true;
+
+                // Status filter
+                if (statusValue === 'assigned' && !row.classList.contains('assigned')) {
+                    show = false;
+                } else if (statusValue === 'unassigned' && !row.classList.contains('unassigned')) {
+                    show = false;
+                }
+
+                // Search filter
+                if (show && searchValue) {
+                    const topic = row.querySelector('.topic-title')?.textContent.toLowerCase() || '';
+                    if (!topic.includes(searchValue)) {
+                        show = false;
+                    }
+                }
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        statusFilter.addEventListener('change', filterTable);
+        searchInput.addEventListener('keyup', filterTable);
+    });
+</script>
+
+{% endblock %}

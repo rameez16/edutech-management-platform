@@ -1,0 +1,504 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg:        #f4f5f7;
+    --surface:   #ffffff;
+    --border:    #e2e5ea;
+    --divider:   #edf0f4;
+    --text-primary:   #1a1f2e;
+    --text-secondary: #5a6378;
+    --text-muted:     #9aa0b0;
+    --accent:    #2563eb;
+    --accent-light: #eff4ff;
+    --accent-mid: #bfcffd;
+    --success:   #16a34a;
+    --success-bg: #f0fdf4;
+    --warning:   #d97706;
+    --warning-bg: #fffbeb;
+    --danger:    #dc2626;
+    --danger-bg: #fef2f2;
+    --pending:   #7c3aed;
+    --pending-bg: #f5f3ff;
+    --radius:    8px;
+    --shadow:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Page Layout ── */
+  .dashboard-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    letter-spacing: -0.2px;
+  }
+
+  .header h1 i {
+    color: var(--accent);
+    font-size: 16px;
+    background: var(--accent-light);
+    padding: 7px;
+    border-radius: 6px;
+    border: 1px solid var(--accent-mid);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: var(--accent);
+    color: #fff !important;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 1px 3px rgba(37,99,235,0.25);
+  }
+
+  .btn-primary:hover {
+    background: #1d4ed8;
+    box-shadow: 0 3px 8px rgba(37,99,235,0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary i { font-size: 12px; }
+
+  /* ── Main Card ── */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  /* ── Section ── */
+  .section {
+    padding: 20px 24px;
+  }
+
+  .section + .section {
+    border-top: 1px solid var(--divider);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .section-header h3 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-muted);
+  }
+
+  .section-header .section-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: var(--accent-light);
+    border: 1px solid var(--accent-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  /* ── Summary Grid ── */
+  .payment-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 12px;
+  }
+
+  .summary-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    transition: border-color 0.15s;
+  }
+
+  .summary-item:hover {
+    border-color: var(--accent-mid);
+  }
+
+  .summary-item h4 {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+
+  .summary-item p {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .summary-item p.em-dash {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  /* ── Status Badge ── */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    border: 1px solid transparent;
+  }
+
+  .status-badge.approved {
+    background: var(--success-bg);
+    color: var(--success);
+    border-color: #bbf7d0;
+  }
+
+  .status-badge.rejected {
+    background: var(--danger-bg);
+    color: var(--danger);
+    border-color: #fecaca;
+  }
+
+  .status-badge.pending {
+    background: var(--pending-bg);
+    color: var(--pending);
+    border-color: #ddd6fe;
+  }
+
+  .status-badge.warning {
+    background: var(--warning-bg);
+    color: var(--warning);
+    border-color: #fde68a;
+  }
+
+  .status-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+  }
+
+  /* ── Document Button ── */
+  .doc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    background: var(--surface);
+    color: var(--accent) !important;
+    border: 1.5px solid var(--accent-mid);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'IBM Plex Sans', sans-serif;
+    text-decoration: none !important;
+    transition: all 0.15s;
+    box-shadow: var(--shadow);
+  }
+
+  .doc-btn:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .doc-btn i { font-size: 14px; }
+
+  .no-doc {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  /* ── Mono dates ── */
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 560px) {
+    .dashboard-container { padding: 16px 12px 32px; }
+    .section { padding: 16px; }
+    .payment-summary { grid-template-columns: 1fr 1fr; }
+    .header h1 { font-size: 16px; }
+  }
+</style>
+
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>
+      <i class="fas fa-file-alt"></i>
+      Leave Application Details
+    </h1>
+    <div class="header-actions">
+      <a href="{% url 'bdm:leave' %}" class="btn-primary" style="text-decoration:none;">
+        <i class="fas fa-arrow-left"></i>
+        Back to List
+      </a>
+    </div>
+  </div>
+
+  <div class="table-card">
+
+    <!-- Basic Information -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-user"></i></span>
+        <h3>Basic Information</h3>
+      </div>
+      <div class="payment-summary">
+
+        <div class="summary-item">
+          <h4>Student</h4>
+          <p>{{ leave.student.full_name }}</p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Batch</h4>
+          <p>{{ leave.batch.name }}</p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Leave Type</h4>
+          <p>{{ leave.get_leave_type_display }}</p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Status</h4>
+          <p>
+            {% with status=leave.status %}
+              {% if status == 'approved' %}
+                <span class="status-badge approved">Approved</span>
+              {% elif status == 'rejected' %}
+                <span class="status-badge rejected">Rejected</span>
+              {% elif status == 'pending' %}
+                <span class="status-badge pending">Pending</span>
+              {% else %}
+                <span class="status-badge warning">{{ leave.get_status_display }}</span>
+              {% endif %}
+            {% endwith %}
+          </p>
+        </div>
+          <div class="summary-item" style="grid-column: 1 / -1;">
+  <h4>Leave Days Summary</h4>
+  <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+    
+    <span>
+      <strong>Total:</strong>
+      {{ leave_stats.total_days_sum|default:0 }} days
+    </span>
+
+    <span class="status-badge approved">
+      Approved: {{ leave_stats.approved_days_sum|default:0 }}
+    </span>
+
+    <span class="status-badge pending">
+      Pending: {{ leave_stats.pending_days_sum|default:0 }}
+    </span>
+
+    <span class="status-badge rejected">
+      Rejected: {{ leave_stats.rejected_days_sum|default:0 }}
+    </span>
+
+  </div>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <!-- Leave Details -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-calendar-alt"></i></span>
+        <h3>Leave Details</h3>
+      </div>
+      <div class="payment-summary">
+
+        <div class="summary-item">
+          <h4>From Date</h4>
+          <p>{{ leave.from_date|date:"d M Y" }}</p>
+        </div>
+
+        <div class="summary-item">
+          <h4>To Date</h4>
+          <p>{{ leave.to_date|date:"d M Y" }}</p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Total Days</h4>
+          <p>{{ leave.total_days }}</p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Reason</h4>
+          <p>{{ leave.reason }}</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Supporting Document -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-paperclip"></i></span>
+        <h3>Supporting Document</h3>
+      </div>
+      {% if leave.supporting_document %}
+        <a href="{{ leave.supporting_document.url }}" target="_blank" class="doc-btn">
+          <i class="fas fa-file-download"></i>
+          View Document
+        </a>
+      {% else %}
+        <p class="no-doc">No document uploaded.</p>
+      {% endif %}
+    </div>
+
+    <!-- Approval Information -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-check-circle"></i></span>
+        <h3>Approval Information</h3>
+      </div>
+      <div class="payment-summary">
+
+        <div class="summary-item">
+          <h4>Status</h4>
+          <p>
+            {% with status=leave.status %}
+              {% if status == 'approved' %}
+                <span class="status-badge approved">Approved</span>
+              {% elif status == 'rejected' %}
+                <span class="status-badge rejected">Rejected</span>
+              {% elif status == 'pending' %}
+                <span class="status-badge pending">Pending</span>
+              {% else %}
+                <span class="status-badge warning">{{ leave.get_status_display }}</span>
+              {% endif %}
+            {% endwith %}
+          </p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Approved By</h4>
+          <p>
+            {% if leave.approved_by %}
+              {{ leave.approved_by }}
+            {% else %}
+              <span class="em-dash">Not yet approved</span>
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Approval Date</h4>
+          <p>
+            {% if leave.approval_date %}
+              <span class="mono">{{ leave.approval_date|date:"d M Y, h:i A" }}</span>
+            {% else %}
+              <span class="em-dash">—</span>
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Rejection Reason</h4>
+          <p>
+            {% if leave.rejection_reason %}
+              {{ leave.rejection_reason }}
+            {% else %}
+              <span class="em-dash">—</span>
+            {% endif %}
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- System Information -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-clock"></i></span>
+        <h3>System Information</h3>
+      </div>
+      <div class="payment-summary">
+
+        <div class="summary-item">
+          <h4>Created At</h4>
+          <p><span class="mono">{{ leave.created_at|date:"d M Y, h:i A" }}</span></p>
+        </div>
+
+        <div class="summary-item">
+          <h4>Last Updated</h4>
+          <p><span class="mono">{{ leave.updated_at|date:"d M Y, h:i A" }}</span></p>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /.table-card -->
+
+</div><!-- /.dashboard-container -->
+{% endblock %}

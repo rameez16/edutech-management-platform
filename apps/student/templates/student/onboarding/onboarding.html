@@ -113,14 +113,14 @@
 
                 <!-- DOWNLOAD ENROLLMENT LETTER -->
                 {% if checklist.enrollment_letter_generated %}
-                    <a href="{% url 'student:download_enrollment_letter' %}"
+                    <a href="{% url 'bdm:download_enrollment_letter' %}"
                        class="btn btn-enroll-download"
                        download style="height:35px; padding-top:5px;">
                         Download Enrollment Letter
                     </a>
                 {% else %}
                     <a class="btn btn-enroll-download disabled"
-                       aria-disabled="true" style="height:35px; padding-top:5px;">
+                       aria-disabled="true" style="height:35px; padding-top:5px; margin-bottom:70px;">
                         Download Enrollment Letter
                     </a>
                 {% endif %}
@@ -249,7 +249,7 @@
                         ID Card Issuance Pending
                     </button>
                 {% else %}
-                    <button class="btn disabled" disabled style="margin-bottom:40px;">
+                    <button class="btn disabled" disabled style="margin-bottom:30px;">
                         ID Card Not Available
                     </button>
                 {% endif %}

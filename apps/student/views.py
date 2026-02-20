@@ -1,57 +1,32 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse, FileResponse
-from django.views.decorators.http import require_POST
-
-from django.utils import timezone
 from django.contrib import messages
+from django.utils import timezone
+from decimal import Decimal
 from django.db.models import Sum
-from apps.bdm.models import Student,Trainer,Course,Batch
-from .models import FeePayment,StudentFeedback
+from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist
 from django.contrib.auth import update_session_auth_hash
 import uuid, os
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import StudentDocument
 from . import views
 from django.contrib.auth.decorators import login_required
 import uuid
 from apps.bdm.models import PaymentDocument
-
-from .forms import EnrollmentAgreementForm
-
-from decimal import Decimal
-import uuid, os
-
+from apps.trainer.models import Attendance,LessonSession,Task,TaskSubmission
+from django.http import HttpResponse, JsonResponse, FileResponse
+from django.views.decorators.http import require_POST
+from .forms import EnrollmentAgreementForm, TaskSubmissionForm
 from apps.accounts.decorators import role_required
+from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession
+from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
+from apps.student.forms import LeaveApplicationForm
+from apps.student.models import LeaveApplication
 
-from apps.bdm.models import Student, StudentAdminProfile, Batch, OnboardingChecklist, Course
-
-
-
-from apps.trainer.models import Module, LessonPlan
-
-from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard
-
-
-# Create your views here.
-
-
-
-# Create your views here.
-#dashboard
-
-@role_required("student")
-def dashboard(request):
-    """Simple dashboard"""
-    
-    return render(request, 'student/dashboard/dashboard.html')
-    
 #one time payment
 @login_required
 def payment(request):
-   
+
     student = request.user.student
 
+    # ✅ Payment Plan Check
     if student.enrollment_agreement.payment_plan.lower() != "full":
         messages.error(request, "Full payment not allowed")
         return redirect("student:payment_gateway")
@@ -62,24 +37,34 @@ def payment(request):
         messages.error(request, "No batch assigned.")
         return redirect("student:dashboard")
 
+    # =====================================
+    # ✅ FEES
+    # =====================================
     course_fee = batch.course.course_fee
+
+    # ✅ FIXED 🔥🔥🔥 (THIS WAS MISSING)
     admission_fee = course_fee * Decimal("0.10")
 
+    total_fee = course_fee   # Full payment → no addition
+
+    # =====================================
+    # ✅ PAYMENTS
+    # =====================================
     payments = FeePayment.objects.filter(student=student)
 
     paid_amount = payments.filter(
         payment_status=FeePayment.PaymentStatus.COMPLETED
     ).aggregate(Sum("amount"))["amount__sum"] or Decimal("0.00")
 
-    total_fee = course_fee
     pending_amount = max(total_fee - paid_amount, Decimal("0.00"))
 
-    # ✅ ADDED (THIS WAS MISSING)
     existing_payment = payments.filter(
         payment_type=FeePayment.PaymentType.FULL_PAYMENT
     ).first()
 
-    # ✅ ADDED (RECEIPT UPLOAD LOGIC)
+    # =====================================
+    # ✅ PAYMENT SUBMISSION
+    # =====================================
     if request.method == "POST":
 
         if existing_payment:
@@ -92,6 +77,9 @@ def payment(request):
             messages.error(request, "Please upload receipt")
             return redirect("student:payment")
 
+        receipt_no = f"RCPT-{uuid.uuid4().hex[:8].upper()}"
+        transaction_id = f"FULL-{uuid.uuid4().hex[:12].upper()}"
+
         payment = FeePayment.objects.create(
             student=student,
             payment_type=FeePayment.PaymentType.FULL_PAYMENT,
@@ -99,34 +87,51 @@ def payment(request):
             payment_method=FeePayment.PaymentMethod.UPI,
             payment_status=FeePayment.PaymentStatus.PENDING,
             payment_date=timezone.now(),
-            transaction_id=f"FULL-{uuid.uuid4().hex[:10]}",
-            receipt_number=f"RCPT-{uuid.uuid4().hex[:6]}"
+            transaction_id=transaction_id,
+            receipt_number=receipt_no
         )
 
+        # =====================================
+        # ✅ SAVE DOCUMENT 🔥
+        # =====================================
         PaymentDocument.objects.create(
-            fee_payment=payment,   # ✅ CORRECT OBJECT
+            fee_payment=payment,
             document_type=PaymentDocument.DocumentType.RECEIPT,
             document_file=receipt,
-            uploaded_by=request.user
+            uploaded_by=request.user,
+
+            description=(
+                f"Full Fee Payment\n"
+                f"Student: {student.full_name}\n"
+                f"Batch: {batch.name}\n"
+                f"Course Fee: ₹{course_fee}\n"
+                f"Admission Fee (10%): ₹{admission_fee}\n"
+                f"Paid Amount: ₹{paid_amount}\n"
+                f"Pending Paid: ₹{pending_amount}\n"
+                f"Receipt No: {receipt_no}\n"
+                f"Transaction ID: {transaction_id}"
+            )
         )
 
-        messages.success(request, "Receipt uploaded successfully")
+        messages.success(request, "✅ Receipt uploaded successfully")
         return redirect("student:payment")
 
+    # =====================================
+    # ✅ RENDER
+    # =====================================
     return render(request, "student/payment/payment.html", {
         "student": student,
-        
         "course_fee": course_fee,
-        "admission_fee": admission_fee,
+        "admission_fee": admission_fee,   # ✅ FIXED
         "total_fee": total_fee,
         "paid_amount": paid_amount,
         "pending_amount": pending_amount,
-        "existing_payment": existing_payment,   # ✅ CRITICAL FIX
+        "existing_payment": existing_payment,
     })
 
+
+
 #admission fee
-
-
 @login_required
 def admission(request):
 
@@ -136,9 +141,10 @@ def admission(request):
     if not batch:
         messages.error(request, "No batch assigned.")
         return redirect("student:dashboard")
-    course = batch.course   # ✅ ADD THIS LINE
 
-    course_fee = batch.course.course_fee
+    course = batch.course
+
+    course_fee = course.course_fee
     admission_amount = course_fee * Decimal("0.10")
 
     admission_fee = FeePayment.objects.filter(
@@ -155,6 +161,7 @@ def admission(request):
         receipt_no = f"RCPT-{uuid.uuid4().hex[:8].upper()}"
         transaction_id = f"ADM-{uuid.uuid4().hex[:12].upper()}"
 
+        # ✅ CREATE PAYMENT
         admission_fee = FeePayment.objects.create(
             student=student,
             payment_type=FeePayment.PaymentType.ADMISSION,
@@ -168,15 +175,26 @@ def admission(request):
 
         receipt_file = request.FILES.get("receipt")
 
-        if receipt_file:
-            PaymentDocument.objects.create(
-                fee_payment=admission_fee,
-                document_type=PaymentDocument.DocumentType.RECEIPT,
-                document_file=receipt_file,
-                uploaded_by=request.user
+        # ✅ SAVE FULL DETAILS TO BDM DOCUMENT 🔥🔥🔥
+        PaymentDocument.objects.create(
+            fee_payment=admission_fee,
+            document_type=PaymentDocument.DocumentType.RECEIPT,
+            document_file=receipt_file if receipt_file else None,
+            uploaded_by=request.user,
+
+            description=(
+                f"Admission Fee Payment\n"
+                f"Student: {student.full_name}\n"
+                f"Batch: {batch.name}\n"
+                f"Course: {course.name}\n"
+                f"Amount: ₹{admission_amount}\n"
+                f"Receipt No: {receipt_no}\n"
+                f"Transaction ID: {transaction_id}"
             )
+        )
 
         messages.success(request, "✅ Admission Fee Paid Successfully")
+        return redirect("student:admission")
 
     return render(request, "student/payment/admission.html", {
         "student": student,
@@ -187,7 +205,6 @@ def admission(request):
         "admission_fee": admission_fee,
         "active_tab": "admission",
     })
-
 @login_required
 def pdc(request):
 
@@ -271,6 +288,8 @@ def emi(request):
         "paid_amount": paid_amount,
         "pending_amount": pending_amount,
     })
+
+
 
 
 #Installments
@@ -365,6 +384,8 @@ def installments(request, student_id):
 
 
 
+
+
 #scan installemts using QR code
 @login_required
 def install_qr(request, installment_id):
@@ -446,29 +467,7 @@ def install_qr(request, installment_id):
         }
     )
 
-@login_required
-def installments_view(request):
-    # logged-in student
-    student = get_object_or_404(Student, user=request.user)
 
-    # fetch installments
-    installments = FeePayment.objects.filter(
-        student=student,
-        payment_type=FeePayment.PaymentType.INSTALLMENT
-    ).order_by("installment_number")
-
-    context = {
-        "student": student,
-        "installments": installments,
-    }
-
-    return render(
-        request,
-        "student/payment/install_view.html",
-        context
-    )
-def pdc_view(request):
-    return render(request, 'student/payment/pdc_view.html')
 @login_required
 def onetime_view(request):
 
@@ -503,12 +502,9 @@ def onetime_view(request):
     return render(
         request,
         "student/payment/one_time_view.html",
-        context
-    )
+        context)
 
 
-def emi_view(request):
-    return render(request, 'student/payment/emi_view.html')
 
 #Edit Profile
 
@@ -542,6 +538,8 @@ def stud_profile(request):
         "student": student
     })
 
+
+
 #Profile Overview
 
 @login_required
@@ -550,6 +548,7 @@ def overview(request):
     return render(request, "student/profile/overview.html", {
         "student": student
     })
+
 
 #Change Password
 
@@ -589,6 +588,10 @@ def password(request):
 
     return render(request, "student/profile/password.html")
 
+
+
+
+
 #one time installment-using QR code
 
 def QR_pay(request):
@@ -625,12 +628,507 @@ def QR_pay(request):
 
     return render(request, 'student/payment/QR_pay.html', context)
 
-def onboard(request):
-    
-    
-    
-    
-    return render(request, 'student/dashboard/onboarding.html')
+
+
+
+
+def stud_feedback(request):
+    if request.method == "POST":
+
+        # 🔴 BASIC VALIDATION
+        if not request.POST.get("feedback_type"):
+            messages.error(request, "❌ Please select feedback type")
+            return redirect("student:stud_feedback")
+
+        if not request.POST.get("overall_rating"):
+            messages.error(request, "❌ Overall rating is required")
+            return redirect("student:stud_feedback")
+
+        # ✅ SAVE FEEDBACK
+        StudentFeedback.objects.create(
+            student_id=request.POST.get("student") or None,
+            feedback_type=request.POST.get("feedback_type"),
+            trainer_id=request.POST.get("trainer") or None,
+            course_id=request.POST.get("course") or None,
+            batch_id=request.POST.get("batch") or None,
+            content_quality=request.POST.get("content_quality") or None,
+            teaching_methodology=request.POST.get("teaching_methodology") or None,
+            responsiveness=request.POST.get("responsiveness") or None,
+            overall_rating=request.POST.get("overall_rating"),
+            comments=request.POST.get("comments"),
+            suggestions=request.POST.get("suggestions"),
+            is_anonymous=True if request.POST.get("is_anonymous") else False,
+        )
+
+        # ✅ SUCCESS MESSAGE
+        messages.success(
+            request,
+            "✅ Thank you! Your feedback has been submitted successfully."
+        )
+
+        return redirect("student:stud_feedback")
+
+    # GET REQUEST
+    context = {
+        "students": Student.objects.all(),
+        "trainers": Trainer.objects.all(),
+        "courses": Course.objects.all(),
+        "batches": Batch.objects.all(),
+    }
+
+    return render(request, "student/dashboard/stud_feedback.html", context)
+
+
+def lms_login(request):
+    return render(request,'student/LMS/lms_login.html')
+
+
+@login_required
+def payment_gateway(request):
+
+    student = request.user.student
+
+    try:
+        agreement = student.enrollment_agreement
+    except EnrollmentAgreement.DoesNotExist:
+        messages.error(request, "Enrollment agreement not found")
+        return redirect("student:dashboard")
+
+    if not agreement.is_signed:
+        messages.warning(request, "Agreement not signed yet")
+        return redirect("student:dashboard")
+
+    plan = agreement.payment_plan.lower()
+
+    if plan == "full":
+        return redirect("student:payment")
+
+    elif plan == "emi":
+        return redirect("student:emi")
+
+    elif plan == "pdc":
+        return redirect("student:pdc")
+
+    elif plan == "installment":
+        return redirect("student:installments", student_id=student.id)  
+
+    messages.error(request, "Invalid payment plan")
+    return redirect("student:dashboard")
+@login_required
+def student_attendance(request):
+
+    student = request.user.student
+
+    attendance_records = (
+        Attendance.objects
+        .filter(student=student)
+        .select_related(
+            "lesson_session",
+            "lesson_session__lesson_plan",
+            "marked_by",
+            "marked_by__user"
+        )
+        .order_by("-date")
+    )
+
+    if not attendance_records.exists():
+        return render(request, "student/dashboard/attendance.html", {
+            "student": student,
+            "attendance_records": [],
+            "percentage": 0,
+            "present_days": 0,
+            "absent_days": 0,
+            "excused_days": 0,
+            "batch": None,
+        })
+
+    batch = attendance_records.first().batch
+    attendance_records = attendance_records.filter(batch=batch)
+
+    percentage = Attendance.calculate_attendance_percentage(student, batch)
+
+    context = {
+        "student": student,
+        "batch": batch,
+        "attendance_records": attendance_records,
+        "percentage": percentage,
+        "present_days": attendance_records.filter(status__in=['present', 'late']).count(),
+        "absent_days": attendance_records.filter(status='absent').count(),
+        "excused_days": attendance_records.filter(status='excused').count(),
+    }
+
+    return render(request, "student/dashboard/attendance.html", context)
+
+
+
+
+@login_required
+def student_leave(request):
+
+    student = request.user.student
+
+    # ✅ Active Batch
+    batch = student.batches.filter(is_active=True).first()
+
+    # ✅ SMART Trainer Fetch (From Sessions 🔥)
+    trainer = None
+
+    if batch:
+        session = (
+            LessonSession.objects
+            .filter(batch=batch, trainer__isnull=False)
+            .select_related("trainer")
+            .first()
+        )
+
+        if session:
+            trainer = session.trainer
+
+    # ✅ Leaves
+    leaves = LeaveApplication.objects.filter(student=student, batch=batch)
+
+    total_leaves = leaves.count()
+    pending_leaves = leaves.filter(status="pending").count()
+    approved_leaves = leaves.filter(status="approved").count()
+    rejected_leaves = leaves.filter(status="rejected").count()
+
+    # ✅ Form Handling
+    if request.method == "POST":
+        form = LeaveApplicationForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            leave = form.save(commit=False)
+            leave.student = student
+            leave.batch = batch
+            leave.save()
+
+            messages.success(request, "Leave submitted successfully")
+            return redirect("student:student_leave")
+
+    else:
+        form = LeaveApplicationForm()
+
+    context = {
+        "student": student,
+        "batch": batch,
+        "trainer": trainer,
+        "form": form,
+        "leaves": leaves,
+
+        "total_leaves": total_leaves,
+        "pending_leaves": pending_leaves,
+        "approved_leaves": approved_leaves,
+        "rejected_leaves": rejected_leaves,
+    }
+
+    return render(request, "student/dashboard/leaves.html", context)
+
+
+
+@login_required
+def student_evaluation(request):
+
+    student = request.user.student
+    submission_id = request.GET.get("submission")
+
+    # ✅ PAGE 2 → INDIVIDUAL EVALUATION 🔥
+    if submission_id:
+
+        submission = (
+            TaskSubmission.objects
+            .select_related(
+                "student",
+                "student__user",
+                "task",
+                "task__batch",
+                "task__lesson_session",
+                "task__lesson_session__trainer",
+                "task__lesson_session__lesson_plan",
+            )
+            .filter(
+                id=submission_id,
+                student=student
+            )
+            .first()
+        )
+
+        return render(
+            request,
+            "student/dashboard/individual_evaluation.html",
+            {"submission": submission}
+        )
+
+    # ✅ PAGE 1 → LIST PAGE 🔥
+    submissions = (
+        TaskSubmission.objects
+        .select_related("task", "task__batch")
+        .filter(student=student)
+        .order_by("-submitted_at")
+    )
+
+    totals = submissions.filter(
+        marks_obtained__isnull=False
+    ).aggregate(
+        obtained=Sum("marks_obtained"),
+        total=Sum("task__total_marks")
+    )
+
+    obtained_marks = totals["obtained"] or 0
+    total_marks = totals["total"] or 0
+
+    percentage = 0
+    if total_marks > 0:
+        percentage = (obtained_marks / total_marks) * 100
+
+    context = {
+        "student": student,
+        "submissions": submissions,
+        "obtained_marks": obtained_marks,
+        "total_marks": total_marks,
+        "percentage": round(percentage, 2),
+    }
+
+    return render(
+        request,
+        "student/dashboard/Evaluation.html",
+        context
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@role_required("student")
+def dashboard(request):
+    student = request.user.student
+    admin_profile = getattr(student, "admin_profile", None)
+    checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
+    batch = student.batches.filter(is_active=True).select_related("course").prefetch_related("trainers__user").first()
+
+    # Get latest photo document
+    profile_photo = student.documents.filter(
+        document_type=StudentDocument.DocumentType.PHOTO
+    ).order_by('-id').first()
+
+    # Only show if VERIFIED
+    if profile_photo and profile_photo.verification_status != StudentDocument.VerificationStatus.VERIFIED:
+        profile_photo = None
+
+    # Step completion logic (same as onboard)
+    completed_steps = 0
+    if checklist.documents_verified:
+        completed_steps += 1
+
+    enrollment_generated = checklist.enrollment_letter_generated
+    enrollment_signed = checklist.enrollment_letter_signed
+    if enrollment_signed:
+        completed_steps += 1
+
+    if getattr(checklist, "id_card_issued", False):
+        completed_steps += 1
+
+    # Pass context to template
+    context = {
+        "student": student,
+        "admin_profile": admin_profile,
+        "profile_photo": profile_photo,
+        "all_docs_verified": checklist.documents_verified,
+        "user": request.user,
+        "batch": batch,  
+        "today": timezone.now().date(),
+        "checklist": checklist,
+        "completed_steps": completed_steps,
+        "enrollment_generated": enrollment_generated,
+        "enrollment_signed": enrollment_signed,
+    }
+
+    return render(request, "student/dashboard/dashboard.html", context)
+
+
+
+
+
 
    
 
@@ -648,21 +1146,6 @@ def upload(request):
     }
 
     onboarding, _ = OnboardingChecklist.objects.get_or_create(student=student)
-
-    # Existing documents mapped by document_type
-    existing_docs = {
-        doc.document_type: doc
-        for doc in StudentDocument.objects.filter(student=student)
-    }
-
-# Lock uploads if ANY document is pending or verified
-    locked = any(
-        doc.verification_status in [
-            StudentDocument.VerificationStatus.PENDING,
-            StudentDocument.VerificationStatus.VERIFIED
-        ]
-        for doc in existing_docs.values()
-    )
 
     # =====================================
     # Get latest document per type
@@ -775,6 +1258,11 @@ def upload(request):
         }
     )
 
+
+
+
+
+
 @role_required("student")
 def onboard(request):
     student = request.user.student
@@ -822,6 +1310,9 @@ def onboard(request):
     }
 
     return render(request, "student/onboarding/onboarding.html", context)
+
+
+
 
 
 
@@ -895,6 +1386,10 @@ def upload_signed_enrollment_letter(request):
     return JsonResponse({"success": False}, status=400)
 
 
+
+
+
+
 @role_required("student")
 def download_id_card(request):
     checklist = request.user.student.onboarding_checklist
@@ -918,6 +1413,10 @@ def download_id_card(request):
     except Exception as e:
         messages.error(request, "ID Card not available: " + str(e))
         return redirect("student:onboarding")
+
+
+
+
 
 
 
@@ -947,6 +1446,9 @@ def lessonplan(request):
         'lessons_by_module': lessons_by_module,
     }
     return render(request, 'student/lessonplan/lessonplan.html', context)
+
+
+
 
 
 
@@ -985,6 +1487,9 @@ def syllabus(request):
 
 
 
+
+
+
 @role_required("student")
 def view_id_card(request):
     student = request.user.student
@@ -1014,9 +1519,6 @@ def view_id_card(request):
 
 
 
-
-
-
 #when merging delete this view this is for just check logic correct or not
 
 @role_required("student")
@@ -1034,96 +1536,6 @@ def download_enrollment_letter(request):
         "A PDF version will be added by BDM."
     )
 
-def stud_feedback(request):
-    if request.method == "POST":
-
-        # 🔴 BASIC VALIDATION
-        if not request.POST.get("feedback_type"):
-            messages.error(request, "❌ Please select feedback type")
-            return redirect("student:stud_feedback")
-
-        if not request.POST.get("overall_rating"):
-            messages.error(request, "❌ Overall rating is required")
-            return redirect("student:stud_feedback")
-
-        # ✅ SAVE FEEDBACK
-        StudentFeedback.objects.create(
-            student_id=request.POST.get("student") or None,
-            feedback_type=request.POST.get("feedback_type"),
-            trainer_id=request.POST.get("trainer") or None,
-            course_id=request.POST.get("course") or None,
-            batch_id=request.POST.get("batch") or None,
-            content_quality=request.POST.get("content_quality") or None,
-            teaching_methodology=request.POST.get("teaching_methodology") or None,
-            responsiveness=request.POST.get("responsiveness") or None,
-            overall_rating=request.POST.get("overall_rating"),
-            comments=request.POST.get("comments"),
-            suggestions=request.POST.get("suggestions"),
-            is_anonymous=True if request.POST.get("is_anonymous") else False,
-        )
-
-        # ✅ SUCCESS MESSAGE
-        messages.success(
-            request,
-            "✅ Thank you! Your feedback has been submitted successfully."
-        )
-
-        return redirect("student:stud_feedback")
-
-    # GET REQUEST
-    context = {
-        "students": Student.objects.all(),
-        "trainers": Trainer.objects.all(),
-        "courses": Course.objects.all(),
-        "batches": Batch.objects.all(),
-    }
-
-    return render(request, "student/dashboard/stud_feedback.html", context)
-
-def lms_login(request):
-    return render(request,'student/LMS/lms_login.html')
-def lms_dashboard(request):
-    return render(request, 'student/LMS//lms_dashboard.html')
-
-
-from .models import EnrollmentAgreement
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.contrib import messages
-
-
-@login_required
-def payment_gateway(request):
-
-    student = request.user.student
-
-    try:
-        agreement = student.enrollment_agreement
-    except EnrollmentAgreement.DoesNotExist:
-        messages.error(request, "Enrollment agreement not found")
-        return redirect("student:dashboard")
-
-    if not agreement.is_signed:
-        messages.warning(request, "Agreement not signed yet")
-        return redirect("student:dashboard")
-
-    plan = agreement.payment_plan.lower()
-
-    if plan == "full":
-        return redirect("student:payment")
-
-    elif plan == "emi":
-        return redirect("student:emi")
-
-    elif plan == "pdc":
-        return redirect("student:pdc")
-
-    elif plan == "installment":
-        return redirect("student:installments", student_id=student.id)  
-
-    messages.error(request, "Invalid payment plan")
-    return redirect("student:dashboard")
-
     response = HttpResponse(content, content_type="application/octet-stream")
     response["Content-Disposition"] = 'attachment; filename="enrollment_letter.txt"'
     return response
@@ -1131,48 +1543,242 @@ def payment_gateway(request):
 
 
 
-def download_document(request, doc_id):
-    document = get_object_or_404(StudentDocument, id=doc_id)
+@role_required("student")
+def batch_details(request):
+    student = request.user.student
 
-    if not document.document_file:
-        raise Http404("File not found.")
+    batch = student.batches.filter(
+        is_active=True
+    ).select_related(
+        "course"
+    ).prefetch_related(
+        "trainers__user"
+    ).first()
 
-    return FileResponse(
-        document.document_file.open('rb'),
-        as_attachment=True,
-        filename=os.path.basename(document.document_file.name)
+    modules_data       = []
+    completed_sessions = []
+    planned_sessions   = []
+    pending_sessions   = []
+    skipped_sessions   = []
+
+    if batch:
+        # One query — all sessions for this batch, with module info
+        # Chain: LessonSession → lesson_plan → module
+        all_sessions = list(
+            LessonSession.objects.filter(batch=batch)
+            .select_related("lesson_plan__module")
+            .order_by(
+                "lesson_plan__module__module_number",
+                "lesson_plan__session_number",
+            )
+        )
+
+        # All modules for this batch's course, in order
+        modules = Module.objects.filter(
+            course=batch.course
+        ).order_by("module_number")
+
+        # Build a dict per module — filter sessions in Python (no extra queries)
+        for module in modules:
+            module_sessions = [
+                s for s in all_sessions
+                if s.lesson_plan.module_id == module.id
+            ]
+
+            completed = [s for s in module_sessions if s.status == LessonSession.SessionStatus.COMPLETED]
+            planned   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.PLANNED]
+            pending   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.PENDING]
+            skipped   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.SKIPPED]
+
+            modules_data.append({
+                "module":          module,
+                "completed":       completed,
+                "planned":         planned,
+                "pending":         pending,
+                "skipped":         skipped,
+                "completed_count": len(completed),
+                "planned_count":   len(planned),
+                "pending_count":   len(pending),
+                "skipped_count":   len(skipped),
+                "total":           len(module_sessions),
+            })
+
+        # Flat lists for fallback (template uses these only when modules is empty)
+        completed_sessions = [s for s in all_sessions if s.status == LessonSession.SessionStatus.COMPLETED]
+        planned_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.PLANNED]
+        pending_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.PENDING]
+        skipped_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.SKIPPED]
+
+    return render(request, "student/batch/batch.html", {
+        "batch":              batch,
+        "modules":            modules_data,       # list of dicts — one per module
+        "completed_sessions": completed_sessions,  # flat fallback
+        "planned_sessions":   planned_sessions,
+        "pending_sessions":   pending_sessions,
+        "skipped_sessions":   skipped_sessions,
+    })
+
+
+
+
+
+@role_required("student")
+def student_tasks(request):
+    student = request.user.student
+
+    batch = student.batches.filter(
+        is_active=True
+    ).select_related("course").first()
+
+    modules = []
+
+    if batch:
+        # One query: all tasks for this batch with full chain prefetched
+        # Task → lesson_session → lesson_plan → module
+        all_tasks = list(
+            Task.objects.filter(batch=batch)
+            .select_related(
+                "lesson_session__lesson_plan__module",
+                "lesson_session__lesson_plan",
+            )
+            .prefetch_related("submissions")
+            .order_by(
+                "lesson_session__lesson_plan__module__module_number",
+                "lesson_session__lesson_plan__session_number",
+                "due_date",
+            )
+        )
+
+        # Attach student_submission to each task so template can use task.student_submission
+        for task in all_tasks:
+            task.student_submission = task.submissions.filter(
+                student=student
+            ).first()
+
+        # Get all modules for this batch's course
+        raw_modules = Module.objects.filter(
+            course=batch.course
+        ).order_by("module_number")
+
+        for module in raw_modules:
+            # Tasks belonging to this module
+            module_tasks = [
+                t for t in all_tasks
+                if t.lesson_session.lesson_plan.module_id == module.id
+            ]
+
+            if not module_tasks:
+                continue  # skip modules with no tasks
+
+            # Group module tasks by lesson_session
+            sessions_dict = {}
+            for task in module_tasks:
+                session = task.lesson_session
+                if session.id not in sessions_dict:
+                    sessions_dict[session.id] = {
+                        "session": session,
+                        "tasks": [],
+                    }
+                sessions_dict[session.id]["tasks"].append(task)
+
+            # Build sessions list, add task_count
+            sessions_list = []
+            for sd in sessions_dict.values():
+                sd["task_count"] = len(sd["tasks"])
+                sessions_list.append(sd)
+
+            # Sort sessions by session_number
+            sessions_list.sort(
+                key=lambda s: s["session"].lesson_plan.session_number
+            )
+
+            modules.append({
+                "module":        module,
+                "sessions":      sessions_list,
+                "session_count": len(sessions_list),
+                "task_count":    len(module_tasks),
+            })
+
+    return render(request, "student/task/task_list.html", {
+        "batch":   batch,
+        "modules": modules,
+    })
+
+
+@role_required("student")
+def task_detail(request, task_id):
+    student = request.user.student
+
+    # Get active batch
+    batch = student.batches.filter(is_active=True).first()
+
+    # Get task only from that batch
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        batch=batch
     )
 
+    # Get student submission (if exists)
+    submission = TaskSubmission.objects.filter(
+        task=task,
+        student=student
+    ).first()
+
+    return render(request, "student/task/task_detail.html", {
+        "task": task,
+        "batch": batch,
+        "submission": submission
+    })
+   
 
 
-#  # Temporary access (no login)
-#     student = Student.objects.first()
+@role_required("student")
+def do_task(request, task_id):
+    student = request.user.student
+    task = get_object_or_404(Task, id=task_id)
 
-#     # Pending installments only
-#     installments = FeePayment.objects.filter(
-#         student=student,
-#         payment_method=FeePayment.PaymentMethod.EMI,   # or INSTALLMENT if you use that
-#         payment_status=FeePayment.PaymentStatus.PENDING
-#     ).order_by('due_date')
+    submission, created = TaskSubmission.objects.get_or_create(
+        task=task,
+        student=student
+    )
 
-#     if not installments.exists():
-#         messages.info(request, "No pending installments")
-#         return redirect('student:installments')
+    # If first time opening
+    if created:
+        submission.status = TaskSubmission.SubmissionStatus.IN_PROGRESS
+        submission.started_at = timezone.now()
+        submission.save()
 
-#     # ---------------- SUBMIT PAYMENT ----------------
-#     if request.method == "POST":
-#         for ins in installments:
-#             ins.payment_status = FeePayment.PaymentStatus.COMPLETED
-#             ins.payment_date = timezone.now()
-#             ins.transaction_id = f"INST-{uuid.uuid4().hex[:10]}"
-#             ins.save()
+    if request.method == "POST":
+        submission.submission_text = request.POST.get("submission_text", "").strip()
+        submission.submission_link = request.POST.get("submission_link", "").strip()
 
-#         messages.success(request, "Installment payment submitted successfully")
-#         return redirect('student:installments')
+        if request.FILES.get("submission_file"):
+            submission.submission_file = request.FILES["submission_file"]
 
-#     context = {
-#         'student': student,
-#         'installments': installments,
-#     }
+        # Prevent empty submission
+        if not submission.submission_text and not submission.submission_link and not submission.submission_file:
+            messages.error(request, "Please provide at least one submission method.")
+        else:
+            submission.submit()
+            messages.success(request, "Task submitted successfully.")
+            return redirect("student:task_detail", task_id=task.id)
 
-#     return render(request, 'student/payment/installment_qr.html', context)
+    return render(request, "student/task/do_task.html", {
+        "task": task,
+        "submission": submission
+    })
+
+
+def clean(self):
+    cleaned_data = super().clean()
+    text = cleaned_data.get("submission_text")
+    file = cleaned_data.get("submission_file")
+    link = cleaned_data.get("submission_link")
+
+    if not text and not file and not link:
+        raise forms.ValidationError(
+            "You must provide at least one submission method."
+        )
+
+    return cleaned_data

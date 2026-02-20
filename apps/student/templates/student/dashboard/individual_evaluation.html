@@ -1,0 +1,198 @@
+{% extends "student/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'student/css/individual_evaluation.css' %}?v=12">
+
+<div class="evaluation-page">
+
+    <div class="evaluation-container">
+
+        {% if submission %}
+
+        <!-- ✅ TITLE -->
+        <div class="evaluation-header">
+            <h1>Evaluate Your Score</h1>
+        </div>
+
+        <!-- ✅ STUDENT DETAILS -->
+        <div class="evaluation-block">
+            <h3>Student Details</h3>
+
+            <div class="evaluation-student-grid">
+
+                <div class="evaluation-card">
+                    <label>Name</label>
+                    <p>{{ submission.student.full_name }}</p>
+                </div>
+
+                <div class="evaluation-card">
+                    <label>Email</label>
+                    <p>{{ submission.student.user.email }}</p>
+                </div>
+
+                <div class="evaluation-card">
+                    <label>Batch</label>
+                    <p>{{ submission.task.batch.name }}</p>
+                </div>
+
+                <div class="evaluation-card">
+                    <label>Trainer</label>
+                    <p>{{ submission.task.lesson_session.trainer.full_name }}</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ✅ TASK DETAILS -->
+        <div class="evaluation-block">
+
+            <p class="evaluation-topic">
+                <span>Topic:</span> {{ submission.task.title }}
+            </p>
+
+            <p class="evaluation-meta">
+                <span>Session:</span>
+                {{ submission.task.lesson_session.lesson_plan.topic }}
+            </p>
+
+            <!-- ✅ TASK TYPE 🔥 -->
+            <p class="evaluation-meta">
+                <span>Task Type:</span>
+                {{ submission.task.get_task_type_display }}
+            </p>
+
+            <p class="evaluation-meta">
+                <span>Difficulty:</span>
+                {{ submission.task.get_difficulty_level_display }}
+            </p>
+
+            <p class="evaluation-meta">
+                <span>Submitted On:</span>
+                {{ submission.submitted_at|date:"l, d F Y, h:i A" }}
+            </p>
+
+        </div>
+
+        <!-- ✅ SUBMISSION -->
+        <div class="evaluation-block">
+            <h3>Your Submission</h3>
+
+            <div class="evaluation-submission-grid">
+
+                <div class="evaluation-card">
+                    <label>Submitted File</label>
+
+                    {% if submission.submission_file %}
+                        <a href="{{ submission.submission_file.url }}" target="_blank">
+                            View File
+                        </a>
+                    {% else %}
+                        <p class="evaluation-muted">No file submitted</p>
+                    {% endif %}
+                </div>
+
+                <div class="evaluation-card">
+                    <label>Submission Link</label>
+
+                    {% if submission.submission_link %}
+                        <a href="{{ submission.submission_link }}" target="_blank">
+                            Open Link
+                        </a>
+                    {% else %}
+                        <p class="evaluation-muted">No link submitted</p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ✅ RESULT -->
+        <div class="evaluation-result">
+
+            <div class="evaluation-result-layout">
+
+                <!-- ✅ LEFT COLUMN -->
+                <div class="evaluation-score-column">
+
+                    <!-- ✅ SCORE CIRCLE -->
+                    <div class="evaluation-score-circle"
+                         style="--score: {{ submission.marks_obtained|floatformat:0 }};
+                                --total: {{ submission.task.total_marks }};">
+
+                        <div class="evaluation-circle-content">
+                            <div class="evaluation-score-text">
+                                {{ submission.marks_obtained }} / {{ submission.task.total_marks }}
+                            </div>
+                            <div class="evaluation-score-label">
+                                Your Score
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ✅ PASS / FAIL 🔥 -->
+                    {% if submission.is_pass %}
+                        <div class="evaluation-badge pass">✅ Pass</div>
+                    {% else %}
+                        <div class="evaluation-badge fail">❌ Fail</div>
+                    {% endif %}
+
+                </div>
+
+                <!-- ✅ RIGHT COLUMN -->
+                <div class="evaluation-score-details">
+
+                    <p>
+                        <span>Maximum Score:</span>
+                        {{ submission.task.total_marks }}
+                    </p>
+
+                    <p>
+                        <span>Minimum Passing Score:</span>
+                        {{ submission.task.passing_marks }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- ✅ VERIFIED DATE -->
+            {% if submission.evaluated_at %}
+                <p class="evaluation-verified-date">
+                    <span>Verified On:</span>
+                    {{ submission.evaluated_at|date:"l, d F Y, h:i A" }}
+                </p>
+            {% endif %}
+
+        </div>
+
+        <!-- ✅ FEEDBACK -->
+        <div class="evaluation-block">
+            <h3>Trainer Feedback</h3>
+
+            {% if submission.feedback %}
+                <div class="evaluation-feedback-box">
+                    {{ submission.feedback }}
+                </div>
+            {% else %}
+                <p class="evaluation-muted">No feedback yet</p>
+            {% endif %}
+        </div>
+
+        {% else %}
+
+        <!-- ✅ EMPTY STATE -->
+        <div class="evaluation-empty">
+            <h3>No Evaluation Available</h3>
+            <p>Your evaluated tasks will appear here.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
