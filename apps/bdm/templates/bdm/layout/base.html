@@ -1425,7 +1425,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 {% endif %}
                             </a>
                             
-                            <a href="" class="sidebar-link {% if 'courses' in request.resolver_match.url_name %}active{% endif %}">
+                            <a href="{% url 'bdm:course_list' %}" class="sidebar-link {% if 'courses' in request.resolver_match.url_name %}active{% endif %}">
                                 <div class="sidebar-link-icon">
                                     <i class="fas fa-book"></i>
                                 </div>

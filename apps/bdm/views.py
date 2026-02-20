@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404,render,redirect
 from .models import Student, Lead, Course, Batch
 from django.core.paginator import Paginator
-from .form import  TrainerAdminProfileForm
+from .form import  TrainerAdminProfileForm ,ModuleForm ,LessonPlanForm
 from django.db import transaction
 from decimal import Decimal
 from django.db.models import Sum, DecimalField
@@ -24,7 +24,7 @@ from django.db.models import Sum, Avg
 
 from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
 from apps.bdm.models import Student ,PaymentDocument
-
+from apps.trainer.models import Module
 
 # Create your views here.
 
@@ -1444,3 +1444,68 @@ def student_feedback(request):
     }
 
     return render(request, 'bdm/student_feedback/student_feedback.html', context)
+
+
+#course section-aleena
+
+
+def course_list_view(request):
+    courses = Course.objects.filter(is_active=True).order_by('-created_at')
+
+    context = {
+        'courses': courses
+    }
+    return render(request, 'bdm/course/course_list.html', context)
+
+
+def course_detail_view(request, pk):
+    course = get_object_or_404(Course, pk=pk)
+    modules = course.modules.all().order_by('module_number')
+
+    if request.method == "POST":
+        form = ModuleForm(request.POST)
+
+        if form.is_valid():
+            module = form.save(commit=False)
+            module.course = course
+            module.save()
+
+            messages.success(request, "Module created successfully!")
+            return redirect('bdm:course_detail', pk=course.pk)
+
+    else:
+        form = ModuleForm()
+
+    context = {
+        'course': course,
+        'modules': modules,
+        'form': form
+    }
+
+    return render(request, 'bdm/course/course_detail.html', context)
+
+
+def module_detail_view(request, pk):
+    module = get_object_or_404(Module, pk=pk)
+    lessons = module.lessons.all().order_by('session_number')
+
+    if request.method == "POST":
+        form = LessonPlanForm(request.POST)
+        if form.is_valid():
+            lesson = form.save(commit=False)
+            lesson.module = module
+            lesson.course = module.course
+            lesson.save()
+
+            messages.success(request, "Lesson Plan created successfully!")
+            return redirect('bdm:module_detail', pk=module.pk)
+    else:
+        form = LessonPlanForm()
+
+    context = {
+        'module': module,
+        'lessons': lessons,
+        'form': form
+    }
+
+    return render(request, 'bdm/course/module_detail.html', context)

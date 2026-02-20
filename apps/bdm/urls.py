@@ -64,6 +64,10 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 
                 
                 path('student_feedback/', views.student_feedback, name='student_feedback'),
+                
+                path('courses/', views.course_list_view, name='course_list'),
+                path('courses/<int:pk>/', views.course_detail_view, name='course_detail'),
+                path('module/<int:pk>/', views.module_detail_view, name='module_detail'),
                 ]
 
 
