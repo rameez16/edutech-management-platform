@@ -83,7 +83,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="batch-schedule.html" class="nav-link">
+                            <a href="{% url 'student:batch_details' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                                     <line x1="16" y1="2" x2="16" y2="6"/>
@@ -115,19 +115,19 @@
 
 
                         <li class="nav-item">
-                            <a href="attendance.html" class="nav-link">
+                            <a href="{% url 'student:student_attendance' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                                     <path d="M16 2v4M8 2v4"/>
                                     <path d="M3 10h18"/>
                                     <path d="M9 16l2 2 4-4"/>
                                 </svg>
-                                Attendance Calendar
+                                Attendance Tracking
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="tasks.html" class="nav-link">
+                            <a href="{% url 'student:student_tasks' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M9 11l3 3L22 4"/>
                                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
@@ -139,7 +139,7 @@
                         
 
                         <li class="nav-item">
-                            <a href="leave.html" class="nav-link">
+                            <a href="{% url 'student:student_leave' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 2v20"/>
                                     <path d="M2 12h20"/>
@@ -178,7 +178,7 @@
 
 
                         <li class="nav-item">
-                            <a href="evaluation.html" class="nav-link">
+                            <a href="{% url 'student:student_evaluation' %}" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 20l9-5-9-5-9 5 9 5z"/>
                                     <path d="M12 12l9-5-9-5-9 5 9 5z"/>
@@ -258,7 +258,7 @@
 
 </div>
 
-<script src="{% static 'student/js/templatemo-glass-admin-script.js' %}"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
 
 <script>
@@ -269,7 +269,7 @@
 </script>
 
 {% block extra_js %}{% endblock %}
-        <script src="{% static 'student/js/templatemo-glass-admin-script.js' %}"></script>
+        
     </div>
   
     </body>
@@ -277,5 +277,5 @@
     <script src="{% static 'student/js/custom.js' %}"></script>
     <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
 
-</body>
+
 </html>

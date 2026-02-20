@@ -6,22 +6,19 @@ from django.db.models import Sum
 from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist
 from django.contrib.auth import update_session_auth_hash
 import uuid, os
-
 from . import views
 from django.contrib.auth.decorators import login_required
 import uuid
 from apps.bdm.models import PaymentDocument
-
+from apps.trainer.models import Attendance,LessonSession,Task,TaskSubmission
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_POST
-from .forms import EnrollmentAgreementForm
+from .forms import EnrollmentAgreementForm, TaskSubmissionForm
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan
+from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession
 from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
-
-
-
-
+from apps.student.forms import LeaveApplicationForm
+from apps.student.models import LeaveApplication
 
 #one time payment
 @login_required
@@ -29,6 +26,7 @@ def payment(request):
 
     student = request.user.student
 
+    # ✅ Payment Plan Check
     if student.enrollment_agreement.payment_plan.lower() != "full":
         messages.error(request, "Full payment not allowed")
         return redirect("student:payment_gateway")
@@ -39,24 +37,34 @@ def payment(request):
         messages.error(request, "No batch assigned.")
         return redirect("student:dashboard")
 
+    # =====================================
+    # ✅ FEES
+    # =====================================
     course_fee = batch.course.course_fee
+
+    # ✅ FIXED 🔥🔥🔥 (THIS WAS MISSING)
     admission_fee = course_fee * Decimal("0.10")
 
+    total_fee = course_fee   # Full payment → no addition
+
+    # =====================================
+    # ✅ PAYMENTS
+    # =====================================
     payments = FeePayment.objects.filter(student=student)
 
     paid_amount = payments.filter(
         payment_status=FeePayment.PaymentStatus.COMPLETED
     ).aggregate(Sum("amount"))["amount__sum"] or Decimal("0.00")
 
-    total_fee = course_fee
     pending_amount = max(total_fee - paid_amount, Decimal("0.00"))
 
-    # ✅ ADDED (THIS WAS MISSING)
     existing_payment = payments.filter(
         payment_type=FeePayment.PaymentType.FULL_PAYMENT
     ).first()
 
-    # ✅ ADDED (RECEIPT UPLOAD LOGIC)
+    # =====================================
+    # ✅ PAYMENT SUBMISSION
+    # =====================================
     if request.method == "POST":
 
         if existing_payment:
@@ -69,6 +77,9 @@ def payment(request):
             messages.error(request, "Please upload receipt")
             return redirect("student:payment")
 
+        receipt_no = f"RCPT-{uuid.uuid4().hex[:8].upper()}"
+        transaction_id = f"FULL-{uuid.uuid4().hex[:12].upper()}"
+
         payment = FeePayment.objects.create(
             student=student,
             payment_type=FeePayment.PaymentType.FULL_PAYMENT,
@@ -76,37 +87,51 @@ def payment(request):
             payment_method=FeePayment.PaymentMethod.UPI,
             payment_status=FeePayment.PaymentStatus.PENDING,
             payment_date=timezone.now(),
-            transaction_id=f"FULL-{uuid.uuid4().hex[:10]}",
-            receipt_number=f"RCPT-{uuid.uuid4().hex[:6]}"
+            transaction_id=transaction_id,
+            receipt_number=receipt_no
         )
 
+        # =====================================
+        # ✅ SAVE DOCUMENT 🔥
+        # =====================================
         PaymentDocument.objects.create(
-            fee_payment=payment,   # ✅ CORRECT OBJECT
+            fee_payment=payment,
             document_type=PaymentDocument.DocumentType.RECEIPT,
             document_file=receipt,
-            uploaded_by=request.user
+            uploaded_by=request.user,
+
+            description=(
+                f"Full Fee Payment\n"
+                f"Student: {student.full_name}\n"
+                f"Batch: {batch.name}\n"
+                f"Course Fee: ₹{course_fee}\n"
+                f"Admission Fee (10%): ₹{admission_fee}\n"
+                f"Paid Amount: ₹{paid_amount}\n"
+                f"Pending Paid: ₹{pending_amount}\n"
+                f"Receipt No: {receipt_no}\n"
+                f"Transaction ID: {transaction_id}"
+            )
         )
 
-        messages.success(request, "Receipt uploaded successfully")
+        messages.success(request, "✅ Receipt uploaded successfully")
         return redirect("student:payment")
 
+    # =====================================
+    # ✅ RENDER
+    # =====================================
     return render(request, "student/payment/payment.html", {
         "student": student,
-        
         "course_fee": course_fee,
-        "admission_fee": admission_fee,
+        "admission_fee": admission_fee,   # ✅ FIXED
         "total_fee": total_fee,
         "paid_amount": paid_amount,
         "pending_amount": pending_amount,
-        "existing_payment": existing_payment,   # ✅ CRITICAL FIX
+        "existing_payment": existing_payment,
     })
 
 
 
-
 #admission fee
-
-
 @login_required
 def admission(request):
 
@@ -116,9 +141,10 @@ def admission(request):
     if not batch:
         messages.error(request, "No batch assigned.")
         return redirect("student:dashboard")
-    course = batch.course   # ✅ ADD THIS LINE
 
-    course_fee = batch.course.course_fee
+    course = batch.course
+
+    course_fee = course.course_fee
     admission_amount = course_fee * Decimal("0.10")
 
     admission_fee = FeePayment.objects.filter(
@@ -135,6 +161,7 @@ def admission(request):
         receipt_no = f"RCPT-{uuid.uuid4().hex[:8].upper()}"
         transaction_id = f"ADM-{uuid.uuid4().hex[:12].upper()}"
 
+        # ✅ CREATE PAYMENT
         admission_fee = FeePayment.objects.create(
             student=student,
             payment_type=FeePayment.PaymentType.ADMISSION,
@@ -148,15 +175,26 @@ def admission(request):
 
         receipt_file = request.FILES.get("receipt")
 
-        if receipt_file:
-            PaymentDocument.objects.create(
-                fee_payment=admission_fee,
-                document_type=PaymentDocument.DocumentType.RECEIPT,
-                document_file=receipt_file,
-                uploaded_by=request.user
+        # ✅ SAVE FULL DETAILS TO BDM DOCUMENT 🔥🔥🔥
+        PaymentDocument.objects.create(
+            fee_payment=admission_fee,
+            document_type=PaymentDocument.DocumentType.RECEIPT,
+            document_file=receipt_file if receipt_file else None,
+            uploaded_by=request.user,
+
+            description=(
+                f"Admission Fee Payment\n"
+                f"Student: {student.full_name}\n"
+                f"Batch: {batch.name}\n"
+                f"Course: {course.name}\n"
+                f"Amount: ₹{admission_amount}\n"
+                f"Receipt No: {receipt_no}\n"
+                f"Transaction ID: {transaction_id}"
             )
+        )
 
         messages.success(request, "✅ Admission Fee Paid Successfully")
+        return redirect("student:admission")
 
     return render(request, "student/payment/admission.html", {
         "student": student,
@@ -167,11 +205,6 @@ def admission(request):
         "admission_fee": admission_fee,
         "active_tab": "admission",
     })
-
-
-
-
-
 @login_required
 def pdc(request):
 
@@ -217,8 +250,6 @@ def pdc(request):
         "pending_amount": pending_amount,
         "pdc_payments": pdc_payments,
     })
-
-
 
 
 #EMI
@@ -437,39 +468,6 @@ def install_qr(request, installment_id):
     )
 
 
-
-
-@login_required
-def installments_view(request):
-    # logged-in student
-    student = get_object_or_404(Student, user=request.user)
-
-    # fetch installments
-    installments = FeePayment.objects.filter(
-        student=student,
-        payment_type=FeePayment.PaymentType.INSTALLMENT
-    ).order_by("installment_number")
-
-    context = {
-        "student": student,
-        "installments": installments,
-    }
-
-    return render(
-        request,
-        "student/payment/install_view.html",
-        context
-    )
-
-
-
-
-
-def pdc_view(request):
-    return render(request, 'student/payment/pdc_view.html')
-
-
-
 @login_required
 def onetime_view(request):
 
@@ -505,12 +503,6 @@ def onetime_view(request):
         request,
         "student/payment/one_time_view.html",
         context)
-
-
-
-def emi_view(request):
-    return render(request, 'student/payment/emi_view.html')
-
 
 
 
@@ -687,17 +679,8 @@ def stud_feedback(request):
     return render(request, "student/dashboard/stud_feedback.html", context)
 
 
-
 def lms_login(request):
     return render(request,'student/LMS/lms_login.html')
-
-
-
-def lms_dashboard(request):
-    return render(request, 'student/LMS//lms_dashboard.html')
-
-
-
 
 
 @login_required
@@ -731,6 +714,355 @@ def payment_gateway(request):
 
     messages.error(request, "Invalid payment plan")
     return redirect("student:dashboard")
+@login_required
+def student_attendance(request):
+
+    student = request.user.student
+
+    attendance_records = (
+        Attendance.objects
+        .filter(student=student)
+        .select_related(
+            "lesson_session",
+            "lesson_session__lesson_plan",
+            "marked_by",
+            "marked_by__user"
+        )
+        .order_by("-date")
+    )
+
+    if not attendance_records.exists():
+        return render(request, "student/dashboard/attendance.html", {
+            "student": student,
+            "attendance_records": [],
+            "percentage": 0,
+            "present_days": 0,
+            "absent_days": 0,
+            "excused_days": 0,
+            "batch": None,
+        })
+
+    batch = attendance_records.first().batch
+    attendance_records = attendance_records.filter(batch=batch)
+
+    percentage = Attendance.calculate_attendance_percentage(student, batch)
+
+    context = {
+        "student": student,
+        "batch": batch,
+        "attendance_records": attendance_records,
+        "percentage": percentage,
+        "present_days": attendance_records.filter(status__in=['present', 'late']).count(),
+        "absent_days": attendance_records.filter(status='absent').count(),
+        "excused_days": attendance_records.filter(status='excused').count(),
+    }
+
+    return render(request, "student/dashboard/attendance.html", context)
+
+
+
+
+@login_required
+def student_leave(request):
+
+    student = request.user.student
+
+    # ✅ Active Batch
+    batch = student.batches.filter(is_active=True).first()
+
+    # ✅ SMART Trainer Fetch (From Sessions 🔥)
+    trainer = None
+
+    if batch:
+        session = (
+            LessonSession.objects
+            .filter(batch=batch, trainer__isnull=False)
+            .select_related("trainer")
+            .first()
+        )
+
+        if session:
+            trainer = session.trainer
+
+    # ✅ Leaves
+    leaves = LeaveApplication.objects.filter(student=student, batch=batch)
+
+    total_leaves = leaves.count()
+    pending_leaves = leaves.filter(status="pending").count()
+    approved_leaves = leaves.filter(status="approved").count()
+    rejected_leaves = leaves.filter(status="rejected").count()
+
+    # ✅ Form Handling
+    if request.method == "POST":
+        form = LeaveApplicationForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            leave = form.save(commit=False)
+            leave.student = student
+            leave.batch = batch
+            leave.save()
+
+            messages.success(request, "Leave submitted successfully")
+            return redirect("student:student_leave")
+
+    else:
+        form = LeaveApplicationForm()
+
+    context = {
+        "student": student,
+        "batch": batch,
+        "trainer": trainer,
+        "form": form,
+        "leaves": leaves,
+
+        "total_leaves": total_leaves,
+        "pending_leaves": pending_leaves,
+        "approved_leaves": approved_leaves,
+        "rejected_leaves": rejected_leaves,
+    }
+
+    return render(request, "student/dashboard/leaves.html", context)
+
+
+
+@login_required
+def student_evaluation(request):
+
+    student = request.user.student
+    submission_id = request.GET.get("submission")
+
+    # ✅ PAGE 2 → INDIVIDUAL EVALUATION 🔥
+    if submission_id:
+
+        submission = (
+            TaskSubmission.objects
+            .select_related(
+                "student",
+                "student__user",
+                "task",
+                "task__batch",
+                "task__lesson_session",
+                "task__lesson_session__trainer",
+                "task__lesson_session__lesson_plan",
+            )
+            .filter(
+                id=submission_id,
+                student=student
+            )
+            .first()
+        )
+
+        return render(
+            request,
+            "student/dashboard/individual_evaluation.html",
+            {"submission": submission}
+        )
+
+    # ✅ PAGE 1 → LIST PAGE 🔥
+    submissions = (
+        TaskSubmission.objects
+        .select_related("task", "task__batch")
+        .filter(student=student)
+        .order_by("-submitted_at")
+    )
+
+    totals = submissions.filter(
+        marks_obtained__isnull=False
+    ).aggregate(
+        obtained=Sum("marks_obtained"),
+        total=Sum("task__total_marks")
+    )
+
+    obtained_marks = totals["obtained"] or 0
+    total_marks = totals["total"] or 0
+
+    percentage = 0
+    if total_marks > 0:
+        percentage = (obtained_marks / total_marks) * 100
+
+    context = {
+        "student": student,
+        "submissions": submissions,
+        "obtained_marks": obtained_marks,
+        "total_marks": total_marks,
+        "percentage": round(percentage, 2),
+    }
+
+    return render(
+        request,
+        "student/dashboard/Evaluation.html",
+        context
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -752,6 +1084,7 @@ def dashboard(request):
     student = request.user.student
     admin_profile = getattr(student, "admin_profile", None)
     checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
+    batch = student.batches.filter(is_active=True).select_related("course").prefetch_related("trainers__user").first()
 
     # Get latest photo document
     profile_photo = student.documents.filter(
@@ -782,6 +1115,8 @@ def dashboard(request):
         "profile_photo": profile_photo,
         "all_docs_verified": checklist.documents_verified,
         "user": request.user,
+        "batch": batch,  
+        "today": timezone.now().date(),
         "checklist": checklist,
         "completed_steps": completed_steps,
         "enrollment_generated": enrollment_generated,
@@ -1209,5 +1544,160 @@ def download_enrollment_letter(request):
 
 
 
+@role_required("student")
+def batch_details(request):
+    student = request.user.student
 
+    batch = student.batches.filter(
+        is_active=True
+    ).select_related(
+        "course"
+    ).prefetch_related(
+        "trainers__user"
+    ).first()
+
+    completed_sessions = []
+    planned_sessions = []
+    pending_sessions = []
+    skipped_sessions = []
+
+    if batch:
+        completed_sessions = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.COMPLETED
+        ).select_related("lesson_plan")
+
+        planned_sessions = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.PLANNED
+        ).select_related("lesson_plan")
+
+        pending_sessions = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.PENDING
+        ).select_related("lesson_plan")
+
+        skipped_sessions = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.SKIPPED
+        ).select_related("lesson_plan")
+
+    return render(request, "student/batch/batch.html", {
+        "batch": batch,
+        "completed_sessions": completed_sessions,
+        "planned_sessions": planned_sessions,
+        "pending_sessions": pending_sessions,
+        "skipped_sessions": skipped_sessions,
+    })
+
+
+
+@role_required("student")
+def student_tasks(request):
+    student = request.user.student
+
+    batch = student.batches.filter(is_active=True).first()
+    tasks = None
+
+    if batch:
+        tasks = batch.tasks.select_related(
+            "lesson_session",
+            "lesson_session__lesson_plan"
+        ).all()
+
+        # Get submissions for this student
+        submissions = TaskSubmission.objects.filter(student=student)
+
+        # Convert to dictionary {task_id: submission}
+        submission_map = {
+            sub.task_id: sub
+            for sub in submissions
+        }
+
+        # Attach submission to each task
+        for task in tasks:
+            task.student_submission = submission_map.get(task.id)
+
+    return render(request, "student/task/task_list.html", {
+        "batch": batch,
+        "tasks": tasks
+    })
+
+
+@role_required("student")
+def task_detail(request, task_id):
+    student = request.user.student
+
+    # Get active batch
+    batch = student.batches.filter(is_active=True).first()
+
+    # Get task only from that batch
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        batch=batch
+    )
+
+    # Get student submission (if exists)
+    submission = TaskSubmission.objects.filter(
+        task=task,
+        student=student
+    ).first()
+
+    return render(request, "student/task/task_detail.html", {
+        "task": task,
+        "batch": batch,
+        "submission": submission
+    })
    
+
+
+@role_required("student")
+def do_task(request, task_id):
+    student = request.user.student
+    task = get_object_or_404(Task, id=task_id)
+
+    submission, created = TaskSubmission.objects.get_or_create(
+        task=task,
+        student=student
+    )
+
+    # If first time opening
+    if created:
+        submission.status = TaskSubmission.SubmissionStatus.IN_PROGRESS
+        submission.started_at = timezone.now()
+        submission.save()
+
+    if request.method == "POST":
+        submission.submission_text = request.POST.get("submission_text", "").strip()
+        submission.submission_link = request.POST.get("submission_link", "").strip()
+
+        if request.FILES.get("submission_file"):
+            submission.submission_file = request.FILES["submission_file"]
+
+        # Prevent empty submission
+        if not submission.submission_text and not submission.submission_link and not submission.submission_file:
+            messages.error(request, "Please provide at least one submission method.")
+        else:
+            submission.submit()
+            messages.success(request, "Task submitted successfully.")
+            return redirect("student:task_detail", task_id=task.id)
+
+    return render(request, "student/task/do_task.html", {
+        "task": task,
+        "submission": submission
+    })
+
+
+def clean(self):
+    cleaned_data = super().clean()
+    text = cleaned_data.get("submission_text")
+    file = cleaned_data.get("submission_file")
+    link = cleaned_data.get("submission_link")
+
+    if not text and not file and not link:
+        raise forms.ValidationError(
+            "You must provide at least one submission method."
+        )
+
+    return cleaned_data

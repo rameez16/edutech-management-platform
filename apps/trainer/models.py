@@ -345,7 +345,7 @@ class Attendance(models.Model):
         unique_together = ['student', 'batch', 'date']
     
     def __str__(self):
-        return f"{self.student.name} - {self.date} - {self.status}"
+        return f"{self.student.full_name} - {self.date} - {self.status}"
     
     @classmethod
     def calculate_attendance_percentage(cls, student, batch):
@@ -735,7 +735,7 @@ class TaskSubmission(models.Model):
         ordering = ['-submitted_at']
     
     def __str__(self):
-        return f"{self.student.name} - {self.task.title} - {self.status}"
+        return f"{self.student.full_name} - {self.task.title} - {self.status}"
     
     def submit(self):
         """Mark task as submitted"""

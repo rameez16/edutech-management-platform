@@ -43,52 +43,84 @@
     }
 
     .announcement-mini {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-height: 100px;       /* adjust height as needed */
-    overflow-y: auto;        /* vertical scroll if content exceeds height */
-    padding-right: 8px;      /* optional: prevent scrollbar from overlapping content */
-}
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 100px;       /* adjust height as needed */
+        overflow-y: auto;        /* vertical scroll if content exceeds height */
+        padding-right: 8px;      /* optional: prevent scrollbar from overlapping content */
+    }
+
+    /* Batch Info Card Custom Styles - Same as Profile Card */
+    .batch-info-card .stat-value {
+        font-size: 14px; /* Bigger batch name */
+        font-weight: 600;
+        color: #111;
+    }
+
+    .batch-info-card .stat-change {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .batch-info-card .stat-change.positive {
+        color: green; /* Active/Assigned */
+    }
+
+    .batch-info-card .stat-change.inactive {
+        color: red; /* Not assigned */
+        background-color: rgba(255, 0, 0, 0.1); /* light red bg */
+    }
+
+    /* Center everything inside batch info card */
+    .batch-info-card .stat-card-inner {
+        display: flex;
+        align-items: center;        /* vertical center */
+        justify-content: center;    /* horizontal center */
+        gap: 16px;
+    }
+
+    /* Center text block */
+    .batch-info-card .stat-info {
+        text-align: center;
+        margin-top: 15px;
+    }
 
 
 
+    /* Common notification box */
+    .announcement-item {
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+        font-weight: 500;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease;
+    }
 
+    .announcement-item:hover {
+        transform: translateY(-2px);
+    }
 
-/* Common notification box */
-.announcement-item {
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    line-height: 1.5;
-    font-weight: 500;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-    transition: transform 0.2s ease;
-}
+    /* Status colors */
+    .announcement-item.warning {
+        background: #fff4e5;
+        color: #a15c00;
+        border-left: 4px solid #ff9800;
+    }
 
-.announcement-item:hover {
-    transform: translateY(-2px);
-}
+    .announcement-item.success {
+        background: #e8f7ee;
+        color: #1b7a46;
+        border-left: 4px solid #22c55e;
+    }
 
-/* Status colors */
-.announcement-item.warning {
-    background: #fff4e5;
-    color: #a15c00;
-    border-left: 4px solid #ff9800;
-}
-
-.announcement-item.success {
-    background: #e8f7ee;
-    color: #1b7a46;
-    border-left: 4px solid #22c55e;
-}
-
-.announcement-item.info {
-    background: #eef5ff;
-    color: #1e4ed8;
-    border-left: 4px solid #3b82f6;
-}
-
+    .announcement-item.info {
+        background: #eef5ff;
+        color: #1e4ed8;
+        border-left: 4px solid #3b82f6;
+    }
 
 
 </style>
@@ -96,114 +128,142 @@
 
 {% block content %}
 
-            <!-- Top Navbar -->
-            <nav class="navbar">
-                <h1 class="page-title">Student Overview</h1>
-                <div class="navbar-right">
-                    <div class="search-box">
-                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                        </svg>
-                        <input type="text" class="search-input" placeholder="Search anything...">
+    <!-- Top Navbar -->
+    <nav class="navbar">
+        <h1 class="page-title">Student Overview</h1>
+
+        <div class="navbar-right">
+
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search anything...">
+            </div>
+
+            <button class="nav-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span class="notification-dot"></span>
+            </button>
+
+            <button class="nav-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2"/><path d="M12 20v2"/>
+                    <path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/>
+                    <path d="M2 12h2"/><path d="M20 12h2"/>
+                    <path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/>
+                </svg>
+
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+
+            <div style="margin-left:14px; display:flex; align-items:center;">
+                {% if profile_photo and all_docs_verified %}
+                    <img src="{{ profile_photo.document_file.url }}"
+                         alt="Profile"
+                         style="width:60px;height:60px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid rgba(255,255,255,0.3);">
+                {% else %}
+                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#06b6d4);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                        {{ student.full_name|first }}
                     </div>
-                    <button class="nav-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                        </svg>
-                        <span class="notification-dot"></span>
-                    </button>
-                    <button class="nav-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
-                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="4"/>
-                            <path d="M12 2v2"/><path d="M12 20v2"/>
-                            <path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/>
-                            <path d="M2 12h2"/><path d="M20 12h2"/>
-                            <path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/>
-                        </svg>
-                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                        </svg>
-                    </button>
-                    <div style="margin-left:14px; display:flex; align-items:center;">
-    {% if profile_photo and all_docs_verified %}
-        <img src="{{ profile_photo.document_file.url }}"
-             alt="Profile"
-             style="width:60px;height:60px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid rgba(255,255,255,0.3);">
+                {% endif %}
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- ONBOARDING BANNER -->
+    {% if completed_steps < 3 %}
+        <div style="margin: 15px 20px; padding: 10px 20px; border-radius: 6px; background-color: #fff3cd; border-left: 4px solid #ffc107; color: #856404; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 20px;">⚠</span>
+                <span style="flex: 1; font-size: 14px; font-weight: 500;">
+                    Your onboarding is not complete. Please complete all steps to access full features.
+                </span>
+                <a href="{% url 'student:stud_onboard' %}" style="padding: 6px 16px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 14px;">
+                    Complete Now →
+                </a>
+            </div>
+        </div>
     {% else %}
-        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#06b6d4);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-            {{ student.full_name|first }}
+        <div style="margin: 15px 20px; padding: 10px 20px; border-radius: 6px; background-color: #d4edda; border-left: 4px solid #28a745; color: #155724; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 20px;">✔</span>
+                <span style="flex: 1; font-size: 14px; font-weight: 500;">
+                    Onboarding process completed!
+                </span>
+            </div>
         </div>
     {% endif %}
-</div>
 
+    <!-- TOP STATS GRID (ALL CARDS IN ONE ROW) -->
+    <section class="stats-grid">
 
+        <!-- Student Profile Card -->
+        <div class="glass-card glass-card-3d stat-card profile-card">
+            <div class="stat-card-inner">
+                <div class="stat-info">
+                    <div class="stat-value">{{ student.full_name }}</div>
 
-                </div>
-            </nav>
-            
+                    <h3>
+                        Student ID:
+                        {% if admin_profile %}
+                            {{ admin_profile.student_code }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </h3>
 
-   <!-- TOP STATS GRID (ALL CARDS IN ONE ROW) -->
-<section class="stats-grid">
-
-   <!-- Student Profile Card -->
-<div class="glass-card glass-card-3d stat-card profile-card">
-    <div class="stat-card-inner">
-
-        <div class="stat-info">
-            <div class="stat-value">{{ student.full_name }}</div>
-
-            <h3>
-                Student ID:
-                {% if admin_profile %}
-                    {{ admin_profile.student_code }}
-                {% else %}
-                    N/A
-                {% endif %}
-            </h3>
-
-            <span class="stat-change {% if user.is_active %}positive{% else %}inactive{% endif %}">
-                {% if user.is_active %}
-                    Active Student
-                {% else %}
-                    Inactive
-                {% endif %}
-            </span>
-        </div>
-
-        
-
-    </div>
-</div>
-
-
-
-
-    <!-- Batch Info Card -->
-    <div class="glass-card glass-card-3d stat-card batch-card">
-        <div class="stat-card-inner">
-            <div class="stat-info">
-                <h3>Batch Info</h3>
-                <div class="stat-value" style="font-size:18px;">
-                    BATCH101
-                </div>
-                <div class="batch-mini">
-                    <p>📘  Web Development</p>
-                    <p><strong>👤 Trainer:</strong> Mr. Smith</p>
+                    <span class="stat-change {% if user.is_active %}positive{% else %}inactive{% endif %}">
+                        {% if user.is_active %}
+                            Active Student
+                        {% else %}
+                            Inactive
+                        {% endif %}
+                    </span>
                 </div>
             </div>
-            <div class="stat-icon magenta">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2">
-                    <path d="M4 4h16v12H4z"/>
-                    <path d="M4 16h16"/>
-                    <path d="M9 20h6"/>
-                </svg>
+        </div>
+
+        <!-- Batch Info Card -->
+        <div class="glass-card glass-card-3d stat-card batch-info-card">
+            <div class="stat-card-inner">
+                <div class="stat-info">
+                    {% if batch %}
+                        <div class="stat-value">{{ batch.name }}</div>
+                        <h3>{{ batch.course.name }}</h3>
+
+                        {% if batch.trainers.exists %}
+                            {% for trainer in batch.trainers.all %}
+                                <span class="stat-change positive">
+                                    👤 Trainer: {{ trainer.full_name|default:trainer.user.get_full_name|default:trainer.user.username }}
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="stat-change inactive">
+                                👤 Trainer: Not assigned
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <div class="stat-value">No Active Batch</div>
+                        <h3>Not Enrolled</h3>
+                        <span class="stat-change inactive">
+                            You are not enrolled in any batch
+                        </span>
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-    <!--Payment-->
-    <div class="glass-card payment-ui">
+
+        <!-- Payment -->
+        <div class="glass-card payment-ui">
             <div class="payment-header">
                 <h4>PAYMENT STATUS</h4>
                 <button class="payment-action-btn">₹</button>
@@ -218,112 +278,182 @@
             </div>
         </div>
 
- <!-- Announcements Card -->
-<div class="glass-card glass-card-3d stat-card">
-    <div class="stat-card-inner">
-        <div class="stat-info">
-            <h3>Notifications</h3>
-            <div class="announcement-mini">
+        <!-- Announcements Card -->
+        <div class="glass-card glass-card-3d stat-card">
+            <div class="stat-card-inner">
+                <div class="stat-info">
+                    <h3>Notifications</h3>
 
-                <!-- 1️⃣ Onboarding Status -->
-                {% if completed_steps < 3 %}
-                    <div class="announcement-item warning">
-                        ⚠ Your onboarding is not complete. Please complete all steps.
+                    <div class="announcement-mini">
+
+                        {% if completed_steps < 3 %}
+                            <div class="announcement-item warning">
+                                ⚠ Your onboarding is not complete. Please complete all steps.
+                            </div>
+                        {% else %}
+                            <div class="announcement-item success">
+                                ✔ Onboarding process completed!
+                            </div>
+                        {% endif %}
+
+                        {% if checklist %}
+                            {% if checklist.enrollment_letter_generated and not checklist.enrollment_letter_signed %}
+                                <div class="announcement-item info">
+                                    ✉ Enrollment letter generated. Please complete following steps.
+                                </div>
+                            {% elif completed_steps == 2 and checklist.id_card_generated %}
+                                <div class="announcement-item success" style="padding-top:10px">
+                                    ✔ Your student ID card has been generated. Please wait until issued.
+                                </div>
+                            {% elif completed_steps == 3 and checklist.id_card_issued %}
+                                <div class="announcement-item success" style="padding-top:10px">
+                                    ✔ Your student ID card has been issued. Please download it.
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
                     </div>
-                {% else %}
-                    <div class="announcement-item success">
-                        ✔ Onboarding process completed!
-                    </div>
-                {% endif %}
-
-                <!-- 2️⃣ Next Actionable Step -->
-                {% if checklist %}
-                    {% if checklist.enrollment_letter_generated and not checklist.enrollment_letter_signed %}
-                        <div class="announcement-item info">
-                            ✉ Enrollment letter generated. Please complete following steps.
-                        </div>
-                    {% elif completed_steps == 2 and checklist.id_card_generated %}
-                        <div class="announcement-item success" style="padding-top:10px">
-                          ✔ Your student ID card has been generated. Please wait until issued.
-                        </div>
-                    {% elif completed_steps == 3 and checklist.id_card_issued %}
-                        <div class="announcement-item success" style="padding-top:10px">
-                          ✔ Your student ID card has been issued. Please download it.
-                        </div>
-                    {% endif %}
-                {% endif %}
-
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-
-
-
-</section>
+    </section>
 
     <!-- ================= RECENT ACTIVITY ================= -->
     <section class="top-grid">
 
         <div class="glass-card overview-card activity-column-card">
 
-    <div class="activity-header">
-        <div>
-            <h4 class="card-label">RECENT ACTIVITY</h4>
-            <p class="card-subtitle">Latest transactions</p>
-        </div>
-    </div>
-
-    <div class="activity-list-column">
-
-        <div class="activity-item">
-            <div class="activity-avatar emerald">JD</div>
-            <div class="activity-content">
-                <p><strong>John Doe</strong> purchased Premium Plan</p>
-                <span>2 minutes ago</span>
+            <div class="activity-header">
+                <div>
+                    <h4 class="card-label">RECENT ACTIVITY</h4>
+                    <p class="card-subtitle">Latest transactions</p>
+                </div>
             </div>
-        </div>
 
-        <div class="activity-item">
-            <div class="activity-avatar gold">AS</div>
-            <div class="activity-content">
-                <p><strong>Anna Smith</strong> submitted a support ticket</p>
-                <span>15 minutes ago</span>
+            <div class="activity-list-column">
+
+                <div class="activity-item">
+                    <div class="activity-avatar emerald">JD</div>
+                    <div class="activity-content">
+                        <p><strong>John Doe</strong> purchased Premium Plan</p>
+                        <span>2 minutes ago</span>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar gold">AS</div>
+                    <div class="activity-content">
+                        <p><strong>Anna Smith</strong> submitted a support ticket</p>
+                        <span>15 minutes ago</span>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar coral">MJ</div>
+                    <div class="activity-content">
+                        <p><strong>Mike Johnson</strong> upgraded subscription</p>
+                        <span>1 hour ago</span>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar success">EW</div>
+                    <div class="activity-content">
+                        <p><strong>Emily White</strong> completed onboarding</p>
+                        <span>2 hours ago</span>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar warning">RB</div>
+                    <div class="activity-content">
+                        <p><strong>Robert Brown</strong> requested refund</p>
+                        <span>3 hours ago</span>
+                    </div>
+                </div>
+
             </div>
+
         </div>
 
-        <div class="activity-item">
-            <div class="activity-avatar coral">MJ</div>
-            <div class="activity-content">
-                <p><strong>Mike Johnson</strong> upgraded subscription</p>
-                <span>1 hour ago</span>
+        <br>
+
+        <div class="overview-row">
+
+            <!-- STUDENT PROGRESS -->
+            <div class="glass-card overview-card progress-glass-card">
+                <div class="progress-header">
+                    <h4 class="card-label">STUDENT PROGRESS</h4>
+                </div>
+
+                <div class="progress-bar-chart">
+                    <canvas id="studentBarChart"></canvas>
+                </div>
             </div>
-        </div>
 
-        <div class="activity-item">
-            <div class="activity-avatar success">EW</div>
-            <div class="activity-content">
-                <p><strong>Emily White</strong> completed onboarding</p>
-                <span>2 hours ago</span>
+            <!-- QUICK LINKS -->
+            <div class="glass-card overview-card quick-links-card">
+                <div class="quick-links-header">
+                    <h4 class="card-label2">QUICK LINKS</h4>
+                </div>
+
+                <div class="quick-links-body">
+                    <a href="#" class="quick-link-btn blue">Syllabus</a>
+                    <a href="#" class="quick-link-btn purple">Attendance</a>
+                    <a href="#" class="quick-link-btn green">Submit Task</a>
+                    <a href="#" class="quick-link-btn orange">Pay Now</a>
+                </div>
             </div>
+
         </div>
 
-        <div class="activity-item">
-            <div class="activity-avatar warning">RB</div>
-            <div class="activity-content">
-                <p><strong>Robert Brown</strong> requested refund</p>
-                <span>3 hours ago</span>
+        <br>
+
+        <!-- ================= CALENDAR + ATTENDANCE + PROGRESS ================= -->
+        <section class="bottom-grid">
+
+            <!-- Calendar -->
+            <div class="glass-card">
+                <h3>January 2025</h3>
+
+                <div class="calendar-grid">
+                    <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span>
+                    <span>THU</span><span>FRI</span><span>SAT</span>
+
+                    <span class="muted">29</span><span class="muted">30</span><span class="muted">31</span>
+                    <span class="active">1</span><span>2</span><span>3</span><span>4</span>
+
+                    <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span>
+                    <span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span>
+                    <span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span>
+                    <span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span class="muted">1</span>
+                </div>
             </div>
-        </div>
 
-    </div>
+            <!-- Attendance -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Attendance performance</h2>
+                        <p class="card-subtitle">Your attendance Performance</p>
+                    </div>
+                </div>
 
-</div>
-<br>
- 
-<div class="overview-row">
+                <div class="donut-container">
+                    <div class="donut-chart">
+                        <svg width="140" height="140" viewBox="0 0 140 140">
+                            <circle class="donut-segment" cx="70" cy="70" r="54"
+                                    stroke="var(--emerald-light)"
+                                    stroke-dasharray="203.6 339.3"
+                                    stroke-dashoffset="0"/>
+                            <circle class="donut-segment" cx="70" cy="70" r="54"
+                                    stroke="var(--gold)"
+                                    stroke-dasharray="135.7 339.3"
+                                    stroke-dashoffset="-203.6"/>
+                        </svg>
 
+<<<<<<< HEAD
     <!-- STUDENT PROGRESS -->
     <div class="glass-card overview-card progress-glass-card">
         <div class="progress-header">
@@ -386,31 +516,31 @@
         <div class="donut-chart">
             <svg width="140" height="140" viewBox="0 0 140 140">
 
+                <!-- Present -->
                 <circle
+                    id="presentRing"
                     class="donut-segment"
                     cx="70"
                     cy="70"
                     r="54"
                     stroke="var(--emerald-light)"
-                    stroke-dasharray="203.6 339.3"
-                    stroke-dashoffset="0"
                 />
 
+                <!-- Absent -->
                 <circle
+                    id="absentRing"
                     class="donut-segment"
                     cx="70"
                     cy="70"
                     r="54"
                     stroke="var(--gold)"
-                    stroke-dasharray="135.7 339.3"
-                    stroke-dashoffset="-203.6"
                 />
 
             </svg>
 
             <div class="donut-center">
-                <div class="donut-value">%</div>
-                <div class="donut-label">Attendent</div>
+                <div id="attendanceValue" class="donut-value">0%</div>
+                <div class="donut-label">Attendance</div>
             </div>
         </div>
 
@@ -433,26 +563,68 @@
                         <div>
                             <h2 class="card-title">Learning Progress</h2>
                             <p class="card-subtitle">Current sprint status</p>
+=======
+                        <div class="donut-center">
+                            <div class="donut-value">%</div>
+                            <div class="donut-label">Attendent</div>
+>>>>>>> 99cee30b609e5646544f0a245ebfb4b12b802ef6
                         </div>
                     </div>
-                    <div class="progress-item">
-                        <div class="progress-header"><span class="progress-label">Covered</span><span class="progress-value">85%</span></div>
-                        <div class="progress-bar"><div class="progress-fill cyan" style="width: 85%;"></div></div>
+
+                    <div class="donut-legend">
+                        <div class="legend-item">
+                            <span class="legend-color cyan"></span>
+                            <span>Present</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color magenta"></span>
+                            <span>Absent</span>
+                        </div>
                     </div>
-                    <div class="progress-item">
-                        <div class="progress-header"><span class="progress-label">Pending</span><span class="progress-value">62%</span></div>
-                        <div class="progress-bar"><div class="progress-fill magenta" style="width: 62%;"></div></div>
-                    </div>
-                   
                 </div>
-            </section>
-     
-    </div>
+            </div>
+
+            <!-- Progress Card -->
+            <div class="glass-card progress-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Learning Progress</h2>
+                        <p class="card-subtitle">Current sprint status</p>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">Covered</span>
+                        <span class="progress-value">85%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill cyan" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">Pending</span>
+                        <span class="progress-value">62%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill magenta" style="width: 62%;"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </section>
 
     <!-- Mobile Menu Toggle -->
     <button class="mobile-menu-toggle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
     </button>
 
