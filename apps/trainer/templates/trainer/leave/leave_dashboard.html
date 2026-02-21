@@ -1,0 +1,130 @@
+{% extends "base/base.html" %} {% load static %} {% block content %}
+
+<h2 class="leave-title">Leave Management</h2>
+
+<!-- Summary Card -->
+<div class="leave-summary">
+  <ul>
+    <li><strong>Total:</strong> {{ leave_applications|length }}</li>
+  </ul>
+  <ul>
+    <li><strong>Pending:</strong> {{ pending_count }}</li>
+  </ul>
+  <ul>
+    <li><strong>Approved:</strong> {{ approved_count }}</li>
+  </ul>
+  <ul>
+    <li><strong>Rejected:</strong> {{ rejected_count }}</li>
+  </ul>
+</div>
+
+<!-- Leave Table Card -->
+<div class="leave-card-wrapper">
+
+    <!-- Search Bar -->
+<div class="leave-header">
+    <div class="leave-search-wrapper">
+        <svg class="leave-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="leaveSearch" placeholder="Search..." class="leave-search">
+
+    </div>
+</div>
+
+  <div class="table-responsive">
+    <table class="leave-table" id="leaveTable">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Batch</th>
+          <th>Dates</th>
+          <th>Days</th>
+          <th>Reason</th>
+          <th class="no-row-click">Document</th>
+          <th>Status</th>
+          <th>Reviewed By</th>
+          <th class="no-row-click">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for leave in leave_applications %}
+        <tr class="clickable-row"
+            data-href="{% url 'trainer:leave-detail' leave.id %}">
+          <td>{{ leave.student.full_name }}</td>
+          <td>{{ leave.batch.name }}</td>
+          <td>
+            {{ leave.from_date }}<br />
+            <small class="date-to">to {{ leave.to_date }}</small>
+          </td>
+          <td>{{ leave.total_days }}</td>
+          <td>{{ leave.reason|truncatechars:50 }}</td>
+          <td class="no-row-click">
+            {% if leave.supporting_document %}
+            <a
+              href="{{ leave.supporting_document.url }}"
+              target="_blank"
+              class="document-link"
+              >View</a
+            >
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            {% if leave.status == "pending" %}
+            <span class="status-badge status-pending">Pending</span>
+            {% elif leave.status == "approved" %}
+            <span class="status-badge status-approved">Approved</span>
+            {% elif leave.status == "rejected" %}
+            <span class="status-badge status-rejected">Rejected</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if leave.approved_by %} {{ leave.approved_by.full_name }}<br />
+            <small>{{ leave.approval_date|date:"M d, Y" }}</small>
+            {% else %}—{% endif %}
+          </td>
+          <td class="no-row-click">
+  {% if leave.status == "pending" or leave.status == "reapprove" %}
+    <!-- Approve Form -->
+    <form method="post" action="{% url 'trainer:leave-process' leave.id %}" style="margin-bottom: 5px">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="approve" />
+      <button type="submit" class="btn-approve">Approve</button>
+    </form>
+
+    <!-- Reject Form -->
+    <form method="post" action="{% url 'trainer:leave-process' leave.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="reject" />
+      <textarea
+        name="rejection_reason"
+        rows="2"
+        placeholder="Reason"
+        required
+        class="form-control"
+      ></textarea>
+      <button type="submit" class="btn-reject">Reject</button>
+    </form>
+
+  {% else %}
+    <form method="post" action="{% url 'trainer:leave-reapprove' leave.id %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn-reapprove">Review Again</button>
+    </form>
+{% endif %}
+
+</td>
+
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="11" class="empty-row">No leave applications found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %} {% comment %} // /////// {% endcomment %}

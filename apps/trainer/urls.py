@@ -20,5 +20,23 @@ urlpatterns = [
     path('batch/<int:batch_id>/lesson-plan/',views.batch_lesson_plan,name='batch-lesson-plan'),
     path("batches/<int:batch_id>/feedback/",views.batch_feedback_view,name="batch-feedback"),
 
+    # attendance
+    path("attendance/", views.attendance_batch_list, name="attendance-batch-list"),
+    path("attendance/batch/<int:batch_id>/", views.attendance_session_list, name="attendance-sessions"),
+    path("attendance/session/<int:session_id>/mark/", views.attendance_mark, name="attendance-mark"),
+    path("attendance/session/<int:session_id>/view/",views.attendance_view,name="attendance-view"),
+    
+    # student_leave
+    path("leaves/", views.leave_dashboard, name="leave-dashboard"),
+    path("leaves/<int:leave_id>/", views.leave_detail, name="leave-detail"),
+    path("leaves/<int:leave_id>/process/", views.process_leave, name="leave-process"),
+    path('leave/<int:leave_id>/reapprove/', views.leave_reapprove, name='leave-reapprove'),
+    
+    # Task Management
+    path("tasks/", views.task_dashboard, name="task-dashboard"),
+    path("tasks/create/", views.task_create, name="task-create"),
+    path("tasks/list/", views.task_list, name="task-list"),
+    path("tasks/submissions/", views.task_submissions, name="task-submissions"),
+    path("tasks/evaluate/<int:submission_id>/",views.evaluate_submission,name="task-evaluate"),
 
 ]

@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<h2 class="task-title">
+    Task Management
+</h2>
+
+<div class="task-tabs">
+
+    <a href="{% url 'trainer:task-dashboard' %}"
+       class="task-tab {% if active_tab == 'dashboard' %}active{% endif %}">
+        Overview
+    </a>
+
+    <a href="{% url 'trainer:task-create' %}"
+       class="task-tab {% if active_tab == 'create' %}active{% endif %}">
+        Create Task
+    </a>
+
+    <a href="{% url 'trainer:task-list' %}"
+       class="task-tab {% if active_tab == 'list' %}active{% endif %}">
+        Task List
+    </a>
+
+    <a href="{% url 'trainer:task-submissions' %}"
+       class="task-tab {% if active_tab == 'submissions' %}active{% endif %}">
+        Submissions
+    </a>
+
+</div>
+
+<div class="tab-content">
+    {% block tab_content %}{% endblock %}
+</div>
+
+{% endblock %}

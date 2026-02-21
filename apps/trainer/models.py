@@ -263,7 +263,7 @@ class MaterialAccess(models.Model):
         ordering = ['-last_accessed']
     
     def __str__(self):
-        return f"{self.student.name} - {self.material.title}"
+        return f"{self.student.full_name} - {self.material.title}"
     
     def mark_viewed(self):
         """Mark material as viewed"""
@@ -456,7 +456,7 @@ class ExamResult(models.Model):
         ordering = ['-marks_obtained']
     
     def __str__(self):
-        return f"{self.student.name} - {self.exam.title} - {self.marks_obtained or 'Not Evaluated'}"
+        return f"{self.student.full_name} - {self.exam.title} - {self.marks_obtained or 'Not Evaluated'}"
     
     def save(self, *args, **kwargs):
         # Auto-calculate grade and pass/fail
@@ -553,7 +553,7 @@ class Certificate(models.Model):
         ordering = ['-issue_date']
     
     def __str__(self):
-        return f"{self.certificate_number} - {self.student.name}"
+        return f"{self.certificate_number} - {self.student.full_name}"
     
     def check_eligibility(self, minimum_attendance=75, minimum_percentage=50):
         """

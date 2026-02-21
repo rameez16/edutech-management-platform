@@ -4,13 +4,17 @@
 {% block title %}Tasks{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'student/css/task.css' %}">
+<link rel="stylesheet" href="{% static 'student/css/task.css' %}?v=2">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/task.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 <div class="task-container">
 
-    <!-- Header Section -->
+    <!-- Header -->
     <div class="task-header">
         {% if batch %}
             <h2>Tasks - {{ batch.name }}</h2>
@@ -21,96 +25,129 @@
         {% endif %}
     </div>
 
-    {% if batch and tasks %}
+    {% if batch and modules %}
     <div class="task-wrapper-card">
 
-        {% for task in tasks %}
-        <div class="task-card">
+        {% for md in modules %}
+        <div class="tm-module-card">
 
-            <!-- Card Header -->
-            <div class="task-card-header">
-                <div class="task-title">
-                    {{ task.title }}
+            <!-- MODULE HEADER -->
+            <div class="tm-module-header">
+                <div class="tm-module-left">
+                    <div class="tm-module-num">M{{ md.module.module_number }}</div>
+                    <div class="tm-module-info">
+                        <div class="tm-module-title">{{ md.module.title }}</div>
+                        <div class="tm-module-meta">
+                            <span class="tm-phase-tag">{{ md.module.get_phase_display }}</span>
+                            <span>📋 {{ md.session_count }} session{{ md.session_count|pluralize }}</span>
+                            <span>📌 {{ md.task_count }} task{{ md.task_count|pluralize }}</span>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="task-type">
-                    {{ task.get_task_type_display }}
-                </div>
+                <span class="tm-module-arrow">&#9660;</span>
             </div>
 
-            <!-- Card Body -->
-            <div class="task-body">
+            <!-- MODULE BODY -->
+            <div class="tm-module-body">
 
-                <p>
-                    <strong>Difficulty:</strong>
-                    {{ task.get_difficulty_level_display }}
-                </p>
+                {% for sd in md.sessions %}
+                <div class="tm-session-card">
 
-                <p>
-                    <strong>Due Date:</strong>
-                    {{ task.due_date|date:"M d, Y" }}
-                </p>
+                    <!-- SESSION HEADER -->
+                    <div class="tm-session-header">
+                        <div class="tm-session-left">
+                            <div class="tm-session-num">S{{ sd.session.lesson_plan.session_number }}</div>
+                            <div class="tm-session-info">
+                                <div class="tm-session-title">{{ sd.session.lesson_plan.topic }}</div>
+                                <div class="tm-session-meta">
+                                    📅 {{ sd.session.planned_date|date:"M d, Y" }}
+                                    · 📌 {{ sd.task_count }} task{{ sd.task_count|pluralize }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tm-session-right">
+                            <span class="tm-session-status {{ sd.session.status }}">
+                                {{ sd.session.get_status_display }}
+                            </span>
+                            <span class="tm-session-arrow">&#9660;</span>
+                        </div>
+                    </div>
 
-                {% if task.lesson_session %}
-                <p>
-                    <strong>Session:</strong>
-                    {{ task.lesson_session.title }}
-                </p>
-                {% endif %}
+                    <!-- SESSION BODY -->
+                    <div class="tm-session-body">
 
-            </div>
+                        <!-- STATUS FILTER TABS -->
+                        <div class="task-filter-tabs">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="not_started">Not Started</button>
+                            <button class="filter-btn" data-filter="in_progress">In Progress</button>
+                            <button class="filter-btn" data-filter="submitted">Submitted</button>
+                            <button class="filter-btn" data-filter="evaluated">Evaluated</button>
+                            <button class="filter-btn" data-filter="resubmit">Resubmit</button>
+                        </div>
 
-            <!-- Card Footer -->
-            <div class="task-footer">
+                        <!-- TASK LIST -->
+                        <div class="task-list">
+                            {% for task in sd.tasks %}
+                            <div class="task-card"
+                                 data-status="{% if task.student_submission %}{% if task.student_submission.status == 'submitted' %}submitted{% elif task.student_submission.status == 'evaluated' %}evaluated{% elif task.student_submission.status == 'in_progress' %}in_progress{% elif task.student_submission.status == 'resubmit' %}resubmit{% else %}not_started{% endif %}{% else %}not_started{% endif %}">
 
-                <!-- STATUS SECTION -->
-                {% if task.student_submission %}
-                    
-                    {% if task.student_submission.status == "submitted" %}
-                        <span class="status status-submitted">
-                            Submitted
-                        </span>
+                                <!-- Card Header -->
+                                <div class="task-card-header">
+                                    <div class="task-title">{{ task.title }}</div>
+                                    <div class="task-type">{{ task.get_task_type_display }}</div>
+                                </div>
 
-                    {% elif task.student_submission.status == "evaluated" %}
-                        <span class="status status-evaluated">
-                            Evaluated
-                        </span>
+                                <!-- Card Body -->
+                                <div class="task-body">
+                                    <p><strong>Difficulty:</strong> {{ task.get_difficulty_level_display }}</p>
+                                    <p><strong>Due Date:</strong> {{ task.due_date|date:"M d, Y" }}</p>
+                                    {% if task.is_mandatory %}
+                                        <p><strong>Mandatory:</strong> Yes</p>
+                                    {% endif %}
+                                </div>
 
-                    {% elif task.student_submission.status == "resubmit" %}
-                        <span class="status status-resubmit">
-                            Resubmit Required
-                        </span>
+                                <!-- Card Footer -->
+                                <div class="task-footer">
+                                    {% if task.student_submission %}
+                                        {% if task.student_submission.status == "submitted" %}
+                                            <span class="status status-submitted">Submitted</span>
+                                        {% elif task.student_submission.status == "evaluated" %}
+                                            <span class="status status-evaluated">Evaluated</span>
+                                        {% elif task.student_submission.status == "resubmit" %}
+                                            <span class="status status-resubmit">Resubmit Required</span>
+                                        {% elif task.student_submission.status == "in_progress" %}
+                                            <span class="status status-in_progress">In Progress</span>
+                                        {% else %}
+                                            <span class="status status-not_started">Not Started</span>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if task.is_overdue %}
+                                            <span class="status overdue">Overdue</span>
+                                        {% else %}
+                                            <span class="status status-not_started">Not Started</span>
+                                        {% endif %}
+                                    {% endif %}
 
-                    {% elif task.student_submission.status == "in_progress" %}
-                        <span class="status status-in_progress">
-                            In Progress
-                        </span>
+                                    <a href="{% url 'student:task_detail' task.id %}" class="view-btn">
+                                        View Task
+                                    </a>
+                                </div>
 
-                    {% else %}
-                        <span class="status status-not_started">
-                            Not Started
-                        </span>
-                    {% endif %}
+                            </div>
+                            {% empty %}
+                                <p class="tm-no-tasks">No tasks for this session.</p>
+                            {% endfor %}
+                            <!-- EMPTY MESSAGE FOR FILTER -->
+                            <div class="filter-empty-message" style="display:none;"></div>
+                        </div>
 
-                {% else %}
-                    
-                    {% if task.is_overdue %}
-                        <span class="status overdue">
-                            Overdue
-                        </span>
-                    {% else %}
-                        <span class="status status-not_started">
-                            Not Started
-                        </span>
-                    {% endif %}
+                    </div>
 
-                {% endif %}
-
-                <!-- View Button -->
-                <a href="{% url 'student:task_detail' task.id %}" 
-                   class="view-btn">
-                    View Task
-                </a>
+                </div>
+                {% empty %}
+                    <p class="tm-no-sessions">No sessions with tasks in this module.</p>
+                {% endfor %}
 
             </div>
 
@@ -118,10 +155,9 @@
         {% endfor %}
 
     </div>
-    {% else %}
-        <div class="no-task">
-            No tasks available.
-        </div>
+
+    {% elif batch %}
+        <div class="no-task">No tasks available.</div>
     {% endif %}
 
 </div>

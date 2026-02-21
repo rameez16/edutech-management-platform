@@ -1,0 +1,72 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h2 class="batch-title batch-header">
+    <a href="{% url 'trainer:attendance-sessions' session.batch.id %}" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+    Attendance Details - {{ session.batch.name }}
+</h2>
+
+<div class="glass-card attendance-summary">
+    <h3>Session Summary</h3>
+    <ul>
+        <li><strong>Session:</strong> {{ session.lesson_plan.session_number }}</li>
+        <li><strong>Date:</strong> {{ session.actual_date }}</li>
+        <li><strong>Total Students:</strong> {{ total_students }}</li>
+        <li><strong>Present:</strong> {{ present_count }}</li>
+        <li><strong>Late:</strong> {{ late_count }}</li>
+        <li><strong>Absent:</strong> {{ absent_count }}</li>
+    </ul>
+</div>
+
+<div class="glass-card attendance-card">
+
+    <div class="attendance-header">
+        <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="attendanceSearch" placeholder="Search students..." class="attendance-search">
+        </div>
+    </div>
+
+
+    <div class="table-wrapper">
+        <table class="data-table attendance-sessions-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance_records %}
+                <tr>
+                    <td>{{ record.student.full_name }}</td>
+                    <td>
+                        {% if record.status == "present" %}
+                            <span class="status-badge attendance-active" style="background-color: #4CAF50; color:white;">Present</span>
+                        {% elif record.status == "late" %}
+                            <span class="status-badge attendance-warning" style="background-color: #FF9800; color:white;">Late</span>
+                        {% elif record.status == "absent" %}
+                            <span class="status-badge attendance-inactive" style="background-color: #F44336; color:white;">Absent</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No attendance marked yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

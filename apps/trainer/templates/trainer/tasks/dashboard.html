@@ -1,0 +1,47 @@
+{% extends "trainer/tasks/base.html" %}
+{% block tab_content %}
+
+<div class="glass-card task-summary-card">
+
+    <div class="card-header">
+        <div>
+            <h4 class="card-title">Task Overview</h4>
+            <p class="card-subtitle">
+                Monitor assignments, deadlines & evaluations
+            </p>
+        </div>
+    </div>
+
+    <div class="task-stats-grid">
+
+        <div class="task-stat-box">
+            <span class="stat-label">Total Tasks</span>
+            <div class="stat-value">{{ total_tasks }}</div>
+        </div>
+
+        <div class="task-stat-box">
+            <span class="stat-label">Active Tasks</span>
+            <div class="stat-value success">
+                {{ active_tasks }}
+            </div>
+        </div>
+
+        <div class="task-stat-box">
+            <span class="stat-label">Overdue Tasks</span>
+            <div class="stat-value danger">
+                {{ overdue_tasks }}
+            </div>
+        </div>
+
+        <div class="task-stat-box">
+            <span class="stat-label">Pending Evaluations</span>
+            <div class="stat-value warning">
+                {{ pending_evaluations }}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
