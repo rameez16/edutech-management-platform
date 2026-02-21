@@ -40,7 +40,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 #only for checking logic delete later for merge
                 path("download-enrollment-letter/",views.download_enrollment_letter,name="download_enrollment_letter"),
                 path('batch_details/', views.batch_details, name='batch_details'),
-                path('tasks/', views.student_tasks, name='student_tasks'),
+                path('stud_tasks/', views.student_tasks, name='student_tasks'),
                 path("tasks/<int:task_id>/", views.task_detail, name="task_detail"),
                 path("task/<int:task_id>/do/", views.do_task, name="do_task"),
 
