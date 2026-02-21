@@ -22,6 +22,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path("student_attendance/", views.student_attendance, name="student_attendance"),
                path("student_leave/", views.student_leave, name="student_leave"),
                path("student_evaluation/",views.student_evaluation, name="student_evaluation"),
+               path('student_issues/', views.student_issues, name='student_issues'),
               
                
                

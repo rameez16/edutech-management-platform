@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from decimal import Decimal
 from django.db.models import Sum
-from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist
+from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist,StudentIssue
 from django.contrib.auth import update_session_auth_hash
 import uuid, os
 from . import views
@@ -18,7 +18,7 @@ from .forms import EnrollmentAgreementForm, TaskSubmissionForm
 from apps.accounts.decorators import role_required
 from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession
 from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
-from apps.student.forms import LeaveApplicationForm
+from apps.student.forms import LeaveApplicationForm,StudentIssueForm
 from apps.student.models import LeaveApplication
 from dateutil.relativedelta import relativedelta 
 
@@ -911,7 +911,76 @@ def student_evaluation(request):
         "student/dashboard/Evaluation.html",
         context
     )
+@login_required
+def student_issues(request):
 
+    student = (
+        Student.objects
+        .select_related("user")
+        .prefetch_related("batches__trainers")
+        .get(user=request.user)
+    )
+
+    # ✅ Active Batch
+    batch = student.batches.filter(is_active=True).first()
+
+    # ✅ Trainer
+    trainer = batch.trainers.first() if batch else None
+
+    # ✅ HANDLE POST
+    if request.method == "POST":
+
+        # ---------------- FEEDBACK SUBMISSION ----------------
+        if "issue_id" in request.POST:
+
+            try:
+                issue = StudentIssue.objects.get(
+                    id=request.POST.get("issue_id"),
+                    student=student
+                )
+
+                issue.student_satisfied = (
+                    request.POST.get("student_satisfied") == "true"
+                )
+
+                issue.satisfaction_comments = request.POST.get(
+                    "satisfaction_comments"
+                )
+
+                issue.save()
+
+                messages.success(request, "Feedback submitted ✅")
+
+            except StudentIssue.DoesNotExist:
+                messages.error(request, "Issue not found ❌")
+
+            return redirect("student:student_issues")
+
+        # ---------------- ISSUE SUBMISSION ----------------
+        form = StudentIssueForm(request.POST)
+
+        if form.is_valid():
+            issue = form.save(commit=False)
+            issue.student = student
+            issue.save()
+
+            messages.success(request, "Issue submitted successfully ✅")
+            return redirect("student:student_issues")
+
+    else:
+        form = StudentIssueForm()
+
+    issues = StudentIssue.objects.filter(student=student)
+
+    context = {
+        "student": student,
+        "batch": batch,
+        "trainer": trainer,
+        "form": form,
+        "issues": issues,
+    }
+
+    return render(request, "student/dashboard/issues.html", context)
 
 
 

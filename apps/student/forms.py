@@ -3,6 +3,7 @@ from apps.student.models import EnrollmentAgreement,LeaveApplication
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from apps.trainer.models import Task,TaskSubmission
+from apps.bdm.models import StudentIssue
 
 class EnrollmentAgreementForm(forms.ModelForm):
     class Meta:
@@ -81,7 +82,20 @@ class LeaveApplicationForm(forms.ModelForm):
                 raise ValidationError("To Date cannot be earlier than From Date 🚨")
 
         return cleaned_data
+    
 
+class StudentIssueForm(forms.ModelForm):
+
+    class Meta:
+        model = StudentIssue
+        fields = ["issue_type", "priority", "subject", "description"]
+
+        widgets = {
+            "issue_type": forms.Select(attrs={"class": "form-control"}),
+            "priority": forms.Select(attrs={"class": "form-control"}),
+            "subject": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter subject"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 4, "placeholder": "Describe your issue"}),
+        }
 
 
 
