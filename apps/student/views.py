@@ -16,11 +16,15 @@ from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_POST
 from .forms import EnrollmentAgreementForm, TaskSubmissionForm
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession
+from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession, SessionMaterial
 from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
 from apps.student.forms import LeaveApplicationForm
 from apps.student.models import LeaveApplication
 from dateutil.relativedelta import relativedelta 
+
+
+from django.db.models import Count, Q
+from collections import defaultdict
 
 #one time payment
 @login_required
@@ -1800,3 +1804,112 @@ def clean(self):
         )
 
     return cleaned_data
+
+
+
+
+
+
+
+
+@role_required("student")
+def lmsdashboard(request):
+    student = request.user.student
+
+    batch = student.batches.filter(
+        is_active=True
+    ).select_related("course").first()
+
+    sessions_with_materials = []
+    total_materials   = 0
+    recordings_count  = 0
+    notes_count       = 0
+    slides_count      = 0
+    code_files_count  = 0
+    assignments_count = 0
+    reference_count   = 0
+    other_count       = 0
+
+    VALID_FILTERS = {'recording', 'notes', 'slides', 'code', 'assignment', 'reference', 'other'}
+    filter_type = request.GET.get("type", "all")
+    if filter_type not in VALID_FILTERS:
+        filter_type = "all"
+
+    if batch:
+        all_sessions = (
+            LessonSession.objects.filter(
+                batch=batch,
+                status=LessonSession.SessionStatus.COMPLETED
+            )
+            .select_related("lesson_plan__module")
+            .prefetch_related("materials")
+            .order_by("lesson_plan__session_number")
+        )
+
+        all_materials = SessionMaterial.objects.filter(
+            lesson_session__batch=batch
+        )
+
+        total_materials   = all_materials.count()
+        recordings_count  = all_materials.filter(material_type=SessionMaterial.MaterialType.RECORDING).count()
+        notes_count       = all_materials.filter(material_type=SessionMaterial.MaterialType.NOTES).count()
+        slides_count      = all_materials.filter(material_type=SessionMaterial.MaterialType.SLIDES).count()
+        code_files_count  = all_materials.filter(material_type=SessionMaterial.MaterialType.CODE).count()
+        assignments_count = all_materials.filter(material_type=SessionMaterial.MaterialType.ASSIGNMENT).count()
+        reference_count   = all_materials.filter(material_type=SessionMaterial.MaterialType.REFERENCE).count()
+        other_count       = all_materials.filter(material_type=SessionMaterial.MaterialType.OTHER).count()
+
+        for session in all_sessions:
+            mats = session.materials.all()
+            if filter_type != "all":
+                mats = mats.filter(material_type=filter_type)
+            mats = list(mats)
+            if mats:
+                sessions_with_materials.append({
+                    "session": session,
+                    "materials": mats,
+                    "material_count": len(mats),
+                })
+
+    return render(request, "student/LMS/lms_dashboard.html", {
+        "batch":                   batch,
+        "sessions_with_materials": sessions_with_materials,
+        "total_materials":         total_materials,
+        "recordings_count":        recordings_count,
+        "notes_count":             notes_count,
+        "slides_count":            slides_count,
+        "code_files_count":        code_files_count,
+        "assignments_count":       assignments_count,
+        "reference_count":         reference_count,
+        "other_count":             other_count,
+        "active_filter":           filter_type,
+    })
+
+
+
+
+@role_required("student")
+def lms_view_material(request, pk):
+    material = get_object_or_404(SessionMaterial, pk=pk)
+    material.increment_views()
+    if material.external_link:
+        return redirect(material.external_link)
+    if material.file:
+        return redirect(material.file.url)
+    return redirect('student:lms_dashboard')
+
+
+@role_required("student")
+def lms_download_material(request, pk):
+    material = get_object_or_404(SessionMaterial, pk=pk)
+    material.increment_downloads()
+    if material.file:
+        return redirect(material.file.url)
+    if material.external_link:
+        return redirect(material.external_link)
+    return redirect('student:lms_dashboard')
+
+
+
+
+

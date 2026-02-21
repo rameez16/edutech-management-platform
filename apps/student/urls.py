@@ -43,6 +43,9 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path('stud_tasks/', views.student_tasks, name='student_tasks'),
                 path("tasks/<int:task_id>/", views.task_detail, name="task_detail"),
                 path("task/<int:task_id>/do/", views.do_task, name="do_task"),
+                path('lms_dashboard/', views.lmsdashboard, name='lms_dashboard'),
+                path('lms/material/<int:pk>/view/', views.lms_view_material, name='lms_view_material'),
+                path('lms/material/<int:pk>/download/', views.lms_download_material, name='lms_download_material'),
 
 
             

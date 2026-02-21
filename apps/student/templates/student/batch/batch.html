@@ -127,6 +127,7 @@
                                 <div class="session-card">
                                     <h5>Session {{ session.lesson_plan.session_number }}</h5>
                                     <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                                    <p><strong>Completed Date:</strong> {{ session.completed_at|date:"F d, Y" }}</p>
                                     {% if session.topics_covered %}<p><strong>Topics Covered:</strong> {{ session.topics_covered|linebreaksbr }}</p>{% endif %}
                                     {% if session.homework_assigned %}<p><strong>Homework:</strong> {{ session.homework_assigned|linebreaksbr }}</p>{% endif %}
                                 </div>
