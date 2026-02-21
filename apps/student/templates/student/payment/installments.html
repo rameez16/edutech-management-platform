@@ -19,9 +19,15 @@
 
     <!-- SUMMARY -->
     <div class="fee-summary">
+
         <div class="fee-box">
-            <p>Total Fee</p>
+            <p>Total Course Fee</p>
             <h3>₹{{ total_fee }}</h3>
+        </div>
+
+        <div class="fee-box">
+            <p>Admission Fee</p>
+            <h3>₹{{ admission_fee }}</h3>
         </div>
 
         <div class="fee-box">
@@ -33,11 +39,12 @@
             <p>Pending Amount</p>
             <h3>₹{{ pending_amount }}</h3>
         </div>
+
     </div>
 
     <center><h2>Installments</h2></center>
 
-    <!-- PAYMENT TABS -->
+    <!-- PAYMENT MODES -->
     <div class="payment-mode-switch">
         <span class="label">Payment Mode:</span>
 
@@ -46,11 +53,13 @@
             <a href="{% url 'student:payment' %}" class="mode-btn">One-Time Payment</a>
             <a href="{% url 'student:emi' %}" class="mode-btn">EMI</a>
             <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
-            <a href="{% url 'student:installments' student.id %}" class="mode-btn  active">Installments</a>
+            <a href="{% url 'student:installments' student.id %}" class="mode-btn active">
+                Installments
+            </a>
         </div>
     </div>
 
-    <!-- TABLE -->
+    <!-- INSTALLMENT TABLE -->
     <div class="loan-table-box">
         <h4>Installment Payment Details</h4>
 
@@ -68,31 +77,46 @@
             <tbody>
             {% for ins in installments %}
                 <tr>
-                    <td>Installment {{ ins.installment_number }}</td>
-                    <td>₹{{ ins.amount }}</td>
-                    <td>{{ ins.due_date|default:"—" }}</td>
 
+                    <td>Installment {{ ins.installment_number }}</td>
+
+                    <td>₹{{ ins.amount }}</td>
+
+                    <!-- DUE DATE -->
                     <td>
-                        {% if ins.payment_status == 'completed' %}
+                        {{ ins.due_date|date:"M d, Y"|default:"—" }}
+                    </td>
+
+                    <!-- ✅ CORRECT STATUS LOGIC ⭐⭐⭐⭐⭐ -->
+                    <td>
+                        {% if ins.display_status == "Paid" %}
                             <span class="status paid">Paid</span>
 
-                        {% elif ins.payment_status == 'pending' %}
-                            <span class="status pending">Pending</span>
+                        {% elif ins.display_status == "Upcoming" %}
+                            <span class="status upcoming">Upcoming</span>
 
                         {% else %}
-                            <span class="status upcoming">Upcoming</span>
+                            <span class="status pending">Pending</span>
                         {% endif %}
                     </td>
 
+                    <!-- ✅ CORRECT ACTION LOGIC ⭐⭐⭐⭐⭐ -->
                     <td>
-                        {% if ins.payment_status == 'pending' %}
+                        {% if ins.display_status == "Pending" %}
                             <a href="{% url 'student:install_qr' ins.id %}" class="pay-btn">
                                 Pay Installment
                             </a>
+
+                        {% elif ins.display_status == "Upcoming" %}
+                            <span class="disabled-btn">
+                                Not Due Yet
+                            </span>
+
                         {% else %}
                             —
                         {% endif %}
                     </td>
+
                 </tr>
 
             {% empty %}
@@ -106,8 +130,9 @@
         </table>
     </div>
 
+    <!-- NOTE -->
     <div class="note">
-        <b>Note:</b> Please pay installments on time.
+        <b>Note:</b> Installments are due on the 21st of every month.
     </div>
 
 </div>
