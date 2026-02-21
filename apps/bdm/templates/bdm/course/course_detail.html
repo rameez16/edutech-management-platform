@@ -1,0 +1,721 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  :root {
+    --bg: #f0f5fc;
+    --surface: #ffffff;
+    --surface2: #e8f0fe;
+    --border: #d1e0f5;
+    --text-primary: #1a2333;
+    --text-secondary: #5a6a84;
+    --accent: #4a90d9;
+    --accent-light: #dbeafe;
+    --accent-mid: #93c5fd;
+    --accent-dark: #2563eb;
+    --success: #16a34a;
+    --success-light: #f0fdf4;
+    --success-mid: #bbf7d0;
+    --danger: #dc2626;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(74,144,217,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .detail-wrapper {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Back Link ── */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    margin-bottom: 22px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .back-link i { font-size: 11px; }
+
+  /* ── Course Overview Card ── */
+  .course-overview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .course-overview::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-mid));
+  }
+
+  .overview-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .overview-icon-title {
+    display: flex; align-items: center; gap: 14px;
+  }
+
+  .overview-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-mid) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: #fff;
+    box-shadow: 0 4px 14px rgba(74,144,217,0.3);
+    flex-shrink: 0;
+  }
+
+  .course-name {
+    font-family: 'Sora', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  .course-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    line-height: 1.6;
+  }
+
+  .meta-row {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .meta-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 13px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .meta-chip i { font-size: 11px; color: var(--accent); }
+
+  .meta-chip.fee {
+    background: var(--success-light);
+    border-color: var(--success-mid);
+    color: var(--success);
+    font-weight: 700;
+  }
+
+  .meta-chip.fee i { color: var(--success); }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 10.5px;
+    font-weight: 600;
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    border: 1px solid var(--accent-mid);
+  }
+
+  .badge i { font-size: 9px; color: var(--accent); }
+
+  /* ── Section Header ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .section-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .section-title i { color: var(--accent); font-size: 15px; }
+
+  /* ── Light Blue Button ── */
+  .btn-blue {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: var(--accent-light);
+    border: 1px solid var(--accent-mid);
+    color: var(--accent-dark);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-blue:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(74,144,217,0.3);
+  }
+
+  .btn-blue i { font-size: 11px; }
+
+  /* ── Module Form Card ── */
+  .module-form-card {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.25s ease;
+  }
+
+  .module-form-card.active { display: block; }
+
+  .form-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .form-title i { color: var(--accent); }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-group {
+    display: flex; flex-direction: column; gap: 5px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .form-group label i { font-size: 10px; color: var(--accent); }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 8px 11px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text-primary);
+    background: var(--bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent-mid);
+    box-shadow: 0 0 0 3px rgba(74,144,217,0.1);
+  }
+
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .form-actions {
+    display: flex; gap: 10px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-submit {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 18px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  .btn-submit:hover {
+    background: var(--accent-dark);
+    box-shadow: 0 3px 10px rgba(74,144,217,0.3);
+  }
+
+  .btn-cancel {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s;
+  }
+
+  .btn-cancel:hover { border-color: var(--accent-mid); color: var(--accent); }
+
+  .error-text { color: var(--danger); font-size: 11px; margin-top: 2px; }
+
+  /* ── Module List ── */
+  .modules-wrapper { display: flex; flex-direction: column; gap: 12px; }
+
+  .module-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .module-container:nth-child(1) { animation-delay: 0.05s; }
+  .module-container:nth-child(2) { animation-delay: 0.10s; }
+  .module-container:nth-child(3) { animation-delay: 0.15s; }
+  .module-container:nth-child(4) { animation-delay: 0.20s; }
+
+  .module-container:hover {
+    border-color: var(--accent-mid);
+    box-shadow: 0 6px 20px rgba(74,144,217,0.1);
+  }
+
+  .module-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    gap: 12px;
+  }
+
+  .module-left {
+    display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;
+  }
+
+  .module-num {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--accent-light);
+    border: 1px solid var(--accent-mid);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-dark);
+    flex-shrink: 0;
+  }
+
+  .module-info { flex: 1; min-width: 0; }
+
+  .module-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .module-sub {
+    display: flex; align-items: center; gap: 10px; margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .phase-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    border: 1px solid var(--accent-mid);
+  }
+
+  .phase-pill i { font-size: 9px; }
+
+  .sessions-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .sessions-pill i { font-size: 10px; color: var(--accent); }
+
+  .module-actions {
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-goto {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px;
+    border-radius: 7px;
+    background: var(--accent-light);
+    border: 1px solid var(--accent-mid);
+    color: var(--accent-dark);
+    font-size: 11.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-goto:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(74,144,217,0.25);
+  }
+
+  .btn-goto i { font-size: 9px; }
+
+  .toggle-arrow {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 7px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 12px;
+    transition: background 0.2s, transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .module-container.open .toggle-arrow {
+    background: var(--accent-light);
+    border-color: var(--accent-mid);
+    color: var(--accent);
+  }
+
+  .module-container.open .toggle-arrow i { transform: rotate(180deg); }
+  .toggle-arrow i { transition: transform 0.3s; }
+
+  /* ── Module Body ── */
+  .module-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.3s ease;
+    background: #f8fafd;
+    border-top: 0px solid var(--border);
+  }
+
+  .module-body.active {
+    max-height: 600px;
+    border-top: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+
+  .body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .body-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .body-section.full { grid-column: 1 / -1; }
+
+  .body-section-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .body-section-label i { font-size: 10px; color: var(--accent); }
+
+  .body-section p {
+    font-size: 12.5px;
+    color: var(--text-primary);
+    line-height: 1.65;
+  }
+
+  /* ── Empty State ── */
+  .empty-state {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 60px 20px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+
+  .empty-icon {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    background: var(--accent-light);
+    border: 1px solid var(--accent-mid);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: var(--accent);
+  }
+
+  .empty-state h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .empty-state p { font-size: 12.5px; color: var(--text-secondary); opacity: 0.7; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .form-grid, .body-grid { grid-template-columns: 1fr; }
+    .form-group.full, .body-section.full { grid-column: 1; }
+    .module-actions .btn-goto span { display: none; }
+  }
+</style>
+
+<div class="detail-wrapper">
+
+  <!-- Back -->
+  <a href="{% url 'bdm:course_list' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Courses
+  </a>
+
+  <!-- ── Course Overview ── -->
+  <div class="course-overview">
+    <div class="overview-top">
+      <div class="overview-icon-title">
+        <div class="overview-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div>
+          <div class="course-name">{{ course.name }}</div>
+          <div class="course-desc">{{ course.description }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta-row">
+      <div class="meta-chip">
+        <i class="fas fa-clock"></i>
+        {{ course.duration }}
+      </div>
+      <div class="meta-chip fee">
+        <i class="fas fa-indian-rupee-sign"></i>
+        ₹{{ course.course_fee }}
+      </div>
+    </div>
+
+    <div class="badge-row">
+      {% for tech in course.tech_stack_list %}
+        <span class="badge"><i class="fas fa-code"></i>{{ tech }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ── Modules Section ── -->
+  <div class="section-header">
+    <div class="section-title">
+      <i class="fas fa-layer-group"></i>
+      Modules & Syllabus
+      {% if modules %}
+        <span style="font-size:12px; font-weight:500; color:var(--text-secondary); font-family:'DM Sans',sans-serif;">({{ modules|length }})</span>
+      {% endif %}
+    </div>
+    <button type="button" class="btn-blue" onclick="toggleModuleForm()">
+      <i class="fas fa-plus"></i> Create Module
+    </button>
+  </div>
+
+  <!-- ── Create Module Form ── -->
+  <div id="module-form-container" class="module-form-card">
+    <div class="form-title">
+      <i class="fas fa-plus-circle"></i> New Module
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        {% for field in form %}
+          <div class="form-group {% if field.field.widget.attrs.rows or field.name == 'description' or field.name == 'learning_objectives' or field.name == 'prerequisites' %}full{% endif %}">
+            <label>
+              <i class="fas fa-pen"></i>
+              {{ field.label }}
+            </label>
+            {{ field }}
+            {% if field.errors %}
+              <small class="error-text">{{ field.errors }}</small>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-save"></i> Save Module
+        </button>
+        <button type="button" class="btn-cancel" onclick="toggleModuleForm()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Module List ── -->
+  {% if modules %}
+  <div class="modules-wrapper">
+    {% for module in modules %}
+    <div class="module-container" id="mc-{{ module.id }}">
+
+      <div class="module-header" onclick="toggleModule({{ module.id }})">
+        <div class="module-left">
+          <div class="module-num">{{ module.module_number }}</div>
+          <div class="module-info">
+            <div class="module-title">{{ module.title }}</div>
+            <div class="module-sub">
+              <span class="phase-pill">
+                <i class="fas fa-flag"></i>
+                {{ module.get_phase_display }}
+              </span>
+              <span class="sessions-pill">
+                <i class="fas fa-calendar-check"></i>
+                {{ module.total_sessions }} sessions
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-actions" onclick="event.stopPropagation()">
+          <a href="{% url 'bdm:module_detail' module.pk %}" class="btn-goto">
+            <i class="fas fa-arrow-up-right"></i>
+            <span>Open</span>
+          </a>
+          <div class="toggle-arrow" onclick="event.stopPropagation(); toggleModule({{ module.id }})">
+            <i class="fas fa-chevron-down" id="arrow-{{ module.id }}"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expandable Body -->
+      <div class="module-body" id="module-body-{{ module.id }}">
+        <div class="body-grid">
+
+          <div class="body-section full">
+            <div class="body-section-label">
+              <i class="fas fa-align-left"></i> Description
+            </div>
+            <p>{{ module.description }}</p>
+          </div>
+
+          <div class="body-section">
+            <div class="body-section-label">
+              <i class="fas fa-bullseye"></i> Learning Objectives
+            </div>
+            <p>{{ module.learning_objectives }}</p>
+          </div>
+
+          {% if module.prerequisites %}
+          <div class="body-section">
+            <div class="body-section-label">
+              <i class="fas fa-sitemap"></i> Prerequisites
+            </div>
+            <p>{{ module.prerequisites }}</p>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">
+      <i class="fas fa-cubes"></i>
+    </div>
+    <h3>No Modules Yet</h3>
+    <p>Click "Create Module" to add the first module to this course.</p>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+  function toggleModule(id) {
+    const body = document.getElementById("module-body-" + id);
+    const arrow = document.getElementById("arrow-" + id);
+    const container = document.getElementById("mc-" + id);
+
+    body.classList.toggle("active");
+    container.classList.toggle("open");
+  }
+
+  function toggleModuleForm() {
+    const form = document.getElementById("module-form-container");
+    form.classList.toggle("active");
+    if (form.classList.contains("active")) {
+      form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+</script>
+
+{% endblock %}

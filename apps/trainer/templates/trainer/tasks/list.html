@@ -1,0 +1,48 @@
+{% extends "trainer/tasks/base.html" %}
+{% block tab_content %}
+
+<div class="glass-card">
+    <h4>All Tasks</h4>
+
+    <div class="task-table-wrapper">
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Batch</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Completion</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for task in tasks %}
+                {% with stats=task.get_completion_stats %}
+                <tr>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.batch.name }}</td>
+                    <td>{{ task.due_date }}</td>
+
+                    <td>
+                        {% if task.is_overdue %}
+                            <span class="task-badge overdue">
+                                Overdue
+                            </span>
+                        {% else %}
+                            <span class="task-badge active">
+                                Active
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ stats.completion_rate }}%</td>
+                </tr>
+                {% endwith %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

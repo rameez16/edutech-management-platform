@@ -1,12 +1,18 @@
 from django.shortcuts import get_object_or_404,render,redirect
 from .models import Student, Lead, Course, Batch
 from django.core.paginator import Paginator
-from .form import  TrainerAdminProfileForm
+from .form import  TrainerAdminProfileForm ,ModuleForm ,LessonPlanForm
 from django.db import transaction
 from decimal import Decimal
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
+from django.db.models import Max
 
+from django.db.models import Prefetch
+
+from django.db import models
+
+from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.utils import timezone
@@ -14,13 +20,24 @@ from datetime import datetime
 from .models import StudentAdminProfile, TrainerAdminProfile
 from .form import StudentAdminProfileForm, TrainerAdminProfileForm
 
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 
-from apps.student.models import FeePayment
-from apps.bdm.models import Student
+from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
+from apps.bdm.models import Student ,PaymentDocument
+from apps.trainer.models import Module
+from apps.trainer.models import Module
 
 
 # Create your views here.
+
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+    View
+)
 
 
 
@@ -35,7 +52,13 @@ from apps.student.models import StudentDocument,EnrollmentAgreement,StudentIDCar
 
 from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
 
+
+from .utils import role_required
+
+
+
 @login_required
+@role_required('admin')
 def dashboard(request):
     """
     Dashboard view with comprehensive statistics and latest data
@@ -224,86 +247,6 @@ def create_admin_profile(request, user_id):
         return redirect("bdm:user_list")
     
     
-    
-    
-# def create_trainer_admin_profile(request, user):
-#     trainer = getattr(user, "trainer", None)
-
-#     if not trainer:
-#         messages.error(request, "Trainer profile not found.")
-#         return redirect("user_list")
-
-#     if request.method == "POST":
-#         form = TrainerAdminProfileForm(request.POST)
-
-#         if form.is_valid():
-#             admin_profile = form.save(commit=False)
-#             admin_profile.trainer = trainer
-#             admin_profile.save()
-
-#             messages.success(
-#                 request,
-#                 f"Trainer admin profile created for {trainer}"
-#             )
-#             return redirect("bdm:user_list")
-
-#     else:
-#         form = TrainerAdminProfileForm()
-
-#     return render(
-#         request,
-#         "bdm/trainer/trainer_profile.html",
-#         {
-#             "form": form,
-#             "user": user,
-#             "role": "trainer"
-#         }
-#     )   
-    
-# def create_student_admin_profile(request, user):
-#     student = getattr(user, "student", None)
-
-#     if not student:
-#         messages.error(request, "Student profile not found.")
-#         return redirect("bdm:user_list")
-
-#     if request.method == "POST":
-#         form = StudentAdminProfileForm(request.POST)
-
-#         if form.is_valid():
-#             admin_profile = form.save(commit=False)
-#             admin_profile.student = student
-#             admin_profile.save()
-
-#             messages.success(
-#                 request,
-#                 f"Student admin profile created for {student}"
-#             )
-#             return redirect("user_list")
-
-#     else:
-#         form = StudentAdminProfileForm()
-
-#     return render(
-#         request,
-#         "bdm/student/student_profile.html",
-#         {
-#             "form": form,
-#             "user": user,
-#             "role": "student"
-#         }
-#     )
-   
-    return render(
-        request,
-        "bdm/trainer/trainer_profile.html",
-        {
-            "form": form,
-            "user": user,
-            "role": "trainer"
-        }
-    )   
- 
 
 
 # student-onboarding- Ramees
@@ -874,10 +817,13 @@ def batch_detail(request, pk):
         .prefetch_related('trainers', 'students'),
         pk=pk
     )
+    
 
     return render(request, 'bdm/batch/batch_detail.html', {
         'batch': batch
     })
+ 
+     
     
 def toggle_batch_extension(request, pk):
     if request.method == "POST":
@@ -1013,38 +959,623 @@ def payments_dashboard(request):
 
     return render(request, "bdm/payments/payments_dashboard.html", context)
 
+
+
+
 @login_required
 def payment_detail(request, pk):
     payment = get_object_or_404(
         FeePayment.objects
-        .select_related("student")
-        .prefetch_related("documents"),
+        .select_related("student", "received_by")
+        .prefetch_related("documents", "student__batches__course"),
         pk=pk
     )
 
-    return render(request, "bdm/payments/payment_detail.html", {
-        "payment": payment
-    })
-    
-def course_fee(request):
+    student = payment.student
+    batch = student.batches.first()
+    course = batch.course if batch else None
 
-    full_payments = FeePayment.objects.filter(
-        payment_type='full'
-    ).select_related('student')
+    # ─────────────────────────────
+    # HANDLE STATUS UPDATE FROM DROPDOWN
+    # ─────────────────────────────
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+        if new_status in dict(FeePayment.PaymentStatus.choices).keys():
+            payment.payment_status = new_status
+            payment.save()
+        return redirect("bdm:payment_detail", pk=payment.pk)
 
-    emi_payments = FeePayment.objects.filter(
-        payment_type=FeePayment.PaymentType.INSTALLMENT
-        ).select_related('student')
+    # ─────────────────────────────
+    # GET TOTAL COURSE FEE
+    # ─────────────────────────────
+    total_fee = course.course_fee if course else Decimal("0.00")
+
+    # ─────────────────────────────
+    # CALCULATE TOTALS
+    # ─────────────────────────────
+    total_paid = (
+        FeePayment.objects
+        .filter(student=student, payment_status=FeePayment.PaymentStatus.COMPLETED)
+        .aggregate(total=Sum("amount"))["total"]
+        or Decimal("0.00")
+    )
+
+    total_pending = (
+        FeePayment.objects
+        .filter(student=student, payment_status=FeePayment.PaymentStatus.PENDING)
+        .aggregate(total=Sum("amount"))["total"]
+        or Decimal("0.00")
+    )
+
+    balance = total_fee - total_paid
+
+    # ─────────────────────────────
+    # EMI INSTALLMENTS
+    # ─────────────────────────────
+    all_installments = []
+    if payment.payment_type == FeePayment.PaymentType.INSTALLMENT:
+        all_installments = (
+            FeePayment.objects
+            .filter(student=student, payment_type=FeePayment.PaymentType.INSTALLMENT)
+            .order_by("installment_number")
+        )
+
+    # ─────────────────────────────
+    # ALL PAYMENTS OF STUDENT
+    # ─────────────────────────────
+    all_student_payments = FeePayment.objects.filter(student=student).order_by("-payment_date")
 
     context = {
-        'full_payments': full_payments,
-        'emi_payments': emi_payments,
+        "payment": payment,
+        "student": payment.student,
+        "course": course,
+        "batch": batch,
+        "all_installments": all_installments,
+        "all_student_payments": all_student_payments,
+        "total_fee": total_fee,
+        "total_paid": total_paid,
+        "total_pending": total_pending,
+        "balance": balance,
+        "today": timezone.now().date(),
+        # ✅ send payment status choices to template
+        "payment_status_choices": FeePayment.PaymentStatus.choices,
     }
 
-    return render(request, 'bdm/payments/course_fee.html', context)
-    return redirect('bdm:leads')
+    return render(request, "bdm/payments/payment_detail.html", context)
+
+def course_fee(request):
+
+    # ✅ Only students who have at least one payment
+    students = (
+        Student.objects
+        .filter(fee_payments__isnull=False)
+        .prefetch_related('fee_payments', 'batches__course')
+        .distinct()
+    )
+
+    search = request.GET.get("search")
+    status_filter = request.GET.get("status")
+
+    if search:
+        students = students.filter(full_name__icontains=search)
+
+    student_data = []
+
+    for student in students:
+
+        batch = student.batches.first()
+        course = batch.course if batch else None
+        course_fee = course.course_fee if course else Decimal("0.00")
+
+        payments = student.fee_payments.all()
+
+        # =====================================================
+        # 🔹 ADMISSION STATUS
+        # =====================================================
+
+        admission_payments = payments.filter(
+            payment_type=FeePayment.PaymentType.ADMISSION
+        )
+
+        if not admission_payments.exists():
+            admission_status = "UNPAID"
+
+        elif admission_payments.filter(
+            payment_status=FeePayment.PaymentStatus.COMPLETED
+        ).exists():
+            admission_status = "PAID"
+
+        elif admission_payments.filter(
+            payment_status=FeePayment.PaymentStatus.PENDING
+        ).exists():
+            admission_status = "PENDING"
+
+        else:
+            admission_status = "UNPAID"
+
+        # =====================================================
+        # 🔹 COURSE FEE STATUS
+        # =====================================================
+
+        # 1️⃣ FULL PAYMENT (Status Based)
+        full_payment = payments.filter(
+            payment_type=FeePayment.PaymentType.FULL_PAYMENT
+        ).order_by('-payment_date').first()
+
+        if full_payment:
+            if full_payment.payment_status == FeePayment.PaymentStatus.COMPLETED:
+                course_status = "COMPLETED"
+            elif full_payment.payment_status == FeePayment.PaymentStatus.PENDING:
+                course_status = "PENDING"
+            else:
+                course_status = "UNPAID"
+
+        else:
+            # 2️⃣ INSTALLMENT LOGIC (Installment-number Based)
+            installments = payments.filter(
+                payment_type=FeePayment.PaymentType.INSTALLMENT
+            )
+
+            if not installments.exists():
+                course_status = "UNPAID"
+
+            else:
+                # If ANY installment is pending → PENDING
+                if installments.filter(
+                    payment_status=FeePayment.PaymentStatus.PENDING
+                ).exists():
+                    course_status = "PENDING"
+
+                else:
+                    # Get latest completed installment
+                    latest_completed = installments.filter(
+                        payment_status=FeePayment.PaymentStatus.COMPLETED
+                    ).order_by('-installment_number').first()
+
+                    if not latest_completed:
+                        course_status = "UNPAID"
+
+                    else:
+                        latest_number = latest_completed.installment_number or 0
+                        total_installments = latest_completed.total_installments or 0
+
+                        if total_installments > 0 and latest_number == total_installments:
+                            course_status = "COMPLETED"
+                        else:
+                            course_status = "IN PROGRESS"
+
+        # =====================================================
+        # 🔹 STATUS FILTER
+        # =====================================================
+
+        if status_filter and course_status != status_filter:
+            continue
+
+        student_data.append({
+            "id": student.id,
+            "name": student.full_name,
+            "course": course.name if course else "—",
+            "course_fee": course_fee,
+            "admission_status": admission_status,
+            "course_status": course_status,
+        })
+
+    return render(request, "bdm/payments/course_fee.html", {
+        "students": student_data
+    })
+    
+ 
+def payment_history(request, student_id):
+    # ================= GET STUDENT =================
+    student = get_object_or_404(Student, id=student_id)
+
+    # ================= HANDLE STATUS UPDATE =================
+    if request.method == "POST":
+        payment_id = request.POST.get("payment_id")
+        new_status = request.POST.get("status")
+
+        payment = get_object_or_404(FeePayment, id=payment_id, student=student)
+        if new_status in dict(FeePayment.PaymentStatus.choices).keys():
+            payment.payment_status = new_status
+            payment.save()
+            messages.success(request, f"Payment status updated to {payment.get_payment_status_display()}.")
+        else:
+            messages.error(request, "Invalid status selected.")
+
+        return redirect("bdm:payment_history", student_id=student.id)
+
+    # ================= GET BATCH & COURSE =================
+    batch = student.batches.first()
+    course = batch.course if batch else None
+    course_fee = course.course_fee if course else Decimal("0.00")
+
+    # ================= PREFETCH PAYMENTS =================
+    payments = FeePayment.objects.filter(student=student).prefetch_related(
+        Prefetch('documents', queryset=PaymentDocument.objects.all())
+    )
+
+    # ================= PAYMENT TYPES =================
+    admission_payments = payments.filter(payment_type=FeePayment.PaymentType.ADMISSION)
+    booking_payments = payments.filter(payment_type=FeePayment.PaymentType.BOOKING)
+    installments = payments.filter(payment_type=FeePayment.PaymentType.INSTALLMENT)
+    full_payment = payments.filter(payment_type=FeePayment.PaymentType.FULL_PAYMENT).first()
+    late_fees = payments.filter(payment_type=FeePayment.PaymentType.LATE_FEE)
+    other_payments = payments.filter(payment_type=FeePayment.PaymentType.OTHER)
+
+    # ================= ADMISSION STATUS =================
+    if not admission_payments.exists():
+        admission_status = "UNPAID"
+    elif admission_payments.filter(payment_status=FeePayment.PaymentStatus.COMPLETED).exists():
+        admission_status = "PAID"
+    elif admission_payments.filter(payment_status=FeePayment.PaymentStatus.PENDING).exists():
+        admission_status = "PENDING"
+    else:
+        admission_status = "UNPAID"
+
+    # ================= PAYMENT SUMMARY =================
+    # Default summary values
+    total_paid = Decimal("0.00")
+    balance = course_fee
+    progress = 0
+
+    # Only include course-related payments: installments + full payment
+    course_payments = payments.filter(
+        payment_type__in=[FeePayment.PaymentType.INSTALLMENT, FeePayment.PaymentType.FULL_PAYMENT]
+    )
+
+    # Sum only COMPLETED payments
+    total_paid = sum(p.amount for p in course_payments if p.payment_status == FeePayment.PaymentStatus.COMPLETED)
+
+    # Calculate balance and progress
+    balance = course_fee - total_paid
+    progress = int((total_paid / course_fee) * 100) if course_fee else 0
+
+    # ================= COURSE FEE STATUS =================
+    if full_payment:
+        if full_payment.payment_status == FeePayment.PaymentStatus.COMPLETED:
+            course_status = "COMPLETED"
+        elif full_payment.payment_status == FeePayment.PaymentStatus.PENDING:
+            course_status = "PENDING"
+        else:
+            course_status = "UNPAID"
+    else:
+        if not installments.exists():
+            course_status = "UNPAID"
+        elif installments.filter(payment_status=FeePayment.PaymentStatus.PENDING).exists():
+            course_status = "PENDING"
+        else:
+            latest_completed = installments.filter(
+                payment_status=FeePayment.PaymentStatus.COMPLETED
+            ).order_by('-installment_number').first()
+            if not latest_completed:
+                course_status = "UNPAID"
+            else:
+                latest_number = latest_completed.installment_number or 0
+                total_installments = latest_completed.total_installments or 0
+                if total_installments > 0 and latest_number == total_installments:
+                    course_status = "COMPLETED"
+                else:
+                    course_status = "IN PROGRESS"
+
+    # ================= CONTEXT =================
+    context = {
+        "student": student,
+        "course": course,
+        "course_fee": course_fee,
+        "total_paid": total_paid,
+        "balance": balance,
+        "admission_payments": admission_payments,
+        "booking_payments": booking_payments,
+        "installments": installments,
+        "full_payment": full_payment,
+        "late_fees": late_fees,
+        "other_payments": other_payments,
+        "admission_status": admission_status,
+        "course_status": course_status,
+        "progress": progress,
+        "payment_status_choices": FeePayment.PaymentStatus.choices,
+    }
+
+    return render(request, "bdm/payments/payment_history.html", context)
+
+#leave section-aleena
+
+def leave_view(request):
+    status_filter = request.GET.get('status', 'all')
+    student_name = request.GET.get('student')
+    leave_type = request.GET.get('leave_type')
+    from_date = request.GET.get('from_date')
+    to_date = request.GET.get('to_date')
+
+    leaves = LeaveApplication.objects.select_related(
+        'student', 'batch', 'approved_by'
+    ).all()
+
+    # Status filter
+    if status_filter != 'all':
+        leaves = leaves.filter(status=status_filter)
+
+    # Student name filter
+    if student_name:
+        leaves = leaves.filter(
+            student__full_name__icontains=student_name
+        )
+
+    # Leave type filter
+    if leave_type:
+        leaves = leaves.filter(leave_type=leave_type)
+
+    # Date range filter
+    if from_date:
+        leaves = leaves.filter(from_date__gte=from_date)
+
+    if to_date:
+        leaves = leaves.filter(to_date__lte=to_date)
+
+    context = {
+        'leaves': leaves,
+        'total_count': LeaveApplication.objects.count(),
+        'pending_count': LeaveApplication.objects.filter(status='pending').count(),
+        'approved_count': LeaveApplication.objects.filter(status='approved').count(),
+        'rejected_count': LeaveApplication.objects.filter(status='rejected').count(),
+        'active_status': status_filter,
+        'leave_types': LeaveApplication.LeaveType.choices,
+    }
+
+    return render(request, 'bdm/leave/leave.html', context)
+
+@login_required
+def leave_detail(request, pk):
+    leave = get_object_or_404(
+        LeaveApplication.objects.select_related(
+            'student', 'batch', 'approved_by'
+        ),
+        pk=pk
+    )
+
+    student = leave.student
+
+    leave_stats = LeaveApplication.objects.filter(student=student).aggregate(
+        total_count=Count('id'),
+        approved_count=Count('id', filter=Q(status='approved')),
+        pending_count=Count('id', filter=Q(status='pending')),
+        rejected_count=Count('id', filter=Q(status='rejected')),
+
+        # 👇 Rename this
+        total_days_sum=Sum('total_days'),
+        approved_days_sum=Sum('total_days', filter=Q(status='approved')),
+        pending_days_sum=Sum('total_days', filter=Q(status='pending')),
+        rejected_days_sum=Sum('total_days', filter=Q(status='rejected')),
+    )
+
+    return render(request, 'bdm/leave/leave_detail.html', {
+        'leave': leave,
+        'leave_stats': leave_stats
+    })
 
 
+#lesson-plan-Ramees
 
 
+class BatchListView(ListView):
+    model = Batch
+    template_name = "bdm/academics/batchview.html"
+    context_object_name = "batches"
+    
 
+class BatchAcademicDashboardView(DetailView):
+    model = Batch
+    template_name = "bdm/academics/batch_dashboard.html"
+    context_object_name = "batch"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        batch = self.object
+        context["modules"] = batch.course.modules.all()
+        # context["progress"] = LessonSession.get_batch_progress(batch)
+        return context    
+    
+from django.shortcuts import get_object_or_404
+from django.views.generic import DetailView
+from .models import  Batch
+from apps.trainer.models import Module
+
+class ModuleDetailView(DetailView):
+    model = Module
+    template_name = "bdm/academics/module_detail.html"
+    context_object_name = "module"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.batch = get_object_or_404(Batch, id=kwargs["batch_id"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        lesson_plans = self.object.lessons.all()
+        context["batch"] = self.batch
+
+        sessions = LessonSession.objects.filter(
+            batch=self.batch,
+            lesson_plan__module=self.object
+        ).select_related("trainer")
+
+        session_map = {s.lesson_plan_id: s for s in sessions}
+
+        # Attach session to each lesson plan
+        for plan in lesson_plans:
+            plan.assigned_session = session_map.get(plan.id)
+
+        context["lesson_plans"] = lesson_plans
+
+        return context
+    
+    
+from django.views.generic import CreateView
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from .models import Batch
+from apps.trainer.models import LessonPlan, LessonSession
+from .form import LessonSessionForm
+
+
+class AssignLessonSessionView(CreateView):
+    model = LessonSession
+    form_class = LessonSessionForm
+    template_name = "bdm/academics/assign_lesson_session.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.batch = get_object_or_404(Batch, id=kwargs["batch_id"])
+        self.lesson_plan = get_object_or_404(LessonPlan, id=kwargs["plan_id"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.batch = self.batch
+        form.instance.lesson_plan = self.lesson_plan
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "bdm:module_detail",
+            kwargs={
+                "batch_id": self.batch.id,
+                "pk": self.lesson_plan.module.id
+            }
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["batch"] = self.batch
+        context["lesson_plan"] = self.lesson_plan
+        return context      
+    
+
+    
+class LessonSessionUpdateView(UpdateView):
+    model = LessonSession
+    form_class = LessonSessionForm
+    template_name = "bdm/academics/assign_lesson_session.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["batch"] = self.object.batch
+        context["lesson_plan"] = self.object.lesson_plan
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "bdm:module_detail",
+            kwargs={
+                "batch_id": self.object.batch.id,
+                "pk": self.object.lesson_plan.module.id
+            }
+        )
+
+class LessonSessionDeleteView(DeleteView):
+    model = LessonSession
+    template_name = "bdm/academics/session_confirm_delete.html"
+
+    def get_success_url(self):
+        return reverse(
+            "bdm:module_detail",
+            kwargs={
+                "batch_id": self.object.batch.id,
+                "pk": self.object.lesson_plan.module.id
+            }
+        )
+
+
+#student_feedback section-aleena
+
+@login_required
+def student_feedback(request):
+    feedback_type = request.GET.get('type', 'all')
+
+    feedbacks = StudentFeedback.objects.select_related(
+        'student', 'trainer', 'course', 'batch'
+    )
+
+    if feedback_type != 'all':
+        feedbacks = feedbacks.filter(feedback_type=feedback_type)
+
+    stats = StudentFeedback.objects.aggregate(
+        total_feedback=Count('id'),
+        avg_rating=Avg('overall_rating'),
+        avg_content=Avg('content_quality'),
+        avg_teaching=Avg('teaching_methodology'),
+        avg_responsiveness=Avg('responsiveness'),
+    )
+
+    context = {
+        'feedbacks': feedbacks,
+        'stats': stats,
+        'active_type': feedback_type,
+    }
+
+    return render(request, 'bdm/student_feedback/student_feedback.html', context)
+
+
+#course section-aleena
+
+
+def course_list_view(request):
+    courses = Course.objects.filter(is_active=True).order_by('-created_at')
+
+    context = {
+        'courses': courses
+    }
+    return render(request, 'bdm/course/course_list.html', context)
+
+
+def course_detail_view(request, pk):
+    course = get_object_or_404(Course, pk=pk)
+    modules = course.modules.all().order_by('module_number')
+
+    if request.method == "POST":
+        form = ModuleForm(request.POST)
+
+        if form.is_valid():
+            module = form.save(commit=False)
+            module.course = course
+            module.save()
+
+            messages.success(request, "Module created successfully!")
+            return redirect('bdm:course_detail', pk=course.pk)
+
+    else:
+        form = ModuleForm()
+
+    context = {
+        'course': course,
+        'modules': modules,
+        'form': form
+    }
+
+    return render(request, 'bdm/course/course_detail.html', context)
+
+
+def module_detail_view(request, pk):
+    module = get_object_or_404(Module, pk=pk)
+    lessons = module.lessons.all().order_by('session_number')
+
+    if request.method == "POST":
+        form = LessonPlanForm(request.POST)
+        if form.is_valid():
+            lesson = form.save(commit=False)
+            lesson.module = module
+            lesson.course = module.course
+            lesson.save()
+
+            messages.success(request, "Lesson Plan created successfully!")
+            return redirect('bdm:module_detail', pk=module.pk)
+    else:
+        form = LessonPlanForm()
+
+    context = {
+        'module': module,
+        'lessons': lessons,
+        'form': form
+    }
+
+    return render(request, 'bdm/course/module_detail.html', context)

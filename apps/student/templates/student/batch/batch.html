@@ -1,0 +1,241 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Batch Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/batch.css' %}?v=3">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/batch.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="batch-container">
+
+    {% if batch %}
+    <!-- BATCH HEADER -->
+    <div class="batch-header">
+        <h2 class="batch-title">{{ batch.name }}</h2>
+        <p class="batch-course">Course: {{ batch.course.name }}</p>
+        <p class="batch-duration">Duration: {{ batch.duration_months }} months</p>
+    </div>
+
+    <!-- WRAPPER CARD -->
+    <div class="batch-wrapper-card">
+
+        <!-- TRAINERS CARD -->
+        <div class="batch-card">
+            <div class="batch-card-header" id="trainersToggle">
+                <h4>Assigned Trainer</h4>
+                <span class="arrow-icon" id="trainersArrowIcon">&#9662;</span>
+            </div>
+            <div class="batch-content" id="trainersContent">
+                {% if batch.trainers.count %}
+                <ul class="trainer-list">
+                    {% for trainer in batch.trainers.all %}
+                    <li class="trainer-item">
+                        {% if trainer.profile_photo %}
+                        <img src="{{ trainer.profile_photo.url }}" alt="{{ trainer.full_name }}" class="trainer-photo">
+                        {% else %}
+                        <div class="trainer-placeholder">
+                            {{ trainer.full_name|first|upper|default:trainer.user.username|first|upper }}
+                        </div>
+                        {% endif %}
+                        <div class="trainer-info">
+                            <strong>{{ trainer.full_name|default:trainer.user.get_full_name|default:trainer.user.username }}</strong>
+                            {% if trainer.primary_domain %}<br><span class="trainer-domain">🎯 {{ trainer.primary_domain }}</span>{% endif %}
+                            {% if trainer.email %}<br><span class="trainer-email">📧 {{ trainer.email }}</span>{% endif %}
+                            {% if trainer.phone %}<br><span class="trainer-phone">📱 {{ trainer.phone }}</span>{% endif %}
+                            {% if trainer.experience_years %}<br><span class="trainer-exp">💼 {{ trainer.experience_years }} yrs experience</span>{% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="no-trainers">No trainer assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- BATCH DETAILS CARD -->
+        <div class="batch-card">
+            <div class="batch-card-header">
+                <h4>Batch schedule Details</h4>
+                <span class="arrow-icon">&#9662;</span>
+            </div>
+
+            <div class="batch-content">
+
+                {% if modules %}
+                <!-- ── MODULE ACCORDION ── -->
+                <div class="modules-header">
+                    <span class="modules-label"> Modules</span>
+                    
+                </div>
+
+                {% for md in modules %}
+                <div class="module-item" data-module-id="{{ md.module.id }}">
+
+                    <!-- MODULE ROW (click to expand) -->
+                    <div class="module-row">
+                        <div class="module-num">{{ md.module.module_number }}</div>
+                        <div class="module-info">
+                            <div class="module-title">
+                                {{ md.module.title }}
+                                <span class="module-phase">{{ md.module.get_phase_display }}</span>
+                            </div>
+                            <div class="module-meta">
+                                <span>🎯 {{ md.module.total_sessions }} sessions</span>
+                                <span>📋 {{ md.total }} scheduled</span>
+                            </div>
+                        </div>
+                        <div class="module-badges">
+                            {% if md.completed_count %}<span class="mod-badge mod-completed">✓ {{ md.completed_count }}</span>{% endif %}
+                            {% if md.planned_count %}<span class="mod-badge mod-planned">{{ md.planned_count }} Planned</span>{% endif %}
+                            {% if md.pending_count %}<span class="mod-badge mod-pending">{{ md.pending_count }} Pending</span>{% endif %}
+                            {% if md.skipped_count %}<span class="mod-badge mod-skipped">{{ md.skipped_count }} Skipped</span>{% endif %}
+                        </div>
+                        <span class="module-arrow">&#9660;</span>
+                    </div>
+
+                    <!-- MODULE BODY (hidden until clicked) -->
+                    <div class="module-body">
+
+                        <!-- STATUS TABS -->
+                        <div class="status-tabs">
+                            <button class="tab-btn active" data-tab="completed">
+                                Completed <span class="tab-count">{{ md.completed_count }}</span>
+                            </button>
+                            <button class="tab-btn" data-tab="planned">
+                                Planned <span class="tab-count">{{ md.planned_count }}</span>
+                            </button>
+                            <button class="tab-btn" data-tab="pending">
+                                Pending <span class="tab-count">{{ md.pending_count }}</span>
+                            </button>
+                            <button class="tab-btn" data-tab="skipped">
+                                Skipped <span class="tab-count">{{ md.skipped_count }}</span>
+                            </button>
+                        </div>
+
+                        <div class="tab-contents">
+
+                            <!-- COMPLETED -->
+                            <div class="tab-content active" data-tab="completed">
+                                {% for session in md.completed %}
+                                <div class="session-card">
+                                    <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                                    <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                                    {% if session.topics_covered %}<p><strong>Topics Covered:</strong> {{ session.topics_covered|linebreaksbr }}</p>{% endif %}
+                                    {% if session.homework_assigned %}<p><strong>Homework:</strong> {{ session.homework_assigned|linebreaksbr }}</p>{% endif %}
+                                </div>
+                                {% empty %}
+                                <p class="empty-tab-msg">No completed sessions in this module.</p>
+                                {% endfor %}
+                            </div>
+
+                            <!-- PLANNED -->
+                            <div class="tab-content" data-tab="planned">
+                                {% for session in md.planned %}
+                                <div class="session-card">
+                                    <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                                    <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                                    {% if session.topics_covered %}<p><strong>Topics:</strong> {{ session.topics_covered|linebreaksbr }}</p>{% endif %}
+                                </div>
+                                {% empty %}
+                                <p class="empty-tab-msg">No planned sessions in this module.</p>
+                                {% endfor %}
+                            </div>
+
+                            <!-- PENDING -->
+                            <div class="tab-content" data-tab="pending">
+                                {% for session in md.pending %}
+                                <div class="session-card">
+                                    <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                                    <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                                </div>
+                                {% empty %}
+                                <p class="empty-tab-msg">No pending sessions in this module.</p>
+                                {% endfor %}
+                            </div>
+
+                            <!-- SKIPPED -->
+                            <div class="tab-content" data-tab="skipped">
+                                {% for session in md.skipped %}
+                                <div class="session-card">
+                                    <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                                    <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                                </div>
+                                {% empty %}
+                                <p class="empty-tab-msg">No skipped sessions in this module.</p>
+                                {% endfor %}
+                            </div>
+
+                        </div><!-- /tab-contents -->
+                    </div><!-- /module-body -->
+
+                </div><!-- /module-item -->
+                {% endfor %}
+
+                {% else %}
+                <!-- FALLBACK: no modules, original flat session view -->
+                <div class="status-tabs">
+                    <button class="tab-btn active" data-tab="completed">Completed</button>
+                    <button class="tab-btn" data-tab="planned">Planned</button>
+                    <button class="tab-btn" data-tab="pending">Pending</button>
+                    <button class="tab-btn" data-tab="skipped">Skipped</button>
+                </div>
+
+                <div class="tab-contents">
+                    <div class="tab-content active" data-tab="completed">
+                        {% for session in completed_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                            <p><strong>Topics Covered:</strong> {{ session.topics_covered|linebreaksbr }}</p>
+                            {% if session.homework_assigned %}<p><strong>Homework:</strong> {{ session.homework_assigned|linebreaksbr }}</p>{% endif %}
+                        </div>
+                        {% empty %}<p>No completed sessions.</p>{% endfor %}
+                    </div>
+                    <div class="tab-content" data-tab="planned">
+                        {% for session in planned_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No planned sessions.</p>{% endfor %}
+                    </div>
+                    <div class="tab-content" data-tab="pending">
+                        {% for session in pending_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No pending sessions.</p>{% endfor %}
+                    </div>
+                    <div class="tab-content" data-tab="skipped">
+                        {% for session in skipped_sessions %}
+                        <div class="session-card">
+                            <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                            <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
+                        </div>
+                        {% empty %}<p>No skipped sessions.</p>{% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div><!-- /batch-content -->
+        </div><!-- /batch-card -->
+
+    </div><!-- /batch-wrapper-card -->
+
+    {% else %}
+    <div class="batch-header">
+        <h2>No Active Batch</h2>
+        <p>You are not currently enrolled in any active batch.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

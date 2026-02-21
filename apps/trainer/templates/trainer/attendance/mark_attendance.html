@@ -1,0 +1,92 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h2 class="batch-title batch-header">
+    <a href="{% url 'trainer:attendance-sessions' session.batch.id %}" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+    Mark Attendance - {{ session.batch.name }}
+</h2>
+
+<div class="glass-card attendance-card">
+    <div class="session-info">
+        <p><strong>Session:</strong> {{ session.lesson_plan.session_number }}</p>
+        <p><strong>Date:</strong> {{ session.actual_date }}</p>
+    </div>
+
+    <div class="attendance-header">
+    <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="studentSearch" placeholder="Search students..." class="attendance-search">
+    </div>
+</div>
+
+
+    <form method="post">
+        {% csrf_token %}
+        <table class="attendance-mark-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th class="text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.full_name }}</td>
+                    <td class="text-center">
+                        <div class="radio-status-group">
+                            <label class="attendance-radio-label">
+                                <input type="radio"
+                                    name="status_{{ student.id }}"
+                                    value="present"
+                                    {% if student.current_status == "present" %}checked{% endif %}>
+                                Present
+                            </label>
+
+                            <label class="attendance-radio-label">
+                                <input type="radio"
+                                    name="status_{{ student.id }}"
+                                    value="late"
+                                    {% if student.current_status == "late" %}checked{% endif %}>
+                                Late
+                            </label>
+
+                            <label class="attendance-radio-label">
+                                <input type="radio"
+                                    name="status_{{ student.id }}"
+                                    value="absent"
+                                    {% if student.current_status == "absent" %}checked{% endif %}>
+                                Absent
+                            </label>
+
+                        </div>
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No students found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Save Attendance</button>
+            <a href="{% url 'trainer:attendance-sessions' session.batch.id %}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% comment %} //  {% endcomment %}

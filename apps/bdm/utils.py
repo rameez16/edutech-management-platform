@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
+from django.shortcuts import get_object_or_404,render,redirect
 
 
 def render_to_pdf(template_src, context, filename="document.pdf"):
@@ -57,3 +58,19 @@ print(optimize_url)
 # Transform the image: auto-crop to square aspect_ratio
 auto_crop_url, _ = cloudinary_url("shoes", width=500, height=500, crop="auto", gravity="auto")
 print(auto_crop_url)
+
+
+
+
+from django.http import HttpResponseForbidden
+from functools import wraps
+
+def role_required(role):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            if request.user.role != role:
+                return redirect("accounts:login")
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator

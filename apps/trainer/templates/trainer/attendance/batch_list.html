@@ -1,0 +1,52 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Attendance{% endblock %}
+{% block page_title %}My Attendance Batches{% endblock %}
+
+{% block content %}
+
+<section class="stats-grid">
+
+    {% for batch in batches %}
+    <div class="batch-card glass-card">
+
+        <!-- Batch Title + Status -->
+        <div class="batch-title-bar">
+            <h4>{{ batch.name }}</h4>
+            <span class="batch-status {{ batch.status|lower }}">
+                {{ batch.status|capfirst }}
+            </span>
+        </div>
+
+        <!-- Session Metrics -->
+        <ul class="batch-info">
+            <li><strong>Total Students:</strong> {{ batch.total_students }}</li>
+            <li><strong>Total Sessions:</strong> {{ batch.total_sessions }}</li>
+            <li><strong>Classes Completed:</strong> {{ batch.classes_completed }}</li>
+            <li><strong>Attendance Completed:</strong> <span class="highlight">{{ batch.completed_attendance }}</span></li>
+            <li><strong>Pending Attendance:</strong> <span class="highlight">{{ batch.pending_attendance }}</span></li>
+            <li><strong>Next Session:</strong> {{ batch.next_session|default:"TBD" }}</li>
+        </ul>
+
+        <!-- Actions -->
+        <div class="attendance-actions">
+            <a href="{% url 'trainer:attendance-sessions' batch.id %}" class="btn-primary">
+                Mark Attendance
+            </a>
+            <a href="{% url 'trainer:batch-overview' batch.id %}" class="btn-secondary">
+                View Details
+            </a>
+        </div>
+
+    </div>
+
+    {% empty %}
+        <div class="glass-card empty-state">
+            <p>No batches assigned to you for attendance.</p>
+        </div>
+    {% endfor %}
+
+</section>
+
+{% endblock %}

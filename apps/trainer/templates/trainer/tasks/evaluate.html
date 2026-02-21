@@ -1,0 +1,59 @@
+{% extends "trainer/tasks/base.html" %}
+{% block tab_content %}
+
+<div class="glass-card">
+
+  <div class="evaluation-header">
+    <a href="{% url 'trainer:task-submissions' %}" class="evaluation-back-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </a>
+    <h4>Evaluate Submission</h4>
+  </div>
+
+  <div class="submission-info">
+    <p><strong>Student:</strong> {{ submission.student.full_name }}</p>
+    <p><strong>Task:</strong> {{ submission.task.title }}</p>
+    <p><strong>Due Date:</strong> {{ submission.task.due_date }}</p>
+
+    {% if submission.is_late %}
+      <span class="task-badge late">Late Submission</span>
+    {% endif %}
+  </div>
+
+  {% if submission.status == "evaluated" %}
+  <div class="re-eval-alert">
+    Already evaluated
+    {% if submission.revision_count > 0 %}
+      (Revised {{ submission.revision_count }} times)
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <form method="post" class="evaluation-form">
+    {% csrf_token %}
+
+    <label>Marks</label>
+    <input type="number" name="marks" />
+
+    <label>Feedback</label>
+    <textarea name="feedback"></textarea>
+
+    <div class="form-actions">
+      <button type="submit" name="action" value="evaluate"
+              class="task-btn-primary">
+        Evaluate
+      </button>
+
+      <button type="submit" name="action" value="resubmit"
+              class="task-btn-warning">
+        Request Resubmission
+      </button>
+    </div>
+  </form>
+
+</div>
+
+{% endblock %}

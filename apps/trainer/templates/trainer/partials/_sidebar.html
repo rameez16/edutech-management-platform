@@ -1,3 +1,5 @@
+
+
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo">ET</div>
@@ -9,8 +11,8 @@
         <!-- Dashboard -->
         <li class="nav-item">
             <a href="{% url 'trainer:dashboard' %}"
-                class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"/>
                     <rect x="14" y="3" width="7" height="7"/>
                     <rect x="14" y="14" width="7" height="7"/>
@@ -23,8 +25,8 @@
         <!-- Profile -->
         <li class="nav-item">
             <a href="{% url 'trainer:profile' %}"
-                class="nav-link {% if request.resolver_match.namespace == 'trainer' and 'profile' in request.resolver_match.url_name %}active{% endif %}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               class="nav-link {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'profile-edit' %}active{% endif %}">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
                 </svg>
@@ -35,31 +37,33 @@
         <!-- My Batches -->
         <li class="nav-item">
             <a href="{% url 'trainer:batches' %}"
-                class="nav-link {% if request.resolver_match.namespace == 'trainer' and 'batch' in request.resolver_match.url_name %}active{% endif %}">
+               class="nav-link {% if request.resolver_match.url_name == 'batches' or request.resolver_match.url_name == 'batch-overview' or request.resolver_match.url_name == 'batch-students' or request.resolver_match.url_name == 'batch-student-details' or request.resolver_match.url_name == 'batch-lesson-plan' or request.resolver_match.url_name == 'batch-feedback' %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="18" height="6"/>
                     <rect x="3" y="9" width="18" height="6"/>
                     <rect x="3" y="15" width="18" height="6"/>
                 </svg>
-                <span>My Batches</span>
+               <span>My Batches</span>
             </a>
         </li>
 
         <!-- Attendance -->
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{% url 'trainer:attendance-batch-list' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'attendance-batch-list' or request.resolver_match.url_name == 'attendance-sessions' or request.resolver_match.url_name == 'attendance-mark' or request.resolver_match.url_name == 'attendance-view' %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                     <path d="M16 2v4M8 2v4M3 10h18"/>
                     <path d="M9 14l2 2 4-4"/>
                 </svg>
-                <span>Attendance</span>
+               <span>Attendance</span>
             </a>
         </li>
 
         <!-- Task Management -->
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{% url 'trainer:task-dashboard' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'task-list' or request.resolver_match.url_name == 'task-create' or request.resolver_match.url_name == 'task-list' or request.resolver_match.url_name == 'task-submissions' or request.resolver_match.url_name == 'task-evaluate'%}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 11l3 3L22 4"/>
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
@@ -92,7 +96,8 @@
 
         <!-- Leave Details -->
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{% url 'trainer:leave-dashboard' %}" 
+                class="nav-link {% if request.resolver_match.url_name == 'leave-dashboard' or request.resolver_match.url_name == 'leave-process' or request.resolver_match.url_name == 'leave-detail' or request.resolver_match.url_name == 'leave-reapprove' %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                     <path d="M16 2v4M8 2v4M3 10h18"/>
@@ -101,7 +106,7 @@
             </a>
         </li>
 
-        <!-- Feedback -->
+        <!-- Students Feedback -->
         <li class="nav-item">
             <a href="#" class="nav-link">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -111,7 +116,7 @@
             </a>
         </li>
 
-        <!-- Upload Classes -->
+        <!-- Upload Daily Classes -->
         <li class="nav-item">
             <a href="#" class="nav-link">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -125,3 +130,4 @@
 
     </ul>
 </aside>
+
