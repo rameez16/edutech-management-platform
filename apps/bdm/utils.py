@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
+from django.shortcuts import get_object_or_404,render,redirect
 
 
 def render_to_pdf(template_src, context, filename="document.pdf"):
@@ -69,7 +70,7 @@ def role_required(role):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
             if request.user.role != role:
-                return HttpResponseForbidden("Permission denied")
+                return redirect("accounts:login")
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
