@@ -1469,13 +1469,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <span class="sidebar-link-badge">{{ batch_count }}</span>
                                 {% endif %}
                             </a>
-                            <a href="{% url 'bdm:batch_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'batch_list' %}active{% endif %}">
-                                <div class="sidebar-link-icon">
-                                    <i class="fas fa-layer-group"></i>
-                                </div>
-                                <span class="sidebar-link-text">Academics Scheduling</span>
-                              
-                            </a>
+                            
                         </div>
                         
                         <div class="sidebar-section">

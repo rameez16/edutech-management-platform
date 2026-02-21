@@ -58,7 +58,7 @@ from .utils import role_required
 
 
 @login_required
-# @role_required('Admin')
+@role_required('admin')
 def dashboard(request):
     """
     Dashboard view with comprehensive statistics and latest data

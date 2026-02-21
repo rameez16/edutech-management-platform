@@ -200,3 +200,7 @@ CLOUDINARY_STORAGE = {
     "API_KEY": "224736626162712",
     "API_SECRET": "KQSdgqLQahENIi3q2VCm9Gc8Hsk",
 }
+
+
+SESSION_COOKIE_AGE = 1800  # logout after 20 minutes of inactivity
+SESSION_SAVE_EVERY_REQUEST = True
