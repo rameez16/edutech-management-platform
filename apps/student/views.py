@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.timezone import now
 from decimal import Decimal
 from django.db.models import Sum
 from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist
@@ -15,10 +16,15 @@ from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_POST
 from .forms import EnrollmentAgreementForm, TaskSubmissionForm
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession
+from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession, SessionMaterial
 from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
 from apps.student.forms import LeaveApplicationForm
 from apps.student.models import LeaveApplication
+from dateutil.relativedelta import relativedelta 
+
+
+from django.db.models import Count, Q
+from collections import defaultdict
 
 #one time payment
 @login_required
@@ -294,7 +300,6 @@ def emi(request):
 
 #Installments
 
-@login_required
 def installments(request, student_id):
 
     student = get_object_or_404(Student, id=student_id)
@@ -320,46 +325,77 @@ def installments(request, student_id):
         return redirect("student:dashboard")
 
     # ================================
-    # ✅ FEE CALCULATION (FIXED ✅)
+    # ✅ FEE CALCULATION ⭐⭐⭐⭐⭐
     # ================================
     course_fee = batch.course.course_fee
 
-    # ✅ Installment Plan → NO admission fee
-    admission_fee = Decimal("0.00")
+    admission_fee = (course_fee * Decimal("0.10")).quantize(Decimal("0.01"))
 
-    # ✅ Total Fee = ONLY Course Fee
+    remaining_fee = course_fee - admission_fee
+
     total_fee = course_fee
 
     # ================================
-    # ✅ INSTALLMENT LOGIC (4 CASES)
+    # ✅ INSTALLMENT LOGIC ⭐⭐⭐⭐⭐
     # ================================
-    installment_amount = (course_fee / Decimal("4")).quantize(Decimal("0.01"))
+    installment_amount = (remaining_fee / Decimal("4")).quantize(Decimal("0.01"))
 
-    installments = FeePayment.objects.filter(
+    installments_qs = FeePayment.objects.filter(
         student=student,
         payment_type=FeePayment.PaymentType.INSTALLMENT
     ).order_by("installment_number")
 
-    # ✅ Auto-create installments if not exist
-    if not installments.exists():
+    today = now().date()
 
-        for i in range(1, 5):
+    if today.day > 21:
+        start_date = today + relativedelta(months=1)
+    else:
+        start_date = today
+
+    # ✅ ENSURE ALL 4 INSTALLMENTS EXIST ⭐⭐⭐⭐⭐
+    existing_numbers = set(
+        installments_qs.values_list("installment_number", flat=True)
+    )
+
+    for i in range(1, 5):
+
+        due_date = start_date + relativedelta(months=i-1, day=21)
+
+        if i not in existing_numbers:
 
             FeePayment.objects.create(
                 student=student,
                 payment_type=FeePayment.PaymentType.INSTALLMENT,
                 installment_number=i,
                 amount=installment_amount,
-                payment_status=FeePayment.PaymentStatus.PENDING
+                payment_status=FeePayment.PaymentStatus.PENDING,
+                payment_date=now(),
+                due_date=due_date,
+                transaction_id=str(uuid.uuid4())
             )
 
-        installments = FeePayment.objects.filter(
-            student=student,
-            payment_type=FeePayment.PaymentType.INSTALLMENT
-        ).order_by("installment_number")
+    # ✅ REFRESH QUERYSET ⭐⭐⭐⭐⭐
+    installments = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.INSTALLMENT
+    ).order_by("installment_number")
 
     # ================================
-    # ✅ PAID AMOUNT
+    # ✅ DISPLAY STATUS LOGIC ⭐⭐⭐⭐⭐🔥
+    # ================================
+    for inst in installments:
+
+        if inst.payment_status == FeePayment.PaymentStatus.COMPLETED:
+            inst.display_status = "Paid"
+
+        elif today < inst.due_date:
+            inst.display_status = "Upcoming"
+
+        else:
+            inst.display_status = "Pending"
+
+    # ================================
+    # ✅ PAID AMOUNT ⭐⭐⭐⭐⭐
     # ================================
     paid_amount = (
         FeePayment.objects.filter(
@@ -369,7 +405,6 @@ def installments(request, student_id):
         or Decimal("0.00")
     )
 
-    # ✅ NEVER NEGATIVE
     pending_amount = max(total_fee - paid_amount, Decimal("0.00"))
 
     return render(request, "student/payment/installments.html", {
@@ -389,11 +424,7 @@ def installments(request, student_id):
 #scan installemts using QR code
 @login_required
 def install_qr(request, installment_id):
-    """
-    Scan & Pay Installment – receipt upload page
-    """
 
-    # ---------------- GET INSTALLMENT ----------------
     installment = get_object_or_404(
         FeePayment,
         id=installment_id,
@@ -401,21 +432,20 @@ def install_qr(request, installment_id):
         payment_type=FeePayment.PaymentType.INSTALLMENT
     )
 
-    # ---------------- CHECK RECEIPT EXISTS ----------------
     receipt_exists = PaymentDocument.objects.filter(
         fee_payment=installment,
         document_type=PaymentDocument.DocumentType.RECEIPT
     ).exists()
 
-    # ---------------- BLOCK ALREADY PAID ----------------
     if installment.payment_status == FeePayment.PaymentStatus.COMPLETED:
         messages.info(request, "This installment is already paid")
-        return redirect(
-            "student:installments",
-            student_id=installment.student.id
-        )
+        return redirect("student:installments", student_id=installment.student.id)
 
-    # ---------------- HANDLE POST ----------------
+    # ✅ BLOCK UPCOMING INSTALLMENTS ⭐⭐⭐⭐⭐
+    if timezone.now().date() < installment.due_date:
+        messages.error(request, "Installment not due yet")
+        return redirect("student:installments", student_id=installment.student.id)
+
     if request.method == "POST":
         receipt = request.FILES.get("receipt")
 
@@ -423,14 +453,14 @@ def install_qr(request, installment_id):
             messages.error(request, "Please upload payment receipt")
             return redirect(request.path)
 
-        # Update installment
+        # ✅ UPDATE INSTALLMENT ⭐⭐⭐⭐⭐🔥
         installment.payment_status = FeePayment.PaymentStatus.PENDING
+        installment.mode_of_payment = FeePayment.PaymentMode.UPI   # ⭐⭐⭐⭐⭐ FIX
         installment.payment_date = timezone.now()
         installment.transaction_id = f"INS-{uuid.uuid4().hex[:10]}"
         installment.receipt_number = f"RCPT-{uuid.uuid4().hex[:6]}"
         installment.save()
 
-        # Save receipt in BDM
         PaymentDocument.objects.create(
             fee_payment=installment,
             document_type=PaymentDocument.DocumentType.RECEIPT,
@@ -442,6 +472,7 @@ def install_qr(request, installment_id):
                 f"Installment No: {installment.installment_number}\n"
                 f"Amount: ₹{installment.amount}\n"
                 f"Transaction ID: {installment.transaction_id}\n"
+                f"Mode: UPI\n"
                 f"Status: Pending Verification"
             ),
             uploaded_by=request.user
@@ -452,21 +483,12 @@ def install_qr(request, installment_id):
             "Receipt uploaded successfully. Waiting for verification ⏳"
         )
 
-        return redirect(
-            "student:installments",
-            student_id=installment.student.id
-        )
+        return redirect("student:installments", student_id=installment.student.id)
 
-    # ---------------- RENDER PAGE ----------------
-    return render(
-        request,
-        "student/payment/install_qr.html",
-        {
-            "installment": installment,
-            "receipt_exists": receipt_exists,
-        }
-    )
-
+    return render(request, "student/payment/install_qr.html", {
+        "installment": installment,
+        "receipt_exists": receipt_exists,
+    })
 
 @login_required
 def onetime_view(request):
@@ -1782,3 +1804,112 @@ def clean(self):
         )
 
     return cleaned_data
+
+
+
+
+
+
+
+
+@role_required("student")
+def lmsdashboard(request):
+    student = request.user.student
+
+    batch = student.batches.filter(
+        is_active=True
+    ).select_related("course").first()
+
+    sessions_with_materials = []
+    total_materials   = 0
+    recordings_count  = 0
+    notes_count       = 0
+    slides_count      = 0
+    code_files_count  = 0
+    assignments_count = 0
+    reference_count   = 0
+    other_count       = 0
+
+    VALID_FILTERS = {'recording', 'notes', 'slides', 'code', 'assignment', 'reference', 'other'}
+    filter_type = request.GET.get("type", "all")
+    if filter_type not in VALID_FILTERS:
+        filter_type = "all"
+
+    if batch:
+        all_sessions = (
+            LessonSession.objects.filter(
+                batch=batch,
+                status=LessonSession.SessionStatus.COMPLETED
+            )
+            .select_related("lesson_plan__module")
+            .prefetch_related("materials")
+            .order_by("lesson_plan__session_number")
+        )
+
+        all_materials = SessionMaterial.objects.filter(
+            lesson_session__batch=batch
+        )
+
+        total_materials   = all_materials.count()
+        recordings_count  = all_materials.filter(material_type=SessionMaterial.MaterialType.RECORDING).count()
+        notes_count       = all_materials.filter(material_type=SessionMaterial.MaterialType.NOTES).count()
+        slides_count      = all_materials.filter(material_type=SessionMaterial.MaterialType.SLIDES).count()
+        code_files_count  = all_materials.filter(material_type=SessionMaterial.MaterialType.CODE).count()
+        assignments_count = all_materials.filter(material_type=SessionMaterial.MaterialType.ASSIGNMENT).count()
+        reference_count   = all_materials.filter(material_type=SessionMaterial.MaterialType.REFERENCE).count()
+        other_count       = all_materials.filter(material_type=SessionMaterial.MaterialType.OTHER).count()
+
+        for session in all_sessions:
+            mats = session.materials.all()
+            if filter_type != "all":
+                mats = mats.filter(material_type=filter_type)
+            mats = list(mats)
+            if mats:
+                sessions_with_materials.append({
+                    "session": session,
+                    "materials": mats,
+                    "material_count": len(mats),
+                })
+
+    return render(request, "student/LMS/lms_dashboard.html", {
+        "batch":                   batch,
+        "sessions_with_materials": sessions_with_materials,
+        "total_materials":         total_materials,
+        "recordings_count":        recordings_count,
+        "notes_count":             notes_count,
+        "slides_count":            slides_count,
+        "code_files_count":        code_files_count,
+        "assignments_count":       assignments_count,
+        "reference_count":         reference_count,
+        "other_count":             other_count,
+        "active_filter":           filter_type,
+    })
+
+
+
+
+@role_required("student")
+def lms_view_material(request, pk):
+    material = get_object_or_404(SessionMaterial, pk=pk)
+    material.increment_views()
+    if material.external_link:
+        return redirect(material.external_link)
+    if material.file:
+        return redirect(material.file.url)
+    return redirect('student:lms_dashboard')
+
+
+@role_required("student")
+def lms_download_material(request, pk):
+    material = get_object_or_404(SessionMaterial, pk=pk)
+    material.increment_downloads()
+    if material.file:
+        return redirect(material.file.url)
+    if material.external_link:
+        return redirect(material.external_link)
+    return redirect('student:lms_dashboard')
+
+
+
+
+
