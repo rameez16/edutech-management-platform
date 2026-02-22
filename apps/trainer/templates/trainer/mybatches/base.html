@@ -28,6 +28,11 @@
         Lesson Plan
     </a>
 
+    <a href="{% url 'trainer:batch-sessions' batch.id %}"
+        class="batch-tab {% if active_tab == 'lesson_sessions' %}active{% endif %}">
+            Lesson Sessions
+    </a>
+
     <a href="{% url 'trainer:batch-feedback' batch.id %}"
        class="batch-tab {% if request.resolver_match.url_name == 'batch-feedback' %}active{% endif %}">
         Feedback

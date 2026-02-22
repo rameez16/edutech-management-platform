@@ -1,6 +1,6 @@
 from django import forms
 from apps.bdm.models import Trainer
-from apps.trainer.models import Task, TaskSubmission
+from apps.trainer.models import Task, TaskSubmission, LessonSession, SessionMaterial
 from django.utils import timezone
 
 class TrainerProfileForm(forms.ModelForm):
@@ -79,3 +79,34 @@ class EvaluationForm(forms.ModelForm):
         widgets = {
             "feedback": forms.Textarea(attrs={"rows": 3}),
         }
+
+
+class CompletedSessionForm(forms.ModelForm):
+    class Meta:
+        model = LessonSession
+        fields = [
+            'actual_duration_hours',
+            'homework_assigned',
+            'student_queries',
+            'remarks',
+        ]
+        widgets = {
+            'homework_assigned': forms.Textarea(attrs={'rows':3, 'placeholder':'Homework details...'}),
+            'student_queries': forms.Textarea(attrs={'rows':3, 'placeholder':'Student questions...'}),
+            'remarks': forms.Textarea(attrs={'rows':2, 'placeholder':'Trainer remarks...'}),
+        }
+        
+# forms.py
+class SessionMaterialForm(forms.ModelForm):
+    class Meta:
+        model = SessionMaterial
+        exclude = [
+            'lesson_session',
+            'uploaded_by',
+            'upload_date',
+            'file_size_mb',
+            'view_count',
+            'download_count',
+            'created_at',
+            'updated_at'
+        ]

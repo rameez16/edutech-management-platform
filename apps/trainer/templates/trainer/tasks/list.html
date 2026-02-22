@@ -4,45 +4,78 @@
 <div class="glass-card">
     <h4>All Tasks</h4>
 
+    <!-- Filter Form -->
+    <!-- Filter Form -->
+<!-- Filter Form -->
+<form method="get" class="task-filter-form">
+    <div class="filter-row">
+        <!-- Batch -->
+        <select name="batch">
+            <option value="">All Batches</option>
+            {% for batch in batches %}
+                <option value="{{ batch.id }}" {% if batch.id|stringformat:"s" == selected_batch %}selected{% endif %}>
+                    {{ batch.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <!-- Status -->
+        <select name="status">
+            <option value="">All Statuses</option>
+            <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+            <option value="overdue" {% if selected_status == 'overdue' %}selected{% endif %}>Overdue</option>
+        </select>
+
+        <!-- Deadline -->
+        <input type="date" name="deadline" value="{{ selected_deadline }}">
+
+        <!-- Buttons -->
+        <div class="filter-buttons">
+            <button type="submit" class="filter-btn">Filter</button>
+            <a href="{% url 'trainer:task-list' %}" class="filter-btn reset">Reset</a>
+        </div>
+    </div>
+</form>
+
     <div class="task-table-wrapper">
         <table class="task-table">
             <thead>
                 <tr>
                     <th>Title</th>
                     <th>Batch</th>
-                    <th>Due Date</th>
+                    <th>Deadline</th>
                     <th>Status</th>
-                    <th>Completion</th>
+                    <th>Completion status</th>
                 </tr>
             </thead>
 
             <tbody>
-                {% for task in tasks %}
-                {% with stats=task.get_completion_stats %}
-                <tr>
-                    <td>{{ task.title }}</td>
-                    <td>{{ task.batch.name }}</td>
-                    <td>{{ task.due_date }}</td>
-
-                    <td>
-                        {% if task.is_overdue %}
-                            <span class="task-badge overdue">
-                                Overdue
-                            </span>
-                        {% else %}
-                            <span class="task-badge active">
-                                Active
-                            </span>
-                        {% endif %}
-                    </td>
-
-                    <td>{{ stats.completion_rate }}%</td>
-                </tr>
-                {% endwith %}
-                {% endfor %}
-            </tbody>
+    {% for task in tasks %}
+    {% with stats=task.get_completion_stats %}
+    <tr>
+        <td>{{ task.title }}</td>
+        <td>{{ task.batch.name }}</td>
+        <td>{{ task.due_date|date:"d M Y" }}</td>
+        <td>
+            {% if task.is_overdue %}
+                <span class="task-badge overdue">Overdue</span>
+            {% else %}
+                <span class="task-badge active">Active</span>
+            {% endif %}
+        </td>
+        <td>{{ stats.completion_rate }}%</td>
+    </tr>
+    {% endwith %}
+    {% empty %}
+    <tr>
+        <td colspan="6" style="text-align:center;">No tasks found.</td>
+    </tr>
+    {% endfor %}
+</tbody>
         </table>
     </div>
 </div>
 
 {% endblock %}
+
+{% comment %} //  {% endcomment %}

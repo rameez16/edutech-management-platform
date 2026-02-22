@@ -1,0 +1,135 @@
+{% extends "trainer/mybatches/base.html" %}
+{% load static %}
+
+{% block tab_content %}
+<div class="lesson-session-card">
+    <h4 class="lesson-session-card-title">Lesson Sessions for {{ batch.name }}</h4>
+
+    <!-- CSS-only Tabs -->
+    <div class="lesson-session-tabs">
+
+        <!-- Radio buttons for tabs -->
+        <input type="radio" name="tabset" id="tab-pending" checked>
+        <input type="radio" name="tabset" id="tab-completed">
+        <input type="radio" name="tabset" id="tab-skipped">
+
+        <!-- Tab labels -->
+        <div class="lesson-session-tab-labels">
+            <label for="tab-pending">Pending ({{ pending_sessions.count }})</label>
+            <label for="tab-completed">Completed ({{ completed_sessions.count }})</label>
+            <label for="tab-skipped">Skipped ({{ skipped_sessions.count }})</label>
+        </div>
+
+        <!-- Tab contents -->
+        <div class="lesson-session-tab-content">
+
+            <!-- Pending Tab -->
+            <div class="tab" id="pending">
+                <div class="table-wrapper">
+                    <table class="lesson-session-table">
+                        <thead>
+                            <tr>
+                                <th>Session</th>
+                                <th>Topic</th>
+                                <th>Planned Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in pending_sessions %}
+                            <tr class="lesson-session-row pending">
+                                <td>Session {{ session.lesson_plan.session_number }}</td>
+                                <td>{{ session.lesson_plan.topic }}</td>
+                                <td>{{ session.planned_date|date:"M d, Y" }}</td>
+                                <td><span class="lesson-session-badge pending">{{ session.get_status_display }}</span></td>
+                                <td>
+                                    <form method="post" action="{% url 'trainer:mark-session-complete' session.id %}" style="display:inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="lesson-session-btn complete">Complete</button>
+                                    </form>
+                                    <form method="post" action="{% url 'trainer:mark-session-skipped' session.id %}" style="display:inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="lesson-session-btn skip">Skip</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted">No pending sessions.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Completed Tab -->
+            <!-- Completed Tab -->
+<div class="tab" id="completed">
+    <div class="table-wrapper">
+        <table class="lesson-session-table">
+            <thead>
+                <tr>
+                    <th>Session</th>
+                    <th>Topic</th>
+                    <th>Planned Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in completed_sessions %}
+                <tr>
+                    <td>Session {{ session.lesson_plan.session_number }}</td>
+                    <td>{{ session.lesson_plan.topic }}</td>
+                    <td>{{ session.planned_date|date:"M d, Y" }}</td>
+                    <td><span class="lesson-session-badge completed">{{ session.get_status_display }}</span></td>
+                    <td>
+                        <!-- Edit button goes to completed session detail page -->
+                        <a href="{% url 'trainer:completed-session-detail' session.id %}" 
+                           class="lesson-session-btn complete" style="padding:4px 10px; font-size:0.8rem;">
+                           Edit
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted">No completed sessions.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+            <!-- Skipped Tab -->
+            <div class="tab" id="skipped">
+                <div class="table-wrapper">
+                    <table class="lesson-session-table">
+                        <thead>
+                            <tr>
+                                <th>Session</th>
+                                <th>Topic</th>
+                                <th>Planned Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in skipped_sessions %}
+                            <tr>
+                                <td>Session {{ session.lesson_plan.session_number }}</td>
+                                <td>{{ session.lesson_plan.topic }}</td>
+                                <td>{{ session.planned_date|date:"M d, Y" }}</td>
+                                <td><span class="lesson-session-badge skipped">{{ session.get_status_display }}</span></td>
+                                <td><span class="text-muted">—</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted">No skipped sessions.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -35,18 +35,6 @@
                                 <strong>{{ lesson.topic }}</strong><br>
                                 <small>{{ lesson.subtopics }}</small>
                             </td>
-                            <td class="text-right">
-                                {% if lesson.is_completed %}
-                                    <span class="status-badge completed">Completed</span>
-                                {% else %}
-                                    <form method="post" action="">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-bordered status-btn">
-                                            Mark Complete
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            </td>
                         </tr>
                         {% empty %}
                         <tr>
