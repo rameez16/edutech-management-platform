@@ -77,7 +77,7 @@ def lms_login(request):
                 lms_access.save()
 
                 login(request, user)
-                return redirect("accounts:lms_dashboard")
+                return redirect("student:lms_dashboard")
 
             except LMSAccess.DoesNotExist:
                 messages.error(request, "No LMS access found.")

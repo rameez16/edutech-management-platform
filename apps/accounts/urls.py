@@ -9,6 +9,5 @@ urlpatterns = [
     # path("users/create/", views.create_user, name="create_user"),
     
     path("lms/login/", views.lms_login, name="lms_login"),
-    path("lms/dashboard/", views.lms_dashboard, name="lms_dashboard"),
     path("lms/logout/", views.lms_logout, name="lms_logout"),
 ]
