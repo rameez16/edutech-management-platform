@@ -88,8 +88,10 @@
     gap: 18px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    height: 100%;
     justify-content: space-between;
+    height: auto;        /* remove fixed 320px */
+    min-height: 320px;   /* keep minimum height */
+
 }
 
 .step-card:hover {
@@ -247,6 +249,7 @@ button.btn-enroll-upload:disabled {
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
     border: none;
     height: auto;
+    margin-top: 20px;
 }
 
 .next-step-card h4 { font-size: 18px; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; }
