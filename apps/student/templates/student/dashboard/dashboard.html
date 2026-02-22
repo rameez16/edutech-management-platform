@@ -130,8 +130,9 @@
 
     <!-- Top Navbar -->
     <nav class="navbar">
-        <h1 class="page-title">Student Overview</h1>
-
+        <h1 style="color:blue;">
+           Welcome  {{ student_name }}
+        </h1>
         <div class="navbar-right">
 
             <div class="search-box">
@@ -264,19 +265,49 @@
 
         <!-- Payment -->
         <div class="glass-card payment-ui">
-            <div class="payment-header">
-                <h4>PAYMENT STATUS</h4>
-                <button class="payment-action-btn">₹</button>
-            </div>
 
-            <div class="payment-row danger">
-                <span class="payment-icon">⚠️</span>
-                <div class="payment-text">
-                    <strong>EMI Pending</strong>
-                    <span>Action Required</span>
-                </div>
-            </div>
+    <div class="payment-header">
+        <h4>PAYMENT STATUS</h4>
+        <button class="payment-action-btn">₹</button>
+    </div>
+
+    <div class="payment-row {{ payment_css }}"
+         onclick="window.location.href='{% url 'student:payment' %}'">
+
+        <span class="payment-icon">
+            {% if payment_css == "danger" %}
+                ⚠️
+            {% elif payment_css == "warning" %}
+                ⏳
+            {% else %}
+                ✅
+            {% endif %}
+        </span>
+
+        <div class="payment-text">
+
+            <strong>{{ payment_notification }}</strong>
+
+            <span>
+                {% if payment_css == "danger" %}
+                    Immediate Action Required
+                {% elif payment_css == "warning" %}
+                    Please Complete Payment
+                {% else %}
+                    All Payments Clear
+                {% endif %}
+            </span>
+
+            {% if pending_payment %}
+                <span class="payment-meta">
+                    ₹{{ pending_payment.amount }}
+                    • Due {{ pending_payment.due_date|date:"d M Y" }}
+                </span>
+            {% endif %}
+
         </div>
+    </div>
+</div>
 
         <!-- Announcements Card -->
         <div class="glass-card glass-card-3d stat-card">
@@ -318,6 +349,201 @@
         </div>
 
     </section>
+
+    
+
+        <br>
+
+    <div class="overview-row">
+<div class="glass-card overview-card task-performance-card">
+
+    <div class="task-header">
+        <h4 class="card-label">TASK PERFORMANCE <i class="fa-solid fa-chart-line"style="color:#3b82f6;" > </i></h4>
+       
+    </div>
+    <br>
+
+    <div class="task-stat">
+        <div class="task-icon marks">
+          <center>  <i class="fa-solid fa-trophy" style="color:#f59e0b;"></i></center>
+        </div>
+        <div class="task-text">
+            <span>Total Marks:</span>
+            <strong>{{ obtained_marks }} / {{ total_marks }}</strong>
+        </div>
+    </div>
+<br>
+    <div class="task-stat">
+        <div class="task-icon percentage">
+           <center> <i class="fa-solid fa-chart-pie" style="color:#22c55e;"></i><center>
+        </div>
+        <div class="task-text">
+            <span>Percentage:</span>
+            <strong>{{ percentage }}%</strong>
+        </div>
+    </div>
+
+</div>
+
+
+            <!-- QUICK LINKS -->
+            <div class="glass-card overview-card quick-links-card">
+                <div class="quick-links-header">
+                    <h4 class="card-label2">QUICK LINKS</h4>
+                </div>
+
+                <div class="quick-links-body">
+                    <a href="{% url 'student:stud_syllabus' %}" class="quick-link-btn blue">Syllabus</a>
+                    <a href="{% url 'student:student_attendance' %}" class="quick-link-btn purple">Attendance</a>
+                    <a href="{% url 'student:student_tasks' %}" class="quick-link-btn green">Submit Task</a>
+                    <a href="{% url 'student:payment' %}" class="quick-link-btn orange">Pay Now</a>
+                </div>
+            </div>
+
+        </div>
+
+        <br>
+        
+
+        <!-- ================= CALENDAR + ATTENDANCE + PROGRESS ================= -->
+        <section class="bottom-grid">
+
+            
+           <!-- Calendar -->
+<div class="glass-card calendar-card">
+
+    <div class="calendar-header">
+        <h3 id="calendar-month"></h3>
+    </div>
+
+    <div class="calendar-grid" id="calendar-grid">
+        <!-- JS will fill -->
+    </div>
+
+</div>
+
+            
+           <!-- ================= ATTENDANCE CARD ================= -->
+<div class="glass-card">
+
+    <div class="card-header">
+        <div>
+            <h2 class="card-title">Attendance Performance</h2>
+            <p class="card-subtitle">Your attendance statistics</p>
+        </div>
+    </div>
+
+    <div class="donut-container">
+
+        <div class="donut-chart">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+
+                <!-- ATTENDED (Present + Late) -->
+                <circle class="donut-segment"
+                        cx="70" cy="70" r="54"
+                        stroke="var(--emerald-light)"
+                        stroke-dasharray="{{ present_dash }} 339.3"
+                        stroke-dashoffset="0"/>
+
+                <!-- ABSENT -->
+                <circle class="donut-segment"
+                        cx="70" cy="70" r="54"
+                        stroke="var(--gold)"
+                        stroke-dasharray="{{ absent_dash }} 339.3"
+                        stroke-dashoffset="-{{ present_dash }}"/>
+
+            </svg>
+
+            <!-- CENTER TEXT -->
+            <div class="donut-center">
+                <div class="donut-value">{{ attendance_percentage }}%</div>
+                <div class="donut-label">Attendance</div>
+            </div>
+        </div>
+
+        <!-- LEGEND -->
+        <div class="donut-legend">
+
+            <!-- ATTENDED -->
+            <div class="legend-item">
+                <span>
+                    <i class="fa-solid fa-circle-check" style="color:var(--emerald-light);"></i>
+                    Attended ({{ present_count|add:late_count }})
+                </span>
+            </div>
+
+            <!-- ABSENT -->
+            <div class="legend-item">
+                <span>
+                    <i class="fa-solid fa-circle-xmark" style="color:var(--gold);"></i>
+                    Absent ({{ absent_count }})
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= LEARNING PROGRESS ================= -->
+<div class="glass-card progress-card">
+
+    <div class="card-header">
+        <div>
+            <h2 class="card-title">Learning Progress</h2>
+            <p class="card-subtitle">Overall course completion</p>
+        </div>
+    </div>
+
+    <!-- COVERED -->
+    <div class="progress-item">
+        <div class="progress-header">
+            <span class="progress-label">Covered</span>
+            <span class="progress-value">
+                {{ covered_percentage }}%
+            </span>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill cyan"
+                 style="width: {{ covered_percentage }}%;">
+            </div>
+        </div>
+    </div>
+
+    <!-- PENDING -->
+    <div class="progress-item">
+        <div class="progress-header">
+            <span class="progress-label">Pending</span>
+            <span class="progress-value">
+                {{ pending_percentage }}%
+            </span>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill magenta"
+                 style="width: {{ pending_percentage }}%;">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+        </section>
+
+    </section>
+    
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+    </button>
+    <br>
+    <br>
 
     <!-- ================= RECENT ACTIVITY ================= -->
     <section class="top-grid">
@@ -376,144 +602,59 @@
             </div>
 
         </div>
+        <script>
+document.addEventListener("DOMContentLoaded", function () {
 
-        <br>
+    const monthLabel = document.getElementById("calendar-month");
+    const calendarGrid = document.getElementById("calendar-grid");
 
-        <div class="overview-row">
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const currentDate = today.getDate();
 
-            <!-- STUDENT PROGRESS -->
-            <div class="glass-card overview-card progress-glass-card">
-                <div class="progress-header">
-                    <h4 class="card-label">STUDENT PROGRESS</h4>
-                </div>
+    const monthNames = [
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ];
 
-                <div class="progress-bar-chart">
-                    <canvas id="studentBarChart"></canvas>
-                </div>
-            </div>
+    monthLabel.innerText = monthNames[currentMonth] + " " + currentYear;
 
-            <!-- QUICK LINKS -->
-            <div class="glass-card overview-card quick-links-card">
-                <div class="quick-links-header">
-                    <h4 class="card-label2">QUICK LINKS</h4>
-                </div>
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-                <div class="quick-links-body">
-                    <a href="#" class="quick-link-btn blue">Syllabus</a>
-                    <a href="#" class="quick-link-btn purple">Attendance</a>
-                    <a href="#" class="quick-link-btn green">Submit Task</a>
-                    <a href="#" class="quick-link-btn orange">Pay Now</a>
-                </div>
-            </div>
+    const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-        </div>
+    // Day names
+    dayNames.forEach(day => {
+        const el = document.createElement("span");
+        el.innerText = day;
+        el.classList.add("calendar-day-name");
+        calendarGrid.appendChild(el);
+    });
 
-        <br>
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) {
+        const el = document.createElement("span");
+        el.classList.add("calendar-date", "muted");
+        calendarGrid.appendChild(el);
+    }
 
-        <!-- ================= CALENDAR + ATTENDANCE + PROGRESS ================= -->
-        <section class="bottom-grid">
+    // Dates
+    for (let day = 1; day <= daysInMonth; day++) {
+        const el = document.createElement("span");
+        el.innerText = day;
+        el.classList.add("calendar-date");
 
-            <!-- Calendar -->
-            <div class="glass-card">
-                <h3>January 2025</h3>
+        if (day === currentDate) {
+            el.classList.add("today");
+        }
 
-                <div class="calendar-grid">
-                    <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span>
-                    <span>THU</span><span>FRI</span><span>SAT</span>
+        calendarGrid.appendChild(el);
+    }
 
-                    <span class="muted">29</span><span class="muted">30</span><span class="muted">31</span>
-                    <span class="active">1</span><span>2</span><span>3</span><span>4</span>
-
-                    <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span>
-                    <span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span>
-                    <span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span>
-                    <span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span class="muted">1</span>
-                </div>
-            </div>
-
-            <!-- Attendance -->
-            <div class="glass-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">Attendance performance</h2>
-                        <p class="card-subtitle">Your attendance Performance</p>
-                    </div>
-                </div>
-
-                <div class="donut-container">
-                    <div class="donut-chart">
-                        <svg width="140" height="140" viewBox="0 0 140 140">
-                            <circle class="donut-segment" cx="70" cy="70" r="54"
-                                    stroke="var(--emerald-light)"
-                                    stroke-dasharray="203.6 339.3"
-                                    stroke-dashoffset="0"/>
-                            <circle class="donut-segment" cx="70" cy="70" r="54"
-                                    stroke="var(--gold)"
-                                    stroke-dasharray="135.7 339.3"
-                                    stroke-dashoffset="-203.6"/>
-                        </svg>
-
-                        <div class="donut-center">
-                            <div class="donut-value">%</div>
-                            <div class="donut-label">Attendent</div>
-                        </div>
-                    </div>
-
-                    <div class="donut-legend">
-                        <div class="legend-item">
-                            <span class="legend-color cyan"></span>
-                            <span>Present</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color magenta"></span>
-                            <span>Absent</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Progress Card -->
-            <div class="glass-card progress-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">Learning Progress</h2>
-                        <p class="card-subtitle">Current sprint status</p>
-                    </div>
-                </div>
-
-                <div class="progress-item">
-                    <div class="progress-header">
-                        <span class="progress-label">Covered</span>
-                        <span class="progress-value">85%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill cyan" style="width: 85%;"></div>
-                    </div>
-                </div>
-
-                <div class="progress-item">
-                    <div class="progress-header">
-                        <span class="progress-label">Pending</span>
-                        <span class="progress-value">62%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill magenta" style="width: 62%;"></div>
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
-    </section>
-
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-    </button>
+});
+</script>
 
 {% endblock %}

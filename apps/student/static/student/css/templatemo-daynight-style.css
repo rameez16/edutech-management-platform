@@ -2105,3 +2105,71 @@ a {
 .legend-color.magenta {
     background: var(--gold);
 }
+/* ===============================
+   COLORED TASK ICONS
+=============================== */
+
+/* Header Icon */
+.header-icon {
+    margin-left: 6px;
+    color: var(--info);
+}
+
+/* Trophy Icon */
+.task-icon.marks i {
+    color: #f59e0b;   /* Gold */
+}
+
+/* Percentage Icon */
+.task-icon.percentage i {
+    color: #22c55e;   /* Green */
+}
+
+/* Optional Glow Effect 😎 */
+.task-icon.marks i {
+    text-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+}
+
+.task-icon.percentage i {
+    text-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
+}
+.calendar-card {
+    padding: 20px;
+}
+
+.calendar-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.calendar-grid span {
+    padding: 8px 0;
+    border-radius: 8px;
+}
+
+.calendar-day-name {
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+.calendar-date {
+    background: rgba(255,255,255,0.08);
+}
+
+.calendar-date.today {
+    background: linear-gradient(135deg, #22c55e, #06b6d4);
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-date.muted {
+    opacity: 0.3;
+}

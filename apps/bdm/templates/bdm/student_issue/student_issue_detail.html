@@ -1,0 +1,666 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+
+  :root {
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --white: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body { background: var(--slate-50); font-family: 'DM Sans', sans-serif; }
+
+  .issue-wrapper {
+    max-width: 900px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ---- BACK LINK ---- */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--slate-500);
+    text-decoration: none;
+    margin-bottom: 1.25rem;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--blue-600); }
+
+  /* ---- HEADER CARD ---- */
+  .issue-header {
+    background: var(--white);
+    border: 1px solid var(--blue-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .issue-title-block { flex: 1; min-width: 0; }
+
+  .issue-subject {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.55rem;
+    color: var(--slate-800);
+    margin: 0 0 0.75rem;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+
+  .issue-meta-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  /* Pills */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.24rem 0.72rem;
+    border-radius: 99px;
+    font-size: 0.73rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pill-type       { background: var(--blue-50);  color: var(--blue-700);  border: 1px solid var(--blue-200); }
+  .pill-high       { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+  .pill-medium     { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+  .pill-low        { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .pill-open       { background: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe; }
+  .pill-inprogress { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+  .pill-resolved   { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .pill-closed     { background: var(--slate-100); color: var(--slate-500); border: 1px solid var(--slate-200); }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .pill-open .status-dot       { background: #7c3aed; }
+  .pill-inprogress .status-dot { background: #2563eb; }
+  .pill-resolved .status-dot   { background: #10b981; }
+  .pill-closed .status-dot     { background: var(--slate-400); }
+
+  /* Assign button */
+  .assign-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.52rem 1.15rem;
+    background: var(--blue-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.22);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .assign-trigger-btn:hover { background: var(--blue-700); }
+
+  /* ---- MAIN CONTENT CARD ---- */
+  .issue-body {
+    background: var(--white);
+    border: 1px solid var(--blue-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Info grid */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .info-cell {
+    padding: 1rem 1.75rem;
+    border-bottom: 1px solid var(--slate-100);
+    border-right: 1px solid var(--slate-100);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .info-cell:nth-child(even) { border-right: none; }
+  .info-cell:nth-last-child(-n+2) { border-bottom: none; }
+
+  .info-cell-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .info-cell-value {
+    font-size: 0.92rem;
+    color: var(--slate-700);
+    font-weight: 500;
+  }
+
+  .assigned-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--slate-700);
+  }
+
+  .assigned-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue-200), var(--blue-500));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .not-assigned {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--slate-400);
+    font-size: 0.88rem;
+    font-style: italic;
+  }
+
+  /* Description section */
+  .issue-section {
+    padding: 1.5rem 1.75rem;
+    border-bottom: 1px solid var(--slate-100);
+  }
+  .issue-section:last-child { border-bottom: none; }
+
+  .section-heading {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--blue-600);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--blue-100);
+  }
+
+  .description-text {
+    font-size: 0.92rem;
+    color: var(--slate-600);
+    line-height: 1.75;
+    background: var(--slate-50);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    border-left: 3px solid #93c5fd;
+    margin: 0;
+  }
+
+  .resolution-text {
+    font-size: 0.92rem;
+    color: #065f46;
+    line-height: 1.75;
+    background: #f0fdf4;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    border-left: 3px solid #6ee7b7;
+    margin: 0;
+  }
+
+  /* ---- ASSIGN SECTION ---- */
+  .assign-card {
+    background: var(--white);
+    border: 1px solid var(--blue-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.22s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .assign-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.75rem;
+    border-bottom: 1px solid var(--blue-100);
+    background: var(--blue-50);
+  }
+
+  .assign-card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--slate-800);
+    margin: 0;
+  }
+
+  .assign-card-sub {
+    font-size: 0.78rem;
+    color: var(--slate-500);
+    margin: 0.1rem 0 0;
+  }
+
+  .close-btn {
+    background: white;
+    border: 1.5px solid var(--slate-200);
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--slate-400);
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .close-btn:hover { border-color: var(--slate-300); color: var(--slate-600); }
+
+  .assign-card-body { padding: 1.5rem 1.75rem; }
+
+  .form-field { margin-bottom: 1.1rem; }
+
+  .form-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--slate-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.45rem;
+  }
+
+  .select-wrap { position: relative; }
+
+  .select-icon {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate-400);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .select-chevron-icon {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate-400);
+    pointer-events: none;
+  }
+
+  .form-select {
+    width: 100%;
+    padding: 0.68rem 2.5rem 0.68rem 2.5rem;
+    background: white;
+    border: 1.5px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--slate-700);
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-shadow: var(--shadow-sm);
+  }
+  .form-select:focus {
+    outline: none;
+    border-color: var(--blue-500);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+
+  .assign-actions {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--slate-100);
+  }
+
+  .btn-confirm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.35rem;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.25);
+  }
+  .btn-confirm:hover { background: #059669; }
+
+  .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    background: white;
+    color: var(--slate-500);
+    border: 1.5px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-cancel:hover { border-color: var(--slate-300); color: var(--slate-700); }
+
+  /* ---- BACK BUTTON ---- */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.52rem 1.25rem;
+    background: white;
+    border: 1.5px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    color: var(--slate-600);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .back-btn:hover { border-color: var(--blue-300, #93c5fd); color: var(--blue-600); background: var(--blue-50); }
+
+  @media (max-width: 600px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .info-cell { border-right: none; }
+    .info-cell:nth-last-child(-n+2) { border-bottom: 1px solid var(--slate-100); }
+    .info-cell:last-child { border-bottom: none; }
+  }
+
+  /* ---- STUDENT BANNER ---- */
+  .student-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    background: var(--white);
+    border: 1px solid var(--blue-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .student-banner-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue-200), var(--blue-500));
+    display: flex; align-items: center; justify-content: center;
+    font-family: "DM Serif Display", serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 4px var(--blue-50);
+    border: 2px solid var(--blue-200);
+  }
+
+  .student-banner-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+  }
+
+  .student-banner-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .student-banner-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--slate-800);
+    font-family: "DM Serif Display", serif;
+  }
+
+</style>
+
+<div class="issue-wrapper">
+
+  <!-- BACK LINK -->
+  <a href="{% url 'bdm:student_issue_list' %}" class="back-link">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Issues
+  </a>
+
+  <!-- STUDENT BANNER -->
+  <div class="student-banner">
+    <div class="student-banner-avatar">{{ issue.student.full_name|slice:":1" }}</div>
+    <div class="student-banner-info">
+      <span class="student-banner-label">Reported by</span>
+      <span class="student-banner-name">{{ issue.student.full_name }}</span>
+    </div>
+  </div>
+
+  <!-- HEADER CARD -->
+  <div class="issue-header">
+    <div class="issue-title-block">
+      <h1 class="issue-subject">{{ issue.subject }}</h1>
+      <div class="issue-meta-pills">
+
+        <!-- Issue type -->
+        <span class="pill pill-type">{{ issue.get_issue_type_display }}</span>
+
+        <!-- Priority -->
+        {% with p=issue.priority %}
+          {% if p == "high" or p == "critical" %}
+            <span class="pill pill-high">&#9650; {{ issue.get_priority_display }}</span>
+          {% elif p == "medium" %}
+            <span class="pill pill-medium">&#8212; {{ issue.get_priority_display }}</span>
+          {% else %}
+            <span class="pill pill-low">&#9660; {{ issue.get_priority_display }}</span>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Status -->
+        {% with s=issue.status %}
+          {% if s == "open" %}
+            <span class="pill pill-open"><span class="status-dot"></span>{{ issue.get_status_display }}</span>
+          {% elif s == "in_progress" or s == "inprogress" %}
+            <span class="pill pill-inprogress"><span class="status-dot"></span>{{ issue.get_status_display }}</span>
+          {% elif s == "resolved" %}
+            <span class="pill pill-resolved"><span class="status-dot"></span>{{ issue.get_status_display }}</span>
+          {% else %}
+            <span class="pill pill-closed"><span class="status-dot"></span>{{ issue.get_status_display }}</span>
+          {% endif %}
+        {% endwith %}
+
+      </div>
+    </div>
+
+    {% if not issue.assigned_to %}
+    <button class="assign-trigger-btn" onclick="toggleAssign()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+        <line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/>
+      </svg>
+      Assign Trainer
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- ASSIGN SECTION (hidden by default) -->
+  {% if not issue.assigned_to %}
+  <div id="assignSection" class="assign-card" style="display:none;">
+    <div class="assign-card-header">
+      <div>
+        <p class="assign-card-title">Assign to Trainer</p>
+        <p class="assign-card-sub">Select a trainer to handle this issue</p>
+      </div>
+      <button type="button" class="close-btn" onclick="toggleAssign()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="assign-card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-field">
+          <label class="form-label">Select Trainer</label>
+          <div class="select-wrap">
+            <svg class="select-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <select name="trainer" class="form-select" required>
+              <option value="">&#8212; Choose a trainer &#8212;</option>
+              {% for trainer in trainers %}
+                <option value="{{ trainer.id }}">{{ trainer.get_full_name }}</option>
+              {% endfor %}
+            </select>
+            <svg class="select-chevron-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="assign-actions">
+          <button type="submit" class="btn-confirm">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Confirm Assignment
+          </button>
+          <button type="button" class="btn-cancel" onclick="toggleAssign()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- MAIN BODY CARD -->
+  <div class="issue-body">
+
+    <!-- Info grid -->
+    <div class="info-grid">
+      <div class="info-cell">
+        <span class="info-cell-label">Student</span>
+        <span class="info-cell-value">{{ issue.student.full_name }}</span>
+      </div>
+      <div class="info-cell">
+        <span class="info-cell-label">Assigned To</span>
+        <span class="info-cell-value">
+          {% if issue.assigned_to %}
+            <span class="assigned-badge">
+              <span class="assigned-avatar">{{ issue.assigned_to.get_full_name|slice:":1" }}</span>
+              {{ issue.assigned_to.get_full_name }}
+            </span>
+          {% else %}
+            <span class="not-assigned">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <line x1="23" y1="1" x2="1" y2="23"/>
+              </svg>
+              Not Assigned
+            </span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="info-cell">
+        <span class="info-cell-label">Issue Type</span>
+        <span class="info-cell-value">{{ issue.get_issue_type_display }}</span>
+      </div>
+      <div class="info-cell">
+        <span class="info-cell-label">Priority</span>
+        <span class="info-cell-value">{{ issue.get_priority_display }}</span>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="issue-section">
+      <p class="section-heading">Description</p>
+      <p class="description-text">{{ issue.description }}</p>
+    </div>
+
+    <!-- Resolution Notes (if any) -->
+    {% if issue.resolution_notes %}
+    <div class="issue-section">
+      <p class="section-heading">Resolution Notes</p>
+      <p class="resolution-text">{{ issue.resolution_notes }}</p>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- BACK BUTTON -->
+  <a href="{% url 'bdm:student_issue_list' %}" class="back-btn">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Issues
+  </a>
+
+</div>
+
+<script>
+  function toggleAssign() {
+    const el = document.getElementById('assignSection');
+    el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+  }
+</script>
+
+{% endblock %}

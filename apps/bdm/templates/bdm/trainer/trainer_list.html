@@ -1,0 +1,549 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display&display=swap');
+
+  :root {
+    --blue-50:  #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --slate-50:  #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --white: #ffffff;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--slate-50); font-family: 'DM Sans', sans-serif; }
+
+  .tm-wrapper {
+    max-width: 1200px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ---- PAGE HEADER ---- */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--slate-800);
+    margin: 0;
+    line-height: 1;
+  }
+
+  .page-subtitle {
+    font-size: 0.88rem;
+    color: var(--slate-400);
+    margin: 0.3rem 0 0;
+  }
+
+  /* ---- FILTER BAR ---- */
+  .filter-card {
+    background: var(--white);
+    border: 1px solid var(--blue-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-group {
+    position: relative;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .filter-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate-400);
+    pointer-events: none;
+    display: flex;
+  }
+
+  .filter-input, .filter-select {
+    width: 100%;
+    padding: 0.55rem 0.9rem 0.55rem 2.2rem;
+    border: 1.5px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--slate-700);
+    background: var(--slate-50);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .filter-input:focus, .filter-select:focus {
+    outline: none;
+    border-color: var(--blue-400, #60a5fa);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    background: var(--white);
+  }
+
+  .filter-select-wrap {
+    position: relative;
+  }
+
+  .filter-select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--slate-400);
+    pointer-events: none;
+  }
+
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.5rem;
+    background: var(--blue-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.22);
+  }
+
+  .filter-btn:hover {
+    background: var(--blue-700);
+    box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+  }
+
+  .reset-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.25rem;
+    background: white;
+    color: var(--slate-500);
+    border: 1.5px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--slate-300);
+    color: var(--slate-700);
+    background: var(--slate-50);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  /* ---- TABLE CARD ---- */
+  .table-card {
+    background: var(--white);
+    border: 1px solid var(--blue-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .table-card table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .table-card thead {
+    background: var(--slate-50);
+    border-bottom: 2px solid var(--blue-100);
+  }
+
+  .table-card th {
+    padding: 0.85rem 1.1rem;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .table-card td {
+    padding: 0.9rem 1.1rem;
+    color: var(--slate-700);
+    border-bottom: 1px solid var(--slate-100);
+    vertical-align: middle;
+  }
+
+  .table-card tbody tr:last-child td { border-bottom: none; }
+
+  .table-card tbody tr {
+    transition: background 0.12s;
+  }
+
+  .table-card tbody tr:hover {
+    background: var(--blue-50);
+  }
+
+  /* ---- AVATAR ---- */
+  .trainer-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--blue-200);
+  }
+
+  .avatar-placeholder {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue-200), var(--blue-500));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.05rem;
+    color: white;
+    border: 2px solid var(--blue-200);
+  }
+
+  /* ---- TRAINER NAME CELL ---- */
+  .trainer-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .trainer-full-name {
+    font-weight: 600;
+    color: var(--slate-800);
+    line-height: 1.2;
+  }
+
+  /* ---- PILLS / BADGES ---- */
+  .pill {
+    display: inline-block;
+    padding: 0.22rem 0.7rem;
+    border-radius: 99px;
+    font-size: 0.73rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .pill-success  { background: #d1fae5; color: #065f46; }
+  .pill-danger   { background: #fee2e2; color: #991b1b; }
+  .pill-warning  { background: #fef3c7; color: #92400e; }
+  .pill-secondary{ background: var(--slate-100); color: var(--slate-500); }
+
+  /* ---- SALARY ---- */
+  .salary-value { font-weight: 600; color: var(--slate-800); }
+  .salary-nil   { color: var(--slate-400); font-size: 0.82rem; font-style: italic; }
+
+  /* ---- DOMAIN TAG ---- */
+  .domain-tag {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    background: var(--blue-50);
+    border: 1px solid var(--blue-200);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--blue-700);
+  }
+
+  /* ---- ACTION BUTTONS ---- */
+  .action-group { display: flex; gap: 0.5rem; }
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+  }
+
+  .action-btn-view {
+    background: var(--blue-50);
+    color: var(--blue-600);
+    border-color: var(--blue-200);
+  }
+  .action-btn-view:hover {
+    background: var(--blue-600);
+    color: white;
+    border-color: var(--blue-600);
+  }
+
+  .action-btn-edit {
+    background: #fffbeb;
+    color: #92400e;
+    border-color: #fde68a;
+  }
+  .action-btn-edit:hover {
+    background: #f59e0b;
+    color: white;
+    border-color: #f59e0b;
+  }
+
+  /* ---- EMPTY STATE ---- */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--slate-400);
+  }
+  .empty-state svg { opacity: 0.35; margin-bottom: 1rem; }
+  .empty-state p { font-size: 0.95rem; margin: 0; }
+
+  /* ---- RESULT COUNT ---- */
+  .result-meta {
+    font-size: 0.82rem;
+    color: var(--slate-400);
+    padding: 0.6rem 1.1rem;
+    border-top: 1px solid var(--slate-100);
+    background: var(--slate-50);
+  }
+
+  @media (max-width: 768px) {
+    .filter-group { min-width: 100%; }
+    .table-card { overflow-x: auto; }
+  }
+</style>
+
+<div class="tm-wrapper">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Trainer Management</h1>
+      <p class="page-subtitle">Browse, search and manage all registered trainers</p>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <form method="get">
+    <div class="filter-card">
+
+      <!-- Search -->
+      <div class="filter-group">
+        <span class="filter-icon">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </span>
+        <input type="text" name="search" class="filter-input"
+               placeholder="Name, email or domain…"
+               value="{{ request.GET.search }}">
+      </div>
+
+      <!-- Assignment -->
+      <div class="filter-group filter-select-wrap">
+        <span class="filter-icon">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </span>
+        <select name="assignment" class="filter-select">
+          <option value="">All Trainers</option>
+          <option value="assigned"   {% if request.GET.assignment == "assigned" %}selected{% endif %}>Assigned</option>
+          <option value="unassigned" {% if request.GET.assignment == "unassigned" %}selected{% endif %}>Unassigned</option>
+        </select>
+      </div>
+
+      <!-- Status -->
+      <div class="filter-group filter-select-wrap">
+        <span class="filter-icon">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+          </svg>
+        </span>
+        <select name="status" class="filter-select">
+          <option value="">All Status</option>
+          <option value="active"   {% if request.GET.status == "active" %}selected{% endif %}>Active</option>
+          <option value="inactive" {% if request.GET.status == "inactive" %}selected{% endif %}>Inactive</option>
+          <option value="pending"  {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
+        </select>
+      </div>
+
+      <!-- Domain -->
+      <div class="filter-group">
+        <span class="filter-icon">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          </svg>
+        </span>
+        <input type="text" name="domain" class="filter-input"
+               placeholder="Primary domain…"
+               value="{{ request.GET.domain }}">
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="filter-btn">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        Filter
+      </button>
+
+      <!-- Reset -->
+      <a href="?" class="reset-btn" title="Clear all filters">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <polyline points="1 4 1 10 7 10"/>
+          <path d="M3.51 15a9 9 0 1 0 .49-4"/>
+        </svg>
+        Reset
+      </a>
+
+    </div>
+  </form>
+
+  <!-- TRAINER TABLE -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Trainer</th>
+          <th>Salary</th>
+          <th>Domain</th>
+          <th>Experience</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% for trainer in trainers %}
+        <tr>
+
+          <!-- Trainer name + avatar -->
+          <td>
+            <div class="trainer-name-cell">
+              {% if trainer.profile_photo %}
+                <img src="{{ trainer.profile_photo.url }}" class="trainer-avatar" alt="{{ trainer.full_name }}">
+              {% else %}
+                <span class="avatar-placeholder">{{ trainer.full_name|slice:":1" }}</span>
+              {% endif %}
+              <span class="trainer-full-name">{{ trainer.full_name }}</span>
+            </div>
+          </td>
+
+          <!-- Salary -->
+          <td>
+            {% if trainer.admin_profile %}
+              <span class="salary-value">₹ {{ trainer.admin_profile.salary }}</span>
+            {% else %}
+              <span class="salary-nil">Not mentioned</span>
+            {% endif %}
+          </td>
+
+          <!-- Domain -->
+          <td><span class="domain-tag">{{ trainer.primary_domain }}</span></td>
+
+          <!-- Experience -->
+          <td>{{ trainer.experience_years }} <span style="color:var(--slate-400);font-size:0.82rem;">yrs</span></td>
+
+          <!-- Active Status -->
+            <td>
+            {% if trainer.admin_profile %}
+            {% if trainer.admin_profile.is_active %}
+            <span class="pill pill-success">Active</span>
+            {% else %}
+            <span class="pill pill-danger">Inactive</span>
+            {% endif %}
+            {% else %}
+            <span class="pill pill-warning">No Admin Profile</span>
+            {% endif %}
+            </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="action-group">
+              <a href="{% url 'bdm:trainer_detail' trainer.pk %}" class="action-btn action-btn-view">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                View
+              </a>
+              {% comment %} <a href="" class="action-btn action-btn-edit">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit
+              </a> {% endcomment %}
+            </div>
+          </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <svg width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
+                <line x1="3" y1="3" x2="21" y2="21"/>
+              </svg>
+              <p>No trainers found matching your criteria.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+    {% if trainers %}
+    <div class="result-meta">
+      Showing {{ trainers|length }} trainer{{ trainers|length|pluralize }}
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}
