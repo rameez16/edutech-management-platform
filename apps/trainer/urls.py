@@ -19,6 +19,12 @@ urlpatterns = [
     path("batches/<int:batch_id>/students/<int:student_id>/",views.student_details_view,name="batch-student-details"),
     path('batch/<int:batch_id>/lesson-plan/',views.batch_lesson_plan,name='batch-lesson-plan'),
     path("batches/<int:batch_id>/feedback/",views.batch_feedback_view,name="batch-feedback"),
+    
+    path('batch/<int:batch_id>/sessions/', views.batch_lesson_sessions, name='batch-sessions'),
+    path('lesson-session/complete/<int:session_id>/', views.mark_session_complete, name='mark-session-complete'),
+    path('lesson-session/skip/<int:session_id>/', views.mark_session_skipped, name='mark-session-skipped'),
+    path('lesson-session/completed/<int:session_id>/', views.completed_session_detail, name='completed-session-detail'),
+    path('lesson-session/<int:session_id>/add-material/',views.add_session_material,name='add-session-material'),
 
     # attendance
     path("attendance/", views.attendance_batch_list, name="attendance-batch-list"),

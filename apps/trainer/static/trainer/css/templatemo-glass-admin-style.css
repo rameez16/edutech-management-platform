@@ -4258,7 +4258,7 @@ textarea.form-control {
     margin-top: 4px;
 }
 
-/* Mobile */
+/* Mobile /*/
 @media (max-width: 768px) {
     .task-stats-grid {
         grid-template-columns: 1fr;
@@ -4344,6 +4344,76 @@ textarea.form-control {
     background: #b91c1c;
     color: #fff;
 }
+.task-filter-form {
+    margin-bottom: 1rem;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+}
+
+.filter-row select,
+.filter-row input[type="date"] {
+    padding: 4px 8px;       /* smaller padding */
+    border-radius: 6px;     /* slightly smaller radius */
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;     /* smaller font */
+    min-width: 130px;
+    height: 32px;           /* reduced height */
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filter-row select:focus,
+.filter-row input[type="date"]:focus {
+    outline: none;
+    border-color: var(--info);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.filter-btn {
+    padding: 4px 10px;       /* smaller padding */
+    border-radius: 6px;      /* slightly smaller radius */
+    border: none;
+    background: var(--info);
+    color: var(--bg-dark);
+    font-weight: 600;
+    cursor: pointer;
+    height: 32px;            /* reduced height to match inputs */
+    font-size: 0.85rem;      /* smaller font */
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.filter-btn:hover {
+    background: var(--info-hover);
+    transform: translateY(-1px);
+}
+
+.filter-btn.reset {
+    background: var(--danger);
+}
+
+.filter-btn.reset:hover {
+    background: var(--danger-hover);
+}
 /* ======================
    TASK PROFESSIONAL FORM
 ========================= */
@@ -4381,7 +4451,7 @@ textarea.form-control {
 }
 
 .task-btn-primary {
-    padding: 8px 18px;
+    padding: 6px 12px;
     border-radius: 8px;
     background: var(--primary);
     color: #fff;
@@ -4512,4 +4582,622 @@ textarea.form-control {
 
 .submission-info{
     margin-bottom: 10px;
+}
+.submission-content h5 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+}
+
+.submission-content > div {
+    margin-bottom: 6px; 
+}
+
+
+.file-btn, .link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.file-btn {
+    background-color: var(--primary);
+    color: #fff;
+}
+
+.file-btn:hover {
+    opacity: 0.9;
+}
+
+.link-btn {
+    background-color: var(--info);
+    color: #fff;
+}
+
+.link-btn:hover {
+    opacity: 0.9;
+}
+
+.file-btn .icon, .link-btn .icon {
+    width: 16px;
+    height: 16px;
+    stroke: #fff;
+}
+
+/* //  */
+/* ===============================
+   LESSON SESSION CARD
+=============================== */
+.lesson-session-card {
+    background: var(--glass-bg);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 0 8px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.lesson-session-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+/* ===============================
+   CSS-only Tabs
+=============================== */
+.lesson-session-tabs input[type="radio"] { display: none; }
+
+/* Center the tab labels */
+.lesson-session-tab-labels {
+    display: flex;
+    justify-content: center;  /* center horizontally */
+    gap: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid #f0f0f0;  /* subtle off-white border */
+    border-radius: 10px;
+    padding: 4px;  /* small padding around labels */
+    background: #ffffff;  /* optional: off-white background for the tab container */
+}
+
+/* Individual labels inside the border */
+.lesson-session-tab-labels label {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: #f8f9fa;  /* slightly lighter than container */
+    color: #007bff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+input#tab-pending:checked ~ .lesson-session-tab-labels label[for="tab-pending"],
+input#tab-completed:checked ~ .lesson-session-tab-labels label[for="tab-completed"],
+input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] {
+    background: var(--primary, #007bff);
+    color: #fff;
+}
+
+/* Show/hide tab content */
+.lesson-session-tab-content .tab { display: none; }
+#tab-pending:checked ~ .lesson-session-tab-content #pending,
+#tab-completed:checked ~ .lesson-session-tab-content #completed,
+#tab-skipped:checked ~ .lesson-session-tab-content #skipped { display: block; }
+
+/* ===============================
+   Table Styling
+=============================== */
+.lesson-session-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.lesson-session-table th,
+.lesson-session-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e2e2e2;
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+/* ===============================
+   Status Badges
+=============================== */
+.lesson-session-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+    text-align: center;
+}
+
+.lesson-session-badge.completed { background-color: #28a745; color: #fff; }
+.lesson-session-badge.skipped { background-color: #6c757d; color: #fff; }
+.lesson-session-badge.pending { background-color: #ffc107; color: #212529; }
+
+/* ===============================
+   Buttons (task-btn-primary style)
+=============================== */
+.lesson-session-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-right: 6px;
+}
+
+.lesson-session-btn.complete {
+    background-color: var(--primary, #007bff);
+    color: #fff;
+}
+
+.lesson-session-btn.complete:hover { filter: brightness(1.1); }
+
+.lesson-session-btn.skip {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.lesson-session-btn.skip:hover { filter: brightness(1.1); }
+
+
+/* ===============================
+   Responsive Adjustments
+=============================== */
+@media (max-width: 576px) {
+    .lesson-session-card-title { font-size: 1.15rem; }
+    .lesson-session-table th, .lesson-session-table td { font-size: 0.85rem; padding: 8px 10px; }
+    .lesson-session-tab-labels { flex-wrap: wrap; gap: 6px; }
+}
+
+/* Card */
+.lesson-session-card {
+    background: var(--glass-bg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.lesson-session-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Table */
+.lesson-session-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.lesson-session-table th, .lesson-session-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e2e2;
+    vertical-align: middle;
+}
+
+/* Badges */
+.lesson-session-badge.completed {
+    background-color: #28a745;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* Buttons */
+.lesson-session-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.lesson-session-btn.complete {
+    background-color: var(--primary, #007bff);
+    color: #fff;
+}
+
+.lesson-session-btn.complete:hover {
+    filter: brightness(1.1);
+}
+
+.lesson-session-btn.skip {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.lesson-session-btn.skip:hover {
+    filter: brightness(1.1);
+}
+
+/* Form title */
+.form-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* ===============================
+   COMPLETED LESSON SESSION CARD
+=============================== */
+.completed-lesson-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    margin: 15px auto 25px;
+    max-width: 850px;
+}
+
+/* Card Title */
+.completed-lesson-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--primary);
+}
+
+/* ===============================
+   SESSION INFO TABLE
+=============================== */
+.completed-lesson-info {
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.completed-lesson-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.completed-lesson-table th,
+.completed-lesson-table td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e2e2e2;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+.completed-lesson-table th {
+    font-weight: 600;
+    background-color: #f5f5f5;
+}
+
+/* Status badge */
+.completed-lesson-badge {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 60px;
+    display: inline-block;
+    text-align: center;
+}
+
+.completed-lesson-badge.completed {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* ===============================
+   UPDATE FORM
+=============================== */
+.completed-lesson-form {
+    background: #fff;
+    padding: 15px 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin-top: 15px;
+}
+
+.completed-lesson-form h5.form-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+/* Form fields */
+.completed-lesson-form input[type="text"],
+.completed-lesson-form input[type="number"],
+.completed-lesson-form input[type="date"],
+.completed-lesson-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    margin-bottom: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.completed-lesson-form input:focus,
+.completed-lesson-form textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0,123,255,0.2);
+    outline: none;
+}
+
+/* Checkbox fields */
+.completed-lesson-form .completed-lesson-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.875rem;
+}
+
+/* Buttons */
+.completed-lesson-btn {
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-right: 6px;
+    text-decoration: none;
+}
+
+.completed-lesson-btn.complete {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.completed-lesson-btn.complete:hover {
+    filter: brightness(1.1);
+}
+
+.completed-lesson-btn.skip {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.completed-lesson-btn.skip:hover {
+    filter: brightness(1.1);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .completed-lesson-card {
+        padding: 12px;
+    }
+
+    .completed-lesson-card-title {
+        font-size: 1.1rem;
+    }
+
+    .completed-lesson-form {
+        padding: 12px;
+    }
+
+    .completed-lesson-table th,
+    .completed-lesson-table td {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+}
+
+.completed-lesson-back-btn {
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary, #007bff);
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.completed-lesson-back-btn:hover {
+    color: #0056b3; /* darker blue on hover */
+    transform: translateX(-2px); /* subtle movement */
+}
+
+.completed-lesson-back-btn svg {
+    margin-right: 6px;
+}
+
+.add-material-btn{
+    margin-bottom:15px;
+    margin-top: 20px;
+}
+/* ==========================================
+   ADD SESSION MATERIAL PAGE
+========================================== */
+
+.material-page-wrapper {
+    max-width: 880px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+.material-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Header */
+.material-card-header {
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.material-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 6px;
+}
+
+.material-session-info {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* ==========================================
+   FORM SECTION
+========================================== */
+
+.material-form-section {
+    margin-top: 10px;
+}
+
+.material-field-group {
+    margin-bottom: 16px;
+}
+
+.material-field-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+/* Inputs */
+.material-field-group input[type="text"],
+.material-field-group input[type="number"],
+.material-field-group input[type="url"],
+.material-field-group input[type="file"],
+.material-field-group textarea,
+.material-field-group select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background-color: #fafafa;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus State */
+.material-field-group input:focus,
+.material-field-group textarea:focus,
+.material-field-group select:focus {
+    outline: none;
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+}
+
+/* Help text */
+.material-help-text {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/* Error */
+.material-error-text {
+    font-size: 0.75rem;
+    color: #dc2626;
+    margin-top: 4px;
+}
+
+/* Checkbox Row */
+.material-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+}
+
+/* ==========================================
+   ACTION BUTTONS
+========================================== */
+
+.material-actions {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 10px;
+}
+
+.material-btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.material-btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.material-btn-secondary {
+    background: #6b7280;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.material-btn-secondary:hover {
+    background: #4b5563;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 576px) {
+    .material-card {
+        padding: 18px;
+    }
+
+    .material-card-title {
+        font-size: 1.1rem;
+    }
+
+    .material-actions {
+        flex-direction: column;
+    }
+
+    .material-btn-primary,
+    .material-btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
 }

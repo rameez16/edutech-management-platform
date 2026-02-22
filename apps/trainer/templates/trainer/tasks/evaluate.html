@@ -3,6 +3,7 @@
 
 <div class="glass-card">
 
+  <!-- Header -->
   <div class="evaluation-header">
     <a href="{% url 'trainer:task-submissions' %}" class="evaluation-back-btn">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -13,6 +14,7 @@
     <h4>Evaluate Submission</h4>
   </div>
 
+  <!-- Submission Info -->
   <div class="submission-info">
     <p><strong>Student:</strong> {{ submission.student.full_name }}</p>
     <p><strong>Task:</strong> {{ submission.task.title }}</p>
@@ -23,6 +25,52 @@
     {% endif %}
   </div>
 
+  <!-- Submitted Content -->
+<div class="submission-content">
+
+  {% if submission.submission_text %}
+    <div class="submission-text">
+      <h5>Submitted Text:</h5>
+      <div class="text-box">{{ submission.submission_text}}</div>
+    </div>
+  {% endif %}
+
+  {% if submission.submission_file %}
+  <div class="submission-file">
+    <h5>Submitted File:</h5>
+    <a href="{{ submission.submission_file.url }}" target="_blank" class="file-btn">
+      <!-- File Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+
+      <!-- File Name -->
+      {{ submission.submission_file.name|slice:"task_submissions/" }}
+
+      <!-- Download Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </a>
+  </div>
+{% endif %}
+
+  {% if submission.submission_link %}
+    <div class="submission-link">
+      <h5>Submitted Link:</h5>
+      <a href="{{ submission.submission_link }}" target="_blank" class="link-btn">
+        Open Link
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
   {% if submission.status == "evaluated" %}
   <div class="re-eval-alert">
     Already evaluated
@@ -32,23 +80,23 @@
   </div>
   {% endif %}
 
+  <!-- Evaluation Form -->
   <form method="post" class="evaluation-form">
     {% csrf_token %}
 
-    <label>Marks</label>
-    <input type="number" name="marks" />
+    <label>Marks (out of {{ submission.task.total_marks }})</label>
+    <input type="number" name="marks" min="0" max="{{ submission.task.total_marks }}"
+           value="{{ submission.marks_obtained|default:'' }}" required />
 
     <label>Feedback</label>
-    <textarea name="feedback"></textarea>
+    <textarea name="feedback" required>{{ submission.feedback }}</textarea>
 
     <div class="form-actions">
-      <button type="submit" name="action" value="evaluate"
-              class="task-btn-primary">
+      <button type="submit" name="action" value="evaluate" class="task-btn-primary">
         Evaluate
       </button>
 
-      <button type="submit" name="action" value="resubmit"
-              class="task-btn-warning">
+      <button type="submit" name="action" value="resubmit" class="task-btn-warning">
         Request Resubmission
       </button>
     </div>
@@ -57,3 +105,5 @@
 </div>
 
 {% endblock %}
+
+{% comment %} ///  {% endcomment %}

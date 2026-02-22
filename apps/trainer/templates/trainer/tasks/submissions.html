@@ -4,6 +4,48 @@
 <div class="glass-card">
     <h4>Task Submissions</h4>
 
+    <!-- Filter Form -->
+    <form method="get" class="task-filter-form">
+        <div class="filter-row">
+            <!-- Batch Filter -->
+            <select name="batch">
+                <option value="">All Batches</option>
+                {% for batch in batches %}
+                    <option value="{{ batch.id }}" {% if batch.id|stringformat:"s" == selected_batch %}selected{% endif %}>
+                        {{ batch.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Task Filter -->
+            <select name="task">
+                <option value="">All Tasks</option>
+                {% for task in tasks %}
+                    <option value="{{ task.id }}" {% if task.id|stringformat:"s" == selected_task %}selected{% endif %}>
+                        {{ task.title }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Status Filter -->
+            <select name="status">
+                <option value="">All Statuses</option>
+                <option value="not_started" {% if selected_status == 'not_started' %}selected{% endif %}>Not Started</option>
+                <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="submitted" {% if selected_status == 'submitted' %}selected{% endif %}>Submitted</option>
+                <option value="evaluated" {% if selected_status == 'evaluated' %}selected{% endif %}>Evaluated</option>
+                <option value="resubmit" {% if selected_status == 'resubmit' %}selected{% endif %}>Resubmit</option>
+            </select>
+
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <button type="submit" class="filter-btn">Filter</button>
+                <a href="{% url 'trainer:task-submissions' %}" class="filter-btn reset">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Submissions Table -->
     <div class="task-table-wrapper">
         <table class="task-table">
             <thead>
@@ -15,70 +57,44 @@
                     <th>Action</th>
                 </tr>
             </thead>
-
             <tbody>
-    {% for sub in submissions %}
-    <tr>
-        <td>{{ sub.student.full_name }}</td>
-        <td>{{ sub.task.title }}</td>
-
-        <td>
-            {% if sub.status == "submitted" %}
-                <span class="task-badge submitted">
-                    Submitted
-                </span>
-            {% elif sub.status == "evaluated" %}
-                <span class="task-badge evaluated">
-                    Evaluated
-                </span>
-            {% else %}
-                <span class="task-badge active">
-                    {{ sub.get_status_display }}
-                </span>
-            {% endif %}
-
-            {% if sub.is_late %}
-                <span class="task-badge late">
-                    Late
-                </span>
-            {% endif %}
-        </td>
-
-        <td>{{ sub.marks_obtained|default:"—" }}</td>
-
-        <td>
-    {% if sub.status == "submitted" %}
-        <a href="{% url 'trainer:task-evaluate' sub.id %}"
-           class="task-btn-primary">
-            Evaluate
-        </a>
-
-    {% elif sub.status == "evaluated" %}
-        <a href="{% url 'trainer:task-evaluate' sub.id %}"
-           class="task-btn-primary">
-            Re-Evaluate
-        </a>
-
-        {% if sub.revision_count > 0 %}
-            <small class="revision-info">
-                (Revised {{ sub.revision_count }} times)
-            </small>
-        {% endif %}
-
-    {% else %}
-        —
-    {% endif %}
-</td>
-    </tr>
-
-    {% empty %}
-    <tr>
-        <td colspan="5" class="text-center">
-            No submissions yet.
-        </td>
-    </tr>
-    {% endfor %}
-</tbody>
+                {% for sub in submissions %}
+                <tr>
+                    <td>{{ sub.student.full_name }}</td>
+                    <td>{{ sub.task.title }}</td>
+                    <td>
+                        {% if sub.status == "submitted" %}
+                            <span class="task-badge submitted">Submitted</span>
+                        {% elif sub.status == "evaluated" %}
+                            <span class="task-badge evaluated">Evaluated</span>
+                        {% else %}
+                            <span class="task-badge active">{{ sub.get_status_display }}</span>
+                        {% endif %}
+                        {% if sub.is_late %}
+                            <span class="task-badge late">Late</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ sub.marks_obtained|default:"—" }}</td>
+                    <td>
+                        {% if sub.status == "submitted" %}
+                            <a href="{% url 'trainer:task-evaluate' sub.id %}" class="task-btn-primary">
+                                Evaluate
+                            </a>
+                        {% elif sub.status == "evaluated" %}
+                            <a href="{% url 'trainer:task-evaluate' sub.id %}" class="task-btn-primary">
+                                Re-Evaluate
+                            </a>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No submissions found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 </div>

@@ -1,0 +1,180 @@
+{% extends "student/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'student/css/issues.css' %}">
+
+<div class="issues-page">
+
+    <div class="issues-wrapper">
+
+        <center><h2 class="page-title">Student Issues</h2></center>
+
+        <!-- ✅ ISSUE FORM -->
+        <div class="issue-card">
+
+            <h3>Submit New Issue</h3>
+
+            <div class="student-info">
+                <p><strong>Name:</strong> {{ student.full_name }}</p>
+                <p><strong>Email:</strong> {{ student.email }}</p>
+
+                <p><strong>Batch:</strong>
+                    {% if batch %} {{ batch.name }} {% else %} Not Assigned {% endif %}
+                </p>
+
+                
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Issue Type</label>
+                    {{ form.issue_type }}
+                </div>
+
+                <div class="form-group">
+                    <label>Priority</label>
+                    {{ form.priority }}
+                </div>
+
+                <div class="form-group">
+                    <label>Subject</label>
+                    {{ form.subject }}
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    {{ form.description }}
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Submit Issue
+                </button>
+
+            </form>
+        </div>
+
+        <!-- ✅ ISSUES LIST -->
+        <div class="issue-card">
+
+            <h3>Submitted Issues</h3>
+
+            {% if issues %}
+
+                <table class="issues-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for issue in issues %}
+                        <tr>
+                            <td>{{ issue.get_issue_type_display }}</td>
+
+                            <td>
+                                <span class="badge priority-{{ issue.priority }}">
+                                    {{ issue.get_priority_display }}
+                                </span>
+                            </td>
+
+                            <td>{{ issue.subject }}</td>
+
+                            <td>
+                                <span class="badge status-{{ issue.status }}">
+                                    {{ issue.get_status_display }}
+                                </span>
+                            </td>
+
+                            <td>{{ issue.created_at|date:"d M Y" }}</td>
+
+                            <td>
+
+                                {% if issue.status == "resolved" and issue.student_satisfied == None %}
+                                    <button class="feedback-btn"
+                                            onclick="openFeedback({{ issue.id }})">
+                                        Give Feedback
+                                    </button>
+
+                                {% elif issue.student_satisfied == True %}
+                                    <span class="badge satisfied">Satisfied ✅</span>
+
+                                {% elif issue.student_satisfied == False %}
+                                    <span class="badge unsatisfied">Not Satisfied ❌</span>
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            {% else %}
+                <div class="empty-state">
+                    No issues submitted.
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ✅ FEEDBACK MODAL -->
+<div id="feedbackModal" class="feedback-modal">
+    <div class="feedback-box">
+
+        <h3>Issue Feedback</h3>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <input type="hidden" name="issue_id" id="issueIdField">
+
+            <div class="form-group">
+                <label>Are you satisfied?</label>
+                <select name="student_satisfied" class="form-control">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Suggestions / Comments</label>
+                <textarea name="satisfaction_comments"
+                          class="form-control"
+                          rows="4"></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Submit Feedback
+            </button>
+        </form>
+
+        <button class="close-btn" onclick="closeFeedback()">✕</button>
+
+    </div>
+</div>
+
+<!-- ✅ JS -->
+<script>
+function openFeedback(issueId) {
+    document.getElementById("feedbackModal").style.display = "flex";
+    document.getElementById("issueIdField").value = issueId;
+}
+
+function closeFeedback() {
+    document.getElementById("feedbackModal").style.display = "none";
+}
+</script>
+
+{% endblock %}

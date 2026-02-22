@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 
-from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm
+from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm
 
 from apps.bdm.models import Trainer, Batch, Student
 from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission
@@ -278,8 +278,8 @@ def attendance_session_list(request, batch_id):
     sessions = LessonSession.objects.filter(
         batch=batch,
         status=LessonSession.SessionStatus.COMPLETED
-    ).select_related("lesson_plan").order_by("-lesson_plan__session_number","-planned_date")
-
+    ).select_related("lesson_plan").order_by("-completed_at")
+    # ).select_related("lesson_plan").order_by("-lesson_plan__session_number","-planned_date")
 
     return render(request, "trainer/attendance/session_list.html", {
         "batch": batch,
@@ -481,15 +481,17 @@ def task_dashboard(request):
 
     return render(request, "trainer/tasks/dashboard.html", context)
 
-
 @login_required
 def task_create(request):
     trainer = request.user.trainer
 
     if request.method == "POST":
         form = TaskForm(request.POST, request.FILES)
+        # Limit lesson_session choices dynamically
         form.fields["lesson_session"].queryset = LessonSession.objects.filter(
-            trainer=trainer
+            trainer=trainer,
+            batch__in=trainer.batches.all(),
+            status=LessonSession.SessionStatus.COMPLETED
         )
 
         if form.is_valid():
@@ -502,7 +504,9 @@ def task_create(request):
     else:
         form = TaskForm()
         form.fields["lesson_session"].queryset = LessonSession.objects.filter(
-            trainer=trainer
+            trainer=trainer,
+            batch__in=trainer.batches.all(),
+            status=LessonSession.SessionStatus.COMPLETED
         )
 
     return render(request, "trainer/tasks/create.html", {
@@ -512,25 +516,90 @@ def task_create(request):
 
 @login_required
 def task_list(request):
-    tasks = Task.objects.filter(created_by=request.user.trainer)
+    trainer = getattr(request.user, 'trainer', None)
+    if not trainer:
+        tasks = Task.objects.none()
+    else:
+        # Only tasks created by this trainer AND in batches assigned to this trainer
+        tasks = Task.objects.filter(
+            created_by=trainer,
+            batch__in=trainer.batches.all()
+        ).order_by('-created_at')
+
+    # Filters from GET params
+    batch_id = request.GET.get('batch')
+    status = request.GET.get('status')
+    deadline = request.GET.get('deadline')
+
+    if batch_id:
+        tasks = tasks.filter(batch_id=batch_id)
+
+    if status:
+        if status == 'overdue':
+            tasks = tasks.filter(due_date__lt=timezone.now().date())
+        elif status == 'active':
+            tasks = tasks.filter(due_date__gte=timezone.now().date())
+
+    if deadline:
+        try:
+            date_obj = timezone.datetime.strptime(deadline, "%Y-%m-%d").date()
+            tasks = tasks.filter(due_date=date_obj)
+        except ValueError:
+            pass
+
+    # Trainer-assigned batches for filter dropdown
+    batches = trainer.batches.all() if trainer else []
 
     return render(request, "trainer/tasks/list.html", {
         "tasks": tasks,
-        "active_tab": "list"
+        "batches": batches,
+        "active_tab": "list",
+        "selected_batch": batch_id,
+        "selected_status": status,
+        "selected_deadline": deadline,
     })
-
 
 @login_required
 def task_submissions(request):
-    submissions = TaskSubmission.objects.filter(
-        task__created_by=request.user.trainer
-    ).select_related("student", "task")
+    trainer = getattr(request.user, 'trainer', None)
+    if not trainer:
+        submissions = TaskSubmission.objects.none()
+    else:
+        submissions = TaskSubmission.objects.filter(
+            task__created_by=trainer,
+            task__batch__in=trainer.batches.all()  # only trainer’s batches
+        ).select_related("student", "task", "task__batch")
+
+    # Get filters from GET
+    batch_id = request.GET.get('batch')
+    task_id = request.GET.get('task')
+    status = request.GET.get('status')
+
+    if batch_id:
+        submissions = submissions.filter(task__batch_id=batch_id)
+
+    if task_id:
+        submissions = submissions.filter(task_id=task_id)
+
+    if status:
+        submissions = submissions.filter(status=status)
+
+    # Dropdowns for filter form
+    batches = trainer.batches.all() if trainer else []
+    tasks = Task.objects.filter(
+        created_by=trainer,
+        batch__in=trainer.batches.all()
+    )
 
     return render(request, "trainer/tasks/submissions.html", {
         "submissions": submissions,
+        "batches": batches,
+        "tasks": tasks,
+        "selected_batch": batch_id,
+        "selected_task": task_id,
+        "selected_status": status,
         "active_tab": "submissions"
     })
-    
     
 def evaluate_submission(request, submission_id):
     submission = get_object_or_404(TaskSubmission, id=submission_id)
@@ -559,4 +628,93 @@ def evaluate_submission(request, submission_id):
         "active_tab": "submissions"
     })
     
-    
+
+def batch_lesson_sessions(request, batch_id):
+    batch = get_object_or_404(Batch, id=batch_id)
+
+    # Separate sessions by status for CSS-only tabs
+    pending_sessions = LessonSession.objects.filter(
+        batch=batch, status=LessonSession.SessionStatus.PENDING
+    ).select_related('lesson_plan').order_by('planned_date')
+
+    completed_sessions = LessonSession.objects.filter(
+        batch=batch, status=LessonSession.SessionStatus.COMPLETED
+    ).select_related('lesson_plan').order_by('planned_date')
+
+    skipped_sessions = LessonSession.objects.filter(
+        batch=batch, status=LessonSession.SessionStatus.SKIPPED
+    ).select_related('lesson_plan').order_by('planned_date')
+
+    context = {
+        'batch': batch,
+        'pending_sessions': pending_sessions,
+        'completed_sessions': completed_sessions,
+        'skipped_sessions': skipped_sessions,
+        'active_tab': 'lesson_sessions'
+    }
+    return render(request, 'trainer/mybatches/lesson_sessions.html', context)
+
+def mark_session_skipped(request, session_id):
+    session = get_object_or_404(LessonSession, id=session_id)
+    if request.method == "POST":
+        session.status = LessonSession.SessionStatus.SKIPPED
+        session.save()
+        messages.info(request, f"Session {session.lesson_plan.session_number} marked as skipped.")
+    return redirect('trainer:batch-sessions', batch_id=session.batch.id)
+ 
+def mark_session_complete(request, session_id):
+    session = get_object_or_404(LessonSession, id=session_id)
+    if request.method == "POST":
+        session.mark_completed(trainer=request.user.trainer)
+        messages.success(request, f"Session {session.lesson_plan.session_number} marked as completed.")
+        # Redirect to completed session detail page
+        return redirect('trainer:completed-session-detail', session_id=session.id)
+    return redirect('trainer:batch-sessions', batch_id=session.batch.id)
+
+
+def completed_session_detail(request, session_id):
+    session = get_object_or_404(LessonSession, id=session_id)
+
+    if session.status != LessonSession.SessionStatus.COMPLETED:
+        messages.warning(request, "This session is not completed yet.")
+        return redirect('trainer:batch-sessions', batch_id=session.batch.id)
+
+    if request.method == "POST":
+        form = CompletedSessionForm(request.POST, instance=session)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Session details updated successfully.")
+            return redirect('trainer:batch-sessions', batch_id=session.batch.id)
+    else:
+        form = CompletedSessionForm(instance=session)
+
+    context = {
+        'session': session,
+        'form': form,
+        'batch': session.batch,   
+        'active_tab': 'lesson_sessions',
+    }
+
+    return render(request, 'trainer/mybatches/completed_session_detail.html', context)
+
+def add_session_material(request, session_id):
+    session = get_object_or_404(LessonSession, id=session_id)
+
+    if request.method == "POST":
+        form = SessionMaterialForm(request.POST, request.FILES)
+        if form.is_valid():
+            material = form.save(commit=False)
+            material.lesson_session = session
+            material.uploaded_by = request.user.trainer
+            material.save()
+            messages.success(request, "Material uploaded successfully.")
+            return redirect('trainer:completed-session-detail', session_id=session.id)
+    else:
+        form = SessionMaterialForm()
+
+    return render(request, 'trainer/mybatches/add_session_material.html', {
+        'form': form,
+        'session': session,
+        'batch': session.batch,
+        'active_tab': 'lesson_sessions', 
+    })

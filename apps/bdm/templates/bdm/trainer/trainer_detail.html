@@ -1,0 +1,911 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+
+  :root {
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --white: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body { background: var(--slate-50); font-family: 'DM Sans', sans-serif; }
+
+  .trainer-wrapper {
+    max-width: 1100px;
+    margin: 2.5rem auto;
+    padding: 0 1.25rem;
+  }
+
+  /* ========== HEADER ========== */
+  .trainer-header {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 1.75rem;
+    border: 1px solid var(--blue-100);
+  }
+
+  .trainer-header-left { display: flex; align-items: center; gap: 1.75rem; }
+
+  .avatar-img {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--blue-200);
+    box-shadow: 0 0 0 5px var(--blue-50);
+    flex-shrink: 0;
+  }
+
+  .avatar-placeholder {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue-200), var(--blue-400));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: white;
+    font-family: 'DM Serif Display', serif;
+    border: 3px solid var(--blue-200);
+    box-shadow: 0 0 0 5px var(--blue-50);
+    flex-shrink: 0;
+  }
+
+  .trainer-info { display: flex; flex-direction: column; }
+
+  .trainer-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.65rem;
+    color: var(--slate-800);
+    margin: 0 0 0.15rem;
+    line-height: 1.2;
+  }
+
+  .trainer-domain {
+    font-size: 0.9rem;
+    color: var(--blue-600);
+    font-weight: 500;
+    margin: 0 0 0.2rem;
+  }
+
+  .trainer-email {
+    font-size: 0.84rem;
+    color: var(--slate-500);
+    margin: 0 0 0.75rem;
+  }
+
+  /* ---- STATUS ROW ---- */
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  /* Animated status pill */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.26rem 0.75rem 0.26rem 0.5rem;
+    border-radius: 99px;
+    font-size: 0.73rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .status-pill.is-active   { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .status-pill.is-inactive { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+  .status-pill.is-pending  { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+  }
+  .is-active  .status-dot { background: #10b981; animation: pulseDot 2s infinite; }
+  .is-inactive .status-dot { background: #ef4444; }
+  .is-pending  .status-dot { background: #f59e0b; }
+
+  @keyframes pulseDot {
+    0%,100% { box-shadow: 0 0 0 2px rgba(16,185,129,0.3); }
+    50%      { box-shadow: 0 0 0 4px rgba(16,185,129,0.08); }
+  }
+
+  /* Toggle track (the pill background) */
+  .toggle-track {
+    display: inline-block;
+    position: relative;
+    width: 44px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--slate-300);
+    cursor: pointer;
+    transition: background 0.25s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+  .toggle-track:hover { box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
+  .toggle-track.is-on  { background: #10b981; }
+
+  /* Toggle thumb (the white circle) */
+  .toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.22);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+  .toggle-track.is-on .toggle-thumb { transform: translateX(20px); }
+
+  /* The submit button wrapper — invisible, just the track is visible */
+  .toggle-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 1;
+  }
+
+  .toggle-hint {
+    font-size: 0.71rem;
+    color: var(--slate-400);
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  /* Header right */
+  .trainer-header-right { text-align: center; flex-shrink: 0; }
+  .batch-label {
+    font-size: 0.73rem;
+    color: var(--slate-400);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.1rem;
+  }
+  .batch-number {
+    font-size: 3rem;
+    font-family: 'DM Serif Display', serif;
+    color: var(--blue-600);
+    line-height: 1;
+  }
+
+  /* ========== TABS ========== */
+  .tab-nav {
+    display: flex;
+    gap: 0.4rem;
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--slate-200);
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    flex: 1;
+    min-width: 130px;
+    padding: 0.6rem 1.25rem;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--slate-500);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .tab-btn:hover  { background: var(--blue-50); color: var(--blue-600); }
+  .tab-btn.active { background: var(--blue-600); color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.25); }
+
+  /* ========== PANELS ========== */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .info-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--blue-100);
+    padding: 2rem 2.5rem;
+    animation: fadeUp 0.22s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ========== INFO GRID ========== */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2rem;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: baseline;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--slate-100);
+    gap: 0.5rem;
+  }
+  .info-row:last-child { border-bottom: none; }
+
+  .info-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-width: 155px;
+    flex-shrink: 0;
+  }
+
+  .info-value { font-size: 0.91rem; color: var(--slate-700); }
+
+  /* ========== SECTION TITLE ========== */
+  .section-title {
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: var(--blue-600);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 1.75rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--blue-100);
+  }
+
+  /* ========== BIO ========== */
+  .bio-text {
+    font-size: 0.91rem;
+    color: var(--slate-600);
+    line-height: 1.75;
+    background: var(--slate-50);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    border-left: 3px solid #93c5fd;
+  }
+
+  /* ========== LINKS ========== */
+  .link-list { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.5rem; }
+
+  .profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    background: var(--blue-50);
+    border: 1px solid var(--blue-200);
+    border-radius: 99px;
+    color: var(--blue-600);
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .profile-link:hover { background: var(--blue-600); color: white; border-color: var(--blue-600); }
+  .profile-link svg { width: 14px; height: 14px; }
+
+  /* ========== PILLS ========== */
+  .pill {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .pill-success   { background: #d1fae5; color: #065f46; }
+  .pill-danger    { background: #fee2e2; color: #991b1b; }
+  .pill-warning   { background: #fef3c7; color: #92400e; }
+  .pill-secondary { background: var(--slate-100); color: var(--slate-600); }
+
+  /* ========== BATCH TABLE ========== */
+  .batch-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .batch-table thead tr { border-bottom: 2px solid var(--blue-100); }
+  .batch-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .batch-table td { padding: 0.85rem 1rem; color: var(--slate-700); border-bottom: 1px solid var(--slate-100); }
+  .batch-table tbody tr:hover { background: var(--blue-50); }
+  .batch-table tbody tr:last-child td { border-bottom: none; }
+
+  /* ========== ASSIGN BATCH ========== */
+  .add-batch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1.1rem;
+    background: var(--blue-600);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+  }
+  .add-batch-btn:hover { background: var(--blue-700); }
+
+  .batch-form-wrap { margin: 1rem 0 0.5rem; animation: fadeUp 0.2s ease; }
+
+  .batch-form-inner {
+    background: var(--blue-50);
+    border: 1.5px solid var(--blue-200);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.75rem;
+  }
+
+  .batch-form-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .batch-form-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--slate-800);
+    margin: 0 0 0.2rem;
+    font-family: 'DM Serif Display', serif;
+  }
+  .batch-form-sub { font-size: 0.82rem; color: var(--slate-500); margin: 0; }
+
+  .form-close-btn {
+    background: white;
+    border: 1.5px solid var(--slate-200);
+    border-radius: 50%;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--slate-500);
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .form-close-btn:hover { border-color: var(--slate-300); background: var(--slate-50); color: var(--slate-700); }
+
+  .batch-form-field { margin-bottom: 1.25rem; }
+
+  .form-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--slate-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .custom-select-wrap { position: relative; display: flex; align-items: center; }
+
+  .select-icon {
+    position: absolute; left: 0.85rem;
+    color: var(--slate-400); pointer-events: none; z-index: 1;
+  }
+  .select-chevron {
+    position: absolute; right: 0.85rem;
+    color: var(--slate-400); pointer-events: none;
+  }
+
+  .form-select-styled {
+    width: 100%;
+    padding: 0.7rem 2.5rem 0.7rem 2.5rem;
+    background: white;
+    border: 1.5px solid var(--blue-200);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--slate-700);
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-shadow: var(--shadow-sm);
+  }
+  .form-select-styled:focus {
+    outline: none;
+    border-color: var(--blue-500);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+
+  .batch-form-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--blue-100);
+  }
+
+  .form-cancel-btn {
+    padding: 0.55rem 1.25rem;
+    background: white;
+    border: 1.5px solid var(--slate-200);
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--slate-600);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .form-cancel-btn:hover { border-color: var(--slate-300); background: var(--slate-50); }
+
+  .form-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.4rem;
+    background: var(--blue-600);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.22);
+  }
+  .form-submit-btn:hover { background: var(--blue-700); }
+
+  .batch-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--slate-400);
+    font-size: 0.9rem;
+  }
+  .batch-empty p { margin: 0.2rem 0; }
+
+  /* ========== BACK BUTTON ========== */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.75rem;
+    padding: 0.55rem 1.4rem;
+    background: white;
+    border: 1.5px solid var(--slate-200);
+    border-radius: 99px;
+    color: var(--slate-600);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .back-btn:hover { border-color: var(--blue-400); color: var(--blue-600); background: var(--blue-50); }
+
+  @media (max-width: 640px) {
+    .trainer-header { flex-direction: column; align-items: flex-start; }
+    .info-grid { grid-template-columns: 1fr; }
+    .trainer-header-right { width: 100%; text-align: left; display: flex; align-items: center; gap: 1rem; }
+    .batch-number { font-size: 2rem; }
+  }
+</style>
+
+
+<div class="trainer-wrapper">
+
+  <!-- ===== HEADER ===== -->
+  <div class="trainer-header">
+    <div class="trainer-header-left">
+
+      {% if trainer.profile_photo %}
+        <img src="{{ trainer.profile_photo.url }}" class="avatar-img" alt="{{ trainer.full_name }}">
+      {% else %}
+        <div class="avatar-placeholder">{{ trainer.full_name|slice:":1" }}</div>
+      {% endif %}
+
+      <div class="trainer-info">
+        <h2 class="trainer-name">{{ trainer.full_name }}</h2>
+        <p class="trainer-domain">{{ trainer.primary_domain }}</p>
+        <p class="trainer-email">{{ trainer.email }}</p>
+
+        <div class="status-row">
+          {% if trainer.admin_profile %}
+
+            <!-- Status pill -->
+            <span class="status-pill {% if trainer.admin_profile.is_active %}is-active{% else %}is-inactive{% endif %}">
+              <span class="status-dot"></span>
+              {% if trainer.admin_profile.is_active %}Active{% else %}Inactive{% endif %}
+            </span>
+
+            <!-- Toggle — plain button wrapping the styled track -->
+            <form method="post" style="margin:0;">
+              {% csrf_token %}
+              <button type="submit"
+                      name="toggle_active"
+                      value="1"
+                      class="toggle-btn"
+                      title="{% if trainer.admin_profile.is_active %}Deactivate{% else %}Activate{% endif %}">
+                <span class="toggle-track {% if trainer.admin_profile.is_active %}is-on{% endif %}">
+                  <span class="toggle-thumb"></span>
+                </span>
+              </button>
+            </form>
+
+            <span class="toggle-hint">
+              {% if trainer.admin_profile.is_active %}Click to deactivate{% else %}Click to activate{% endif %}
+            </span>
+
+          {% else %}
+
+            {% if trainer.status == "active" %}
+              <span class="status-pill is-active"><span class="status-dot"></span>Active</span>
+            {% elif trainer.status == "inactive" %}
+              <span class="status-pill is-inactive"><span class="status-dot"></span>Inactive</span>
+            {% else %}
+              <span class="status-pill is-pending"><span class="status-dot"></span>Pending</span>
+            {% endif %}
+
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="trainer-header-right">
+      <div class="batch-label">Total Batches</div>
+      <div class="batch-number">{{ trainer.batches.count }}</div>
+    </div>
+  </div>
+
+
+  <!-- ===== TABS ===== -->
+  <div class="tab-nav" role="tablist">
+    <button class="tab-btn active" onclick="switchTab(event,'professional')" role="tab">Professional Info</button>
+    <button class="tab-btn"        onclick="switchTab(event,'personal')"     role="tab">Personal Info</button>
+    {% if trainer.admin_profile %}
+    <button class="tab-btn"        onclick="switchTab(event,'admin')"        role="tab">Admin Profile</button>
+    {% endif %}
+    <button class="tab-btn"        onclick="switchTab(event,'batches')"      role="tab">Batch Details</button>
+  </div>
+
+
+  <!-- ===== PROFESSIONAL ===== -->
+  <div class="tab-panel active" id="panel-professional">
+    <div class="info-card">
+      <div class="section-title">Academic &amp; Experience</div>
+      <div class="info-grid">
+        <div>
+          <div class="info-row">
+            <span class="info-label">Qualification</span>
+            <span class="info-value">{{ trainer.qualification }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Experience</span>
+            <span class="info-value">{{ trainer.experience_years }} years</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Teaching Exp.</span>
+            <span class="info-value">{{ trainer.teaching_experience_years }} years</span>
+          </div>
+        </div>
+        <div>
+          <div class="info-row">
+            <span class="info-label">Teaching Style</span>
+            <span class="info-value">{{ trainer.get_teaching_style_display }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Primary Domain</span>
+            <span class="info-value">{{ trainer.primary_domain }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Secondary Skills</span>
+            <span class="info-value">{{ trainer.secondary_skills }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Frameworks</span>
+            <span class="info-value">{{ trainer.frameworks }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== PERSONAL ===== -->
+  <div class="tab-panel" id="panel-personal">
+    <div class="info-card">
+      <div class="section-title">Contact &amp; Location</div>
+      <div class="info-grid">
+        <div>
+          <div class="info-row">
+            <span class="info-label">Gender</span>
+            <span class="info-value">{{ trainer.get_gender_display }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span class="info-value">{{ trainer.phone }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Languages</span>
+            <span class="info-value">{{ trainer.languages_spoken }}</span>
+          </div>
+        </div>
+        <div>
+          <div class="info-row">
+            <span class="info-label">Location</span>
+            <span class="info-value">{{ trainer.location }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Timezone</span>
+            <span class="info-value">{{ trainer.timezone }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">Biography</div>
+      <div class="bio-text">{{ trainer.bio|linebreaks }}</div>
+
+      <div class="section-title">Professional Links</div>
+      <div class="link-list">
+        {% if trainer.portfolio_url %}
+          <a href="{{ trainer.portfolio_url }}" target="_blank" class="profile-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h6"/>
+              <polyline points="16 3 21 3 21 8"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Portfolio
+          </a>
+        {% endif %}
+        {% if trainer.github_url %}
+          <a href="{{ trainer.github_url }}" target="_blank" class="profile-link">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
+          </a>
+        {% endif %}
+        {% if trainer.linkedin_url %}
+          <a href="{{ trainer.linkedin_url }}" target="_blank" class="profile-link">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            LinkedIn
+          </a>
+        {% endif %}
+        {% if not trainer.portfolio_url and not trainer.github_url and not trainer.linkedin_url %}
+          <p style="color:var(--slate-400); font-size:0.88rem;">No professional links added.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== ADMIN ===== -->
+  {% if trainer.admin_profile %}
+  <div class="tab-panel" id="panel-admin">
+    <div class="info-card">
+      <div class="section-title">Administrative Details</div>
+      <div class="info-grid">
+        <div>
+          <div class="info-row">
+            <span class="info-label">Employee ID</span>
+            <span class="info-value">{{ trainer.admin_profile.employee_id }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Date Joined</span>
+            <span class="info-value">{{ trainer.admin_profile.date_joined }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Salary</span>
+            <span class="info-value">&#8377; {{ trainer.admin_profile.salary }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Performance</span>
+            <span class="info-value">{{ trainer.admin_profile.performance_rating }}</span>
+          </div>
+        </div>
+        <div>
+          <div class="info-row">
+            <span class="info-label">Background Check</span>
+            <span class="info-value">
+              {% if trainer.admin_profile.background_verified %}
+                <span class="pill pill-success">Verified</span>
+              {% else %}
+                <span class="pill pill-danger">Not Verified</span>
+              {% endif %}
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Profile Status</span>
+            <span class="info-value">
+              {% if trainer.admin_profile.profile_verified %}
+                <span class="pill pill-success">Verified</span>
+              {% else %}
+                <span class="pill pill-warning">Pending</span>
+              {% endif %}
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Active</span>
+            <span class="info-value">
+              {% if trainer.admin_profile.is_active %}
+                <span class="pill pill-success">Active</span>
+              {% else %}
+                <span class="pill pill-secondary">Inactive</span>
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ===== BATCHES ===== -->
+  <div class="tab-panel" id="panel-batches">
+    <div class="info-card">
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+        <div class="section-title" style="margin:0; border:none; padding:0;">Assigned Batches</div>
+        <button type="button" class="add-batch-btn" onclick="toggleBatchForm()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Assign Batch
+        </button>
+      </div>
+
+      <div id="batchForm" class="batch-form-wrap" style="display:none;">
+        <div class="batch-form-inner">
+          <div class="batch-form-header">
+            <div>
+              <p class="batch-form-title">Assign to Batch</p>
+              <p class="batch-form-sub">Select a batch to assign <strong>{{ trainer.full_name }}</strong> as trainer</p>
+            </div>
+            <button type="button" class="form-close-btn" onclick="toggleBatchForm()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="batch-form-field">
+              <label class="form-label">Select Batch</label>
+              <div class="custom-select-wrap">
+                <svg class="select-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                </svg>
+                <select name="batch_id" required class="form-select-styled">
+                  <option value="">&#8212; Choose a batch &#8212;</option>
+                  {% for batch in available_batches %}
+                    <option value="{{ batch.id }}">{{ batch.name }} &middot; {{ batch.course.name }}</option>
+                  {% endfor %}
+                </select>
+                <svg class="select-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="batch-form-actions">
+              <button type="button" class="form-cancel-btn" onclick="toggleBatchForm()">Cancel</button>
+              <button type="submit" name="assign_batch" value="1" class="form-submit-btn">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Assign Trainer
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div style="margin-top:1.25rem;">
+        {% if trainer.batches.all %}
+        <table class="batch-table">
+          <thead>
+            <tr>
+              <th>Batch Name</th>
+              <th>Course</th>
+              <th>Students</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for batch in trainer.batches.all %}
+            <tr>
+              <td><strong>{{ batch.name }}</strong></td>
+              <td>{{ batch.course.name }}</td>
+              <td>{{ batch.total_students }}</td>
+              <td>
+                {% if batch.is_completed %}
+                  <span class="pill pill-secondary">Completed</span>
+                {% elif batch.is_active %}
+                  <span class="pill pill-success">Ongoing</span>
+                {% else %}
+                  <span class="pill pill-danger">Inactive</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <div class="batch-empty">
+            <svg width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24"
+                 style="opacity:0.3; display:block; margin:0 auto 0.75rem;">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <path d="M16 2v4M8 2v4M3 10h18"/>
+            </svg>
+            <p>No batches assigned yet.</p>
+            <p style="font-size:0.8rem;">Click <strong>Assign Batch</strong> above to get started.</p>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- BACK -->
+  <a href="{% url 'bdm:trainer_list' %}" class="back-btn">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to List
+  </a>
+
+</div>
+
+<script>
+  function switchTab(e, panelId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    document.getElementById('panel-' + panelId).classList.add('active');
+  }
+
+  function toggleBatchForm() {
+    const f = document.getElementById('batchForm');
+    f.style.display = (f.style.display === 'none' || f.style.display === '') ? 'block' : 'none';
+  }
+</script>
+
+{% endblock %}

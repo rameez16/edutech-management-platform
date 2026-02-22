@@ -1,0 +1,579 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+
+  :root {
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --white: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body { background: var(--slate-50); font-family: 'DM Sans', sans-serif; }
+
+  .si-wrapper {
+    max-width: 1200px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ---- PAGE HEADER ---- */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--slate-800);
+    margin: 0;
+    line-height: 1;
+  }
+
+  .page-subtitle {
+    font-size: 0.87rem;
+    color: var(--slate-400);
+    margin: 0.3rem 0 0;
+  }
+
+  /* ---- FILTER CARD ---- */
+  .filter-card {
+    background: var(--white);
+    border: 1px solid var(--blue-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1.5fr;
+    gap: 0.75rem;
+    align-items: end;
+  }
+
+  .filter-field { display: flex; flex-direction: column; gap: 0.3rem; }
+
+  .filter-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-input-wrap { position: relative; }
+
+  .filter-input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate-400);
+    pointer-events: none;
+    display: flex;
+  }
+
+  .filter-input,
+  .filter-select {
+    width: 100%;
+    padding: 0.55rem 0.85rem 0.55rem 2.15rem;
+    border: 1.5px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--slate-700);
+    background: var(--slate-50);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .filter-input:focus,
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--blue-400);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    background: var(--white);
+  }
+
+  .select-chevron {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate-400);
+    pointer-events: none;
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--slate-100);
+  }
+
+  .btn-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.52rem 1.35rem;
+    background: var(--blue-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+  }
+  .btn-filter:hover { background: var(--blue-700); }
+
+  .btn-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.52rem 1.15rem;
+    background: white;
+    color: var(--slate-500);
+    border: 1.5px solid var(--slate-200);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { border-color: var(--slate-300); color: var(--slate-700); background: var(--slate-50); }
+
+  /* ---- TABLE CARD ---- */
+  .table-card {
+    background: var(--white);
+    border: 1px solid var(--blue-100);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .table-card table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.895rem;
+  }
+
+  .table-card thead {
+    background: var(--slate-50);
+    border-bottom: 2px solid var(--blue-100);
+  }
+
+  .table-card th {
+    padding: 0.85rem 1.1rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+  }
+
+  .table-card td {
+    padding: 0.9rem 1.1rem;
+    color: var(--slate-700);
+    border-bottom: 1px solid var(--slate-100);
+    vertical-align: middle;
+  }
+
+  .table-card tbody tr:last-child td { border-bottom: none; }
+  .table-card tbody tr { transition: background 0.1s; }
+  .table-card tbody tr:hover { background: var(--blue-50); }
+
+  /* Student name */
+  .student-name {
+    font-weight: 600;
+    color: var(--slate-800);
+  }
+
+  /* Subject */
+  .subject-text {
+    color: var(--slate-600);
+    max-width: 280px;
+  }
+
+  /* ---- PILLS ---- */
+  .pill {
+    display: inline-block;
+    padding: 0.22rem 0.7rem;
+    border-radius: 99px;
+    font-size: 0.73rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  /* Issue type */
+  .pill-type    { background: var(--blue-50);  color: var(--blue-700);  border: 1px solid var(--blue-200); }
+
+  /* Priority */
+  .pill-high    { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+  .pill-medium  { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+  .pill-low     { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+
+  /* Status */
+  .pill-open       { background: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe; }
+  .pill-inprogress { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+  .pill-resolved   { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .pill-closed     { background: var(--slate-100); color: var(--slate-500); border: 1px solid var(--slate-200); }
+
+  /* ---- ACTION BUTTON ---- */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.34rem 0.85rem;
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.79rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s;
+    border: 1.5px solid transparent;
+  }
+
+  .action-btn-view {
+    background: var(--blue-50);
+    color: var(--blue-600);
+    border-color: var(--blue-200);
+  }
+  .action-btn-view:hover {
+    background: var(--blue-600);
+    color: white;
+    border-color: var(--blue-600);
+  }
+
+  /* ---- EMPTY STATE ---- */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--slate-400);
+  }
+  .empty-state svg { display: block; margin: 0 auto 0.85rem; opacity: 0.3; }
+  .empty-state p { font-size: 0.92rem; margin: 0; }
+
+  /* ---- TABLE FOOTER ---- */
+  .table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.1rem;
+    border-top: 1px solid var(--slate-100);
+    background: var(--slate-50);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .result-count {
+    font-size: 0.8rem;
+    color: var(--slate-400);
+  }
+
+  /* ---- PAGINATION ---- */
+  .pagination-wrap {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+  }
+
+  .page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 0.65rem;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s;
+    border: 1.5px solid var(--slate-200);
+    background: white;
+    color: var(--slate-600);
+  }
+  .page-btn:hover { border-color: var(--blue-300, #93c5fd); color: var(--blue-600); background: var(--blue-50); }
+  .page-btn.active { background: var(--blue-600); color: white; border-color: var(--blue-600); font-weight: 600; }
+  .page-btn:disabled, .page-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+  @media (max-width: 768px) {
+    .filter-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 480px) {
+    .filter-grid { grid-template-columns: 1fr; }
+    .table-card { overflow-x: auto; }
+  }
+</style>
+
+<div class="si-wrapper">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Student Issues</h1>
+      <p class="page-subtitle">Track and manage all reported student issues</p>
+    </div>
+  </div>
+
+  <!-- FILTER CARD -->
+  <form method="get">
+    <div class="filter-card">
+      <div class="filter-grid">
+
+        <!-- Issue Type -->
+        <div class="filter-field">
+          <label class="filter-label">Issue Type</label>
+          <div class="filter-input-wrap">
+            <span class="filter-input-icon">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </span>
+            <select name="issue_type" class="filter-select">
+              <option value="">All Types</option>
+              {% for value, label in issue_types %}
+                <option value="{{ value }}" {% if request.GET.issue_type == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <svg class="select-chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="filter-field">
+          <label class="filter-label">Status</label>
+          <div class="filter-input-wrap">
+            <span class="filter-input-icon">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+              </svg>
+            </span>
+            <select name="status" class="filter-select">
+              <option value="">All Statuses</option>
+              {% for value, label in statuses %}
+                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <svg class="select-chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Priority -->
+        <div class="filter-field">
+          <label class="filter-label">Priority</label>
+          <div class="filter-input-wrap">
+            <span class="filter-input-icon">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+              </svg>
+            </span>
+            <select name="priority" class="filter-select">
+              <option value="">All Priorities</option>
+              {% for value, label in priorities %}
+                <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <svg class="select-chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="filter-field">
+          <label class="filter-label">Search</label>
+          <div class="filter-input-wrap">
+            <span class="filter-input-icon">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+            </span>
+            <input type="text"
+                   name="search"
+                   class="filter-input"
+                   value="{{ request.GET.search }}"
+                   placeholder="Subject or description…">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="filter-actions">
+        <button type="submit" class="btn-filter">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+          </svg>
+          Apply Filter
+        </button>
+        <a href="{% url 'bdm:student_issue_list' %}" class="btn-reset">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-4"/>
+          </svg>
+          Reset
+        </a>
+      </div>
+    </div>
+  </form>
+
+  <!-- TABLE CARD -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Subject</th>
+          <th>Type</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for issue in issues %}
+        <tr>
+          <td><span class="student-name">{{ issue.student.full_name }}</span></td>
+
+          <td><span class="subject-text">{{ issue.subject|truncatechars:45 }}</span></td>
+
+          <td>
+            <span class="pill pill-type">{{ issue.get_issue_type_display }}</span>
+          </td>
+
+          <td>
+            {% with p=issue.priority %}
+              {% if p == "high" or p == "critical" %}
+                <span class="pill pill-high">{{ issue.get_priority_display }}</span>
+              {% elif p == "medium" %}
+                <span class="pill pill-medium">{{ issue.get_priority_display }}</span>
+              {% else %}
+                <span class="pill pill-low">{{ issue.get_priority_display }}</span>
+              {% endif %}
+            {% endwith %}
+          </td>
+
+          <td>
+            {% with s=issue.status %}
+              {% if s == "open" %}
+                <span class="pill pill-open">{{ issue.get_status_display }}</span>
+              {% elif s == "in_progress" or s == "inprogress" %}
+                <span class="pill pill-inprogress">{{ issue.get_status_display }}</span>
+              {% elif s == "resolved" %}
+                <span class="pill pill-resolved">{{ issue.get_status_display }}</span>
+              {% else %}
+                <span class="pill pill-closed">{{ issue.get_status_display }}</span>
+              {% endif %}
+            {% endwith %}
+          </td>
+
+          <td>
+            <a href="{% url 'bdm:student_issue_detail' issue.pk %}" class="action-btn action-btn-view">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              View
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <svg width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <p>No issues found matching your criteria.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Footer: count + pagination -->
+    {% if issues %}
+    <div class="table-footer">
+      <span class="result-count">
+        Showing {{ issues|length }} issue{{ issues|length|pluralize }}
+        {% if request.GET.search or request.GET.status or request.GET.priority or request.GET.issue_type %}
+          &nbsp;&middot;&nbsp; Filtered results
+        {% endif %}
+      </span>
+
+      {% if page_obj.has_other_pages %}
+      <div class="pagination-wrap">
+        {% if page_obj.has_previous %}
+          <a class="page-btn" href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}&priority={{ request.GET.priority }}&issue_type={{ request.GET.issue_type }}">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </a>
+        {% endif %}
+
+        <span class="page-btn active">{{ page_obj.number }}</span>
+
+        <span style="font-size:0.78rem; color:var(--slate-400);">of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+          <a class="page-btn" href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}&priority={{ request.GET.priority }}&issue_type={{ request.GET.issue_type }}">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

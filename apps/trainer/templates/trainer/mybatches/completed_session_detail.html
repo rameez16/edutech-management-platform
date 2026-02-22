@@ -1,0 +1,76 @@
+{% extends "trainer/mybatches/base.html" %}
+{% load static %}
+
+{% block tab_content %}
+<div class="completed-lesson-card">
+    <div class="completed-lesson-card-header" style="margin-bottom: 15px;">
+    <h4 class="completed-lesson-card-title" style="display:flex;align-items:center;gap:8px;">
+        <a href="{% url 'trainer:batch-sessions' session.batch.id %}" 
+           class="completed-lesson-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 width="20" height="20">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </a>
+        Session {{ session.lesson_plan.session_number }} Details - {{ session.batch.name }}
+    </h4>
+</div>
+
+    <!-- Session Info Table -->
+    <div class="completed-lesson-info">
+        <table class="completed-lesson-table">
+            <tbody>
+                <tr>
+                    <th>Topic</th>
+                    <td>{{ session.lesson_plan.topic }}</td>
+                </tr>
+                <tr>
+                    <th>Planned Date</th>
+                    <td>{{ session.planned_date|date:"M d, Y" }}</td>
+                </tr>
+                <tr>
+                    <th>Actual Date</th>
+                    <td>{{ session.actual_date|date:"M d, Y" }}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td><span class="completed-lesson-badge completed">{{ session.get_status_display }}</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="add-material-btn">
+    <a href="{% url 'trainer:add-session-material' session.id %}" 
+       class="completed-lesson-btn complete">
+        + Add Material
+    </a>
+</div>
+    </div>
+
+    <!-- Update Form -->
+    <div class="completed-lesson-form">
+        <h5 class="form-title">Update Session Details</h5>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {% if field.field.widget.input_type == "checkbox" %}
+                        <div class="completed-lesson-checkbox">
+                            {{ field }} {{ field.label }}
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    {% if field.errors %}
+                        <p class="text-danger">{{ field.errors }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="completed-lesson-btn complete">Save Changes</button>
+            <a href="{% url 'trainer:batch-sessions' session.batch.id %}" class="completed-lesson-btn skip">Back to Sessions</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

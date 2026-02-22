@@ -1440,7 +1440,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 {% endif %}
                             </a>
                             
-                            <a href="" class="sidebar-link {% if 'trainer' in request.resolver_match.url_name %}active{% endif %}">
+                            <a href="{% url 'bdm:trainer_list' %}" class="sidebar-link {% if 'trainer' in request.resolver_match.url_name %}active{% endif %}">
                                 <div class="sidebar-link-icon">
                                     <i class="fas fa-chalkboard-teacher"></i>
                                 </div>
@@ -1537,6 +1537,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <i class="fas fa-comment-alt"></i>
                                 </div>
                                 <span class="sidebar-link-text">Student Feedbacks</span>
+                            </a>
+                            <a href="{% url 'bdm:student_issue_list' %}" class="sidebar-link {% if 'feedback' in request.resolver_match.url_name %}active{% endif %}">
+                                <div class="sidebar-link-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <span class="sidebar-link-text">Student Issues</span>
                             </a>
                             
                             <a href="" class="sidebar-link {% if 'issue' in request.resolver_match.url_name %}active{% endif %}">

@@ -80,6 +80,13 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path('courses/', views.course_list_view, name='course_list'),
                 path('courses/<int:pk>/', views.course_detail_view, name='course_detail'),
                 path('module/<int:pk>/', views.module_detail_view, name='module_detail'),
+                
+                path("trainers/", views.trainer_list_view, name="trainer_list"),
+                path("trainers/<int:pk>/", views.trainer_detail_view, name="trainer_detail"),
+                
+                
+                path('issues/', views.student_issue_list, name='student_issue_list'),
+                path('issues/<int:pk>/', views.student_issue_detail, name='student_issue_detail'),
                 ]
 
 
