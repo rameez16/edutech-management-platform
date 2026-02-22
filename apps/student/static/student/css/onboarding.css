@@ -1,39 +1,33 @@
-/* ================================
-   STUDENT ONBOARDING MODULE
-================================ */
+/* ═══════════════════════════════════════════════════════════
+   STUDENT ONBOARDING — onboarding.css
+   ═══════════════════════════════════════════════════════════ */
 
-.background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-   
-}
-
-
-/* Root wrapper must fill base.html content area */
 .student-onboarding {
-    width: 100%;
-    max-width: 100%;
-    padding: 0;          /* base.html already has padding */
-    margin: 0;
+    max-width: 1200px;
+    margin: 10px auto;
+    padding: 40px 40px 40px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 18px;
+    
 }
 
-/* Header spacing */
 .onboarding-header {
-    margin-bottom: 24px;
-    height: 200px;
+    padding: 32px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    height: auto;
 }
 
 .onboarding-title {
-    font-size: 26px;
-    font-weight: 600;
-    margin-bottom: 16px;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    color: #45007a;
 }
 
-/* PROGRESS */
 .onboarding-progress {
     display: flex;
     flex-direction: column;
@@ -44,337 +38,263 @@
     display: flex;
     justify-content: space-between;
     font-size: 14px;
+    color: #4b5563;
+    font-weight: 500;
 }
 
-
-/* Progress bar */
 .progress-track {
     width: 100%;
     height: 8px;
-    background: rgba(255,255,255,0.15);
+    background: #e5e7eb;
     border-radius: 6px;
     overflow: hidden;
 }
 
-.progress-fill {
-    height: 100%;
-    border-radius: 6px;
-}
+.progress-fill { height: 100%; border-radius: 6px; }
 
 .onboarding-fill {
-    background: linear-gradient(90deg, var(--emerald-light), var(--emerald));
-    height: 100%;
-    border-radius: 10px;
+    background: linear-gradient(90deg, #10b981, #34d399);
 }
 
 .progress-status {
     display: flex;
     gap: 20px;
     font-size: 13px;
+    font-weight: 600;
 }
 
-.status.completed { color: var(--success); }
-.status.pending   { color: var(--warning); }
-.status.locked    { color: var(--text-muted); }
+.status.completed { color: #10b981; }
+.status.pending   { color: #f59e0b; }
+.status.locked    { color: #9ca3af; }
 
-/* Steps layout */
 .onboarding-steps {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-bottom: 24px;
-    height: 230px;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: stretch;
+    border-radius: 18px;
+    padding: 20px 0px;
+    
 }
 
-/* Step cards */
 .step-card {
-    height: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 2px solid #e5e7eb;
+    padding: 28px 24px;
     display: flex;
     flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     justify-content: space-between;
+    height: auto;        /* remove fixed 320px */
+    min-height: 320px;   /* keep minimum height */
+
 }
 
-/* Buttons full width inside cards */
-.step-card .btn,
-.step-card .btn-group-vertical a {
-    width: 100%;
+.step-card:hover {
+    border-color: #a5b4fc;
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.12);
+    transform: translateY(-3px);
 }
 
-/* HEADER */
+.step-card.completed { border-color: #a7f3d0; background: #ffffff; }
+.step-card.pending   { border-color: #fcd34d; background: linear-gradient(135deg, #ffffff, #fffbeb); }
+.step-card.locked    { border-color: #e5e7eb; background: #fafafa; opacity: 0.85; }
+
 .step-header {
     display: flex;
     justify-content: space-between;
-    font-weight: 600;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
 }
 
-/* BADGES */
 .badge {
     font-size: 11px;
-    padding: 4px 10px;
+    font-weight: 700;
+    padding: 3px 10px;
     border-radius: 20px;
+    letter-spacing: 0.3px;
 }
 
-.badge.success {
-    background: rgba(34,197,94,0.15);
-    color: var(--success);
-}
+.badge.success { background: #d1fae5; color: #065f46; }
+.badge.warning { background: #fef3c7; color: #92400e; }
+.badge.locked  { background: #f3f4f6; color: #9ca3af; }
 
-.badge.warning {
-    background: rgba(234,179,8,0.15);
-    color: var(--warning);
-}
-
-.badge.locked {
-    background: rgba(255,255,255,0.1);
-    color: var(--text-muted);
-}
-
-/* TEXT */
 .step-desc {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: #6b7280;
+    line-height: 1.6;
+    text-align: center;
+    margin: 0;
 }
 
-/* BUTTONS */
 .btn {
+    display: block;
     padding: 10px 16px;
-    border-radius: 12px;
+    border-radius: 10px;
     text-align: center;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: all 0.2s ease;
 }
-
-
 
 .btn.primary {
-    background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
-    color: white;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
+.btn.primary:hover { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
 
-.btn.secondary {
-    background: linear-gradient(135deg, var(--gold), var(--amber));
-    color: white;
-}
-
-.btn.outline {
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-}
-
-.btn.disabled {
-    background: rgba(255,255,255,0.1);
-    color: var(--text-muted);
-    cursor: not-allowed;
-}
-
-.btn-group-vertical {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* NEXT STEP */
-.next-step-card {
-    padding: 26px;
-    height: 150px;
-}
-
-.next-step-card h4 {
-    font-size: 18px;
-    margin-bottom: 8px;
-}
-
-.next-step-card p {
-    font-size: 14px;
-    color: var(--text-secondary);
-}
-
-
-/* FORCE View Documents button to blue */
-.step-card .btn.success {
-    background: #2563eb !important;
+.btn.success {
+    background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
     color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
+.btn.success:hover { background: linear-gradient(135deg, #1d4ed8, #2563eb) !important; }
 
-.step-card .btn.success:hover {
-    background: #1d4ed8 !important;
-}
+.btn.secondary { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #ffffff; }
 
+.btn.outline { border: 1.5px solid #ddd6fe; color: #6366f1; background: transparent; }
 
-/* Badge for completed steps */
-.step-card .badge.success {
-    background: rgba(34,197,94,0.15);
-    color: var(--success);
-}
-
-/* Button for View / Download actions */
-.step-card .btn.success {
-    background: #4464ce !important;  /* Blue for view/download */
-    color: #ffffff !important;
-}
-
-.step-card .btn.success:hover {
-    background: #1d4ed8 !important;
-}
-
-/* Progress status colors already handled */
-.status.completed { color: var(--success); }
-.status.pending   { color: var(--warning); }
-.status.locked    { color: var(--text-muted); }
-
-
-
-/* ===============================
-   STEP 2 ENROLLMENT LETTER BUTTONS
-================================= */
-
-
-.step2-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;           /* vertical spacing */
-    width: 100%;          /* full width inside card */
-}
-
-.step2-buttons .btn {
-    width: 100%;          /* full width buttons */
-    padding: 12px 0;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 8px;
-    border: solid 1px black !important;
-    text-align: center;
-    border: 2px solid transparent;
-    transition: background 0.3s, color 0.3s, border 0.3s;
-}
-
-/* Download button (orange) */
-.btn-enroll-download {
-    background-color: #fcb148 !important;  /* lighter orange */
-    color: #000;
-}
-
-.btn-enroll-download:hover {
-    background-color: #da8403 !important;  /* darker hover */
-}
-
-/* Upload button (blue) */
-.btn-enroll-upload {
-    background-color: #22a155 !important;  /* blue */
-    color: #fff !important;
-}
-
-.btn-enroll-upload:hover {
-    background-color: #037233 !important;
-}
-
-/* Disabled button */
-.btn.disabled {
-    background-color: rgba(255,255,255,0.1) !important;
-    color: var(--text-muted) !important;
+.btn.disabled,
+button:disabled {
+    background: #f3f4f6 !important;
+    color: #9ca3af !important;
     cursor: not-allowed !important;
     pointer-events: none !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
+.btn-group-vertical { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.btn-group-vertical .btn,
+.btn-group-vertical a,
+.btn-group-vertical button { width: 100%; }
 
-/* Make link behave like button content */
-.btn-link {
-    display: block;
-    width: 100%;
-    height: 100%;
-    color: inherit;
-    text-decoration: none;
-    pointer-events: auto;
+.step2-buttons { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.step2-buttons .btn {
+    width: 100%; padding: 10px 0; font-size: 14px; font-weight: 600;
+    border-radius: 10px; text-align: center; border: none !important;
 }
 
-/* When parent button is disabled, block link clicks */
-button:disabled .btn-link {
-    pointer-events: none;
+.btn-enroll-download {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+.btn-enroll-download:hover { background: linear-gradient(135deg, #d97706, #f59e0b) !important; }
+.btn-enroll-download.disabled { background: #f3f4f6 !important; color: #9ca3af !important; box-shadow: none; }
+
+.btn-enroll-upload {
+    background: linear-gradient(135deg, #10b981, #34d399) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+.btn-enroll-upload:hover { background: linear-gradient(135deg, #059669, #10b981) !important; }
+.btn-enroll-upload:disabled,
+button.btn-enroll-upload:disabled {
+    background: linear-gradient(135deg, #10b981, #34d399) !important;
+    color: #fff !important;
+    opacity: 0.85;
+    cursor: default !important;
+    pointer-events: none !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
 }
 
+.step3-buttons { display: flex; flex-direction: column; gap: 10px; width: 100%; }
 
-
-/* Fullscreen modal */
-.fullscreen-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto; /* scroll if content too tall */
-    background-color: rgba(0,0,0,0.8);
-}
-
-/* Fullscreen content */
-.modal-content-full {
-    background-color: #fff;
-    margin: 30px auto;
-    padding: 20px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 800px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-    position: relative;
-}
-
-/* Close button */
-.modal-content-full .close {
-    color: #aaa;
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.modal-content-full .close:hover {
-    color: black;
-}
-
-
-/* ===============================
-   VIEW ID CARD BUTTON - FORCE STYLE
-================================== */
 .step3-card .btn-group-vertical .view-id-btn {
-    background-color: #9072e9 !important; /* green */
-    color: white !important;
-    border: solid 2px black !important;
-    border-radius: 12px !important;
-    padding: 12px 20px !important;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
     width: 100% !important;
     text-align: center !important;
     cursor: pointer !important;
     font-size: 14px !important;
     font-weight: 600 !important;
-    transition: background-color 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+    transition: all 0.2s ease !important;
 }
-
 .step3-card .btn-group-vertical .view-id-btn:hover {
-    background-color: #622ab7 !important; /* darker green */
+    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
 }
 
+.btn-idcard-download {
+    background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+    transition: all 0.2s ease !important;
+}
+.btn-idcard-download:hover { background: linear-gradient(135deg, #1d4ed8, #2563eb) !important; }
 
+.next-step-card {
+    padding: 28px 32px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    border: none;
+    height: auto;
+    margin-top: 20px;
+}
 
-/* RESPONSIVE */
+.next-step-card h4 { font-size: 18px; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; }
+.next-step-card p  { font-size: 14px; color: #6b7280; margin: 0; }
+
+.fullscreen-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.modal-content-full {
+    background-color: #fff;
+    margin: 30px auto;
+    padding: 24px;
+    border-radius: 18px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.modal-content-full .close {
+    color: #9ca3af;
+    position: absolute;
+    top: 14px; right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.modal-content-full .close:hover { color: #1f2937; }
+
 @media (max-width: 992px) {
-    .onboarding-steps {
-        grid-template-columns: 1fr;
-    }
+    .onboarding-steps { grid-template-columns: 1fr; }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+@media (max-width: 768px) {
+    .student-onboarding { padding: 0 14px 30px; }
+    .onboarding-header  { padding: 22px; }
+    .onboarding-title   { font-size: 22px; }
+    .step-card          { padding: 18px; }
+    .next-step-card     { padding: 20px 22px; }
+}

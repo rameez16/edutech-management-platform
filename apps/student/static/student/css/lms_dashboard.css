@@ -1,134 +1,443 @@
-body {
+/* ═══════════════════════════════════════════════════════════
+   LMS DASHBOARD — lms_dashboard.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Container ─────────────────────────────────────────────── */
+.lms-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px 40px;
+    box-sizing: border-box;
+}
+
+/* ── LMS Header ─────────────────────────────────────────────── */
+.lms-header {
+    padding: 32px;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #ffffff, #f4f6ff);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.lms-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: #2d2d2d;
+}
+
+.lms-meta {
+    font-size: 15px;
+    font-weight: 600;
+    color: #6366f1;
     margin: 0;
-    font-family: Inter, sans-serif;
-    background: #f4f6fb;
-}
-
-/* LAYOUT */
-.app-wrapper {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* SIDEBAR */
-.sidebar {
-    width: 260px;
-    background: #1f2a44;
-    color: #fff;
-    padding: 24px;
-}
-
-.brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 20px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lms-meta span {
+    color: #6366f1;
+}
+
+/* ── Wrapper Card ────────────────────────────────────────────── */
+.lms-wrapper-card {
+    padding: 30px;
+    background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Stats Row (4 cards) ─────────────────────────────────────── */
+.lms-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-bottom: 28px;
+}
+
+.lms-stat-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.lms-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+}
+
+.lms-stat-number {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.lms-stat-all     .lms-stat-number { color: #6366f1; }
+.lms-stat-videos  .lms-stat-number { color: #ef4444; }
+.lms-stat-docs    .lms-stat-number { color: #3b82f6; }
+.lms-stat-resources .lms-stat-number { color: #10b981; }
+
+.lms-stat-label {
+    font-size: 13px;
     font-weight: 600;
-    margin-bottom: 30px;
+    color: #374151;
+    margin-top: 2px;
 }
 
-.menu {
-    list-style: none;
-    padding: 0;
+.lms-stat-sub {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 400;
+    margin-top: 1px;
 }
 
-.menu li {
-    margin-bottom: 8px;
+/* ── Sessions inner white card ───────────────────────────────── */
+.lms-sessions-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    padding: 24px 28px 28px;
 }
 
-.menu a {
+/* ── Filter Tabs ─────────────────────────────────────────────── */
+.lms-filter-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.lms-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: #e0e7ff;
+    color: #4338ca;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    cursor: pointer;
+}
+
+.lms-filter-btn:hover {
+    background: #c7d2fe;
+    transform: translateY(-1px);
+}
+
+.lms-filter-btn.active {
+    background: #6366f1;
+    color: #fff;
+}
+
+.filter-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.lms-filter-btn.active .filter-dot {
+    background: rgba(255, 255, 255, 0.8);
+    opacity: 1;
+}
+
+.dot-recording  { background: #ef4444; }
+.dot-notes      { background: #3b82f6; }
+.dot-slides     { background: #8b5cf6; }
+.dot-code       { background: #10b981; }
+.dot-assignment { background: #f59e0b; }
+.dot-reference  { background: #06b6d4; }
+.dot-other      { background: #9ca3af; }
+
+/* ── Sessions Wrapper ────────────────────────────────────────── */
+.lms-sessions-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Session Group Header ────────────────────────────────────── */
+.lms-session-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 4px;
+    margin-top: 10px;
+}
+
+.lms-session-header:first-of-type {
+    margin-top: 0;
+}
+
+.lms-session-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #6366f1;
+}
+
+.lms-session-date {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.lms-session-count {
+    margin-left: auto;
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* ── Materials Group ─────────────────────────────────────────── */
+.lms-materials-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+/* ── Material Card ───────────────────────────────────────────── */
+.lms-material-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.07);
+    border: 1px solid #ede9ff;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.lms-material-card:hover {
+    box-shadow: 0 8px 28px rgba(99, 102, 241, 0.14);
+    transform: translateY(-2px);
+}
+
+/* Left colored border bar */
+.lms-material-type-bar {
+    width: 4px;
+    align-self: stretch;
+    flex-shrink: 0;
+}
+
+.lms-bar-recording  { background: #ef4444; }
+.lms-bar-notes      { background: #3b82f6; }
+.lms-bar-slides     { background: #8b5cf6; }
+.lms-bar-code       { background: #10b981; }
+.lms-bar-assignment { background: #f59e0b; }
+.lms-bar-reference  { background: #06b6d4; }
+.lms-bar-other      { background: #9ca3af; }
+
+/* Icon */
+.lms-material-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    margin: 16px 16px 16px 14px;
+}
+
+.lms-icon-recording  { background: #fef2f2; }
+.lms-icon-notes      { background: #eff6ff; }
+.lms-icon-slides     { background: #f5f3ff; }
+.lms-icon-code       { background: #ecfdf5; }
+.lms-icon-assignment { background: #fffbeb; }
+.lms-icon-reference  { background: #ecfeff; }
+.lms-icon-other      { background: #f9fafb; }
+
+/* Material info */
+.lms-material-info {
+    flex: 1;
+    min-width: 0;
+    padding: 16px 0;
+}
+
+.lms-material-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lms-material-desc {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Tags */
+.lms-material-tags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.lms-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 999px;
+    letter-spacing: 0.2px;
+}
+
+.lms-tag-recording  { background: #fee2e2; color: #b91c1c; }
+.lms-tag-notes      { background: #dbeafe; color: #1d4ed8; }
+.lms-tag-slides     { background: #ede9ff; color: #5b21b6; }
+.lms-tag-code       { background: #d1fae5; color: #065f46; }
+.lms-tag-assignment { background: #fef3c7; color: #92400e; }
+.lms-tag-reference  { background: #cffafe; color: #0e7490; }
+.lms-tag-other      { background: #f3f4f6; color: #374151; }
+
+.lms-tag-mandatory {
+    background: #1f2937;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.lms-tag-meta {
+    background: transparent;
+    color: #9ca3af;
+    font-weight: 500;
+    padding: 0 4px;
+}
+
+/* ── Action Buttons ──────────────────────────────────────────── */
+.lms-material-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px 0 12px;
+    flex-shrink: 0;
+}
+
+.lms-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+    cursor: pointer;
+    border: none;
+}
+
+.lms-btn-primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.lms-btn-primary:hover {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
     color: #fff;
     text-decoration: none;
-    display: block;
-    padding: 12px;
-    border-radius: 10px;
-    opacity: 0.9;
 }
 
-.menu a i {
-    margin-right: 10px;
+.lms-btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
 }
 
-.menu a:hover {
-    background: rgba(255,255,255,0.1);
-    opacity: 1;
+.lms-btn-secondary:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+    color: #374151;
+    text-decoration: none;
 }
 
-/* CONTENT */
-.content {
-    flex: 1;
-    padding: 30px;
-}
-
-/* HEADER */
-.content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.user-badge {
-    background: #fff;
-    padding: 8px 14px;
-    border-radius: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-/* CARDS */
-.info-card {
-    background: #fff;
-    border-radius: 18px;
-    padding: 20px;
+/* ── Empty State ─────────────────────────────────────────────── */
+.lms-empty-state {
     text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
-
-.info-card i {
-    font-size: 28px;
-    margin-bottom: 8px;
-}
-
-/* PANELS */
-.panel {
-    background: #fff;
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
-
-/* LISTS */
-.status-list,
-.activity-list {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 15px;
-}
-
-.status-list li,
-.activity-list li {
-    padding: 8px 0;
-}
-
-.done { color: #2e7d32; }
-.pending { color: #f9a825; }
-.sidebar-logout-btn {
-    width: 100%;
-    background: none;
-    border: none;
-    color: #ffffff;
-    padding: 12px;
-    text-align: left;
-    border-radius: 10px;
-    cursor: pointer;
-    opacity: 0.9;
+    padding: 60px 20px;
+    color: #9ca3af;
     font-size: 15px;
+    font-style: italic;
+    background: #faf5ff;
+    border-radius: 14px;
+    border: 1.5px dashed #ddd6fe;
 }
 
-.sidebar-logout-btn i {
-    margin-right: 10px;
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .lms-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.sidebar-logout-btn:hover {
-    background: rgba(255,255,255,0.12);
-    opacity: 1;
+@media (max-width: 768px) {
+    .lms-header { padding: 22px; }
+    .lms-title { font-size: 22px; }
+    .lms-wrapper-card { padding: 20px; }
+    .lms-sessions-card { padding: 16px 20px 22px; }
+
+    .lms-material-card { flex-wrap: wrap; }
+
+    .lms-material-desc {
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .lms-material-actions {
+        width: 100%;
+        padding: 0 16px 14px 82px;
+        justify-content: flex-start;
+    }
+
+    .lms-btn { padding: 8px 14px; font-size: 12.5px; }
+    .lms-stat-number { font-size: 28px; }
+    .lms-filter-btn { padding: 7px 14px; font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+    .lms-stats-row { grid-template-columns: repeat(2, 1fr); }
+    .lms-wrapper-card { padding: 14px; }
+    .lms-sessions-card { padding: 12px 14px 16px; }
+    .lms-session-header { padding: 12px 2px; }
+
+    .lms-material-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+        margin: 12px 12px 12px 10px;
+    }
+
+    .lms-material-title { font-size: 14px; }
 }

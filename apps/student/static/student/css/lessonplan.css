@@ -1,144 +1,221 @@
-/* ===============================
-   Container
-   =============================== */
+/* ═══════════════════════════════════════════════════════════
+   LESSON PLAN — lessonplan.css
+   Follows the same design system as batch.css / lms_dashboard.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Container ─────────────────────────────────────────────── */
 .lesson-plan-container {
-    width: 100%;
-    padding: 24px;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px 40px;
     box-sizing: border-box;
 }
 
-/* ===============================
-   Header
-   =============================== */
+/* ── Header ──────────────────────────────────────────────────── */
 .lesson-plan-header {
-    padding: 24px;
-    margin-bottom: 24px;
-    background: rgb(255, 255, 255);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #ffffff, #f4f6ff);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
 }
 
-/* ===============================
-   Modules Grid
-   =============================== */
+.lesson-plan-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #37007a;
+}
+
+.lesson-plan-header p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #7361b5;
+    margin: 0;
+}
+
+/* ── Modules Grid (wrapper card) ─────────────────────────────── */
 .modules-grid {
+    padding: 30px;
+    background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
 }
 
-/* ===============================
-   Module Card
-   =============================== */
+/* ── Module Card ─────────────────────────────────────────────── */
 .module-card {
-    padding: 20px;
-    border-radius: 12px;
-    background: rgba(244, 221, 249, 0.601);
-    backdrop-filter: blur(8px);
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid #e5e7eb;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Hover only on card, NOT clickable */
 .module-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 18px rgba(99, 102, 241, 0.10);
+    transform: none; /* remove the lift — batch style doesn't lift cards */
 }
 
-/* ===============================
-   Module Header (ONLY clickable area)
-   =============================== */
+.module-card.open {
+    border-color: #6366f1;
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.13);
+}
+
+/* ── Module Header ───────────────────────────────────────────── */
 .module-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-weight: 600;
-    font-size: 18px;
+    padding: 16px 20px;
     cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    transition: background 0.15s ease;
+    user-select: none;
 }
 
+.module-header:hover {
+    background: #fafafa;
+}
 
+.module-card.open .module-header {
+    background: #faf5ff;
+    color: #6366f1;
+}
 
-/* ===============================
-   Lesson Plan Content (Module Body)
-   =============================== */
+.module-header h4 {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: inherit;
+}
+
+.toggle-icon {
+    font-size: 11px;
+    color: #9ca3af;
+    transition: transform 0.25s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.module-card.open .toggle-icon {
+    transform: rotate(90deg);
+    color: #6366f1;
+}
+
+/* ── Lesson Plan Content (module body) ───────────────────────── */
 .lesson-plan-content {
     display: none;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 12px;
+    gap: 0;
+    border-top: 1.5px solid #ede9ff;
+    background: #faf5ff;
+    padding: 16px 20px 20px;
+    animation: fadeDown 0.22s ease;
 }
 
 .lesson-plan-content.visible {
     display: flex;
 }
 
-/* ===============================
-   Lesson Item (Session Row)
-   =============================== */
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Lesson Item (session row) ───────────────────────────────── */
 .lesson-item {
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: #ffffff;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 15px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    padding: 12px 16px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #ede9ff;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1f2937;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
+    margin-bottom: 8px;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.05);
 }
 
 .lesson-item:hover {
     background: #eef2ff;
-    transform: translateX(2px);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.10);
+    transform: none;
 }
 
-/* Locked Lesson */
+.lesson-item strong {
+    color: #6366f1;
+    font-weight: 700;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+/* Locked */
 .lesson-item.locked {
-    opacity: 0.6;
-    background: rgba(220, 220, 220, 0.3);
-    font-style: italic;
+    opacity: 0.5;
+    background: #f9fafb;
     cursor: not-allowed;
+    font-style: italic;
 }
 
-/* ===============================
-   Session Details (Expandable Panel)
-   =============================== */
+/* ── Session Details Panel ───────────────────────────────────── */
 .lesson-details {
     display: none;
-    margin: 10px 0 16px;
+    margin: -4px 0 12px 0;
     padding: 18px 20px;
-    background: #f9fafb;
+    background: #fff;
     border-left: 4px solid #6366f1;
-    border-radius: 12px;
+    border-radius: 0 10px 10px 10px;
     font-size: 14px;
-    line-height: 1.6;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    line-height: 1.7;
+    color: #4b5563;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.07);
+    border: 1px solid #ede9ff;
+    border-left: 4px solid #6366f1;
 }
 
 .lesson-details.visible {
     display: block;
+    animation: fadeDown 0.2s ease;
 }
 
-/* ===============================
-   Lesson Details Typography
-   =============================== */
+.lesson-details p {
+    margin: 0 0 10px 0;
+}
+
+.lesson-details p:last-child {
+    margin-bottom: 0;
+}
+
 .lesson-details strong {
     color: #4338ca;
-    font-weight: 600;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
 }
 
 .lesson-details ul {
-    margin: 8px 0 12px 20px;
+    margin: 6px 0 12px 18px;
     padding: 0;
 }
 
 .lesson-details li {
-    margin-bottom: 6px;
+    margin-bottom: 5px;
+    color: #374151;
 }
 
-.lesson-details p {
-    margin-bottom: 10px;
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .lesson-plan-header { padding: 22px; }
+    .lesson-plan-header h2 { font-size: 22px; }
+    .modules-grid { padding: 20px; }
+    .module-header { padding: 14px 16px; }
+    .lesson-plan-content { padding: 12px 14px 16px; }
 }
