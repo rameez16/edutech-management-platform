@@ -37,45 +37,75 @@ def logout_view(request):
     return redirect("accounts:login")
 
 
-# from django.contrib.auth.decorators import login_required
-# from django.shortcuts import render, redirect
-# from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.utils import timezone
+from apps.student.models import LMSAccess
 
-# from accounts.forms import TrainerStudentUserCreationForm
-# from accounts.decorators import role_required
-# from trainer.forms import TrainerAdminProfileForm
-# from student.forms import StudentAdminProfileForm
+def lms_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        lms_user_id = request.POST.get("lms_user_id")
 
-# @login_required
-# @role_required("admin")
-# def create_trainer_student(request):
-#     user_form = TrainerStudentUserCreationForm(request.POST or None)
+        user = authenticate(request, username=username, password=password)
 
-#     trainer_form = TrainerAdminProfileForm(prefix="trainer")
-#     student_form = StudentAdminProfileForm(prefix="student")
+        if user is not None:
+            try:
+                student = user.student
+                lms_access = student.lms_access
 
-#     if request.method == "POST" and user_form.is_valid():
-#         user = user_form.save()
+                # ✅ Verify LMS User ID
+                if lms_access.lms_user_id != lms_user_id:
+                    messages.error(request, "Invalid LMS User ID.")
+                    return redirect("lms_login")
 
-#         if user.role == "trainer":
-#             trainer_form = TrainerAdminProfileForm(
-#                 request.POST, prefix="trainer", instance=user.trainer
-#             )
-#             if trainer_form.is_valid():
-#                 trainer_form.save()
+                # ✅ Check active
+                if not lms_access.is_active:
+                    messages.error(request, "LMS access is inactive.")
+                    return redirect("lms_login")
 
-#         elif user.role == "student":
-#             student_form = StudentAdminProfileForm(
-#                 request.POST, prefix="student", instance=user.student
-#             )
-#             if student_form.is_valid():
-#                 student_form.save()
+                # ✅ Check expiry
+                if lms_access.expiry_date and lms_access.expiry_date < timezone.now().date():
+                    messages.error(request, "LMS access has expired.")
+                    return redirect("lms_login")
 
-#         messages.success(request, f"{user.role.title()} user created successfully.")
-#         return redirect("admin_dashboard")
+                # ✅ Update tracking
+                lms_access.last_login = timezone.now()
+                lms_access.total_login_count += 1
+                lms_access.save()
 
-#     return render(request, "accounts/create_trainer_student.html", {
-#         "user_form": user_form,
-#         "trainer_form": trainer_form,
-#         "student_form": student_form,
-#     })
+                login(request, user)
+                return redirect("accounts:lms_dashboard")
+
+            except LMSAccess.DoesNotExist:
+                messages.error(request, "No LMS access found.")
+                return redirect("accounts:lms_login")
+
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    return render(request, "accounts/lms/login.html")
+
+
+
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def lms_dashboard(request):
+    try:
+        lms_access = request.user.student.lms_access
+    except:
+        return redirect("lms_login")
+
+    return render(request, "accounts/lms/lms_dashboard.html", {
+        "lms_access": lms_access
+    })
+    
+    
+def lms_logout(request):
+    logout(request)
+    return redirect("accounts:lms_login")    
+    

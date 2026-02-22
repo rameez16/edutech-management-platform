@@ -1,0 +1,7 @@
+<h2>Welcome to LMS</h2>
+
+<p>Username: {{ lms_access.lms_username }}</p>
+<p>Total Logins: {{ lms_access.total_login_count }}</p>
+<p>Expiry Date: {{ lms_access.expiry_date }}</p>
+
+<a href="{% url 'accounts:lms_logout' %}">Logout</a>

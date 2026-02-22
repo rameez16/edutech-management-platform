@@ -771,6 +771,32 @@
                 </a>
             </div>
         </form>
+
+        {% if lms_access %}
+<div class="detail-item">
+    <span class="detail-label">LMS Username</span>
+    <span class="detail-value">{{ lms_access.lms_username }}</span>
+</div>
+
+<div class="detail-item">
+    <span class="detail-label">LMS User ID</span>
+    <span class="detail-value">{{ lms_access.lms_user_id }}</span>
+</div>
+
+<div class="detail-item">
+    <span class="detail-label">LMS Status</span>
+    <span class="detail-value" style="color: var(--success-green);">
+        Access Granted
+    </span>
+</div>
+{% else %}
+<div class="detail-item">
+    <span class="detail-label">LMS Access</span>
+    <span class="detail-value" style="color: var(--danger-red);">
+        Not Created
+    </span>
+</div>
+{% endif %}
     </div>
 
     <!-- Timeline -->
