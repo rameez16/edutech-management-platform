@@ -5,6 +5,8 @@ from django.utils import timezone
 from apps.trainer.models import Task,TaskSubmission
 from apps.bdm.models import StudentIssue
 
+#niranjana
+
 class EnrollmentAgreementForm(forms.ModelForm):
     class Meta:
         model = EnrollmentAgreement
@@ -26,7 +28,7 @@ class EnrollmentAgreementForm(forms.ModelForm):
 
 
 
-
+#rinta
 
 class LeaveApplicationForm(forms.ModelForm):
 
@@ -98,7 +100,7 @@ class StudentIssueForm(forms.ModelForm):
         }
 
 
-
+#niranjana
 
 class TaskSubmissionForm(forms.ModelForm):
     class Meta:

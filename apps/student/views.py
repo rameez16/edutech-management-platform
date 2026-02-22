@@ -1,32 +1,38 @@
+#rinta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.timezone import now
 from decimal import Decimal
 from django.db.models import Sum
-from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist,StudentIssue
+from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist,StudentIssue,PaymentDocument
 from django.contrib.auth import update_session_auth_hash
 import uuid, os
 from . import views
 from django.contrib.auth.decorators import login_required
 import uuid
-from apps.bdm.models import PaymentDocument
-from apps.trainer.models import Attendance,LessonSession,Task,TaskSubmission
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_POST
 from .forms import EnrollmentAgreementForm, TaskSubmissionForm
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession
-from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
+from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession, Attendance
+from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback,LeaveApplication
 from apps.student.forms import LeaveApplicationForm,StudentIssueForm
-from apps.student.models import LeaveApplication
 from dateutil.relativedelta import relativedelta 
+import calendar
 
+#rinta
 #one time payment
 @login_required
 def payment(request):
 
     student = request.user.student
+     # ✅ ADDED AGREEMENT SAFETY 🔥🔥🔥
+    try:
+        agreement = student.enrollment_agreement
+    except EnrollmentAgreement.DoesNotExist:
+        messages.error(request, "Enrollment agreement not generated")
+        return redirect("student:stud_dashboard")
 
     # ✅ Payment Plan Check
     if student.enrollment_agreement.payment_plan.lower() != "full":
@@ -1164,50 +1170,202 @@ def student_issues(request):
 
 
 
-
+#rinta+niranjana
 
 @role_required("student")
 def dashboard(request):
+
     student = request.user.student
+
+    # ✅ SAFE STUDENT NAME
+    student_name = (
+        student.full_name
+        or student.user.get_full_name()
+        or student.user.first_name
+        or student.user.username
+    )
+
     admin_profile = getattr(student, "admin_profile", None)
     checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
-    batch = student.batches.filter(is_active=True).select_related("course").prefetch_related("trainers__user").first()
 
-    # Get latest photo document
+    batch = (
+        student.batches
+        .filter(is_active=True)
+        .select_related("course")
+        .prefetch_related("trainers__user")
+        .first()
+    )
+
+    # ✅ PROFILE PHOTO
     profile_photo = student.documents.filter(
         document_type=StudentDocument.DocumentType.PHOTO
     ).order_by('-id').first()
 
-    # Only show if VERIFIED
     if profile_photo and profile_photo.verification_status != StudentDocument.VerificationStatus.VERIFIED:
         profile_photo = None
 
-    # Step completion logic (same as onboard)
+    # ✅ ONBOARDING PROGRESS
     completed_steps = 0
+
     if checklist.documents_verified:
         completed_steps += 1
 
     enrollment_generated = checklist.enrollment_letter_generated
     enrollment_signed = checklist.enrollment_letter_signed
+
     if enrollment_signed:
         completed_steps += 1
 
     if getattr(checklist, "id_card_issued", False):
         completed_steps += 1
 
-    # Pass context to template
+    # ✅ MARKS
+    submissions = TaskSubmission.objects.filter(
+        student=student,
+        marks_obtained__isnull=False
+    ).select_related("task")
+
+    obtained_marks = submissions.aggregate(
+        total=Sum("marks_obtained")
+    )["total"] or 0
+
+    task_ids = submissions.values_list("task_id", flat=True).distinct()
+
+    total_marks = Task.objects.filter(
+        id__in=task_ids
+    ).aggregate(
+        total=Sum("total_marks")
+    )["total"] or 0
+
+    percentage = 0
+    if total_marks > 0:
+        percentage = (obtained_marks / total_marks) * 100
+
+    # =====================================================
+    # ✅ ATTENDANCE (Late = Attendance)
+    # =====================================================
+
+    attendance = Attendance.objects.filter(
+        student=student,
+        batch=batch
+    )
+
+    present_count = attendance.filter(status__iexact="present").count()
+    late_count = attendance.filter(status__iexact="late").count()
+    absent_count = attendance.filter(status__iexact="absent").count()
+
+    total_attendance = present_count + late_count + absent_count
+    circumference = 339.3
+
+    if total_attendance > 0:
+        present_dash = ((present_count + late_count) / total_attendance) * circumference
+        absent_dash = (absent_count / total_attendance) * circumference
+        attendance_percentage = round(((present_count + late_count) / total_attendance) * 100, 1)
+    else:
+        present_dash = 0
+        absent_dash = 0
+        attendance_percentage = 0
+
+    # ✅ LEARNING PROGRESS
+    covered_percentage = 0
+    pending_percentage = 0
+
+    if batch:
+        progress_data = LessonSession.get_batch_progress(batch)
+        covered_percentage = progress_data["progress_percentage"]
+        pending_percentage = 100 - covered_percentage
+
+    # =====================================================
+    # ✅ PAYMENT ENGINE
+    # =====================================================
+
+    today = timezone.now().date()
+
+    payment_notification = "No Pending Payments"
+    payment_css = "success"
+    pending_payment = None
+
+    total_fee = Decimal("0")
+
+    if batch and batch.course:
+        total_fee = batch.course.course_fee or Decimal("0")
+
+    paid_amount = FeePayment.objects.filter(
+        student=student,
+        payment_status=FeePayment.PaymentStatus.COMPLETED
+    ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+
+    balance = total_fee - paid_amount
+
+    overdue_payment = FeePayment.objects.filter(
+        student=student,
+        payment_status=FeePayment.PaymentStatus.PENDING,
+        due_date__lt=today
+    ).order_by("due_date").first()
+
+    upcoming_payment = FeePayment.objects.filter(
+        student=student,
+        payment_status=FeePayment.PaymentStatus.PENDING
+    ).order_by("due_date").first()
+
+    if balance > 0:
+
+        if overdue_payment:
+            payment_notification = "Payment Overdue"
+            payment_css = "danger"
+            pending_payment = overdue_payment
+
+        else:
+            payment_notification = "Payment Pending"
+            payment_css = "warning"
+            pending_payment = upcoming_payment
+
+    # ✅ CALENDAR
+    cal = calendar.Calendar()
+    month_days = cal.monthdayscalendar(today.year, today.month)
+
+    month_name = calendar.month_name[today.month]
+    year = today.year
+    today_day = today.day
+
     context = {
         "student": student,
+        "student_name": student_name,
+
         "admin_profile": admin_profile,
         "profile_photo": profile_photo,
         "all_docs_verified": checklist.documents_verified,
-        "user": request.user,
-        "batch": batch,  
-        "today": timezone.now().date(),
+        "batch": batch,
+        "today": today,
         "checklist": checklist,
         "completed_steps": completed_steps,
-        "enrollment_generated": enrollment_generated,
-        "enrollment_signed": enrollment_signed,
+
+        "obtained_marks": obtained_marks,
+        "total_marks": total_marks,
+        "percentage": round(percentage, 2),
+
+        "present_count": present_count,
+        "late_count": late_count,
+        "absent_count": absent_count,
+        "present_dash": round(present_dash, 1),
+        "absent_dash": round(absent_dash, 1),
+        "attendance_percentage": attendance_percentage,
+
+        "covered_percentage": covered_percentage,
+        "pending_percentage": pending_percentage,
+
+        "payment_notification": payment_notification,
+        "payment_css": payment_css,
+        "pending_payment": pending_payment,
+
+        "fee_balance": balance,
+        "paid_amount": paid_amount,
+        "total_fee": total_fee,
+
+        "month_days": month_days,
+        "month_name": month_name,
+        "year": year,
+        "today_day": today_day,
     }
 
     return render(request, "student/dashboard/dashboard.html", context)
@@ -1217,7 +1375,15 @@ def dashboard(request):
 
 
 
+
    
+
+
+
+
+
+
+#niranjana
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
