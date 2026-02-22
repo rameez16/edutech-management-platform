@@ -23,7 +23,8 @@ from .form import StudentAdminProfileForm, TrainerAdminProfileForm
 from django.db.models import Sum, Avg
 
 from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
-from apps.bdm.models import Student ,PaymentDocument
+from apps.bdm.models import Student ,PaymentDocument ,StudentIssue
+
 from apps.trainer.models import Module
 from apps.trainer.models import Module
 
@@ -1579,3 +1580,165 @@ def module_detail_view(request, pk):
     }
 
     return render(request, 'bdm/course/module_detail.html', context)
+
+
+
+#trainer-page-aleena
+def trainer_list_view(request):
+    trainers = Trainer.objects.all().select_related(
+        "user", "admin_profile"
+    ).prefetch_related("batches")
+
+    # 🔎 Search
+    search_query = request.GET.get("search")
+    if search_query:
+        trainers = trainers.filter(
+            Q(full_name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(primary_domain__icontains=search_query) |
+            Q(location__icontains=search_query)
+        )
+
+    # 🎯 Domain Filter
+    domain = request.GET.get("domain")
+    if domain:
+        trainers = trainers.filter(primary_domain__icontains=domain)
+
+    # 📦 Assignment Filter
+    assignment = request.GET.get("assignment")
+
+    if assignment == "assigned":
+        trainers = trainers.filter(batches__isnull=False).distinct()
+
+    elif assignment == "unassigned":
+        trainers = trainers.filter(batches__isnull=True)
+
+    # 🟢 Status Filter
+    status = request.GET.get("status")
+
+    if status == "active":
+        trainers = trainers.filter(admin_profile__is_active=True)
+
+    elif status == "inactive":
+        trainers = trainers.filter(admin_profile__is_active=False)
+
+    elif status == "pending":
+        trainers = trainers.filter(admin_profile__profile_verified=False)
+
+    context = {
+        "trainers": trainers,
+    }
+
+    return render(request, "bdm/trainer/trainer_list.html", context)
+
+def trainer_detail_view(request, pk):
+    trainer = get_object_or_404(Trainer, pk=pk)
+
+    if request.method == "POST":
+
+        # 🔁 Toggle Active Status
+        if "toggle_active" in request.POST:
+            if hasattr(trainer, "admin_profile"):
+                profile = trainer.admin_profile
+                profile.is_active = not profile.is_active
+                profile.save()
+                messages.success(request, "Trainer active status updated.")
+
+            return redirect("bdm:trainer_detail", pk=pk)
+
+        # 📦 Assign Batch
+        if "assign_batch" in request.POST:
+            batch_id = request.POST.get("batch_id")
+
+            if batch_id:
+                batch = get_object_or_404(Batch, id=batch_id)
+
+                if trainer in batch.trainers.all():
+                    messages.warning(request, "Trainer is already assigned to this batch.")
+                else:
+                    batch.trainers.add(trainer)
+                    messages.success(request, "Trainer successfully assigned to batch.")
+
+            return redirect("bdm:trainer_detail", pk=pk)
+
+    available_batches = Batch.objects.exclude(trainers=trainer)
+
+    context = {
+        "trainer": trainer,
+        "available_batches": available_batches,
+    }
+
+    return render(request, "bdm/trainer/trainer_detail.html", context)
+
+
+
+#studentissue -aleena
+
+def student_issue_list(request):
+    issues = StudentIssue.objects.select_related(
+        'student', 'assigned_to'
+    ).all()
+
+    # Filters
+    issue_type = request.GET.get('issue_type')
+    status = request.GET.get('status')
+    priority = request.GET.get('priority')
+    search = request.GET.get('search')
+
+    if issue_type:
+        issues = issues.filter(issue_type=issue_type)
+
+    if status:
+        issues = issues.filter(status=status)
+
+    if priority:
+        issues = issues.filter(priority=priority)
+
+    if search:
+        issues = issues.filter(
+            Q(subject__icontains=search) |
+            Q(description__icontains=search)
+        )
+
+    # Pagination
+    paginator = Paginator(issues, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'issues': page_obj,
+        'page_obj': page_obj,
+        'issue_types': StudentIssue.IssueType.choices,
+        'statuses': StudentIssue.Status.choices,
+        'priorities': StudentIssue.Priority.choices,
+    }
+
+    return render(request, 'bdm/student_issue/student_issue_list.html', context)
+
+
+
+def student_issue_detail(request, pk):
+    issue = get_object_or_404(StudentIssue, pk=pk)
+
+    # Get only trainers (adjust filter based on your role system)
+    trainers = User.objects.filter(groups__name='Trainer')
+
+    if request.method == "POST":
+        trainer_id = request.POST.get('trainer')
+
+        if trainer_id:
+            trainer = get_object_or_404(User, pk=trainer_id)
+
+            issue.assigned_to = trainer
+            issue.status = StudentIssue.Status.IN_PROGRESS
+            issue.save()
+
+            messages.success(request, "Issue assigned successfully.")
+            return redirect('bdm/student_issue/student_issue_detail', pk=issue.pk)
+
+    context = {
+        'issue': issue,
+        'trainers': trainers
+    }
+
+    return render(request, 'bdm/student_issue/student_issue_detail.html', context)
