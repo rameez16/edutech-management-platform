@@ -1,114 +1,215 @@
-{% extends "student/layout/lms_main.html" %}
-{% block title %}Student Dashboard{% endblock %}
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}LMS Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/lms_dashboard.css' %}?v=2">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'student/js/lms_dashboard.js' %}"></script>
+{% endblock %}
 
 {% block content %}
-{% load static %}
-<div class="content-header">
-    <h2>Student Dashboard</h2>
-    <div class="user-badge">
-        <i class="fa-solid fa-user"></i> {{ request.user.first_name|default:"Student" }}
-    </div>
-</div>
+<div class="lms-container">
 
-<!-- TOP CARDS -->
-<div class="row g-4 mt-3">
-    <div class="col-md-4">
-        <div class="info-card">
-            <i class="fa-solid fa-calendar-days text-success"></i>
-            <h3>82%</h3>
-            <p>Attendance</p>
+    {% if batch %}
+
+    <!-- LMS HEADER -->
+    <div class="lms-header">
+        <h2 class="lms-title">LMS Portal</h2>
+        <p class="lms-meta">
+            <span class="lms-batch-name">{{ batch.name }}</span>
+            &middot;
+            <span class="lms-course-name">{{ batch.course.name }}</span>
+            &middot;
+            <span class="lms-duration">{{ batch.duration_months }} months</span>
+        </p>
+        <div>
+            <a href="{% url 'accounts:lms_logout' %}">Logout</a>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="info-card">
-            <i class="fa-solid fa-graduation-cap text-primary"></i>
-            <h3>6 / 10</h3>
-            <p>Course Progress</p>
+    <!-- WRAPPER CARD -->
+    <div class="lms-wrapper-card">
+
+        <!-- STATS CARDS (4 combined) -->
+        <div class="lms-stats-row">
+
+            <div class="lms-stat-card lms-stat-all">
+                <span class="lms-stat-number">{{ total_materials }}</span>
+                <span class="lms-stat-label">All Materials</span>
+            </div>
+
+            <div class="lms-stat-card lms-stat-videos">
+                <span class="lms-stat-number">{{ recordings_count }}</span>
+                <span class="lms-stat-label">Videos</span>
+                <span class="lms-stat-sub">Recordings</span>
+            </div>
+
+            <div class="lms-stat-card lms-stat-docs">
+                <span class="lms-stat-number">{{ notes_count|add:slides_count|add:assignments_count }}</span>
+                <span class="lms-stat-label">Documents</span>
+                <span class="lms-stat-sub">Notes · Slides · Assignments</span>
+            </div>
+
+            <div class="lms-stat-card lms-stat-resources">
+                <span class="lms-stat-number">{{ reference_count|add:code_files_count|add:other_count }}</span>
+                <span class="lms-stat-label">Resources</span>
+                <span class="lms-stat-sub">Reference · Code · Other</span>
+            </div>
+
         </div>
+
+        <!-- SESSIONS CARD -->
+        <div class="lms-sessions-card">
+
+            <!-- FILTER TABS -->
+            <div class="lms-filter-tabs">
+                <a href="?type=all"        class="lms-filter-btn {% if active_filter == 'all' %}active{% endif %}">
+                    <span class="filter-dot"></span> All
+                </a>
+                <a href="?type=recording"  class="lms-filter-btn {% if active_filter == 'recording' %}active{% endif %}">
+                    <span class="filter-dot dot-recording"></span> Recordings
+                </a>
+                <a href="?type=notes"      class="lms-filter-btn {% if active_filter == 'notes' %}active{% endif %}">
+                    <span class="filter-dot dot-notes"></span> Notes
+                </a>
+                <a href="?type=slides"     class="lms-filter-btn {% if active_filter == 'slides' %}active{% endif %}">
+                    <span class="filter-dot dot-slides"></span> Slides
+                </a>
+                <a href="?type=code"       class="lms-filter-btn {% if active_filter == 'code' %}active{% endif %}">
+                    <span class="filter-dot dot-code"></span> Code
+                </a>
+                <a href="?type=assignment" class="lms-filter-btn {% if active_filter == 'assignment' %}active{% endif %}">
+                    <span class="filter-dot dot-assignment"></span> Assignments
+                </a>
+                <a href="?type=reference"  class="lms-filter-btn {% if active_filter == 'reference' %}active{% endif %}">
+                    <span class="filter-dot dot-reference"></span> Reference
+                </a>
+                <a href="?type=other"      class="lms-filter-btn {% if active_filter == 'other' %}active{% endif %}">
+                    <span class="filter-dot dot-other"></span> Other
+                </a>
+            </div>
+
+            <!-- SESSIONS + MATERIALS -->
+            <div class="lms-sessions-wrapper">
+
+                {% for item in sessions_with_materials %}
+                {% with session=item.session %}
+
+                <!-- SESSION GROUP HEADER -->
+                <div class="lms-session-header">
+                    <span class="lms-session-label">SESSION {{ session.lesson_plan.session_number }}</span>
+                    <span class="lms-session-date">{{ session.actual_date|date:"M d, Y" }}</span>
+                    <span class="lms-session-count">{{ item.material_count }} material{{ item.material_count|pluralize }}</span>
+                </div>
+
+                <!-- MATERIAL CARDS -->
+                <div class="lms-materials-group">
+                    {% for material in item.materials %}
+                    <div class="lms-material-card">
+
+                        <!-- LEFT BORDER COLOR INDICATOR -->
+                        <div class="lms-material-type-bar lms-bar-{{ material.material_type }}"></div>
+
+                        <!-- ICON -->
+                        <div class="lms-material-icon lms-icon-{{ material.material_type }}">
+                            {% if material.material_type == 'recording' %}🎬
+                            {% elif material.material_type == 'notes' %}📝
+                            {% elif material.material_type == 'slides' %}📊
+                            {% elif material.material_type == 'code' %}💻
+                            {% elif material.material_type == 'assignment' %}🎯
+                            {% elif material.material_type == 'reference' %}📚
+                            {% else %}📎
+                            {% endif %}
+                        </div>
+
+                        <!-- MATERIAL INFO -->
+                        <div class="lms-material-info">
+                            <h5 class="lms-material-title">{{ material.title }}</h5>
+                            {% if material.description %}
+                            <p class="lms-material-desc">{{ material.description }}</p>
+                            {% endif %}
+
+                            <!-- TAGS ROW -->
+                            <div class="lms-material-tags">
+                                <span class="lms-tag lms-tag-type lms-tag-{{ material.material_type }}">
+                                    {{ material.get_material_type_display }}
+                                </span>
+                                {% if material.is_mandatory %}
+                                <span class="lms-tag lms-tag-mandatory">MANDATORY</span>
+                                {% endif %}
+                                {% if material.material_type == 'recording' and material.duration_minutes %}
+                                <span class="lms-tag lms-tag-meta">⏱ {{ material.duration_minutes }}m</span>
+                                {% endif %}
+                                {% if material.view_count %}
+                                <span class="lms-tag lms-tag-meta">👁 {{ material.view_count }} views</span>
+                                {% endif %}
+                                {% if material.download_count %}
+                                <span class="lms-tag lms-tag-meta">⬇ {{ material.download_count }} downloads</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- ACTION BUTTONS -->
+                        <div class="lms-material-actions">
+                            {% if material.external_link %}
+                                {% if material.material_type == 'recording' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">▶ Watch</a>
+                                {% elif material.material_type == 'assignment' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
+                                {% elif material.material_type == 'slides' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">🖼 View</a>
+                                {% elif material.material_type == 'reference' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📚 Open</a>
+                                {% elif material.material_type == 'other' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📎 Open</a>
+                                {% else %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">👁 View PDF</a>
+                                {% endif %}
+                            {% elif material.file %}
+                                {% if material.material_type == 'recording' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">▶ Watch</a>
+                                {% elif material.material_type == 'notes' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📄 View PDF</a>
+                                {% elif material.material_type == 'slides' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">🖼 View</a>
+                                {% elif material.material_type == 'assignment' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
+                                {% elif material.material_type == 'reference' %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📚 Open</a>
+                                {% else %}
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📎 Open</a>
+                                {% endif %}
+                                <a href="{% url 'student:lms_download_material' material.id %}" class="lms-btn lms-btn-secondary" data-material-id="{{ material.id }}">⬇ Download</a>
+                            {% endif %}
+                        </div>
+
+                    </div><!-- /lms-material-card -->
+                    {% endfor %}
+                </div><!-- /lms-materials-group -->
+
+                {% endwith %}
+                {% empty %}
+                <div class="lms-empty-state">
+                    <p>No materials found{% if active_filter != 'all' %} for this filter{% endif %}.</p>
+                </div>
+                {% endfor %}
+
+            </div><!-- /lms-sessions-wrapper -->
+
+        </div><!-- /lms-sessions-card -->
+
+    </div><!-- /lms-wrapper-card -->
+
+    {% else %}
+    <div class="lms-header">
+        <h2>No Active Batch</h2>
+        <p>You are not currently enrolled in any active batch.</p>
     </div>
+    {% endif %}
 
-    <div class="col-md-4">
-        <div class="info-card">
-            <i class="fa-solid fa-clipboard-list text-warning"></i>
-            <h3>3</h3>
-            <p>Pending Tasks</p>
-        </div>
-    </div>
-</div>
-
-<!-- NEW SECTION -->
-<div class="row g-4 mt-4">
-
-    <div class="col-md-4">
-        <div class="panel highlight">
-            <h5><i class="fa-solid fa-bullseye"></i> Today’s Focus</h5>
-            <p><strong>Topic:</strong> JavaScript Arrays</p>
-            <p><strong>Class:</strong> 10:00 AM – 12:00 PM</p>
-            <button class="btn btn-primary btn-sm">Join Class</button>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="panel">
-            <h5><i class="fa-solid fa-clock"></i> Assignments Due Soon</h5>
-            <ul class="simple-list">
-                <li>JS Assignment – <span class="warn">Tomorrow</span></li>
-                <li>React Setup – <span>3 days</span></li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="panel">
-            <h5><i class="fa-solid fa-calendar"></i> Weekly Schedule</h5>
-            <ul class="simple-list">
-                <li>Mon – HTML</li>
-                <li>Tue – CSS</li>
-                <li class="today">Wed – JavaScript</li>
-                <li>Thu – React</li>
-            </ul>
-        </div>
-    </div>
-
-</div>
-
-<!-- PROGRESS -->
-<div class="row g-4 mt-4">
-    <div class="col-md-8">
-        <div class="panel">
-            <h5><i class="fa-solid fa-chart-pie"></i> Course Progress Overview</h5>
-            <ul class="status-list">
-                <li class="done">✔ HTML Basics</li>
-                <li class="done">✔ CSS Fundamentals</li>
-                <li class="pending">⏳ JavaScript</li>
-                <li class="pending">⏳ React</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="panel">
-            <h5><i class="fa-solid fa-clock"></i> Batch & Schedule</h5>
-            <p><strong>Batch:</strong> MERN-FS-01</p>
-            <p><strong>Time:</strong> 10:00 AM – 12:00 PM</p>
-            <p><strong>Trainer:</strong> Anamika N</p>
-        </div>
-    </div>
-</div>
-
-<!-- ACTIVITY -->
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="panel">
-            <h5><i class="fa-solid fa-bolt"></i> Recent Activities</h5>
-            <ul class="activity-list">
-                <li>✔ Attendance marked</li>
-                <li>📤 Task submitted</li>
-                <li>📊 Evaluation updated</li>
-            </ul>
-        </div>
-    </div>
-</div>
-
+</div><!-- /lms-container -->
 {% endblock %}

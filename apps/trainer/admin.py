@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Module,LessonPlan,LessonSession,Task,TaskSubmission,SubstituteTeaching,Exam,Certificate,ExamResult,ExtensionRequest,Attendance
+from .models import Module,LessonPlan,LessonSession,Task,TaskSubmission,SubstituteTeaching,Exam,Certificate,ExamResult,ExtensionRequest,Attendance,SessionMaterial
 
 admin.site.register(Module)
 admin.site.register(LessonPlan)
@@ -15,4 +15,5 @@ admin.site.register(Certificate)
 admin.site.register(ExamResult)
 admin.site.register(ExtensionRequest)
 admin.site.register(Attendance)
+admin.site.register(SessionMaterial)
 

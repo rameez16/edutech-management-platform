@@ -22,6 +22,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path("student_attendance/", views.student_attendance, name="student_attendance"),
                path("student_leave/", views.student_leave, name="student_leave"),
                path("student_evaluation/",views.student_evaluation, name="student_evaluation"),
+               path('student_issues/', views.student_issues, name='student_issues'),
               
                
                
@@ -43,6 +44,9 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path('stud_tasks/', views.student_tasks, name='student_tasks'),
                 path("tasks/<int:task_id>/", views.task_detail, name="task_detail"),
                 path("task/<int:task_id>/do/", views.do_task, name="do_task"),
+                path('lms_dashboard/', views.lmsdashboard, name='lms_dashboard'),
+                path('lms/material/<int:pk>/view/', views.lms_view_material, name='lms_view_material'),
+                path('lms/material/<int:pk>/download/', views.lms_download_material, name='lms_download_material'),
 
 
             

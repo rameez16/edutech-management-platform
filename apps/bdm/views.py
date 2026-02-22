@@ -375,6 +375,10 @@ def enrollment_verification_list(request):
 
 
 from .utils import generate_card_number
+import random
+import string
+from django.utils.crypto import get_random_string
+from apps.student.models import LMSAccess
 
 @login_required
 def approve_enrollment_agreement(request, student_id):
@@ -409,8 +413,25 @@ def approve_enrollment_agreement(request, student_id):
                 'expiry_date': timezone.now().date() + timedelta(days=200),
             }
         )
+        
+        # ✅ AUTO CREATE LMS ACCESS (if not exists)
+        lms_access, created = LMSAccess.objects.get_or_create(
+            student=agreement.student,
+            defaults={
+                'lms_username':agreement.student.user.username,
+                'lms_user_id': f"LMS{random.randint(10000,99999)}",
+                'activated_date': timezone.now().date(),
+                'expiry_date': timezone.now().date() + timedelta(days=200),
+            }
+        )
 
-        messages.success(request, "Agreement approved & ID card generated.")
+        if created:
+            messages.success(
+                request,
+                f"LMS Access created. Username: {lms_access.lms_username}"
+                )
+
+        messages.success(request, "Agreement approved & ID card generated.LMS access granted")
         return redirect('bdm:view_student_id_card', student_id=student_id)
 
     return render(
@@ -428,6 +449,11 @@ def view_student_id_card(request, student_id):
         student__id=student_id
     )
 
+    # ✅ ALWAYS define this first
+    lms_access = LMSAccess.objects.filter(
+        student=id_card.student
+    ).first()
+
     if request.method == "POST":
         if "collect" in request.POST:
             id_card.is_collected = True
@@ -440,13 +466,17 @@ def view_student_id_card(request, student_id):
         id_card.save()
         messages.success(request, "ID card status updated.")
 
+        # Redirect after POST (Best Practice)
+        return redirect('bdm:view_student_id_card', student_id=student_id)
+
     return render(
         request,
         "bdm/student_onboarding/student_id card/id_card.html",
-        {"id_card": id_card}
+        {
+            "id_card": id_card,
+            "lms_access": lms_access
+        }
     )
-
-
 
 
 
