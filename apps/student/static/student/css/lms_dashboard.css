@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   LMS DASHBOARD — lms.css
-   Follows the same design system as batch.css
+   LMS DASHBOARD — lms_dashboard.css
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Container ─────────────────────────────────────────────── */
@@ -42,22 +41,30 @@
     color: #6366f1;
 }
 
-/* ── Stats Row ───────────────────────────────────────────────── */
+/* ── Wrapper Card ────────────────────────────────────────────── */
+.lms-wrapper-card {
+    padding: 30px;
+    background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Stats Row (4 cards) ─────────────────────────────────────── */
 .lms-stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: 30px;
     margin-bottom: 28px;
 }
 
 .lms-stat-card {
     background: #fff;
     border-radius: 16px;
-    padding: 24px 28px;
+    padding: 18px 20px;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -66,32 +73,38 @@
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
 }
 
-.lms-stat-primary {
-    background: #fff;
-}
-
 .lms-stat-number {
-    font-size: 36px;
+    font-size: 30px;
     font-weight: 800;
     line-height: 1;
-    color: #6366f1;
 }
 
-/* Per-type stat number colors matching material type colors */
-.lms-stat-card:nth-child(1) .lms-stat-number { color: #6366f1; } /* Total — indigo */
-.lms-stat-card:nth-child(2) .lms-stat-number { color: #ef4444; } /* Recordings — red */
-.lms-stat-card:nth-child(3) .lms-stat-number { color: #3b82f6; } /* Notes — blue */
-.lms-stat-card:nth-child(4) .lms-stat-number { color: #8b5cf6; } /* Slides — purple */
-.lms-stat-card:nth-child(5) .lms-stat-number { color: #10b981; } /* Code — green */
-.lms-stat-card:nth-child(6) .lms-stat-number { color: #f59e0b; } /* Assignments — amber */
-.lms-stat-card:nth-child(7) .lms-stat-number { color: #06b6d4; } /* Reference — cyan */
-.lms-stat-card:nth-child(8) .lms-stat-number { color: #9ca3af; } /* Other — grey */
+.lms-stat-all     .lms-stat-number { color: #6366f1; }
+.lms-stat-videos  .lms-stat-number { color: #ef4444; }
+.lms-stat-docs    .lms-stat-number { color: #3b82f6; }
+.lms-stat-resources .lms-stat-number { color: #10b981; }
 
 .lms-stat-label {
     font-size: 13px;
-    font-weight: 500;
-    color: #9ca3af;
+    font-weight: 600;
+    color: #374151;
     margin-top: 2px;
+}
+
+.lms-stat-sub {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 400;
+    margin-top: 1px;
+}
+
+/* ── Sessions inner white card ───────────────────────────────── */
+.lms-sessions-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    padding: 24px 28px 28px;
 }
 
 /* ── Filter Tabs ─────────────────────────────────────────────── */
@@ -127,7 +140,6 @@
     color: #fff;
 }
 
-/* Colored dot on filter tabs */
 .filter-dot {
     width: 8px;
     height: 8px;
@@ -150,28 +162,11 @@
 .dot-reference  { background: #06b6d4; }
 .dot-other      { background: #9ca3af; }
 
-/* ── Stats + Filter + Sessions outer wrapper (the lavender bg card) ── */
-.lms-wrapper-card {
-    padding: 30px;
-    background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
-    border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-}
-
 /* ── Sessions Wrapper ────────────────────────────────────────── */
 .lms-sessions-wrapper {
     display: flex;
     flex-direction: column;
     gap: 0;
-}
-
-/* ── Sessions inner white card ───────────────────────────────── */
-.lms-sessions-card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
-    overflow: hidden;
-    padding: 24px 28px 28px;
 }
 
 /* ── Session Group Header ────────────────────────────────────── */
@@ -224,10 +219,8 @@
     border: 1px solid #ede9ff;
     display: flex;
     align-items: center;
-    gap: 0;
     overflow: hidden;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
-    position: relative;
 }
 
 .lms-material-card:hover {
@@ -235,7 +228,7 @@
     transform: translateY(-2px);
 }
 
-/* Left colored border bar (by material type) */
+/* Left colored border bar */
 .lms-material-type-bar {
     width: 4px;
     align-self: stretch;
@@ -250,7 +243,7 @@
 .lms-bar-reference  { background: #06b6d4; }
 .lms-bar-other      { background: #9ca3af; }
 
-/* Icon circle */
+/* Icon */
 .lms-material-icon {
     width: 52px;
     height: 52px;
@@ -271,7 +264,7 @@
 .lms-icon-reference  { background: #ecfeff; }
 .lms-icon-other      { background: #f9fafb; }
 
-/* Material info block */
+/* Material info */
 .lms-material-info {
     flex: 1;
     min-width: 0;
@@ -298,7 +291,7 @@
     text-overflow: ellipsis;
 }
 
-/* Tags row */
+/* Tags */
 .lms-material-tags {
     display: flex;
     align-items: center;
@@ -316,7 +309,6 @@
     letter-spacing: 0.2px;
 }
 
-/* Type tags */
 .lms-tag-recording  { background: #fee2e2; color: #b91c1c; }
 .lms-tag-notes      { background: #dbeafe; color: #1d4ed8; }
 .lms-tag-slides     { background: #ede9ff; color: #5b21b6; }
@@ -325,20 +317,12 @@
 .lms-tag-reference  { background: #cffafe; color: #0e7490; }
 .lms-tag-other      { background: #f3f4f6; color: #374151; }
 
-/* Ensure lms-tag-type + lms-tag-other combination renders correctly */
-.lms-tag.lms-tag-other {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-/* Mandatory badge */
 .lms-tag-mandatory {
     background: #1f2937;
     color: #fff;
     letter-spacing: 0.5px;
 }
 
-/* Meta info (views, downloads, duration) */
 .lms-tag-meta {
     background: transparent;
     color: #9ca3af;
@@ -387,7 +371,6 @@
 .lms-btn-secondary {
     background: #f3f4f6;
     color: #374151;
-    box-shadow: none;
 }
 
 .lms-btn-secondary:hover {
@@ -412,34 +395,17 @@
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 900px) {
     .lms-stats-row {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .lms-header {
-        padding: 22px;
-    }
+    .lms-header { padding: 22px; }
+    .lms-title { font-size: 22px; }
+    .lms-wrapper-card { padding: 20px; }
+    .lms-sessions-card { padding: 16px 20px 22px; }
 
-    .lms-title {
-        font-size: 22px;
-    }
-
-    .lms-wrapper-card {
-        padding: 20px;
-    }
-
-    .lms-sessions-card {
-        padding: 16px 20px 22px;
-    }
-
-    .lms-material-card {
-        flex-wrap: wrap;
-    }
-
-    .lms-material-info {
-        min-width: 0;
-    }
+    .lms-material-card { flex-wrap: wrap; }
 
     .lms-material-desc {
         white-space: normal;
@@ -455,46 +421,16 @@
         justify-content: flex-start;
     }
 
-    .lms-btn {
-        padding: 8px 14px;
-        font-size: 12.5px;
-    }
-
-    .lms-stats-row {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-
-    .lms-stat-number {
-        font-size: 28px;
-    }
-
-    .lms-filter-tabs {
-        gap: 8px;
-    }
-
-    .lms-filter-btn {
-        padding: 7px 14px;
-        font-size: 13px;
-    }
+    .lms-btn { padding: 8px 14px; font-size: 12.5px; }
+    .lms-stat-number { font-size: 28px; }
+    .lms-filter-btn { padding: 7px 14px; font-size: 13px; }
 }
 
 @media (max-width: 480px) {
-    .lms-stats-row {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .lms-wrapper-card {
-        padding: 14px;
-    }
-
-    .lms-sessions-card {
-        padding: 12px 14px 16px;
-    }
-
-    .lms-session-header {
-        padding: 12px 2px;
-    }
+    .lms-stats-row { grid-template-columns: repeat(2, 1fr); }
+    .lms-wrapper-card { padding: 14px; }
+    .lms-sessions-card { padding: 12px 14px 16px; }
+    .lms-session-header { padding: 12px 2px; }
 
     .lms-material-icon {
         width: 44px;
@@ -503,7 +439,5 @@
         margin: 12px 12px 12px 10px;
     }
 
-    .lms-material-title {
-        font-size: 14px;
-    }
+    .lms-material-title { font-size: 14px; }
 }

@@ -28,46 +28,38 @@
         </p>
     </div>
 
-    <!-- WRAPPER CARD (lavender bg — same as batch-wrapper-card) -->
+    <!-- WRAPPER CARD -->
     <div class="lms-wrapper-card">
 
-        <!-- STATS CARDS -->
+        <!-- STATS CARDS (4 combined) -->
         <div class="lms-stats-row">
-            <div class="lms-stat-card">
+
+            <div class="lms-stat-card lms-stat-all">
                 <span class="lms-stat-number">{{ total_materials }}</span>
-                <span class="lms-stat-label">Total Materials</span>
+                <span class="lms-stat-label">All Materials</span>
             </div>
-            <div class="lms-stat-card">
+
+            <div class="lms-stat-card lms-stat-videos">
                 <span class="lms-stat-number">{{ recordings_count }}</span>
-                <span class="lms-stat-label">Recordings</span>
+                <span class="lms-stat-label">Videos</span>
+                <span class="lms-stat-sub">Recordings</span>
             </div>
-            <div class="lms-stat-card">
-                <span class="lms-stat-number">{{ notes_count }}</span>
-                <span class="lms-stat-label">Notes</span>
+
+            <div class="lms-stat-card lms-stat-docs">
+                <span class="lms-stat-number">{{ notes_count|add:slides_count|add:assignments_count }}</span>
+                <span class="lms-stat-label">Documents</span>
+                <span class="lms-stat-sub">Notes · Slides · Assignments</span>
             </div>
-            <div class="lms-stat-card">
-                <span class="lms-stat-number">{{ slides_count }}</span>
-                <span class="lms-stat-label">Slides</span>
+
+            <div class="lms-stat-card lms-stat-resources">
+                <span class="lms-stat-number">{{ reference_count|add:code_files_count|add:other_count }}</span>
+                <span class="lms-stat-label">Resources</span>
+                <span class="lms-stat-sub">Reference · Code · Other</span>
             </div>
-            <div class="lms-stat-card">
-                <span class="lms-stat-number">{{ code_files_count }}</span>
-                <span class="lms-stat-label">Code Files</span>
-            </div>
-            <div class="lms-stat-card">
-                <span class="lms-stat-number">{{ assignments_count }}</span>
-                <span class="lms-stat-label">Assignments</span>
-            </div>
-            <div class="lms-stat-card">
-                <span class="lms-stat-number">{{ reference_count }}</span>
-                <span class="lms-stat-label">Reference</span>
-            </div>
-            <div class="lms-stat-card">
-                <span class="lms-stat-number">{{ other_count }}</span>
-                <span class="lms-stat-label">Other</span>
-            </div>
+
         </div>
 
-        <!-- SESSIONS CARD (white card inside wrapper) -->
+        <!-- SESSIONS CARD -->
         <div class="lms-sessions-card">
 
             <!-- FILTER TABS -->
@@ -162,72 +154,33 @@
                         <div class="lms-material-actions">
                             {% if material.external_link %}
                                 {% if material.material_type == 'recording' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    ▶ Watch
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">▶ Watch</a>
                                 {% elif material.material_type == 'assignment' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    📋 View Task
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
                                 {% elif material.material_type == 'slides' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    🖼 View
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">🖼 View</a>
                                 {% elif material.material_type == 'reference' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    📚 Open
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📚 Open</a>
                                 {% elif material.material_type == 'other' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    📎 Open
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📎 Open</a>
                                 {% else %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    👁 View PDF
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">👁 View PDF</a>
                                 {% endif %}
                             {% elif material.file %}
                                 {% if material.material_type == 'recording' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    ▶ Watch
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">▶ Watch</a>
                                 {% elif material.material_type == 'notes' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    📄 View PDF
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📄 View PDF</a>
                                 {% elif material.material_type == 'slides' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    🖼 View
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">🖼 View</a>
                                 {% elif material.material_type == 'assignment' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    📋 View Task
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
                                 {% elif material.material_type == 'reference' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    📚 Open
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📚 Open</a>
                                 {% else %}
-                                <a href="{% url 'student:lms_view_material' material.id %}"
-                                   class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">
-                                    📎 Open
-                                </a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📎 Open</a>
                                 {% endif %}
-                                <a href="{% url 'student:lms_download_material' material.id %}"
-                                   class="lms-btn lms-btn-secondary" data-material-id="{{ material.id }}">
-                                    ⬇ Download
-                                </a>
+                                <a href="{% url 'student:lms_download_material' material.id %}" class="lms-btn lms-btn-secondary" data-material-id="{{ material.id }}">⬇ Download</a>
                             {% endif %}
                         </div>
 
