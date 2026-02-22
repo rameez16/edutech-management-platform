@@ -4687,7 +4687,7 @@ input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] 
 
 /* Show/hide tab content */
 .lesson-session-tab-content .tab { display: none; }
-#tab-pending:checked ~ .lesson-session-tab-content #pending,
+#tab-planned:checked ~ .lesson-session-tab-content #planned,
 #tab-completed:checked ~ .lesson-session-tab-content #completed,
 #tab-skipped:checked ~ .lesson-session-tab-content #skipped { display: block; }
 
@@ -4987,6 +4987,48 @@ input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] 
     filter: brightness(1.1);
 }
 
+
+/* Common button style */
+.lesson-session-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 90px;       /* same width */
+    height: 34px;          /* same height */
+    padding: 0 12px;
+
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none; /* IMPORTANT for <a> */
+    transition: 0.2s ease;
+}
+
+/* Complete button */
+.lesson-session-btn.complete {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Skip button */
+.lesson-session-btn.skip {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+/* Hover effects */
+.lesson-session-btn.complete:hover {
+    filter: brightness(1.1);
+}
+
+.lesson-session-btn.skip:hover {
+    filter: brightness(1.1);
+}
+
 /* Responsive */
 @media (max-width: 576px) {
     .completed-lesson-card {
@@ -5176,6 +5218,36 @@ input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] 
 
 .material-btn-secondary:hover {
     background: #4b5563;
+}
+
+.existing-materials {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #f9fafb;
+}
+
+.existing-materials h5 {
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.existing-materials ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.existing-materials li {
+    padding: 4px 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 12px;
+}
+
+.existing-materials li:last-child {
+    border-bottom: none;
 }
 
 /* ==========================================

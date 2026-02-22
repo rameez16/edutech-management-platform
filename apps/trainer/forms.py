@@ -29,7 +29,6 @@ class TrainerProfileForm(forms.ModelForm):
         }
 
 
-
 class TaskForm(forms.ModelForm):
 
     class Meta:
@@ -71,7 +70,6 @@ class TaskForm(forms.ModelForm):
 
 
 class EvaluationForm(forms.ModelForm):
-
     class Meta:
         model = TaskSubmission
         fields = ["marks_obtained", "feedback"]
@@ -85,18 +83,19 @@ class CompletedSessionForm(forms.ModelForm):
     class Meta:
         model = LessonSession
         fields = [
+            'actual_date',
             'actual_duration_hours',
             'homework_assigned',
             'student_queries',
             'remarks',
         ]
         widgets = {
+            'actual_date': forms.DateInput(attrs={'type': 'date','required': 'required'}),
             'homework_assigned': forms.Textarea(attrs={'rows':3, 'placeholder':'Homework details...'}),
             'student_queries': forms.Textarea(attrs={'rows':3, 'placeholder':'Student questions...'}),
-            'remarks': forms.Textarea(attrs={'rows':2, 'placeholder':'Trainer remarks...'}),
+            'remarks': forms.Textarea(attrs={'rows':3, 'placeholder':'Trainer remarks...'}),
         }
         
-# forms.py
 class SessionMaterialForm(forms.ModelForm):
     class Meta:
         model = SessionMaterial
