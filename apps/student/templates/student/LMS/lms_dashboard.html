@@ -26,9 +26,7 @@
             &middot;
             <span class="lms-duration">{{ batch.duration_months }} months</span>
         </p>
-        <div>
-            <a href="{% url 'accounts:lms_logout' %}">Logout</a>
-        </div>
+        
     </div>
 
     <!-- WRAPPER CARD -->
@@ -101,8 +99,8 @@
 
                 <!-- SESSION GROUP HEADER -->
                 <div class="lms-session-header">
-                    <span class="lms-session-label">SESSION {{ session.lesson_plan.session_number }}</span>
-                    <span class="lms-session-date">{{ session.actual_date|date:"M d, Y" }}</span>
+                    <span class="lms-session-label">SESSION {{ session.lesson_plan.session_number }} : {{ session.lesson_plan.topic }}</span>
+                    <span class="lms-session-date">{{ session.planned_date|date:"M d, Y" }}</span>
                     <span class="lms-session-count">{{ item.material_count }} material{{ item.material_count|pluralize }}</span>
                 </div>
 

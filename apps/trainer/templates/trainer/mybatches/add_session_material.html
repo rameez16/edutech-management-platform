@@ -37,6 +37,25 @@
 </div>
 
         <div class="material-form-section">
+            {% if session.materials.exists %}
+    <div class="existing-materials">
+        <h5>Uploaded Materials</h5>
+        <ul>
+            {% for material in session.materials.all %}
+                <li>
+                    {{ material.title }}
+                    ({{ material.get_material_type_display }})
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+            {% if session.status != session.SessionStatus.COMPLETED %}
+    <div class="material-error-text">
+        Materials can only be uploaded for completed sessions.
+    </div>
+{% endif %}
+{% if session.status == session.SessionStatus.COMPLETED %}
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
@@ -71,6 +90,7 @@
                 </div>
 
             </form>
+            {% endif %}
         </div>
 
     </div>
