@@ -139,7 +139,7 @@ class StudentDocument(models.Model):
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
     document_file = models.FileField(
         upload_to='student_documents/%Y/%m/',
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])],storage=RawMediaCloudinaryStorage()
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png','docx'])],storage=RawMediaCloudinaryStorage()
     )
     document_number = models.CharField(max_length=100, blank=True, help_text="Aadhaar/PAN number")
     
