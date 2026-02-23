@@ -31,21 +31,37 @@
                 </tr>
                 <tr>
                     <th>Actual Date</th>
-                    <td>{{ session.actual_date|date:"M d, Y" }}</td>
+                    <td>
+                        {% if session.actual_date %}
+                            {{ session.actual_date|date:"M d, Y" }}
+                        {% else %}
+                            <span class="text-muted">Not set</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <th>Status</th>
-                    <td><span class="completed-lesson-badge completed">{{ session.get_status_display }}</span></td>
+                    <td>
+                        {% if session.actual_date %}
+                            <span class="completed-lesson-badge completed">
+                                Completed
+                            </span>
+                        {% else %}
+                            <span class="completed-lesson-badge" style="background:#ffc107;color:#000;">
+                                Not Completed
+                            </span>
+                        {% endif %}
+                    </td>
                 </tr>
             </tbody>
         </table>
 
         <div class="add-material-btn">
-    <a href="{% url 'trainer:add-session-material' session.id %}" 
-       class="completed-lesson-btn complete">
-        + Add Material
-    </a>
-</div>
+            <a href="{% url 'trainer:add-session-material' session.id %}" 
+            class="completed-lesson-btn complete">
+                + Add Material
+            </a>
+        </div>
     </div>
 
     <!-- Update Form -->

@@ -3,27 +3,24 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.timezone import now
-from decimal import Decimal
 from django.db.models import Sum
-from apps.bdm.models import Student,Trainer,Course,Batch,StudentAdminProfile,OnboardingChecklist,StudentIssue,PaymentDocument
-from django.contrib.auth import update_session_auth_hash
-import uuid, os
-from . import views
-from django.contrib.auth.decorators import login_required
-import uuid
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_POST
-from .forms import EnrollmentAgreementForm, TaskSubmissionForm
-from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession, Attendance
-from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback,LeaveApplication
-from apps.student.forms import LeaveApplicationForm,StudentIssueForm
-from apps.trainer.models import Module, LessonPlan,TaskSubmission, Task, LessonSession, SessionMaterial
-from .models import FeePayment, StudentDocument, EnrollmentAgreement, StudentIDCard, StudentFeedback
-from apps.student.forms import LeaveApplicationForm
-from apps.student.models import LeaveApplication
-from dateutil.relativedelta import relativedelta 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
+from decimal import Decimal
+from dateutil.relativedelta import relativedelta
+import uuid
+import os
 import calendar
+from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument
+from apps.accounts.decorators import role_required
+from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial
+from apps.student.models import LeaveApplication
+from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCard,StudentFeedback
+from .forms import EnrollmentAgreementForm,TaskSubmissionForm
+from apps.student.forms import LeaveApplicationForm,StudentIssueForm
+
 
 #rinta
 

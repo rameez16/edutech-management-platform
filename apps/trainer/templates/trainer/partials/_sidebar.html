@@ -106,6 +106,17 @@
             </a>
         </li>
 
+        <!-- Students Issues -->
+        <li class="nav-item">
+            <a href="{% url 'trainer:trainer_assigned_issues' %}" 
+            class="nav-link {% if request.resolver_match.url_name == 'trainer_assigned_issues' or request.resolver_match.url_name == 'trainer_issue_detail' %}active{% endif %}">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+                <span>Students Issues</span>
+            </a>
+        </li>
+
         <!-- Students Feedback -->
         <li class="nav-item">
             <a href="#" class="nav-link">
