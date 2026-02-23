@@ -4,36 +4,36 @@
 
 /* ── Container ─────────────────────────────────────────────── */
 .lms-container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px 40px;
+    max-width: 75rem;        /* was 1200px */
+    margin: 2.5rem auto;     /* was 40px */
+    padding: 0 1.25rem 2.5rem;
     box-sizing: border-box;
 }
 
 /* ── LMS Header ─────────────────────────────────────────────── */
 .lms-header {
-    padding: 32px;
-    margin-bottom: 30px;
+    padding: 2rem;           /* was 32px */
+    margin-bottom: 1.875rem; /* was 30px */
     background: linear-gradient(135deg, #ffffff, #f4f6ff);
-    border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    border-radius: 1.125rem;
+    box-shadow: 0 0.5rem 1.875rem rgba(0, 0, 0, 0.05);
 }
 
 .lms-title {
-    font-size: 28px;
+    font-size: 1.75rem;      /* was 28px */
     font-weight: 700;
-    margin: 0 0 12px 0;
+    margin: 0 0 0.75rem 0;
     color: #2d2d2d;
 }
 
 .lms-meta {
-    font-size: 15px;
+    font-size: 0.9375rem;    /* was 15px */
     font-weight: 600;
     color: #6366f1;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
     flex-wrap: wrap;
 }
 
@@ -43,38 +43,38 @@
 
 /* ── Wrapper Card ────────────────────────────────────────────── */
 .lms-wrapper-card {
-    padding: 30px;
+    padding: 1.875rem;       /* was 30px */
     background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
-    border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    border-radius: 1.125rem;
+    box-shadow: 0 0.5rem 1.875rem rgba(0, 0, 0, 0.08);
 }
 
 /* ── Stats Row (4 cards) ─────────────────────────────────────── */
 .lms-stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
-    margin-bottom: 28px;
+    gap: 1.875rem;           /* was 30px */
+    margin-bottom: 1.75rem;
 }
 
 .lms-stat-card {
     background: #fff;
-    border-radius: 16px;
-    padding: 18px 20px;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
+    border-radius: 1rem;
+    padding: 1.125rem 1.25rem;
+    box-shadow: 0 0.75rem 2.1875rem rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0.375rem;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .lms-stat-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 1.125rem 2.8125rem rgba(0, 0, 0, 0.12);
 }
 
 .lms-stat-number {
-    font-size: 30px;
+    font-size: 1.875rem;     /* was 30px */
     font-weight: 800;
     line-height: 1;
 }
@@ -85,45 +85,45 @@
 .lms-stat-resources .lms-stat-number { color: #10b981; }
 
 .lms-stat-label {
-    font-size: 13px;
+    font-size: 0.8125rem;    /* was 13px */
     font-weight: 600;
     color: #374151;
-    margin-top: 2px;
+    margin-top: 0.125rem;
 }
 
 .lms-stat-sub {
-    font-size: 11px;
+    font-size: 0.6875rem;    /* was 11px */
     color: #9ca3af;
     font-weight: 400;
-    margin-top: 1px;
+    margin-top: 0.0625rem;
 }
 
 /* ── Sessions inner white card ───────────────────────────────── */
 .lms-sessions-card {
     background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
+    border-radius: 1.125rem;
+    box-shadow: 0 0.75rem 2.1875rem rgba(0, 0, 0, 0.07);
     overflow: hidden;
-    padding: 24px 28px 28px;
+    padding: 1.5rem 1.75rem 1.75rem;
 }
 
 /* ── Filter Tabs ─────────────────────────────────────────────── */
 .lms-filter-tabs {
     display: flex;
-    gap: 10px;
-    margin-bottom: 28px;
+    gap: 0.625rem;
+    margin-bottom: 1.75rem;
     flex-wrap: wrap;
 }
 
 .lms-filter-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 18px;
-    border-radius: 20px;
+    gap: 0.375rem;
+    padding: 0.5rem 1.125rem;
+    border-radius: 1.25rem;
     background: #e0e7ff;
     color: #4338ca;
-    font-size: 14px;
+    font-size: 0.875rem;     /* was 14px */
     font-weight: 500;
     text-decoration: none;
     transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
@@ -141,8 +141,8 @@
 }
 
 .filter-dot {
-    width: 8px;
-    height: 8px;
+    width: 0.5rem;
+    height: 0.5rem;
     border-radius: 50%;
     background: currentColor;
     opacity: 0.7;
@@ -173,9 +173,9 @@
 .lms-session-header {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 4px;
-    margin-top: 10px;
+    gap: 0.875rem;
+    padding: 0.875rem 0.25rem;
+    margin-top: 0.625rem;
 }
 
 .lms-session-header:first-of-type {
@@ -183,7 +183,7 @@
 }
 
 .lms-session-label {
-    font-size: 11px;
+    font-size: 0.6875rem;    /* was 11px */
     font-weight: 800;
     letter-spacing: 1.2px;
     text-transform: uppercase;
@@ -191,14 +191,14 @@
 }
 
 .lms-session-date {
-    font-size: 13px;
+    font-size: 0.8125rem;    /* was 13px */
     font-weight: 500;
     color: #6b7280;
 }
 
 .lms-session-count {
     margin-left: auto;
-    font-size: 12px;
+    font-size: 0.75rem;      /* was 12px */
     color: #9ca3af;
     font-weight: 500;
 }
@@ -207,15 +207,15 @@
 .lms-materials-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 0.625rem;
+    margin-bottom: 0.75rem;
 }
 
 /* ── Material Card ───────────────────────────────────────────── */
 .lms-material-card {
     background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.07);
+    border-radius: 0.875rem;
+    box-shadow: 0 0.25rem 1rem rgba(99, 102, 241, 0.07);
     border: 1px solid #ede9ff;
     display: flex;
     align-items: center;
@@ -224,7 +224,7 @@
 }
 
 .lms-material-card:hover {
-    box-shadow: 0 8px 28px rgba(99, 102, 241, 0.14);
+    box-shadow: 0 0.5rem 1.75rem rgba(99, 102, 241, 0.14);
     transform: translateY(-2px);
 }
 
@@ -245,15 +245,15 @@
 
 /* Icon */
 .lms-material-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
+    width: 3.25rem;          /* was 52px */
+    height: 3.25rem;
+    border-radius: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 1.375rem;     /* was 22px */
     flex-shrink: 0;
-    margin: 16px 16px 16px 14px;
+    margin: 1rem 1rem 1rem 0.875rem;
 }
 
 .lms-icon-recording  { background: #fef2f2; }
@@ -268,23 +268,23 @@
 .lms-material-info {
     flex: 1;
     min-width: 0;
-    padding: 16px 0;
+    padding: 1rem 0;
 }
 
 .lms-material-title {
-    font-size: 15px;
+    font-size: 0.9375rem;    /* was 15px */
     font-weight: 700;
     color: #1f2937;
-    margin: 0 0 4px 0;
+    margin: 0 0 0.25rem 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .lms-material-desc {
-    font-size: 13px;
+    font-size: 0.8125rem;    /* was 13px */
     color: #6b7280;
-    margin: 0 0 8px 0;
+    margin: 0 0 0.5rem 0;
     line-height: 1.5;
     white-space: nowrap;
     overflow: hidden;
@@ -295,16 +295,16 @@
 .lms-material-tags {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.375rem;
     flex-wrap: wrap;
 }
 
 .lms-tag {
     display: inline-flex;
     align-items: center;
-    font-size: 11px;
+    font-size: 0.6875rem;    /* was 11px */
     font-weight: 600;
-    padding: 2px 9px;
+    padding: 0.125rem 0.5625rem;
     border-radius: 999px;
     letter-spacing: 0.2px;
 }
@@ -327,25 +327,25 @@
     background: transparent;
     color: #9ca3af;
     font-weight: 500;
-    padding: 0 4px;
+    padding: 0 0.25rem;
 }
 
 /* ── Action Buttons ──────────────────────────────────────────── */
 .lms-material-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 20px 0 12px;
+    gap: 0.5rem;
+    padding: 0 1.25rem 0 0.75rem;
     flex-shrink: 0;
 }
 
 .lms-btn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 9px 18px;
-    border-radius: 10px;
-    font-size: 13.5px;
+    gap: 0.3125rem;
+    padding: 0.5625rem 1.125rem;
+    border-radius: 0.625rem;
+    font-size: 0.84375rem;   /* was 13.5px */
     font-weight: 600;
     text-decoration: none;
     transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
@@ -357,13 +357,13 @@
 .lms-btn-primary {
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0.25rem 0.75rem rgba(99, 102, 241, 0.3);
 }
 
 .lms-btn-primary:hover {
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0.375rem 1.125rem rgba(99, 102, 241, 0.4);
     color: #fff;
     text-decoration: none;
 }
@@ -383,12 +383,12 @@
 /* ── Empty State ─────────────────────────────────────────────── */
 .lms-empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 3.75rem 1.25rem;
     color: #9ca3af;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-style: italic;
     background: #faf5ff;
-    border-radius: 14px;
+    border-radius: 0.875rem;
     border: 1.5px dashed #ddd6fe;
 }
 
@@ -400,10 +400,10 @@
 }
 
 @media (max-width: 768px) {
-    .lms-header { padding: 22px; }
-    .lms-title { font-size: 22px; }
-    .lms-wrapper-card { padding: 20px; }
-    .lms-sessions-card { padding: 16px 20px 22px; }
+    .lms-header { padding: 1.375rem; }
+    .lms-title { font-size: 1.375rem; }
+    .lms-wrapper-card { padding: 1.25rem; }
+    .lms-sessions-card { padding: 1rem 1.25rem 1.375rem; }
 
     .lms-material-card { flex-wrap: wrap; }
 
@@ -417,27 +417,27 @@
 
     .lms-material-actions {
         width: 100%;
-        padding: 0 16px 14px 82px;
+        padding: 0 1rem 0.875rem 5.125rem;
         justify-content: flex-start;
     }
 
-    .lms-btn { padding: 8px 14px; font-size: 12.5px; }
-    .lms-stat-number { font-size: 28px; }
-    .lms-filter-btn { padding: 7px 14px; font-size: 13px; }
+    .lms-btn { padding: 0.5rem 0.875rem; font-size: 0.78125rem; }
+    .lms-stat-number { font-size: 1.75rem; }
+    .lms-filter-btn { padding: 0.4375rem 0.875rem; font-size: 0.8125rem; }
 }
 
 @media (max-width: 480px) {
     .lms-stats-row { grid-template-columns: repeat(2, 1fr); }
-    .lms-wrapper-card { padding: 14px; }
-    .lms-sessions-card { padding: 12px 14px 16px; }
-    .lms-session-header { padding: 12px 2px; }
+    .lms-wrapper-card { padding: 0.875rem; }
+    .lms-sessions-card { padding: 0.75rem 0.875rem 1rem; }
+    .lms-session-header { padding: 0.75rem 0.125rem; }
 
     .lms-material-icon {
-        width: 44px;
-        height: 44px;
-        font-size: 18px;
-        margin: 12px 12px 12px 10px;
+        width: 2.75rem;
+        height: 2.75rem;
+        font-size: 1.125rem;
+        margin: 0.75rem 0.75rem 0.75rem 0.625rem;
     }
 
-    .lms-material-title { font-size: 14px; }
+    .lms-material-title { font-size: 0.875rem; }
 }
