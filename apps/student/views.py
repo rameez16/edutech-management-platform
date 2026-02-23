@@ -48,7 +48,7 @@ def payment(request):
 
     if not batch:
         messages.error(request, "No batch assigned.")
-        return redirect("student:dashboard")
+        return redirect("student:stud_dashboard")
 
     # =====================================
     # ✅ FEES
@@ -153,7 +153,7 @@ def admission(request):
 
     if not batch:
         messages.error(request, "No batch assigned.")
-        return redirect("student:dashboard")
+        return redirect("student:stud_dashboard")
 
     course = batch.course
 
@@ -329,7 +329,7 @@ def installments(request, student_id):
 
     if not batch:
         messages.error(request, "No batch assigned")
-        return redirect("student:dashboard")
+        return redirect("student:stud_dashboard")
 
     # ================================
     # ✅ FEE CALCULATION ⭐⭐⭐⭐⭐
@@ -506,7 +506,7 @@ def onetime_view(request):
 
     if not batch:
         messages.error(request, "No batch assigned")
-        return redirect("student:dashboard")
+        return redirect("student:stud_dashboard")
 
     course_fee = batch.course.course_fee
     admission_fee = course_fee * Decimal("0.10")
