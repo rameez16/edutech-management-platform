@@ -1772,3 +1772,27 @@ def student_issue_detail(request, pk):
     }
 
     return render(request, 'bdm/student_issue/student_issue_detail.html', context)
+
+
+
+
+# Ramees-Student view
+
+
+from django.views.generic import ListView, DetailView
+from django.shortcuts import get_object_or_404
+from django.db.models import Count
+from apps.bdm.models import Student, Batch
+from apps.student.models import FeePayment
+from apps.student.models import LMSAccess
+from apps.bdm.models import OnboardingChecklist
+
+
+class StudentListView(ListView):
+    model = Student
+    template_name = "bdm/student/student_list.html"
+    context_object_name = "students"
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Student.objects.select_related("user").prefetch_related("batches")
