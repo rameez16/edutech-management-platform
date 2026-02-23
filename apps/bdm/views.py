@@ -310,6 +310,7 @@ def verify_document(request, doc_id):
     print(check)
     if student.all_required_documents_verified():
         checklist.documents_verified = True
+        checklist.enrollment_letter_generated = True
         checklist.save()
         messages.success(
             request,
