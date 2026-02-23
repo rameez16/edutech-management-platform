@@ -711,21 +711,30 @@ class OnboardingChecklist(models.Model):
     @property
     def completion_percentage(self):
         """Calculate onboarding completion percentage"""
+
         total_steps = 12
+
+        # Check if student has any PDC payments
+        has_pdc_or_emi = self.student.fee_payments.filter(
+            payment_type__in=["installment"]
+        ).exists()
+
         completed_steps = sum([
             self.documents_uploaded,
             self.documents_verified,
             self.booking_fee_paid,
+            self.admission_fee_paid,
             self.payment_plan_created,
             self.enrollment_letter_generated,
             self.enrollment_letter_signed,
             self.id_card_generated,
             self.id_card_issued,
             self.lms_access_created,
-            self.pdc_collected if self.student.payment_option in ['pdc', 'emi'] else True,
+            self.pdc_collected if has_pdc_or_emi else True,
             self.batch_assigned,
             self.orientation_completed
         ])
+
         return round((completed_steps / total_steps) * 100, 1)
 
 

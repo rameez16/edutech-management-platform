@@ -59,7 +59,7 @@ from .utils import role_required
 
 
 @login_required
-@role_required('admin')
+# @role_required('admin')
 def dashboard(request):
     """
     Dashboard view with comprehensive statistics and latest data
@@ -1788,6 +1788,7 @@ from apps.student.models import LMSAccess
 from apps.bdm.models import OnboardingChecklist
 
 
+
 class StudentListView(ListView):
     model = Student
     template_name = "bdm/student/student_list.html"
@@ -1796,3 +1797,73 @@ class StudentListView(ListView):
 
     def get_queryset(self):
         return Student.objects.select_related("user").prefetch_related("batches")
+
+    
+    
+class StudentDashboardView(DetailView):
+    model = Student
+    template_name = "bdm/student/student_dashboard.html"
+    context_object_name = "student"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = self.object
+
+        # Batch
+        batch = student.batches.first()
+
+        # Progress
+        from apps.trainer.models import LessonSession
+        progress = None
+        if batch:
+            progress = LessonSession.get_batch_progress(batch)
+
+        # Attendance
+        from apps.trainer.models import Attendance
+        attendance = 0
+        if batch:
+            attendance = Attendance.calculate_attendance_percentage(student, batch)
+
+        # Tasks
+        from apps.trainer.models import TaskSubmission
+        pending_tasks = TaskSubmission.get_student_pending_tasks(student)
+        overdue_tasks = TaskSubmission.get_student_overdue_tasks(student)
+
+        # Fees
+        fee_summary = FeePayment.get_payment_summary(student)
+
+        # Documents
+        documents = student.documents.all()
+
+        # Onboarding
+        onboarding = getattr(student, "onboarding_checklist", None)
+
+        # LMS
+        lms = getattr(student, "lms_access", None)
+
+        context.update({
+            "batch": batch,
+            "progress": progress,
+            "attendance": attendance,
+            "pending_tasks": pending_tasks,
+            "overdue_tasks": overdue_tasks,
+            "fee_summary": fee_summary,
+            "documents": documents,
+            "onboarding": onboarding,
+            "lms": lms
+        })
+
+        return context    
+    
+from django.views import View
+from django.shortcuts import redirect
+
+class ToggleStudentStatusView(View):
+    def post(self, request, pk):
+        student = get_object_or_404(Student, pk=pk)
+        student.is_active = not student.is_active
+        student.save()
+        return redirect("student_dashboard", pk=pk)
+    
+    
+    

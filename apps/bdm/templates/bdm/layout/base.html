@@ -1450,7 +1450,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 {% endif %}
                             </a>
                             
-                            <a href="" class="sidebar-link {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+                            <a href="{% url 'bdm:student_list' %}" class="sidebar-link {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
                                 <div class="sidebar-link-icon">
                                     <i class="fas fa-user-graduate"></i>
                                 </div>
@@ -1465,6 +1465,15 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <i class="fas fa-layer-group"></i>
                                 </div>
                                 <span class="sidebar-link-text">Batches</span>
+                                {% if batch_count > 0 %}
+                                <span class="sidebar-link-badge">{{ batch_count }}</span>
+                                {% endif %}
+                            </a>
+                            <a href="{% url 'bdm:batch_list_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'batch_list' %}active{% endif %}">
+                                <div class="sidebar-link-icon">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <span class="sidebar-link-text">Academic Scheduling</span>
                                 {% if batch_count > 0 %}
                                 <span class="sidebar-link-badge">{{ batch_count }}</span>
                                 {% endif %}

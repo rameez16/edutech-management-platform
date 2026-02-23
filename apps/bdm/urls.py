@@ -62,7 +62,7 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 
                 #ramees-lession-plan
                 
-                path('academics/batches/', views.BatchListView.as_view(), name='batch_list') ,
+                path('academics/batches/', views.BatchListView.as_view(), name='batch_list_manage') ,
                 path('academics/batch/<int:pk>/', views.BatchAcademicDashboardView.as_view(), name='batch_academic_dashboard'),
                 path("academics/batch/<int:batch_id>/module/<int:pk>/",views.ModuleDetailView.as_view(),name="module_detail"),          
                 path("academics/batch/<int:batch_id>/lesson-plan/<int:plan_id>/assign/",views.AssignLessonSessionView.as_view(),name="assign_lesson_session"),
@@ -87,6 +87,10 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 
                 path('issues/', views.student_issue_list, name='student_issue_list'),
                 path('issues/<int:pk>/', views.student_issue_detail, name='student_issue_detail'),
+                
+                path("students/", views.StudentListView.as_view(), name="student_list"),
+                path("students/<int:pk>/", views.StudentDashboardView.as_view(), name="student_dashboard"),
+                
                 ]
 
 
