@@ -415,6 +415,8 @@ def approve_enrollment_agreement(request, student_id):
             }
         )
         
+        checklist.id_card_generated = True
+        
         # ✅ AUTO CREATE LMS ACCESS (if not exists)
         lms_access, created = LMSAccess.objects.get_or_create(
             student=agreement.student,
