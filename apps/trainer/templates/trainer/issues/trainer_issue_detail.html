@@ -1,0 +1,97 @@
+{% extends "base/base.html" %}
+
+
+{% block content %}
+
+<div class="glass-card issues-detail-card">
+
+    <!-- Header -->
+   <h4 class="issues-detail-title" style="display:flex;align-items:center;gap:8px;">
+    <a href="{% url 'trainer:trainer_assigned_issues' %}" class="issues-details-back-button" style="display:inline-flex;align-items:center;color:inherit;text-decoration:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+    Issue Details
+</h4>
+
+    <form method="POST" class="issues-detail-form">
+        {% csrf_token %}
+
+        <div class="issues-detail-grid">
+
+            <!-- Student -->    
+            <div class="issues-detail-row">
+                <span class="issues-detail-label">Student</span>
+                <span class="issues-detail-value">{{ issue.student.full_name }}</span>
+            </div>
+
+            <!-- Subject -->
+            <div class="issues-detail-row">
+                <span class="issues-detail-label">Subject</span>
+                <textarea readonly class="issues-detail-textarea-large">{{ issue.subject }}</textarea>
+            </div>
+
+            <!-- Description -->
+            <div class="issues-detail-row">
+                <span class="issues-detail-label">Description</span>
+                <textarea readonly class="issues-detail-textarea-large">{{ issue.description }}</textarea>
+            </div>
+
+            <!-- Status -->
+            <div class="issues-detail-row">
+                <span class="issues-detail-label">Status</span>
+                <span class="issues-detail-value">{{ issue.get_status_display }}</span>
+            </div>
+
+            <!-- Priority -->
+            <div class="issues-detail-row">
+                <span class="issues-detail-label">Priority</span>
+                <span class="issues-detail-value">
+                    <span class="issues-priority-badge {{ issue.priority|lower }}">
+                        {{ issue.get_priority_display }}
+                    </span>
+                </span>
+            </div>
+
+            <!-- Resolution Notes (Editable) -->
+            <div class="issues-detail-row">
+                <span class="issues-detail-label">Resolution Notes</span>
+                {{ form.resolution_notes }}
+            </div>
+
+            <!-- Student Satisfied -->
+            <div class="issues-detail-row">
+                <span class="issues-detail-label">Student Satisfied</span>
+                <span class="issues-detail-value">
+                    {% if issue.student_satisfied == True %}
+                        Yes
+                    {% elif issue.student_satisfied == False %}
+                        No
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </span>
+            </div>
+
+            <!-- Satisfaction Comments -->
+            <div class="issues-detail-row">
+                <span class="issues-detail-label">Satisfaction Comments</span>
+                <textarea readonly class="issues-detail-textarea-large">{{ issue.satisfaction_comments|default:"-" }}</textarea>
+            </div>
+
+        </div>
+
+        <div class="issues-detail-actions">
+            <button type="submit" class="issues-btn-resolve">
+                Mark as Resolved
+            </button>
+            <a href="{% url 'trainer:trainer_assigned_issues' %}" class="issues-btn-back">
+                Back to List
+            </a>
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}

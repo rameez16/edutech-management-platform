@@ -43,5 +43,9 @@ urlpatterns = [
     path("tasks/list/", views.task_list, name="task-list"),
     path("tasks/submissions/", views.task_submissions, name="task-submissions"),
     path("tasks/evaluate/<int:submission_id>/",views.evaluate_submission,name="task-evaluate"),
-
+    
+    # Student Issues
+    path('assigned-issues/', views.trainer_issues_list_view, name='trainer_assigned_issues'),
+    path('assigned-issues/<int:pk>/', views.trainer_issue_detail_view, name='trainer_issue_detail'),
+    
 ]

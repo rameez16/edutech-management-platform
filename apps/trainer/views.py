@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 
-from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm
+from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm,TrainerIssueResolveForm
 
-from apps.bdm.models import Trainer, Batch, Student
+from apps.bdm.models import Trainer, Batch, Student, StudentIssue
 from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission
 from apps.student.models import StudentFeedback, LeaveApplication
 
@@ -735,4 +735,50 @@ def add_session_material(request, session_id):
         'session': session,
         'batch': session.batch,
         'active_tab': 'lesson_sessions',
+    })
+    
+# // student lssue 
+
+@login_required
+def trainer_issues_list_view(request):
+    """
+    List all trainer-related issues assigned to the logged-in trainer.
+    """
+    trainer = request.user
+    issues = StudentIssue.objects.filter(
+        issue_type=StudentIssue.IssueType.TRAINER,
+        assigned_to=trainer
+    ).order_by('-created_at')
+    
+    return render(request, 'trainer/issues/trainer_issues_list.html', {'issues': issues})
+
+@login_required
+def trainer_issue_detail_view(request, pk):
+    """
+    Show trainer issue details and allow the trainer to add Resolution Notes.
+    After submitting, mark the issue as resolved and redirect to the issues list.
+    """
+    trainer = request.user
+    issue = get_object_or_404(
+        StudentIssue,
+        pk=pk,
+        issue_type=StudentIssue.IssueType.TRAINER,
+        assigned_to=trainer
+    )
+
+    if request.method == "POST":
+        form = TrainerIssueResolveForm(request.POST, instance=issue)
+        if form.is_valid():
+            issue = form.save(commit=False)
+            issue.status = StudentIssue.Status.RESOLVED
+            issue.resolved_by = trainer
+            issue.resolved_at = timezone.now()
+            issue.save()
+            return redirect('trainer:trainer_assigned_issues')
+    else:
+        form = TrainerIssueResolveForm(instance=issue)
+
+    return render(request, 'trainer/issues/trainer_issue_detail.html', {
+        'issue': issue,
+        'form': form
     })

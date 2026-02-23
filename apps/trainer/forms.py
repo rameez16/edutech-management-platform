@@ -1,8 +1,8 @@
 from django import forms
 from apps.bdm.models import Trainer
 from apps.trainer.models import Task, TaskSubmission, LessonSession, SessionMaterial
-from django.utils import timezone
-
+from django.utils import timezone 
+from apps.bdm.models import StudentIssue
 class TrainerProfileForm(forms.ModelForm):
     class Meta:
         model = Trainer
@@ -109,3 +109,19 @@ class SessionMaterialForm(forms.ModelForm):
             'created_at',
             'updated_at'
         ]
+        
+        
+class TrainerIssueResolveForm(forms.ModelForm):
+    class Meta:
+        model = StudentIssue
+        fields = [
+            "resolution_notes",
+        ]
+        widgets = {
+            "resolution_notes": forms.Textarea(
+                attrs={
+                    "class": "issues-detail-textarea-large",
+                    "placeholder": "Enter resolution notes here..."
+                }
+            ),
+        }
