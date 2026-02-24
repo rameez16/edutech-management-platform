@@ -32,7 +32,7 @@ from collections import defaultdict
 def payment(request):
 
     student = request.user.student
-     # ✅ ADDED AGREEMENT SAFETY 🔥🔥🔥
+     # ✅ ADDED AGREEMENT SAFETY 
     try:
         agreement = student.enrollment_agreement
     except EnrollmentAgreement.DoesNotExist:
@@ -55,7 +55,7 @@ def payment(request):
     # =====================================
     course_fee = batch.course.course_fee
 
-    # ✅ FIXED 🔥🔥🔥 (THIS WAS MISSING)
+    
     admission_fee = course_fee * Decimal("0.10")
 
     total_fee = course_fee   # Full payment → no addition
@@ -105,7 +105,7 @@ def payment(request):
         )
 
         # =====================================
-        # ✅ SAVE DOCUMENT 🔥
+        # ✅ SAVE DOCUMENT 
         # =====================================
         PaymentDocument.objects.create(
             fee_payment=payment,
@@ -188,7 +188,7 @@ def admission(request):
 
         receipt_file = request.FILES.get("receipt")
 
-        # ✅ SAVE FULL DETAILS TO BDM DOCUMENT 🔥🔥🔥
+        # ✅ SAVE FULL DETAILS TO BDM DOCUMENT 
         PaymentDocument.objects.create(
             fee_payment=admission_fee,
             document_type=PaymentDocument.DocumentType.RECEIPT,
@@ -332,7 +332,7 @@ def installments(request, student_id):
         return redirect("student:stud_dashboard")
 
     # ================================
-    # ✅ FEE CALCULATION ⭐⭐⭐⭐⭐
+    # ✅ FEE CALCULATION 
     # ================================
     course_fee = batch.course.course_fee
 
@@ -343,7 +343,7 @@ def installments(request, student_id):
     total_fee = course_fee
 
     # ================================
-    # ✅ INSTALLMENT LOGIC ⭐⭐⭐⭐⭐
+    # ✅ INSTALLMENT LOGIC
     # ================================
     installment_amount = (remaining_fee / Decimal("4")).quantize(Decimal("0.01"))
 
@@ -359,7 +359,7 @@ def installments(request, student_id):
     else:
         start_date = today
 
-    # ✅ ENSURE ALL 4 INSTALLMENTS EXIST ⭐⭐⭐⭐⭐
+    # ✅ ENSURE ALL 4 INSTALLMENTS EXIST 
     existing_numbers = set(
         installments_qs.values_list("installment_number", flat=True)
     )
@@ -381,14 +381,14 @@ def installments(request, student_id):
                 transaction_id=str(uuid.uuid4())
             )
 
-    # ✅ REFRESH QUERYSET ⭐⭐⭐⭐⭐
+    # ✅ REFRESH QUERYSET 
     installments = FeePayment.objects.filter(
         student=student,
         payment_type=FeePayment.PaymentType.INSTALLMENT
     ).order_by("installment_number")
 
     # ================================
-    # ✅ DISPLAY STATUS LOGIC ⭐⭐⭐⭐⭐🔥
+    # ✅ DISPLAY STATUS LOGIC 
     # ================================
     for inst in installments:
 
@@ -402,7 +402,7 @@ def installments(request, student_id):
             inst.display_status = "Pending"
 
     # ================================
-    # ✅ PAID AMOUNT ⭐⭐⭐⭐⭐
+    # ✅ PAID AMOUNT 
     # ================================
     paid_amount = (
         FeePayment.objects.filter(
@@ -448,7 +448,7 @@ def install_qr(request, installment_id):
         messages.info(request, "This installment is already paid")
         return redirect("student:installments", student_id=installment.student.id)
 
-    # ✅ BLOCK UPCOMING INSTALLMENTS ⭐⭐⭐⭐⭐
+    # ✅ BLOCK UPCOMING INSTALLMENTS 
     if timezone.now().date() < installment.due_date:
         messages.error(request, "Installment not due yet")
         return redirect("student:installments", student_id=installment.student.id)
@@ -460,9 +460,9 @@ def install_qr(request, installment_id):
             messages.error(request, "Please upload payment receipt")
             return redirect(request.path)
 
-        # ✅ UPDATE INSTALLMENT ⭐⭐⭐⭐⭐🔥
+        # ✅ UPDATE INSTALLMENT 
         installment.payment_status = FeePayment.PaymentStatus.PENDING
-        installment.mode_of_payment = FeePayment.PaymentMode.UPI   # ⭐⭐⭐⭐⭐ FIX
+        installment.mode_of_payment = FeePayment.PaymentMode.UPI   
         installment.payment_date = timezone.now()
         installment.transaction_id = f"INS-{uuid.uuid4().hex[:10]}"
         installment.receipt_number = f"RCPT-{uuid.uuid4().hex[:6]}"
@@ -511,7 +511,7 @@ def onetime_view(request):
     course_fee = batch.course.course_fee
     admission_fee = course_fee * Decimal("0.10")
 
-    # ✅ FIXED 🔥
+    # ✅ FIXED 
     total_fee = course_fee
 
     payment = FeePayment.objects.filter(
@@ -721,11 +721,11 @@ def payment_gateway(request):
         agreement = student.enrollment_agreement
     except EnrollmentAgreement.DoesNotExist:
         messages.error(request, "Enrollment agreement not found")
-        return redirect("student:dashboard")
+        return redirect("student:stud_dashboard")
 
     if not agreement.is_signed:
         messages.warning(request, "Agreement not signed yet")
-        return redirect("student:dashboard")
+        return redirect("student:stud_dashboard")
 
     plan = agreement.payment_plan.lower()
 
@@ -742,7 +742,7 @@ def payment_gateway(request):
         return redirect("student:installments", student_id=student.id)  
 
     messages.error(request, "Invalid payment plan")
-    return redirect("student:dashboard")
+    return redirect("student:stud_dashboard")
 @login_required
 def student_attendance(request):
 
@@ -799,7 +799,7 @@ def student_leave(request):
     # ✅ Active Batch
     batch = student.batches.filter(is_active=True).first()
 
-    # ✅ SMART Trainer Fetch (From Sessions 🔥)
+    # ✅ SMART Trainer Fetch 
     trainer = None
 
     if batch:
@@ -860,7 +860,7 @@ def student_evaluation(request):
     student = request.user.student
     submission_id = request.GET.get("submission")
 
-    # ✅ PAGE 2 → INDIVIDUAL EVALUATION 🔥
+    # ✅ PAGE 2 → INDIVIDUAL EVALUATION 
     if submission_id:
 
         submission = (
@@ -1722,7 +1722,7 @@ def syllabus(request):
     if batch:
         course = batch.course
 
-        # 🔥 Remove extra blank lines from tech_stack
+        #  Remove extra blank lines from tech_stack
         if course.tech_stack:
             course.tech_stack = "\n".join(
                 line.strip()
@@ -1730,7 +1730,7 @@ def syllabus(request):
                 if line.strip()
             )
 
-        # 🔥 Remove extra blank lines from syllabus
+        #  Remove extra blank lines from syllabus
         if course.syllabus:
             course.syllabus = "\n".join(
                 line.strip()
