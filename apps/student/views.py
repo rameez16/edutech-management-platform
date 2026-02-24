@@ -763,9 +763,18 @@ def student_attendance(request):
 
     student = request.user.student
 
+    # ✅ ALWAYS GET ACTIVE BATCH FIRST
+    batch = (
+        student.batches
+        .filter(is_active=True)
+        .select_related("course")
+        .prefetch_related("trainers__user")
+        .first()
+    )
+
     attendance_records = (
         Attendance.objects
-        .filter(student=student)
+        .filter(student=student, batch=batch)
         .select_related(
             "lesson_session",
             "lesson_session__lesson_plan",
@@ -775,7 +784,7 @@ def student_attendance(request):
         .order_by("-date")
     )
 
-    if not attendance_records.exists():
+    if not batch:
         return render(request, "student/dashboard/attendance.html", {
             "student": student,
             "attendance_records": [],
@@ -785,9 +794,6 @@ def student_attendance(request):
             "excused_days": 0,
             "batch": None,
         })
-
-    batch = attendance_records.first().batch
-    attendance_records = attendance_records.filter(batch=batch)
 
     percentage = Attendance.calculate_attendance_percentage(student, batch)
 
@@ -814,19 +820,8 @@ def student_leave(request):
     # ✅ Active Batch
     batch = student.batches.filter(is_active=True).first()
 
-    # ✅ SMART Trainer Fetch 
-    trainer = None
-
-    if batch:
-        session = (
-            LessonSession.objects
-            .filter(batch=batch, trainer__isnull=False)
-            .select_related("trainer")
-            .first()
-        )
-
-        if session:
-            trainer = session.trainer
+    # ✅ Trainer (CORRECT SOURCE)
+    trainer = batch.trainers.first() if batch else None
 
     # ✅ Leaves
     leaves = LeaveApplication.objects.filter(student=student, batch=batch)
