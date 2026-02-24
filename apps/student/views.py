@@ -180,7 +180,7 @@ def admission(request):
             payment_type=FeePayment.PaymentType.ADMISSION,
             amount=admission_amount,
             payment_method=FeePayment.PaymentMethod.UPI,
-            payment_status=FeePayment.PaymentStatus.COMPLETED,
+            payment_status=FeePayment.PaymentStatus.PENDING,
             payment_date=timezone.now(),
             transaction_id=transaction_id,
             receipt_number=receipt_no
