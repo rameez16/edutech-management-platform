@@ -71,6 +71,14 @@ MIDDLEWARE = [
     
 ]
 
+
+
+
+
+
+
+
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

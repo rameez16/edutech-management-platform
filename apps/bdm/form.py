@@ -72,20 +72,21 @@ class TrainerAdminProfileForm(forms.ModelForm):
         ]
 
 
+
 class StudentAdminProfileForm(forms.ModelForm):
 
     enrolled_course = forms.ModelChoiceField(
         queryset=Course.objects.all(),
-        empty_label="Select Course",
-        required=True
+        empty_label="Select Course (Optional)",
+        required=False
     )
 
     batch_assigned = forms.ModelChoiceField(
         queryset=Batch.objects.annotate(
             student_count=Count("students")
         ),
-        empty_label="Select Batch",
-        required=True
+        empty_label="Select Batch (Optional)",
+        required=False
     )
 
     class Meta:
@@ -105,8 +106,6 @@ class StudentAdminProfileForm(forms.ModelForm):
         self.fields["batch_assigned"].label_from_instance = (
             lambda batch: f"{batch.name} (Students: {batch.student_count})"
         )
-        
-        
 
 from apps.trainer.models import LessonSession
 

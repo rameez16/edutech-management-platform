@@ -321,63 +321,6 @@ class Student(models.Model):
 
 
 
-class StudentAdminProfile(models.Model):
-
-    student = models.OneToOneField(
-        "Student",
-        on_delete=models.CASCADE,
-        related_name="admin_profile"
-    )
-
-    # --------------------------------------------------
-    # ADMIN CONTROLS
-    # --------------------------------------------------
-    student_code = models.CharField(
-        max_length=20,
-        unique=True,
-        blank=True
-    )
-
-    date_joined = models.DateField(auto_now_add=True)
-
-    enrolled_course = models.CharField(max_length=200, blank=True)
-    batch_assigned = models.CharField(max_length=100, blank=True)
-
-    booking_fee_paid = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True
-    )
-
-
-
-    background_verified = models.BooleanField(default=False)
-    profile_verified = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-
-    # --------------------------------------------------
-    # AUTO STUDENT ID (NO SIGNAL)
-    # --------------------------------------------------
-    def save(self, *args, **kwargs):
-        if not self.student_id:
-            last_pk = (
-                StudentAdminProfile.objects
-                .order_by("-pk")
-                .values_list("pk", flat=True)
-                .first()
-            ) or 0
-
-            self.student_id = f"STD-{last_pk + 1:04d}"
-
-        super().save(*args, **kwargs)
-
-    # --------------------------------------------------
-    # META
-    # --------------------------------------------------
-    def __str__(self):
-        return f"{self.student_id} | {self.student}"    
-    
     
     
 class Batch(models.Model):
@@ -426,6 +369,66 @@ class Batch(models.Model):
             return students.aggregate(models.Avg('attendance_percentage'))['attendance_percentage__avg']
         return 0        
     
+    
+
+class StudentAdminProfile(models.Model):
+
+    student = models.OneToOneField(
+        "Student",
+        on_delete=models.CASCADE,
+        related_name="admin_profile"
+    )
+
+    # --------------------------------------------------
+    # ADMIN CONTROLS
+    # --------------------------------------------------
+    student_code = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True
+    )
+
+    date_joined = models.DateField(auto_now_add=True)
+
+    enrolled_course = models.ForeignKey(Course,on_delete=models.SET_NULL,null=True,blank=True)
+
+    batch_assigned = models.ForeignKey(Batch,on_delete=models.SET_NULL,null=True,blank=True
+)
+
+    booking_fee_paid = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+
+
+    background_verified = models.BooleanField(default=False)
+    profile_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    # --------------------------------------------------
+    # AUTO STUDENT ID (NO SIGNAL)
+    # --------------------------------------------------
+    def save(self, *args, **kwargs):
+        if not self.student_id:
+            last_pk = (
+                StudentAdminProfile.objects
+                .order_by("-pk")
+                .values_list("pk", flat=True)
+                .first()
+            ) or 0
+
+            self.student_id = f"STD-{last_pk + 1:04d}"
+
+        super().save(*args, **kwargs)
+
+    # --------------------------------------------------
+    # META
+    # --------------------------------------------------
+    def __str__(self):
+        return f"{self.student_id} | {self.student}"    
     
    
 class TeleCallerProfile(models.Model):
