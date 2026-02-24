@@ -526,10 +526,6 @@ document.addEventListener("DOMContentLoaded", function () {
             border: 1px solid #334155;
         }
 
-        .user-dropdown:hover .user-dropdown-menu {
-            display: block;
-        }
-
         .user-dropdown-menu a {
             display: flex;
             align-items: center;
@@ -725,17 +721,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         .sidebar-link.active {
-            background: var(--gradient-blue);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
-        }
+    background: rgba(0, 102, 255, 0.08);
+    color: var(--primary-blue);
+    font-weight: 600;
+    box-shadow: none;
+}
 
-        .carbon .sidebar-link.active {
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-        }
+.carbon .sidebar-link.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+sidebar-link {
+    position: relative;
+}
+
+.sidebar-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--primary-blue);
+}
 
         .sidebar-link.active .sidebar-link-icon {
-            color: white;
+            color: rgb(9, 185, 171);
         }
 
         .sidebar-link-icon {
@@ -1643,7 +1655,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </footer>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.2.0/toastr.min.js"></script>
     <script>
         // Theme handling
@@ -1682,20 +1694,40 @@ document.addEventListener("DOMContentLoaded", function () {
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
         }
 
-        function toggleUserDropdown() {
-            const menu = document.querySelector('.user-dropdown-menu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        }
+        // function toggleUserDropdown() {
+        //     const menu = document.querySelector('.user-dropdown-menu');
+        //     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        // }
 
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.notification-dropdown')) {
-                document.querySelector('.notification-dropdown-menu').style.display = 'none';
-            }
-            if (!event.target.closest('.user-dropdown')) {
-                document.querySelector('.user-dropdown-menu').style.display = 'none';
-            }
-        });
+        // // Close dropdowns when clicking outside
+        // document.addEventListener('click', function(event) {
+        //     if (!event.target.closest('.notification-dropdown')) {
+        //         document.querySelector('.notification-dropdown-menu').style.display = 'none';
+        //     }
+        //     if (!event.target.closest('.user-dropdown')) {
+        //         document.querySelector('.user-dropdown-menu').style.display = 'none';
+        //     }
+        // });
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+const userMenuBtn = document.querySelector('.user-menu');
+const userDropdown = document.querySelector('.user-dropdown-menu');
+
+userMenuBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    userDropdown.style.display =
+        userDropdown.style.display === 'block' ? 'none' : 'block';
+});
+
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.user-dropdown')) {
+        userDropdown.style.display = 'none';
+    }
+});
+
+});
 
         // Toastr configuration
         toastr.options = {
