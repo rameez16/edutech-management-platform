@@ -252,6 +252,26 @@ button.btn-enroll-upload:disabled {
     margin-top: 20px;
 }
 
+.lms-user-id {
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: rgb(164, 221, 162);
+    color: #000000;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: solid black 2px;
+}
+
+.lms-user-id:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    cursor: default;
+}
+
 .next-step-card h4 { font-size: 18px; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; }
 .next-step-card p  { font-size: 14px; color: #6b7280; margin: 0; }
 
