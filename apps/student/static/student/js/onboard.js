@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Upload file when selected
+        
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length === 0) return;
 
@@ -159,28 +160,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.success) {
                     alertify.success("Enrollment letter uploaded successfully ✔");
 
-                    uploadBtn.disabled = true;
-                    uploadBtn.textContent = "Uploaded Successfully ✔";
-                    fileInput.disabled = true;
-
-                    const stepCard = uploadForm.closest('.step-card');
-                    if (stepCard) {
-                        const badge = stepCard.querySelector('.badge');
-                        if (badge) {
-                            badge.textContent = "Completed";
-                            badge.classList.remove('warning', 'locked');
-                            badge.classList.add('success');
-                        }
-
-                        stepCard.classList.remove('pending', 'locked');
-                        stepCard.classList.add('completed');
-
-                        const stepDesc = stepCard.querySelector('.step-desc');
-                        if (stepDesc) stepDesc.textContent = "Enrollment letter signed successfully.";
-
-                        const checkbox = stepCard.querySelector('input[type="checkbox"]');
-                        if (checkbox) checkbox.checked = true;
-                    }
+                    // Auto refresh after 1 second
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
 
                 } else {
                     alertify.error(data.message || "Upload failed ❌");
