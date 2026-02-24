@@ -721,11 +721,11 @@ def payment_gateway(request):
         agreement = student.enrollment_agreement
     except EnrollmentAgreement.DoesNotExist:
         messages.error(request, "Enrollment agreement not found")
-        return redirect("student:dashboard")
+        return redirect("student:stud_dashboard")
 
     if not agreement.is_signed:
         messages.warning(request, "Agreement not signed yet")
-        return redirect("student:dashboard")
+        return redirect("student:stud_dashboard")
 
     plan = agreement.payment_plan.lower()
 
@@ -742,7 +742,7 @@ def payment_gateway(request):
         return redirect("student:installments", student_id=student.id)  
 
     messages.error(request, "Invalid payment plan")
-    return redirect("student:dashboard")
+    return redirect("student:stud_dashboard")
 @login_required
 def student_attendance(request):
 
