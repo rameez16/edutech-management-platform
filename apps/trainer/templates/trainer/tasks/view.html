@@ -1,0 +1,133 @@
+{% extends "trainer/tasks/base.html" %}
+{% block tab_content %}
+
+<div class="glass-card task-view-layout">
+
+    <!-- Header -->
+    <div class="task-view-header">
+
+    <div class="task-view-header-left">
+
+        <!-- Back Button -->
+        <a href="{% url 'trainer:task-list' %}" 
+           class="task-view-back">
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                 width="18" height="18" 
+                 viewBox="0 0 24 24" 
+                 fill="none" stroke="currentColor" 
+                 stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </a>
+
+        <div>
+            <h2 class="task-view-title">{{ task.title }}</h2>
+            <div class="task-view-submeta">
+                {{ task.batch.name }} • {{ task.get_task_type_display }}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="task-view-header-right">
+        {% if task.is_overdue %}
+            <span class="task-view-badge task-view-badge-danger">Overdue</span>
+        {% elif task.due_date %}
+            <span class="task-view-badge task-view-badge-success">Active</span>
+        {% else %}
+            <span class="task-view-badge task-view-badge-muted">Draft</span>
+        {% endif %}
+
+        <a href="{% url 'trainer:task-edit' task.id %}" 
+           class="task-view-btn-primary">
+            Edit
+        </a>
+    </div>
+</div>
+
+    <!-- Body -->
+    <div class="task-view-body">
+        <!-- LEFT -->
+        <div class="task-view-main">
+            <div class="task-view-block">
+                <h5>Description</h5>
+                <p>{{ task.description|default:"No description provided."|linebreaks }}</p>
+            </div>
+
+            <div class="task-view-block">
+                <h5>Instructions</h5>
+                <p>{{ task.instructions|default:"—"|linebreaks }}</p>
+            </div>
+
+            {% if task.reference_links %}
+            <div class="task-view-block">
+                <h5>Reference Links</h5>
+                <p>{{ task.reference_links|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            {% if task.attachment %}
+            <div class="task-view-block">
+                <h5>Attachment</h5>
+                <a href="{{ task.attachment.url }}" 
+                target="_blank"
+                class="task-view-download">
+
+                    <!-- Download Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span>Download Attachment</span>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT -->
+        <div class="task-view-sidebar">
+
+            <div class="task-view-card">
+                <div class="task-view-meta">
+                    <span>Due Date</span>
+                    <strong>{{ task.due_date|date:"d M Y"|default:"—" }}</strong>
+                </div>
+                <div class="task-view-meta">
+                    <span>Difficulty</span>
+                    <strong>{{ task.get_difficulty_level_display|default:"—" }}</strong>
+                </div>
+                <div class="task-view-meta">
+                    <span>Total Marks</span>
+                    <strong>{{ task.total_marks }}</strong>
+                </div>
+                <div class="task-view-meta">
+                    <span>Passing Marks</span>
+                    <strong>{{ task.passing_marks }}</strong>
+                </div>
+            </div>
+
+            <div class="task-view-card">
+                <div class="task-view-meta">
+                    <span>Total Students</span>
+                    <strong>{{ stats.total_students }}</strong>
+                </div>
+                <div class="task-view-meta">
+                    <span>Submitted</span>
+                    <strong>{{ stats.submitted }}</strong>
+                </div>
+                <div class="task-view-meta">
+                    <span>Pending</span>
+                    <strong>{{ stats.pending }}</strong>
+                </div>
+                <div class="task-view-meta task-view-meta-highlight">
+                    <span>Completion</span>
+                    <strong>{{ stats.completion_rate }}%</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

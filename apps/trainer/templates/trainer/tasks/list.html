@@ -3,9 +3,6 @@
 
 <div class="glass-card">
     <h4>All Tasks</h4>
-
-    <!-- Filter Form -->
-    <!-- Filter Form -->
 <!-- Filter Form -->
 <form method="get" class="task-filter-form">
     <div class="filter-row">
@@ -46,6 +43,7 @@
                     <th>Deadline</th>
                     <th>Status</th>
                     <th>Completion status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
 
@@ -64,6 +62,16 @@
             {% endif %}
         </td>
         <td>{{ stats.completion_rate }}%</td>
+
+        <td class="task-actions">
+            <a href="{% url 'trainer:task-view' task.id %}" class="task-btn-view">
+                View
+            </a>
+            |
+            <a href="{% url 'trainer:task-edit' task.id %}" class="task-btn-edit">
+                Edit
+            </a>
+        </td>
     </tr>
     {% endwith %}
     {% empty %}
@@ -77,5 +85,3 @@
 </div>
 
 {% endblock %}
-
-{% comment %} //  {% endcomment %}

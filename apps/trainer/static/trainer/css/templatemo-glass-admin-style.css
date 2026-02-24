@@ -4414,6 +4414,42 @@ textarea.form-control {
 .filter-btn.reset:hover {
     background: var(--danger-hover);
 }
+
+.task-actions {
+    display: flex;
+    gap: 3px;        /* space between buttons */
+    align-items: center;
+}
+
+.task-actions a {
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+/* View Button */
+.task-btn-view {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.task-btn-view:hover {
+    background-color: #138496;
+}
+
+/* Edit Button */
+.task-btn-edit {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.task-btn-edit:hover {
+    background-color: #e0a800;
+}
+
 /* ======================
    TASK PROFESSIONAL FORM
 ========================= */
@@ -4629,6 +4665,174 @@ textarea.form-control {
     width: 16px;
     height: 16px;
     stroke: #fff;
+}
+
+
+/* // */
+
+/* ===============================
+   TASK VIEW LAYOUT
+================================ */
+
+.task-view-layout {
+    padding: 1.8rem;
+}
+
+/* Header */
+.task-view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.2rem;
+}
+
+.task-view-title {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.task-view-submeta {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.task-view-header-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Badges */
+.task-view-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.task-view-badge-success {
+    background: rgba(34,197,94,.15);
+    color: #22c55e;
+}
+
+.task-view-badge-danger {
+    background: rgba(239,68,68,.15);
+    color: #ef4444;
+}
+
+.task-view-badge-muted {
+    background: rgba(148,163,184,.15);
+    color: #94a3b8;
+}
+
+/* Button */
+.task-view-btn-primary {
+    padding: 7px 16px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+/* Body Layout */
+.task-view-body {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+/* Left Blocks */
+.task-view-block {
+    margin-bottom: 1.8rem;
+}
+
+.task-view-block h5 {
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--primary);
+}
+
+.task-view-block p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Sidebar Cards */
+.task-view-card {
+    padding: 1.2rem;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 1.5rem;
+}
+
+[data-theme="light"] .task-view-card {
+    background: #f1f5f9;
+}
+
+.task-view-meta {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.85rem;
+}
+
+.task-view-meta-highlight {
+    border-top: 1px solid var(--glass-border);
+    margin-top: 8px;
+    padding-top: 10px;
+    font-weight: 600;
+}
+/* Download Link */
+
+.task-view-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: 0.2s ease;
+    background: var(--primary);
+    color: #fff;
+}
+
+.task-view-download svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Back Button */
+
+.task-view-header-left {
+    display: flex;
+    align-items: flex-start;
+}
+
+.task-view-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+
+/* Responsive */
+@media (max-width: 992px) {
+    .task-view-body {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* //  */

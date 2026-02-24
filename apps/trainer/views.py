@@ -68,7 +68,7 @@ def my_batches(request):
         Batch.objects
         .filter(trainers=trainer, is_active=True)
         .select_related("course")
-        .prefetch_related("students")
+        .prefetch_related("students","lesson_sessions")
         .order_by("-start_date")
     )
 
@@ -76,16 +76,14 @@ def my_batches(request):
     batch_list = []
 
     for batch in batches:
-        total_days = (batch.expected_finish_date - batch.start_date).days
-        completed_days = max((today - batch.start_date).days, 0)
+        
+        progress_data = LessonSession.get_batch_progress(batch)
+        
 
         progress = 0
-        if total_days > 0:
-            progress = min(round((completed_days / total_days) * 100), 100)
-            
-        if progress >= 100:
+        if progress_data["progress_percentage"] >= 100:
             status = "Completed"
-        elif today < batch.start_date:
+        elif progress_data["completed"] == 0:
             status = "Upcoming"
         else:
             status = "Ongoing"
@@ -97,9 +95,9 @@ def my_batches(request):
             "start_date": batch.start_date,
             "end_date": batch.expected_finish_date,
             "duration": f"{batch.duration_months} Months",
-            "classes_completed": completed_days,
+            "classes_completed": progress_data["completed"],
+            "progress": progress_data["progress_percentage"],
             "total_students": batch.students.count(),
-            "progress": progress,
             "status": status,
         })
 
@@ -611,11 +609,22 @@ def evaluate_submission(request, submission_id):
         if action == "evaluate":
             marks = request.POST.get("marks")
             feedback = request.POST.get("feedback")
+            
+            try:
+                marks = int(marks)
+            except (TypeError, ValueError):
+                marks = 0
 
             submission.marks_obtained = marks
             submission.feedback = feedback
             submission.status = TaskSubmission.SubmissionStatus.EVALUATED
             submission.needs_revision = False
+            
+            if marks >= submission.task.passing_marks:
+                submission.is_pass = True
+            else:
+                submission.is_pass = False
+            
             submission.save()
 
         elif action == "resubmit":
@@ -629,6 +638,69 @@ def evaluate_submission(request, submission_id):
         "active_tab": "submissions"
     })
     
+
+@login_required
+def task_view(request, task_id):
+    trainer = request.user.trainer
+
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        created_by=trainer,
+        batch__in=trainer.batches.all()
+    )
+
+    stats = task.get_completion_stats()
+
+    return render(request, "trainer/tasks/view.html", {
+        "task": task,
+        "stats": stats,
+        "active_tab": "list"
+    })
+    
+@login_required
+def task_edit(request, task_id):
+    trainer = request.user.trainer
+
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        created_by=trainer,
+        batch__in=trainer.batches.all()
+    )
+
+    if request.method == "POST":
+        form = TaskForm(request.POST, request.FILES, instance=task)
+        form.fields["lesson_session"].queryset = LessonSession.objects.filter(
+            trainer=trainer,
+            batch__in=trainer.batches.all(),
+            status=LessonSession.SessionStatus.COMPLETED
+        )
+
+        if form.is_valid():
+            
+            if not form.has_changed():
+                messages.info(request, "No changes were made.")
+                return redirect("trainer:task-list")
+            
+            edited_task = form.save(commit=False)
+            edited_task.batch = edited_task.lesson_session.batch
+            edited_task.save()
+            messages.success(request, "Task updated successfully.")
+            return redirect("trainer:task-list")
+    else:
+        form = TaskForm(instance=task)
+        form.fields["lesson_session"].queryset = LessonSession.objects.filter(
+            trainer=trainer,
+            batch__in=trainer.batches.all(),
+            status=LessonSession.SessionStatus.COMPLETED
+        )
+
+    return render(request, "trainer/tasks/create.html", {
+        "form": form,
+        "active_tab": "list",
+        "is_edit": True
+    })
     
 # my batches - lessonsessions    
 @login_required
