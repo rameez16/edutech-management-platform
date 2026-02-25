@@ -12,9 +12,9 @@
 
         <!-- ================= STUDENT DETAILS ================= -->
         <div class="student-info-box">
-            <p><strong>Student ID:</strong> {{ installment.student.id }}</p>
-            <p><strong>Name:</strong> {{ installment.student.user.get_full_name }}</p>
-            <p><strong>Email:</strong> {{ installment.student.user.email }}</p>
+            <p><strong>Student ID:</strong> {{ student.id }}</p>
+            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ student.user.email }}</p>
         </div>
 
         <!-- ================= QR IMAGE ================= -->
@@ -24,9 +24,9 @@
 
         <!-- ================= INSTALLMENT DETAILS ================= -->
         <div class="qr-info">
-            <p><strong>Installment No:</strong> {{ installment.installment_number }}</p>
-            <p><strong>Amount:</strong> ₹{{ installment.amount }}</p>
-            <p><strong>Due Date:</strong> {{ installment.due_date|default:"—" }}</p>
+            <p><strong>Installment No:</strong> {{ installment_number }}</p>
+            <p><strong>Amount:</strong> ₹{{ amount }}</p>
+            <p><strong>Due Date:</strong> {{ due_date|default:"—" }}</p>
 
             <!-- ===== STATUS (CORRECT LOGIC) ===== -->
             <p>
@@ -69,7 +69,7 @@
         {% endif %}
 
         <!-- ================= BACK BUTTON ================= -->
-        <a href="{% url 'student:installments' installment.student.id %}"
+        <a href="{% url 'student:installments' student.id %}"
            class="back-btn">
             ← Back to Installments
         </a>

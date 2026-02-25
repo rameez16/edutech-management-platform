@@ -158,6 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 if (data.success) {
                     alertify.success("Enrollment letter uploaded successfully ✔");
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
 
                     uploadBtn.disabled = true;
                     uploadBtn.textContent = "Uploaded Successfully ✔";
