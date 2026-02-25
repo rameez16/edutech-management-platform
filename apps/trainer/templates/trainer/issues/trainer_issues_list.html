@@ -1,0 +1,57 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}View Issues{% endblock %}
+{% block page_title %}View Issues {% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <h4 class="card-title">My Assigned Issues ({{ issues|length }})</h4>
+
+    <div class="responsive-card-table">
+        <table class="issue-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for issue in issues %}
+                <tr>
+                    <td>{{ issue.student.full_name|default:issue.student.user.username }}</td>
+                    <td>{{ issue.subject }}</td>
+                    <td>
+                        <span class="issue-status {{ issue.status|lower }}">
+                            {{ issue.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="issue-priority {{ issue.priority|lower }}">
+                            {{ issue.get_priority_display }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'trainer:trainer_issue_detail' issue.pk %}" 
+                           class="btn-issue-view btn-sm">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        No issues assigned to you.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

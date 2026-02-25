@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 
-from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm
+from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm,TrainerIssueResolveForm
 
-from apps.bdm.models import Trainer, Batch, Student
+from apps.bdm.models import Trainer, Batch, Student, StudentIssue
 from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission
 from apps.student.models import StudentFeedback, LeaveApplication
 
@@ -600,7 +600,8 @@ def task_submissions(request):
         "selected_status": status,
         "active_tab": "submissions"
     })
-    
+  
+@login_required  
 def evaluate_submission(request, submission_id):
     submission = get_object_or_404(TaskSubmission, id=submission_id)
 
@@ -628,13 +629,16 @@ def evaluate_submission(request, submission_id):
         "active_tab": "submissions"
     })
     
-
+    
+# my batches - lessonsessions    
+@login_required
 def batch_lesson_sessions(request, batch_id):
     batch = get_object_or_404(Batch, id=batch_id)
 
     # Separate sessions by status for CSS-only tabs
-    pending_sessions = LessonSession.objects.filter(
-        batch=batch, status=LessonSession.SessionStatus.PENDING
+    planned_sessions = LessonSession.objects.filter(
+        batch=batch,
+        status=LessonSession.SessionStatus.PLANNED
     ).select_related('lesson_plan').order_by('planned_date')
 
     completed_sessions = LessonSession.objects.filter(
@@ -647,13 +651,14 @@ def batch_lesson_sessions(request, batch_id):
 
     context = {
         'batch': batch,
-        'pending_sessions': pending_sessions,
+        'planned_sessions': planned_sessions,
         'completed_sessions': completed_sessions,
         'skipped_sessions': skipped_sessions,
         'active_tab': 'lesson_sessions'
     }
     return render(request, 'trainer/mybatches/lesson_sessions.html', context)
 
+@login_required
 def mark_session_skipped(request, session_id):
     session = get_object_or_404(LessonSession, id=session_id)
     if request.method == "POST":
@@ -662,27 +667,33 @@ def mark_session_skipped(request, session_id):
         messages.info(request, f"Session {session.lesson_plan.session_number} marked as skipped.")
     return redirect('trainer:batch-sessions', batch_id=session.batch.id)
  
-def mark_session_complete(request, session_id):
-    session = get_object_or_404(LessonSession, id=session_id)
-    if request.method == "POST":
-        session.mark_completed(trainer=request.user.trainer)
-        messages.success(request, f"Session {session.lesson_plan.session_number} marked as completed.")
-        # Redirect to completed session detail page
-        return redirect('trainer:completed-session-detail', session_id=session.id)
-    return redirect('trainer:batch-sessions', batch_id=session.batch.id)
 
-
+@login_required
 def completed_session_detail(request, session_id):
     session = get_object_or_404(LessonSession, id=session_id)
-
-    if session.status != LessonSession.SessionStatus.COMPLETED:
-        messages.warning(request, "This session is not completed yet.")
-        return redirect('trainer:batch-sessions', batch_id=session.batch.id)
 
     if request.method == "POST":
         form = CompletedSessionForm(request.POST, instance=session)
         if form.is_valid():
-            form.save()
+
+            if not form.has_changed():
+                messages.warning(request, "No changes were made.")
+                return redirect(
+                    'trainer:completed-session-detail',
+                    session_id=session.id
+                )
+
+            updated_session = form.save(commit=False)
+
+            if (
+                updated_session.actual_date and
+                session.status != LessonSession.SessionStatus.COMPLETED
+            ):
+                updated_session.status = LessonSession.SessionStatus.COMPLETED
+                updated_session.completed_at = timezone.now()
+                
+            updated_session.save()
+
             messages.success(request, "Session details updated successfully.")
             return redirect('trainer:batch-sessions', batch_id=session.batch.id)
     else:
@@ -691,14 +702,20 @@ def completed_session_detail(request, session_id):
     context = {
         'session': session,
         'form': form,
-        'batch': session.batch,   
+        'batch': session.batch,
         'active_tab': 'lesson_sessions',
     }
 
-    return render(request, 'trainer/mybatches/completed_session_detail.html', context)
+    return render(request,'trainer/mybatches/completed_session_detail.html',context)
 
+@login_required
 def add_session_material(request, session_id):
     session = get_object_or_404(LessonSession, id=session_id)
+
+    #  Prevent upload if not completed
+    if session.status != LessonSession.SessionStatus.COMPLETED:
+        messages.error(request, "Materials can only be added to completed sessions.")
+        return redirect('trainer:completed-session-detail', session.id)
 
     if request.method == "POST":
         form = SessionMaterialForm(request.POST, request.FILES)
@@ -707,6 +724,7 @@ def add_session_material(request, session_id):
             material.lesson_session = session
             material.uploaded_by = request.user.trainer
             material.save()
+
             messages.success(request, "Material uploaded successfully.")
             return redirect('trainer:completed-session-detail', session_id=session.id)
     else:
@@ -716,5 +734,51 @@ def add_session_material(request, session_id):
         'form': form,
         'session': session,
         'batch': session.batch,
-        'active_tab': 'lesson_sessions', 
+        'active_tab': 'lesson_sessions',
+    })
+    
+# // student lssue 
+
+@login_required
+def trainer_issues_list_view(request):
+    """
+    List all trainer-related issues assigned to the logged-in trainer.
+    """
+    trainer = request.user
+    issues = StudentIssue.objects.filter(
+        issue_type=StudentIssue.IssueType.TRAINER,
+        assigned_to=trainer
+    ).order_by('-created_at')
+    
+    return render(request, 'trainer/issues/trainer_issues_list.html', {'issues': issues})
+
+@login_required
+def trainer_issue_detail_view(request, pk):
+    """
+    Show trainer issue details and allow the trainer to add Resolution Notes.
+    After submitting, mark the issue as resolved and redirect to the issues list.
+    """
+    trainer = request.user
+    issue = get_object_or_404(
+        StudentIssue,
+        pk=pk,
+        issue_type=StudentIssue.IssueType.TRAINER,
+        assigned_to=trainer
+    )
+
+    if request.method == "POST":
+        form = TrainerIssueResolveForm(request.POST, instance=issue)
+        if form.is_valid():
+            issue = form.save(commit=False)
+            issue.status = StudentIssue.Status.RESOLVED
+            issue.resolved_by = trainer
+            issue.resolved_at = timezone.now()
+            issue.save()
+            return redirect('trainer:trainer_assigned_issues')
+    else:
+        form = TrainerIssueResolveForm(instance=issue)
+
+    return render(request, 'trainer/issues/trainer_issue_detail.html', {
+        'issue': issue,
+        'form': form
     })

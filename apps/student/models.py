@@ -10,6 +10,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator, FileExt
 from django.utils import timezone
 from cloudinary_storage.storage import MediaCloudinaryStorage
 from cloudinary_storage.storage import RawMediaCloudinaryStorage
+from django.db.models import Sum
 
 # =============================================
 # FINANCIAL MODELS
@@ -82,24 +83,36 @@ class FeePayment(models.Model):
     def __str__(self):
         return f"{self.student.full_name} - {self.payment_type} - ₹{self.amount}"
     
+   
+        
+     
     @classmethod
     def get_payment_summary(cls, student):
         """Get payment summary for a student"""
-        payments = cls.objects.filter(student=student, payment_status=cls.PaymentStatus.COMPLETED)
-        total_paid = sum(p.amount for p in payments)
-        
-        pending_payments = cls.objects.filter(
-            student=student, 
+
+        total_paid = cls.objects.filter(
+            student=student,
+            payment_status=cls.PaymentStatus.COMPLETED
+        ).aggregate(total=Sum("amount"))["total"] or 0
+
+        total_pending = cls.objects.filter(
+            student=student,
             payment_status=cls.PaymentStatus.PENDING
-        )
-        total_pending = sum(p.amount for p in pending_payments)
-        
+        ).aggregate(total=Sum("amount"))["total"] or 0
+
+        # Get course fee safely from batch
+        batch = student.batches.first()
+        course_fee = 0
+
+        if batch and batch.course:
+            course_fee = batch.course.course_fee
+
         return {
-            'total_paid': total_paid,
-            'total_pending': total_pending,
-            'course_fee': student.selected_course.course_fee,
-            'balance': student.selected_course.course_fee - total_paid
-        }
+            "total_paid": total_paid,
+            "total_pending": total_pending,
+            "course_fee": course_fee,
+            "balance": course_fee - total_paid
+        }   
 
 
 # =============================================
@@ -126,7 +139,7 @@ class StudentDocument(models.Model):
     document_type = models.CharField(max_length=20, choices=DocumentType.choices)
     document_file = models.FileField(
         upload_to='student_documents/%Y/%m/',
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])],storage=RawMediaCloudinaryStorage()
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png','docx'])],storage=RawMediaCloudinaryStorage()
     )
     document_number = models.CharField(max_length=100, blank=True, help_text="Aadhaar/PAN number")
     

@@ -59,17 +59,17 @@ def lms_login(request):
                 # ✅ Verify LMS User ID
                 if lms_access.lms_user_id != lms_user_id:
                     messages.error(request, "Invalid LMS User ID.")
-                    return redirect("lms_login")
+                    return redirect("accounts:lms_login")
 
                 # ✅ Check active
                 if not lms_access.is_active:
                     messages.error(request, "LMS access is inactive.")
-                    return redirect("lms_login")
+                    return redirect("accounts:lms_login")
 
                 # ✅ Check expiry
                 if lms_access.expiry_date and lms_access.expiry_date < timezone.now().date():
                     messages.error(request, "LMS access has expired.")
-                    return redirect("lms_login")
+                    return redirect("accounts:lms_login")
 
                 # ✅ Update tracking
                 lms_access.last_login = timezone.now()
@@ -93,18 +93,7 @@ def lms_login(request):
 
 from django.contrib.auth.decorators import login_required
 
-@login_required
-def lms_dashboard(request):
-    try:
-        lms_access = request.user.student.lms_access
-    except:
-        return redirect("lms_login")
 
-    return render(request, "accounts/lms/lms_dashboard.html", {
-        "lms_access": lms_access
-    })
-    
-    
 def lms_logout(request):
     logout(request)
     return redirect("accounts:lms_login")    

@@ -1,8 +1,8 @@
 from django import forms
 from apps.bdm.models import Trainer
 from apps.trainer.models import Task, TaskSubmission, LessonSession, SessionMaterial
-from django.utils import timezone
-
+from django.utils import timezone 
+from apps.bdm.models import StudentIssue
 class TrainerProfileForm(forms.ModelForm):
     class Meta:
         model = Trainer
@@ -27,7 +27,6 @@ class TrainerProfileForm(forms.ModelForm):
             'experience_years': forms.NumberInput(attrs={'min': 0,'placeholder': 'Total industry experience'}),
             'teaching_experience_years': forms.NumberInput(attrs={'min': 0,'placeholder': 'Years of teaching experience'}),
         }
-
 
 
 class TaskForm(forms.ModelForm):
@@ -71,7 +70,6 @@ class TaskForm(forms.ModelForm):
 
 
 class EvaluationForm(forms.ModelForm):
-
     class Meta:
         model = TaskSubmission
         fields = ["marks_obtained", "feedback"]
@@ -85,18 +83,19 @@ class CompletedSessionForm(forms.ModelForm):
     class Meta:
         model = LessonSession
         fields = [
+            'actual_date',
             'actual_duration_hours',
             'homework_assigned',
             'student_queries',
             'remarks',
         ]
         widgets = {
+            'actual_date': forms.DateInput(attrs={'type': 'date','required': 'required'}),
             'homework_assigned': forms.Textarea(attrs={'rows':3, 'placeholder':'Homework details...'}),
             'student_queries': forms.Textarea(attrs={'rows':3, 'placeholder':'Student questions...'}),
-            'remarks': forms.Textarea(attrs={'rows':2, 'placeholder':'Trainer remarks...'}),
+            'remarks': forms.Textarea(attrs={'rows':3, 'placeholder':'Trainer remarks...'}),
         }
         
-# forms.py
 class SessionMaterialForm(forms.ModelForm):
     class Meta:
         model = SessionMaterial
@@ -110,3 +109,19 @@ class SessionMaterialForm(forms.ModelForm):
             'created_at',
             'updated_at'
         ]
+        
+        
+class TrainerIssueResolveForm(forms.ModelForm):
+    class Meta:
+        model = StudentIssue
+        fields = [
+            "resolution_notes",
+        ]
+        widgets = {
+            "resolution_notes": forms.Textarea(
+                attrs={
+                    "class": "issues-detail-textarea-large",
+                    "placeholder": "Enter resolution notes here..."
+                }
+            ),
+        }

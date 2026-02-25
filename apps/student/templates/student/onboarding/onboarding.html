@@ -244,6 +244,12 @@
                     <button type="button" class="btn btn-idcard-download" data-id-url="{% url 'student:view_id_card' %}">
                         Download ID Card
                     </button>
+                    {% if checklist.id_card_issued %}
+                        <div class="lms-user-id">
+                            LMS User ID: <strong>{{ checklist.student.lms_access.lms_user_id }}</strong>
+                        </div>
+                    {% endif %}
+
                 {% elif checklist.id_card_generated %}
                     <button class="btn disabled" disabled style="margin-bottom:40px;">
                         ID Card Issuance Pending

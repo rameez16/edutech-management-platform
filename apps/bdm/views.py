@@ -310,6 +310,7 @@ def verify_document(request, doc_id):
     print(check)
     if student.all_required_documents_verified():
         checklist.documents_verified = True
+        checklist.enrollment_letter_generated = True
         checklist.save()
         messages.success(
             request,
@@ -413,6 +414,10 @@ def approve_enrollment_agreement(request, student_id):
                 'expiry_date': timezone.now().date() + timedelta(days=200),
             }
         )
+        
+        checklist.id_card_generated = True
+        checklist.id_card_issued = True
+        checklist.save() 
         
         # ✅ AUTO CREATE LMS ACCESS (if not exists)
         lms_access, created = LMSAccess.objects.get_or_create(
@@ -1772,3 +1777,98 @@ def student_issue_detail(request, pk):
     }
 
     return render(request, 'bdm/student_issue/student_issue_detail.html', context)
+
+
+
+
+# Ramees-Student view
+
+
+from django.views.generic import ListView, DetailView
+from django.shortcuts import get_object_or_404
+from django.db.models import Count
+from apps.bdm.models import Student, Batch
+from apps.student.models import FeePayment
+from apps.student.models import LMSAccess
+from apps.bdm.models import OnboardingChecklist
+
+
+
+class StudentListView(ListView):
+    model = Student
+    template_name = "bdm/student/student_list.html"
+    context_object_name = "students"
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Student.objects.select_related("user").prefetch_related("batches")
+
+    
+    
+class StudentDashboardView(DetailView):
+    model = Student
+    template_name = "bdm/student/student_dashboard.html"
+    context_object_name = "student"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = self.object
+
+        # Batch
+        batch = student.batches.first()
+
+        # Progress
+        from apps.trainer.models import LessonSession
+        progress = None
+        if batch:
+            progress = LessonSession.get_batch_progress(batch)
+
+        # Attendance
+        from apps.trainer.models import Attendance
+        attendance = 0
+        if batch:
+            attendance = Attendance.calculate_attendance_percentage(student, batch)
+
+        # Tasks
+        from apps.trainer.models import TaskSubmission
+        pending_tasks = TaskSubmission.get_student_pending_tasks(student)
+        overdue_tasks = TaskSubmission.get_student_overdue_tasks(student)
+
+        # Fees
+        fee_summary = FeePayment.get_payment_summary(student)
+
+        # Documents
+        documents = student.documents.all()
+
+        # Onboarding
+        onboarding = getattr(student, "onboarding_checklist", None)
+
+        # LMS
+        lms = getattr(student, "lms_access", None)
+
+        context.update({
+            "batch": batch,
+            "progress": progress,
+            "attendance": attendance,
+            "pending_tasks": pending_tasks,
+            "overdue_tasks": overdue_tasks,
+            "fee_summary": fee_summary,
+            "documents": documents,
+            "onboarding": onboarding,
+            "lms": lms
+        })
+
+        return context    
+    
+from django.views import View
+from django.shortcuts import redirect
+
+class ToggleStudentStatusView(View):
+    def post(self, request, pk):
+        student = get_object_or_404(Student, pk=pk)
+        student.is_active = not student.is_active
+        student.save()
+        return redirect("student_dashboard", pk=pk)
+    
+    
+    

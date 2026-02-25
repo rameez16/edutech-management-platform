@@ -1,0 +1,549 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+    :root {
+        --primary-blue: #0a4b7a;
+        --secondary-blue: #1e6aa8;
+        --light-blue-1: #e3f2fd;
+        --light-blue-2: #bbdef5;
+        --light-blue-3: #d4eafc;
+        --accent-glow: rgba(33, 150, 243, 0.15);
+    }
+
+    /* Header Section */
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--light-blue-1), var(--light-blue-2));
+        padding: 2.5rem 2rem;
+        border-radius: 32px;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 30px var(--accent-glow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header:before {
+        content: "📊";
+        position: absolute;
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 5rem;
+        opacity: 0.1;
+    }
+
+    .student-name-large {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin: 0 0 0.5rem 0;
+        letter-spacing: -0.02em;
+    }
+
+    .student-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 60px;
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);
+    }
+
+    .student-id {
+        color: var(--primary-blue);
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .dashboard-card {
+        background: white;
+        border-radius: 28px;
+        padding: 1.5rem;
+        box-shadow: 0 15px 30px var(--accent-glow);
+        border: 1px solid rgba(33, 150, 243, 0.15);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(4px);
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 25px 40px rgba(33, 150, 243, 0.25);
+        border-color: rgba(33, 150, 243, 0.3);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--light-blue-1);
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--light-blue-1), var(--light-blue-2));
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: 0 8px 15px var(--accent-glow);
+    }
+
+    .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin: 0;
+    }
+
+    .card-subtitle {
+        color: #5e7f9e;
+        font-size: 0.9rem;
+        margin-top: 0.2rem;
+    }
+
+    /* Info Rows */
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 0;
+        border-bottom: 1px dashed var(--light-blue-2);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #5e7f9e;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .info-value {
+        color: var(--primary-blue);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 0.4rem 1.2rem;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+
+    .status-active {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.15);
+    }
+
+    .status-inactive {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+        background: var(--light-blue-1);
+        border-radius: 20px;
+        height: 12px;
+        margin: 1rem 0;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.5s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-bar:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .percentage-text {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        text-align: center;
+        margin: 1rem 0 0 0;
+    }
+
+    /* Tasks Grid */
+    .tasks-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .task-stat {
+        background: var(--light-blue-1);
+        border-radius: 18px;
+        padding: 1.2rem;
+        text-align: center;
+    }
+
+    .task-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        line-height: 1;
+    }
+
+    .task-label {
+        color: #5e7f9e;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .task-urgent {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* Document List */
+    .document-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .document-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 1rem;
+        background: var(--light-blue-1);
+        border-radius: 16px;
+        margin-bottom: 0.8rem;
+        transition: all 0.2s ease;
+    }
+
+    .document-item:hover {
+        background: var(--light-blue-2);
+        transform: translateX(4px);
+    }
+
+    .doc-type {
+        font-weight: 600;
+        color: var(--primary-blue);
+    }
+
+    .doc-status {
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: white;
+        color: var(--primary-blue);
+        border: 1px solid var(--light-blue-2);
+    }
+
+    /* Fee Summary */
+    .fee-amount {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+    }
+
+    .fee-positive {
+        color: #059669;
+    }
+
+    .fee-negative {
+        color: #b91c1c;
+    }
+
+    /* Full-width cards */
+    .full-width-card {
+        grid-column: span 3;
+        background: white;
+        border-radius: 28px;
+        padding: 1.8rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 15px 30px var(--accent-glow);
+        border: 1px solid rgba(33, 150, 243, 0.15);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .full-width-card {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<!-- Header Section -->
+<div class="dashboard-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="student-name-large">{{ student.full_name }}</h1>
+            <div class="student-badge">
+                <span>🎓</span>
+                <span class="student-id">Student Dashboard</span>
+                <span>•</span>
+                <span class="status-badge {% if student.is_active %}status-active{% else %}status-inactive{% endif %}">
+                    {% if student.is_active %}● Active{% else %}○ Inactive{% endif %}
+                </span>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="#" style="background: white; padding: 0.8rem 1.5rem; border-radius: 40px; color: var(--primary-blue); text-decoration: none; font-weight: 600; border: 2px solid var(--light-blue-2);">📧 Message</a>
+            <a href="#" style="background: var(--primary-blue); padding: 0.8rem 1.5rem; border-radius: 40px; color: white; text-decoration: none; font-weight: 600;">⚡ Quick Actions</a>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Grid -->
+<div class="dashboard-grid">
+    <!-- Basic Info Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">👤</div>
+            <div>
+                <h3 class="card-title">Basic Information</h3>
+                <div class="card-subtitle">Personal details</div>
+            </div>
+        </div>
+        <div class="info-row">
+            <span class="info-label">📧 Email</span>
+            <span class="info-value">{{ student.email }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">📱 Phone</span>
+            <span class="info-value">{{ student.phone }}</span>
+        </div>
+    </div>
+
+    <!-- Batch Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">📚</div>
+            <div>
+                <h3 class="card-title">Batch & Course</h3>
+                <div class="card-subtitle">Current enrollment</div>
+            </div>
+        </div>
+        {% if batch %}
+            <div class="info-row">
+                <span class="info-label">Batch</span>
+                <span class="info-value">{{ batch.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Course</span>
+                <span class="info-value">{{ batch.course.name }}</span>
+            </div>
+        {% else %}
+            <p style="color: #9bb7d4; text-align: center; padding: 2rem 0;">No batch assigned</p>
+        {% endif %}
+    </div>
+
+    <!-- Progress Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">📈</div>
+            <div>
+                <h3 class="card-title">Progress</h3>
+                <div class="card-subtitle">Course completion</div>
+            </div>
+        </div>
+        {% if progress %}
+            <div class="info-row">
+                <span class="info-label">Completed</span>
+                <span class="info-value">{{ progress.completed }}/{{ progress.total }}</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: {{ progress.progress_percentage }}%"></div>
+            </div>
+            <div class="percentage-text">{{ progress.progress_percentage }}%</div>
+        {% endif %}
+    </div>
+
+    <!-- Attendance Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">📅</div>
+            <div>
+                <h3 class="card-title">Attendance</h3>
+                <div class="card-subtitle">Overall rate</div>
+            </div>
+        </div>
+        <div style="text-align: center; padding: 1rem;">
+            <span style="font-size: 3.5rem; font-weight: 700; color: var(--primary-blue);">{{ attendance }}%</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ attendance }}%"></div>
+        </div>
+    </div>
+
+    <!-- Tasks Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">✅</div>
+            <div>
+                <h3 class="card-title">Tasks</h3>
+                <div class="card-subtitle">Pending items</div>
+            </div>
+        </div>
+        <div class="tasks-grid">
+            <div class="task-stat">
+                <div class="task-number">{{ pending_tasks.count }}</div>
+                <div class="task-label">Pending</div>
+            </div>
+            <div class="task-stat task-urgent">
+                <div class="task-number">{{ overdue_tasks.count }}</div>
+                <div class="task-label">Overdue</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fee Summary Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">💰</div>
+            <div>
+                <h3 class="card-title">Fee Summary</h3>
+                <div class="card-subtitle">Financial status</div>
+            </div>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Total Paid</span>
+            <span class="info-value fee-amount">₹{{ fee_summary.total_paid }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Pending</span>
+            <span class="info-value fee-negative">₹{{ fee_summary.total_pending }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Balance</span>
+            <span class="info-value {% if fee_summary.balance > 0 %}fee-negative{% else %}fee-positive{% endif %}">
+                ₹{{ fee_summary.balance }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Documents Section - Full Width -->
+<div class="full-width-card">
+    <div class="card-header" style="margin-bottom: 1rem;">
+        <div class="card-icon">📎</div>
+        <div>
+            <h3 class="card-title">Documents</h3>
+            <div class="card-subtitle">Verification status</div>
+        </div>
+    </div>
+    
+    <ul class="document-list">
+        {% for doc in documents %}
+            <li class="document-item">
+                <span class="doc-type">{{ doc.document_type }}</span>
+                <span class="doc-status">{{ doc.verification_status }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Onboarding & LMS Section -->
+<div class="dashboard-grid">
+    <!-- Onboarding Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">🚀</div>
+            <div>
+                <h3 class="card-title">Onboarding</h3>
+                <div class="card-subtitle">Setup progress</div>
+            </div>
+        </div>
+        {% if onboarding %}
+            <div class="progress-container" style="margin: 1.5rem 0;">
+                <div class="progress-bar" style="width: {{ onboarding.completion_percentage }}%"></div>
+            </div>
+            <div class="percentage-text" style="font-size: 2rem;">{{ onboarding.completion_percentage }}%</div>
+        {% endif %}
+    </div>
+
+    <!-- LMS Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">💻</div>
+            <div>
+                <h3 class="card-title">LMS Access</h3>
+                <div class="card-subtitle">Learning platform</div>
+            </div>
+        </div>
+        {% if lms %}
+            <div class="info-row">
+                <span class="info-label">Username</span>
+                <span class="info-value">{{ lms.lms_username }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value">
+                    <span class="status-badge {% if lms.is_active %}status-active{% else %}status-inactive{% endif %}">
+                        {{ lms.is_active|yesno:"Active,Inactive" }}
+                    </span>
+                </span>
+            </div>
+        {% else %}
+            <p style="color: #9bb7d4; text-align: center; padding: 2rem 0;">No LMS access</p>
+        {% endif %}
+    </div>
+
+    <!-- Quick Stats Card -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <div class="card-icon">⚡</div>
+            <div>
+                <h3 class="card-title">Quick Stats</h3>
+                <div class="card-subtitle">Overview</div>
+            </div>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Documents</span>
+            <span class="info-value">{{ documents|length }} uploaded</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Tasks</span>
+            <span class="info-value">{{ pending_tasks.count|add:overdue_tasks.count }} total</span>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

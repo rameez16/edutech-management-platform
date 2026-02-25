@@ -21,7 +21,6 @@ urlpatterns = [
     path("batches/<int:batch_id>/feedback/",views.batch_feedback_view,name="batch-feedback"),
     
     path('batch/<int:batch_id>/sessions/', views.batch_lesson_sessions, name='batch-sessions'),
-    path('lesson-session/complete/<int:session_id>/', views.mark_session_complete, name='mark-session-complete'),
     path('lesson-session/skip/<int:session_id>/', views.mark_session_skipped, name='mark-session-skipped'),
     path('lesson-session/completed/<int:session_id>/', views.completed_session_detail, name='completed-session-detail'),
     path('lesson-session/<int:session_id>/add-material/',views.add_session_material,name='add-session-material'),
@@ -44,5 +43,9 @@ urlpatterns = [
     path("tasks/list/", views.task_list, name="task-list"),
     path("tasks/submissions/", views.task_submissions, name="task-submissions"),
     path("tasks/evaluate/<int:submission_id>/",views.evaluate_submission,name="task-evaluate"),
-
+    
+    # Student Issues
+    path('assigned-issues/', views.trainer_issues_list_view, name='trainer_assigned_issues'),
+    path('assigned-issues/<int:pk>/', views.trainer_issue_detail_view, name='trainer_issue_detail'),
+    
 ]
