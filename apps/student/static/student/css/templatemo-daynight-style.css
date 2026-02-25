@@ -838,8 +838,8 @@ a {
     text-transform: capitalize;
 }
 
-.pending-priority.high   { background: #fee2e2; color: #dc2626; }
-.pending-priority.medium { background: #ffdba6; color: #92400e; }
+.pending-priority.high   { background: #ffd4d4; color: #dc2626; }
+.pending-priority.medium { background: #fcf23c; color: #92400e; }
 .pending-priority.low    { background: #d1fae5; color: #059669; }
 
 .pending-goto-btn {
