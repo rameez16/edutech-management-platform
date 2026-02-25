@@ -92,10 +92,10 @@
 
 /* COLORS */
 
-.gradient-main { background: linear-gradient(135deg, #5f2cff, #7a5cff); }
-.gradient-present { background: linear-gradient(135deg, #00c853, #00e676); }
-.gradient-absent { background: linear-gradient(135deg, #ff1744, #ff5252); }
-.gradient-excused { background: linear-gradient(135deg, #00b0ff, #40c4ff); }
+.gradient-main { background: whitesmoke; }
+.gradient-present { background: whitesmoke; }
+.gradient-absent { background: whitesmoke; }
+.gradient-excused { background: whitesmoke; }
 
 /* ================= PROGRESS BAR ================= */
 
@@ -160,10 +160,10 @@ td {
     color: white;
 }
 
-.badge.present { background: #00c853; }
-.badge.absent { background: #ff1744; }
-.badge.late { background: #ffcc00; color: black; }
-.badge.excused { background: #00b0ff; }
+.badge.present { background: whitesmoke; }
+.badge.absent { background: whitesmoke ;}
+.badge.late { background: whitesmoke; }
+.badge.excused { background: whitesmoke; }
 
 /* REMARKS FIX */
 

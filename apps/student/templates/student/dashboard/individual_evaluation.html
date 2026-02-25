@@ -133,10 +133,10 @@
                     </div>
 
                     <!-- ✅ PASS / FAIL 🔥 -->
-                    {% if submission.is_pass %}
-                        <div class="evaluation-badge pass">✅ Pass</div>
+                    {% if submission.marks_obtained >= submission.task.passing_marks %}
+                       <div class="evaluation-badge pass">✅ Pass</div>
                     {% else %}
-                        <div class="evaluation-badge fail">❌ Fail</div>
+                       <div class="evaluation-badge fail">❌ Fail</div>
                     {% endif %}
 
                 </div>

@@ -64,7 +64,6 @@
                     EMI
                 </a>
 
-                <!-- ✅ FIXED -->
                 <a href="{% url 'student:pdc' %}" class="mode-btn">
                     PDC
                 </a>
@@ -139,9 +138,26 @@
 
                     {% else %}
 
-                        <p class="payment-status done">
-                            ✅ Payment submitted
-                        </p>
+                        <!-- ✅ FIXED PAYMENT STATUS LOGIC -->
+                        {% if existing_payment.payment_status == existing_payment.PaymentStatus.COMPLETED %}
+
+                            <p class="payment-status success">
+                                ✅ Payment Completed
+                            </p>
+
+                        {% elif existing_payment.payment_status == existing_payment.PaymentStatus.PENDING %}
+
+                            <p class="payment-status warning">
+                                ⏳ Payment Under Verification
+                            </p>
+
+                        {% else %}
+
+                            <p class="payment-status done">
+                                ✅ Payment Submitted
+                            </p>
+
+                        {% endif %}
 
                     {% endif %}
                 </form>
