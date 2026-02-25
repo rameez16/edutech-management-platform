@@ -907,3 +907,23 @@ class UserNotificationSettings(models.Model):
     
     def __str__(self):
         return f"Notification Settings - {self.user.username}"
+    
+
+class Announcement(models.Model):
+
+    AUDIENCE_CHOICES = (
+        ('students', 'Students'),
+        ('trainers', 'Trainers'),
+        ('both', 'Both'),
+    )
+
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    audience = models.CharField(max_length=20, choices=AUDIENCE_CHOICES)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    is_important = models.BooleanField(default=False)
+    publish_date = models.DateTimeField(auto_now_add=True)
+    expiry_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title    
