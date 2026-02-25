@@ -1387,27 +1387,24 @@ def dashboard(request):
     pending_task_count = len(pending_tasks)
 
 
-    # =====================================================
-    # ✅ LATEST MATERIALS (recent tasks as materials)
-    # =====================================================
+    #LATEST MATERIALS (from LMS SessionMaterial)
+
+
     latest_materials = []
-    recent_tasks = Task.objects.filter(batch=batch).order_by("-id")[:3]
 
-    for t in recent_tasks:
-        task_type = t.get_task_type_display().lower()
-        if "pdf" in task_type or "document" in task_type:
-            file_type = "pdf"
-        elif "code" in task_type or "notebook" in task_type:
-            file_type = "notebook"
-        else:
-            file_type = "doc"
+    if batch:
+        materials = SessionMaterial.objects.filter(
+            lesson_session__batch=batch
+        ).select_related('lesson_session__lesson_plan').order_by('-id')[:5]
 
-        latest_materials.append({
-            "title":       t.title,
-            "file_type":   file_type,
-            "uploaded_at": t.due_date,   # fallback — use due_date as reference
-            "task_id":     t.id,
-        })
+        for m in materials:
+            latest_materials.append({
+                'id':            m.id,
+                'title':         m.title,
+                'material_type': m.material_type,
+                'type_display':  m.get_material_type_display(),
+                'session_number': m.lesson_session.lesson_plan.session_number if m.lesson_session and m.lesson_session.lesson_plan else '',
+            })
 
 
 

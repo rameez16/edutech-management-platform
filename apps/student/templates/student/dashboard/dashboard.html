@@ -319,27 +319,56 @@
         </div>
     </div>
 
-    <!-- LATEST MATERIALS (placeholder) -->
-    <div class="glass-card glass-card-3d overview-card latest-materials-card">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+    <!-- LATEST MATERIALS -->
+<div class="glass-card glass-card-3d overview-card latest-materials-card">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:18px;">📁</span>
             <h4 class="card-label">Latest Materials</h4>
         </div>
-        <p class="card-subtitle" style="margin-bottom:14px;">Recently uploaded files</p>
-        <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0;">
-            <span style="font-size:32px;display:block;margin-bottom:8px;">📂</span>
-            Coming soon
-        </div>
+        <a href="{% url 'accounts:lms_login' %}" 
+           style="font-size:11px;color:#7c3aed;font-weight:600;text-decoration:none;">
+            View All →
+        </a>
     </div>
+    <p class="card-subtitle" style="margin-bottom:12px;">Recently uploaded files</p>
+
+    <div class="materials-scroll">
+        {% for m in latest_materials %}
+        <a href="{% url 'student:lms_view_material' m.id %}" class="material-item" style="text-decoration:none;">
+            <div class="material-icon">
+                {% if m.material_type == 'recording' %}🎬
+                {% elif m.material_type == 'notes' %}📝
+                {% elif m.material_type == 'slides' %}📊
+                {% elif m.material_type == 'code' %}💻
+                {% elif m.material_type == 'assignment' %}🎯
+                {% elif m.material_type == 'reference' %}📚
+                {% else %}📎{% endif %}
+            </div>
+            <div class="material-info">
+                <div class="material-name">{{ m.title }}</div>
+                    <div class="material-time">
+                        {{ m.type_display }}
+                        {% if m.session_number %}· Session {{ m.session_number }}{% endif %}
+                    </div>
+            </div>
+        </a>
+        {% empty %}
+        <div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:13px;">
+            <span style="font-size:32px;display:block;margin-bottom:8px;">📂</span>
+            No materials yet
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
 
 </div>
 <br>
 
-<script>
-function togglePendingTasks(el) {
-    el.querySelector('.pending-task-list').classList.toggle('open');
-}
-</script>
+
+
 
 
         

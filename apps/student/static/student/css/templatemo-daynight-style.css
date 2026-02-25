@@ -492,14 +492,6 @@ a {
         0 0 40px rgba(52, 89, 211, 0.432);
 }
 
-/* 3D Tilt Effect */
-.glass-card-3d {
-    transition: transform 0.4s cubic-bezier(0.03, 0.98, 0.52, 0.99);
-}
-
-.glass-card-3d:hover {
-    transform: rotateX(5deg) rotateY(-5deg) translateZ(10px);
-}
 
 /* ============================================
    STATS CARDS
@@ -750,7 +742,7 @@ a {
 =========================== */
 .pending-task-card {
     margin-top: 16px;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, #faf4de, #faeec2);
     border: 1px solid #fbbf24;
     border-radius: 12px;
     padding: 12px 14px;
@@ -758,9 +750,7 @@ a {
     transition: box-shadow 0.2s ease;
 }
 
-.pending-task-card:hover {
-    box-shadow: 0 4px 16px rgba(251, 191, 36, 0.35);
-}
+
 
 .pending-task-header {
     display: flex;
@@ -799,12 +789,28 @@ a {
     margin-top: 12px;
     border-top: 1px solid #fbbf24;
     padding-top: 10px;
+    max-height: 80px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
 .pending-task-list.open {
     display: block;
 }
 
+.pending-task-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.pending-task-list::-webkit-scrollbar-track {
+    background: #fffae4;
+    border-radius: 4px;
+}
+
+.pending-task-list::-webkit-scrollbar-thumb {
+    background: #ffd86e;
+    border-radius: 4px;
+}
 .pending-task-row {
     display: flex;
     align-items: center;
@@ -833,7 +839,7 @@ a {
 }
 
 .pending-priority.high   { background: #fee2e2; color: #dc2626; }
-.pending-priority.medium { background: #fef3c7; color: #92400e; }
+.pending-priority.medium { background: #ffdba6; color: #92400e; }
 .pending-priority.low    { background: #d1fae5; color: #059669; }
 
 .pending-goto-btn {
@@ -886,42 +892,33 @@ a {
 /* ===========================
    LATEST MATERIALS CARD
 =========================== */
-.latest-materials-card {
-    flex: 1;
+
+.materials-scroll {
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
-.material-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    background: rgba(124, 58, 237, 0.06);
-    border-radius: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background 0.15s ease;
+.materials-scroll::-webkit-scrollbar {
+    width: 4px;
 }
 
-.material-item:hover {
-    background: rgba(124, 58, 237, 0.12);
+.materials-scroll::-webkit-scrollbar-track {
+    background: rgba(124, 58, 237, 0.05);
+    border-radius: 4px;
 }
 
-.material-icon {
-    font-size: 20px;
-    flex-shrink: 0;
+.materials-scroll::-webkit-scrollbar-thumb {
+    background: #c4b5fd;
+    border-radius: 4px;
 }
 
-.material-name {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-primary);
+.materials-scroll::-webkit-scrollbar-thumb:hover {
+    background: #7c3aed;
 }
 
-.material-time {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
+
+
 
 /* ===========================
    OVERVIEW ROW - 3 EQUAL CARDS
