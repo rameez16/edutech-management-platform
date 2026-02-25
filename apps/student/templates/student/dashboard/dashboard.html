@@ -3,127 +3,7 @@
 
 {% block title %}Student Dashboard{% endblock %}
 {% block extra_css %}
-<style>
-    /* Profile Card Custom Styles */
-    .profile-card .stat-value {
-        font-size: 20px; /* Bigger name */
-        font-weight: 600;
-        color: #111; /* You can adjust */
-    }
 
-    .profile-card .stat-change {
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .profile-card .stat-change.positive {
-        color: green; /* Active Student */
-    }
-
-    .profile-card .stat-change.inactive {
-        color: red; /* Inactive Student */
-        background-color: rgba(255, 0, 0, 0.1); /* light red bg */
-    }
-
-    
-    /* Center everything inside profile card */
-    .profile-card .stat-card-inner {
-        display: flex;
-        align-items: center;        /* vertical center */
-        justify-content: center;    /* horizontal center */
-        gap: 16px;
-        
-        
-    }
-
-    /* Center text block */
-    .profile-card .stat-info {
-        text-align: center;
-        margin-top: 15px;
-    }
-
-    .announcement-mini {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-height: 100px;       /* adjust height as needed */
-        overflow-y: auto;        /* vertical scroll if content exceeds height */
-        padding-right: 8px;      /* optional: prevent scrollbar from overlapping content */
-    }
-
-    /* Batch Info Card Custom Styles - Same as Profile Card */
-    .batch-info-card .stat-value {
-        font-size: 14px; /* Bigger batch name */
-        font-weight: 600;
-        color: #111;
-    }
-
-    .batch-info-card .stat-change {
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .batch-info-card .stat-change.positive {
-        color: green; /* Active/Assigned */
-    }
-
-    .batch-info-card .stat-change.inactive {
-        color: red; /* Not assigned */
-        background-color: rgba(255, 0, 0, 0.1); /* light red bg */
-    }
-
-    /* Center everything inside batch info card */
-    .batch-info-card .stat-card-inner {
-        display: flex;
-        align-items: center;        /* vertical center */
-        justify-content: center;    /* horizontal center */
-        gap: 16px;
-    }
-
-    /* Center text block */
-    .batch-info-card .stat-info {
-        text-align: center;
-        margin-top: 15px;
-    }
-
-
-
-    /* Common notification box */
-    .announcement-item {
-        padding: 12px 16px;
-        border-radius: 10px;
-        font-size: 14px;
-        line-height: 1.5;
-        font-weight: 500;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-        transition: transform 0.2s ease;
-    }
-
-    .announcement-item:hover {
-        transform: translateY(-2px);
-    }
-
-    /* Status colors */
-    .announcement-item.warning {
-        background: #fff4e5;
-        color: #a15c00;
-        border-left: 4px solid #ff9800;
-    }
-
-    .announcement-item.success {
-        background: #e8f7ee;
-        color: #1b7a46;
-        border-left: 4px solid #22c55e;
-    }
-
-    .announcement-item.info {
-        background: #eef5ff;
-        color: #1e4ed8;
-        border-left: 4px solid #3b82f6;
-    }
-
-
-</style>
 {% endblock %}
 
 {% block content %}
@@ -354,55 +234,114 @@
 
         <br>
 
-    <div class="overview-row">
-<div class="glass-card overview-card task-performance-card">
+   <div class="overview-row">
 
-    <div class="task-header">
-        <h4 class="card-label">TASK PERFORMANCE <i class="fa-solid fa-chart-line"style="color:#3b82f6;" > </i></h4>
-       
-    </div>
-    <br>
+    <!-- TASK PERFORMANCE + PENDING TASKS -->
+    <div class="glass-card glass-card-3d overview-card task-performance-card">
+        <div class="task-header">
+            <h4 class="card-label">TASK PERFORMANCE <i class="fa-solid fa-chart-line" style="color:#3b82f6;"></i></h4>
+        </div>
+        <br>
+        <div class="task-stat">
+            
+            <div class="task-text">
+                <span>Total Marks:</span>
+                <strong>{{ obtained_marks }} / {{ total_marks }}</strong>
+            </div>
+        </div>
+        <br>
+        <div class="task-stat">
+            
+            <div class="task-text">
+                <span>Percentage:</span>
+                <strong style="color:#22c55e;">{{ percentage }}%</strong>
+            </div>
+        </div>
 
-    <div class="task-stat">
-        <div class="task-icon marks">
-          <center>  <i class="fa-solid fa-trophy" style="color:#f59e0b;"></i></center>
+        <!-- PENDING TASKS NOTIFICATION CARD -->
+        {% if pending_task_count > 0 %}
+        <div class="pending-task-card" onclick="togglePendingTasks(this)">
+            <div class="pending-task-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:16px;">⚠️</span>
+                    <div>
+                        <div class="pending-task-title">Pending Tasks</div>
+                        <div class="pending-task-sub">
+                            {{ pending_task_count }} task{{ pending_task_count|pluralize }} need attention
+                        </div>
+                    </div>
+                </div>
+                <div class="pending-task-badge">{{ pending_task_count }}</div>
+            </div>
+            <div class="pending-task-list">
+                {% for task in pending_tasks %}
+                <div class="pending-task-row">
+                    <div>
+                        <div class="pending-task-name">{{ task.title }}</div>
+                        <div class="pending-task-due">
+                            Due: {{ task.due_date|date:"M d, Y" }}
+                            {% if task.status == 'in_progress' %}
+                                <span class="pending-status-tag">In Progress</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <span class="pending-priority {{ task.priority }}">Priority : {{ task.priority }}</span>
+                </div>
+                {% endfor %}
+                <a href="{% url 'student:student_tasks' %}" class="pending-goto-btn">
+                    → Go to Task Portal
+                </a>
+            </div>
         </div>
-        <div class="task-text">
-            <span>Total Marks:</span>
-            <strong>{{ obtained_marks }} / {{ total_marks }}</strong>
+
+        {% else %}
+        <div class="pending-all-done">
+            <span>✅</span>
+            <div>
+                <div style="font-weight:700;font-size:13px;color:#065f46;">All Tasks Done!</div>
+                <div style="font-size:11px;color:#047857;margin-top:2px;">No pending tasks right now.</div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="glass-card overview-card quick-links-card">
+        <div class="quick-links-header">
+            <h4 class="card-label2">QUICK LINKS</h4>
+        </div>
+        <div class="quick-links-body">
+            <a href="{% url 'student:stud_syllabus' %}" class="quick-link-btn blue">Syllabus</a>
+            <a href="{% url 'student:student_attendance' %}" class="quick-link-btn purple">Attendance</a>
+            <a href="{% url 'student:student_tasks' %}" class="quick-link-btn green">Submit Task</a>
+            <a href="{% url 'student:payment' %}" class="quick-link-btn orange">Pay Now</a>
         </div>
     </div>
-<br>
-    <div class="task-stat">
-        <div class="task-icon percentage">
-           <center> <i class="fa-solid fa-chart-pie" style="color:#22c55e;"></i><center>
+
+    <!-- LATEST MATERIALS (placeholder) -->
+    <div class="glass-card glass-card-3d overview-card latest-materials-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:18px;">📁</span>
+            <h4 class="card-label">Latest Materials</h4>
         </div>
-        <div class="task-text">
-            <span>Percentage:</span>
-            <strong>{{ percentage }}%</strong>
+        <p class="card-subtitle" style="margin-bottom:14px;">Recently uploaded files</p>
+        <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0;">
+            <span style="font-size:32px;display:block;margin-bottom:8px;">📂</span>
+            Coming soon
         </div>
     </div>
 
 </div>
+<br>
+
+<script>
+function togglePendingTasks(el) {
+    el.querySelector('.pending-task-list').classList.toggle('open');
+}
+</script>
 
 
-            <!-- QUICK LINKS -->
-            <div class="glass-card overview-card quick-links-card">
-                <div class="quick-links-header">
-                    <h4 class="card-label2">QUICK LINKS</h4>
-                </div>
-
-                <div class="quick-links-body">
-                    <a href="{% url 'student:stud_syllabus' %}" class="quick-link-btn blue">Syllabus</a>
-                    <a href="{% url 'student:student_attendance' %}" class="quick-link-btn purple">Attendance</a>
-                    <a href="{% url 'student:student_tasks' %}" class="quick-link-btn green">Submit Task</a>
-                    <a href="{% url 'student:payment' %}" class="quick-link-btn orange">Pay Now</a>
-                </div>
-            </div>
-
-        </div>
-
-        <br>
         
 
         <!-- ================= CALENDAR + ATTENDANCE + PROGRESS ================= -->

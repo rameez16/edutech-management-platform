@@ -1335,6 +1335,84 @@ def dashboard(request):
             payment_css = "warning"
             pending_payment = upcoming_payment
 
+    # =====================================================
+    # ✅ PENDING TASKS (not_started + in_progress)
+    # =====================================================
+
+    pending_tasks = []
+
+    if batch:
+        # Get all tasks belonging to sessions in this student's batch
+        batch_tasks = Task.objects.filter(
+            batch=batch
+        ).order_by("due_date")
+
+        for task in batch_tasks:
+            # Find this student's submission for the task (if any)
+            submission = TaskSubmission.objects.filter(
+                task=task,
+                student=student
+            ).first()
+
+            # Determine current status
+            if submission:
+                status = submission.status  # 'submitted', 'evaluated', 'in_progress', 'resubmit'
+            else:
+                status = "not_started"
+
+            # Only include pending statuses
+            if status in ["not_started", "in_progress"]:
+                # Auto-priority based on days until due date
+                if task.due_date:
+                    days_left = (task.due_date - today).days
+                    if days_left < 0:
+                        priority = "high"   # overdue
+                    elif days_left <= 1:
+                        priority = "high"
+                    elif days_left <= 4:
+                        priority = "medium"
+                    else:
+                        priority = "low"
+                else:
+                    priority = "low"
+
+                pending_tasks.append({
+                    "id":       task.id,
+                    "title":    task.title,
+                    "due_date": task.due_date,
+                    "priority": priority,
+                    "status":   status,
+                })
+
+    pending_task_count = len(pending_tasks)
+
+
+    # =====================================================
+    # ✅ LATEST MATERIALS (recent tasks as materials)
+    # =====================================================
+    latest_materials = []
+    recent_tasks = Task.objects.filter(batch=batch).order_by("-id")[:3]
+
+    for t in recent_tasks:
+        task_type = t.get_task_type_display().lower()
+        if "pdf" in task_type or "document" in task_type:
+            file_type = "pdf"
+        elif "code" in task_type or "notebook" in task_type:
+            file_type = "notebook"
+        else:
+            file_type = "doc"
+
+        latest_materials.append({
+            "title":       t.title,
+            "file_type":   file_type,
+            "uploaded_at": t.due_date,   # fallback — use due_date as reference
+            "task_id":     t.id,
+        })
+
+
+
+
+
     # ✅ CALENDAR
     cal = calendar.Calendar()
     month_days = cal.monthdayscalendar(today.year, today.month)
@@ -1381,6 +1459,11 @@ def dashboard(request):
         "month_name": month_name,
         "year": year,
         "today_day": today_day,
+
+
+        "pending_tasks":      pending_tasks,
+        "pending_task_count": pending_task_count,
+        "latest_materials": latest_materials,
     }
 
     return render(request, "student/dashboard/dashboard.html", context)
