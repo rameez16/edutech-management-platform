@@ -1451,50 +1451,7 @@ BATCH CARD
 }
 
 
-/* dashboard  */
 
-/* ==============================
-   QUICK ACTIONS 
-   ============================== */
-
-.quick-links h4 {
-    margin-bottom: 0.75rem;
-}
-
-/* Button container */
-.quick-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 0.6rem;
-}
-
-/* Buttons inside quick actions */
-.quick-actions .btn {
-    text-align: center;
-    font-weight: 500;
-    padding: 0.45rem 0.75rem;
-    border-radius: 8px;
-    border: 1px solid rgba(79, 156, 255, 0.45); /* 👈 visible border */
-    background-color: transparent;            
-    transition: all 0.2s ease;
-}
-
-
-/* Subtle hover (no redesign) */
-.quick-actions .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-}
-
-/* Dark mode */
-.quick-actions .btn {
-    color: var(--text-primary);
-}
-
-/* Light mode */
-[data-theme="light"] .quick-actions .btn {
-    color: var(--primary);
-}
 
 
 
@@ -3446,8 +3403,8 @@ details[open] .module-summary {
     color: #fff;
 }
 
-.status-badge.attendance-inactive {
-    background: var(--danger);
+.status-badge.attendance-pending {
+    background: var(--warning);
     display: inline-block;
     padding: 3px 10px;
     font-size: 0.6rem;
@@ -5767,4 +5724,389 @@ input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] 
     .issues-detail-row {
         flex-direction: column;
     }
+}
+
+
+/* =====================================================
+   TRAINER DASHBOARD - FULL STYLESHEET
+===================================================== */
+
+
+/* =====================================================
+   DASHBOARD GRID
+===================================================== */
+
+.trainer-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+
+/* =====================================================
+   GLASS CARD BASE
+===================================================== */
+
+.trainer-dashboard-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent); 
+    border-radius: var(--border-radius);
+    padding: var(--card-padding);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal);
+}
+
+.trainer-dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.2),
+        transparent
+    );
+}
+
+.trainer-dashboard-card:hover {
+    background: var(--glass-hover);
+    border-color: var(--primary);
+    box-shadow: 
+        0 25px 50px -12px var(--glass-shadow),
+        0 0 30px color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+
+/* =====================================================
+   CARD TITLE + ICON
+===================================================== */
+
+.trainer-dashboard-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--primary);
+    position: relative;
+    padding-bottom: 8px;
+}
+
+.trainer-dashboard-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.85;
+}
+
+.trainer-dashboard-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 70%;              /* small underline */
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+    border-radius: 2px;
+}
+
+
+
+/* =====================================================
+   QUICK ACTIONS
+===================================================== */
+
+/* dashboard  */
+
+/* ==============================
+   QUICK ACTIONS 
+   ============================== */
+
+.quick-links h4 {
+    margin-bottom: 0.75rem;
+}
+
+/* Button container */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.6rem;
+    
+}
+
+/* Buttons inside quick actions */
+.quick-actions .btn {
+    text-align: center;
+    font-weight: 500;
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(79, 156, 255, 0.45);
+    background-color: transparent;            
+    transition: all 0.2s ease;
+}
+
+
+/* Subtle hover (no redesign) */
+.quick-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    background: var(--primary);
+}
+
+/* Dark mode */
+.quick-actions .btn {
+    color: var(--text-primary);
+}
+
+/* Light mode */
+[data-theme="light"] .quick-actions .btn {
+    color: var(--primary);
+}
+
+/* Light mode */
+[data-theme="light"] .quick-actions .btn:hover {
+    color: #fff;
+}
+
+
+/* =====================================================
+   PROGRESS BAR
+===================================================== */
+
+.trainer-dashboard-progress-wrapper {
+    margin-top: 14px;
+}
+
+.trainer-dashboard-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.trainer-dashboard-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #34d399, #10b981);
+    border-radius: 20px;
+    transition: width 0.4s ease;
+}
+
+
+/* =====================================================
+   SIMPLE LIST
+===================================================== */
+
+.trainer-dashboard-list {
+    list-style: disc inside;
+    padding: 0;
+    margin: 0;
+}
+
+.trainer-dashboard-list li {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.trainer-dashboard-list li strong {
+    color: var(--text-primary);
+}
+
+.trainer-dashboard-list li:last-child {
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   BADGE
+===================================================== */
+
+.trainer-dashboard-badge {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 20px;
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--success);
+}
+
+
+/* =====================================================
+   BORDERED BUTTON
+===================================================== */
+
+.trainer-dashboard-btn-bordered {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.trainer-dashboard-btn-bordered:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
+}
+
+
+
+.simple-session-list {
+    list-style: disc;
+    padding-left: 10px;
+    margin: 0;
+}
+
+.new-session-date-badge {
+    display: inline-block;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+.new-session-info {
+    font-size: 12px;
+    color: #495057;
+    margin-top: 4px;
+}
+.new-session-info strong {
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-bottom: 2px;
+    display: block; /* ensures batch name is on its own line */
+}
+
+.new-session-item{
+    margin-bottom: 10px;
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN
+===================================================== */
+
+/* Large tablets */
+@media (max-width: 1200px) {
+    .trainer-dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    .trainer-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .trainer-dashboard-card {
+        padding: 18px;
+    }
+
+    .trainer-dashboard-title {
+        font-size: 14px;
+    }
+
+    .trainer-dashboard-list li {
+        font-size: 13px;
+    }
+}
+
+/* Mobile small */
+@media (max-width: 480px) {
+    .trainer-dashboard-actions {
+        flex-direction: column;
+    }
+
+    .trainer-dashboard-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Dashboard Attendance Summary List */
+.dashboard-attendance-list {
+    list-style: disc inside;
+    padding-left: 0px;
+}
+
+.dashboard-attendance-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 6px;
+    padding: 6px 0px;
+    color: var(--text-secondary);
+}
+
+.dashboard-attendance-list li strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+.trainer-dashboard-btn-bordered {
+    display: flex;
+    justify-content: center;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(79, 156, 255, 0.45);
+    background: var(--primary);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-top: 20px;
+}
+
+.trainer-dashboard-btn-bordered:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    
+}
+
+[data-theme="light"] .trainer-dashboard-btn-bordered {
+    color: #fff;
+}
+
+/* Light mode */
+[data-theme="light"] .trainer-dashboard-btn-bordered:hover {
+    color: var(--text-primary);
+    background-color: transparent;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(79, 156, 255, 0.45);
+}
+
+.new-schedule-item{
+    font-size: 14px;
+}
+
+
+
+
+.trainer-notification-card .trainer-dashboard-list li {
+    font-size: 14px;   
+    line-height: 1.7;
+    font-weight: 500;
+}
+
+.trainer-notification-card .trainer-dashboard-list li strong {
+    font-size: 14px;     
+    font-weight: 600;
 }

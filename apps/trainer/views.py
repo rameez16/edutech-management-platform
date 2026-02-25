@@ -2,11 +2,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
+from django.db.models import Max
 
 from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm,TrainerIssueResolveForm
 
 from apps.bdm.models import Trainer, Batch, Student, StudentIssue
-from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission
+from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission, SessionMaterial
 from apps.student.models import StudentFeedback, LeaveApplication
 
 
@@ -15,8 +16,175 @@ from apps.student.models import StudentFeedback, LeaveApplication
 # dashboard
 def dashboard(request):
     """Dashboard view"""
+    
+    trainer = request.user.trainer
+    
+    
+    #upcoming planned sections
+    # Get last 4 planned sessions for this trainer
+    planned_sessions = (
+        LessonSession.objects
+        .filter(
+            trainer=trainer,
+            status=LessonSession.SessionStatus.PLANNED
+        )
+        .select_related("batch", "lesson_plan")
+        .order_by("-planned_date")[:4]
+    )
+    
+    # Newly assigned batches - e.g.,
+    newly_assigned_batches = (
+        Batch.objects
+        .filter(trainers=trainer, is_active=True)
+        .order_by('-start_date')[:4]  # latest 4 batches
+    )
+    
+    
+    # attendance summary
+    # All completed sessions by this trainer
+    completed_sessions = LessonSession.objects.filter(
+        trainer=trainer,
+        status=LessonSession.SessionStatus.COMPLETED
+    )
+
+    classes_conducted = completed_sessions.count()
+
+    # Sessions where attendance is already marked
+    marked_session_ids = Attendance.objects.filter(
+        lesson_session__trainer=trainer
+    ).values_list("lesson_session_id", flat=True).distinct()
+
+    # Sessions where attendance is NOT marked
+    pending_sessions = completed_sessions.exclude(
+        id__in=marked_session_ids
+    ).order_by("actual_date")
+
+    pending_attendance = pending_sessions.count()
+
+    # First pending session (for redirect button)
+    first_pending_session = pending_sessions.first()
+
+    # Last attendance update date
+    last_updated = Attendance.objects.filter(
+        lesson_session__trainer=trainer
+    ).aggregate(last=Max("date"))["last"]
+    
+    completed_attendance = classes_conducted - pending_attendance
+    
+    # todays schedule
+    today = timezone.now().date()
+    today_sessions = (
+    LessonSession.objects
+    .filter(
+        trainer=trainer,
+        planned_date=today  # or actual_date if you use that
+    )
+    .select_related("batch", "lesson_plan")
+    .order_by("planned_date")[:4]
+    )
+    
+    # batch progress 
+    
+    active_batches = Batch.objects.filter(
+    trainers=trainer,
+    is_active=True
+)
+
+    active_batches_count = active_batches.count()
+
+    total_students = Student.objects.filter(
+        batches__in=active_batches
+    ).distinct().count()
+    
+    # batch progress 
+
+    total_sessions_count = LessonSession.objects.filter(
+        trainer=trainer
+    ).count()
+
+    completed_sessions_count = LessonSession.objects.filter(
+        trainer=trainer,
+        status=LessonSession.SessionStatus.COMPLETED
+    ).count()
+
+    if total_sessions_count > 0:
+        progress_percentage = round((completed_sessions_count / total_sessions_count) * 100)
+    else:
+        progress_percentage = 0
+        
+    #notification
+    # attendance
+    # completed_sessions,marked_session_ids
+    
+    completed_sessions = LessonSession.objects.filter(
+    trainer=trainer,
+    status=LessonSession.SessionStatus.COMPLETED
+    )
+    
+    attendance_pending_count = completed_sessions.exclude(
+        id__in=marked_session_ids
+    ).count()
+    # upload materials
+    uploaded_session_ids = SessionMaterial.objects.filter(
+    lesson_session__trainer=trainer
+    ).values_list("lesson_session_id", flat=True)
+
+    material_pending_count = completed_sessions.exclude(
+        id__in=uploaded_session_ids
+    ).count()
+    
+    # student submission task
+    
+    pending_evaluations_count = TaskSubmission.objects.filter(
+        task__lesson_session__trainer=trainer,
+        status=TaskSubmission.SubmissionStatus.SUBMITTED
+    ).count()
+        
+
+    # Class Uploads
+    # Completed sessions (queryset)
+    completed_sessions_qs = LessonSession.objects.filter(
+        trainer=trainer,
+        status=LessonSession.SessionStatus.COMPLETED
+    )
+
+    # Sessions that have at least one material uploaded
+    uploaded_session_ids = SessionMaterial.objects.filter(
+        lesson_session__trainer=trainer
+    ).values_list("lesson_session_id", flat=True).distinct()
+
+    uploaded_sessions_count = completed_sessions_qs.filter(
+        id__in=uploaded_session_ids
+    ).count()
+
+    # Completed but no material uploaded
+    pending_uploads_count = completed_sessions_qs.exclude(
+        id__in=uploaded_session_ids
+    ).count()
     context = {
         'page_title': 'Dashboard',
+        "planned_sessions": planned_sessions,
+        "newly_assigned_batches": newly_assigned_batches,
+        
+        "classes_conducted": classes_conducted,
+        "pending_attendance": pending_attendance,
+        "last_updated": last_updated,
+        "first_pending_session": first_pending_session,
+        "completed_attendance": completed_attendance,
+        
+        "today_sessions": today_sessions,
+        
+        "active_batches_count": active_batches_count,
+        "total_students": total_students,
+        "progress_percentage": progress_percentage,
+        
+        
+        "attendance_pending_count": attendance_pending_count,
+        "material_pending_count": material_pending_count,
+        "pending_evaluations_count": pending_evaluations_count,
+        
+        "uploaded_sessions_count": uploaded_sessions_count,
+        "pending_uploads_count": pending_uploads_count,
     }
     return render(request, 'trainer/dashboard/overview.html', context)
 
@@ -278,6 +446,12 @@ def attendance_session_list(request, batch_id):
         status=LessonSession.SessionStatus.COMPLETED
     ).select_related("lesson_plan").order_by("-completed_at")
     # ).select_related("lesson_plan").order_by("-lesson_plan__session_number","-planned_date")
+    
+     # Attach attendance status manually
+    for session in sessions:
+        session.attendance_marked = Attendance.objects.filter(
+            lesson_session=session
+        ).exists()
 
     return render(request, "trainer/attendance/session_list.html", {
         "batch": batch,

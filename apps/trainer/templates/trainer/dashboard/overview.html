@@ -1,15 +1,16 @@
 {% extends "base/base.html" %}
+{% load static %}
 
 {% block title %}Trainer Dashboard{% endblock %}
 {% block page_title %}Dashboard Overview{% endblock %}
+
 
 {% block content %}
 
 <section class="stats-grid">
 
-    <!-- Quick Actions -->
-    <div class="glass-card quick-links">
-        <h4 class="card-title">
+    <div class="trainer-dashboard-card quick-link">
+        <h4 class="trainer-dashboard-title">
             <svg class="card-icon" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"></circle>
@@ -19,118 +20,277 @@
         </h4>
 
         <div class="quick-actions">
-            <a href="" class="btn btn-outline-primary btn-sm">Upload Attendance</a>
-            <a href="" class="btn btn-outline-primary btn-sm">Upload Class Recording</a>
-            <a href="" class="btn btn-outline-secondary btn-sm">View Schedule</a>
-            <a href="" class="btn btn-outline-secondary btn-sm">Submit Reports</a>
+            <!-- Attendance -->
+            <a href="{% url 'trainer:attendance-batch-list' %}"
+                class="btn btn-success btn-sm">
+                Mark Attendance
+            </a>
+                <!-- Session -->
+            <a href="{% url 'trainer:batches' %}"
+                class="btn btn-success btn-sm">
+                Lesson Sessions
+            </a>
+                <!-- Task -->
+            <a href="{% url 'trainer:task-create' %}" 
+            class="btn btn-success btn-sm">
+            Create Task
+            </a>
+                <a href="{% url 'trainer:task-submissions' %}" 
+            class="btn btn-outline-success btn-sm">
+            Review Submissions
+            </a>
+
+            <!-- Issues -->
+            <a href="{% url 'trainer:trainer_assigned_issues' %}" 
+            class="btn btn-outline-danger btn-sm">
+            View Issues
+            </a>
+
+            <!-- Leave -->
+            <a href="{% url 'trainer:leave-dashboard' %}" 
+            class="btn btn-warning btn-sm">
+            Process Leave Requests
+            </a>
         </div>
     </div>
 
-    <!-- Batch Progress -->
-    <div class="glass-card">
-        <h4 class="card-title">
-            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <path d="M3 3v18h18"></path>
-                <path d="M18 17V9"></path>
-                <path d="M13 17V5"></path>
-                <path d="M8 17v-3"></path>
-            </svg>
-            Batch Progress
-        </h4>
+<!-- Upcoming Planned Sessions -->
+<div class="trainer-dashboard-card">
+    <h4 class="trainer-dashboard-title">
+        <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        Upcoming Planned Sessions
+    </h4>
 
-        <p><strong>Active Batches:</strong> 3</p>
-        <p><strong>Total Students:</strong> 68</p>
+    {% if planned_sessions %}
+        <ul class="simple-session-list">
+    {% for session in planned_sessions %}
+        <li class="new-session-item">
+            <span class="new-session-date-badge">
+                {{ session.planned_date|date:"d M Y" }}
+            </span>
 
-        <div class="progress-wrapper">
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 55%;"></div>
+            <div class="new-session-info">
+                {% if session.lesson_plan %}
+                    <strong>Session {{ session.lesson_plan.session_number }} : {{ session.lesson_plan.topic }}</strong>
+                {% endif %}
+                {{ session.batch.name }}
+                
             </div>
-            <small>55% Completed</small>
+        </li>
+
+    {% endfor %}
+</ul>
+    {% else %}
+        <p class="text-muted">No planned sessions available.</p>
+    {% endif %}
+</div>
+
+
+<!-- Newly Assigned Batches -->
+<div class="trainer-dashboard-card newly-assigned">
+    <h4 class="trainer-dashboard-title">
+        <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20"></path>
+            <path d="M2 12h20"></path>
+        </svg>
+        Newly Assigned Batches
+    </h4>
+
+    <ul class="simple-session-list">
+        {% for batch in newly_assigned_batches %}
+            <li class="new-session-item">
+                <span class="new-session-date-badge">
+                    {{ batch.start_date|date:"d M Y" }}
+                </span>
+
+                <div class="new-session-info">
+                    <strong>{{ batch.name }}</strong>
+                    {% if batch.course %}
+                        —  {{ batch.course.name }}
+                    {% endif %}
+                </div>
+            </li>
+        {% empty %}
+            <li>No new batches assigned</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Attendance Summary -->
+<div class="trainer-dashboard-card">
+    <h4 class="trainer-dashboard-title">
+        <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        Attendance Summary
+    </h4>
+
+    <ul class="dashboard-attendance-list">
+        <li>
+            <span>Classes Conducted</span>
+            <strong>{{ classes_conducted }}</strong>
+        </li>
+
+        <li>
+            <span>Completed Attendance</span>
+            <strong>{{ completed_attendance }}</strong>
+        </li>
+
+        <li>
+            <span>Pending Attendance</span>
+            <strong>{{ pending_attendance }}</strong>
+        </li>
+
+        <li>
+            <span>Last Updated</span>
+            <strong>
+                {% if last_updated %}
+                    {{ last_updated|date:"d M Y" }}
+                {% else %}
+                    Not Available
+                {% endif %}
+            </strong>
+        </li>
+    </ul>
+
+    {% if pending_attendance > 0 and first_pending_session %}
+    <a href="{% url 'trainer:attendance-mark' first_pending_session.id %}"
+       class="trainer-dashboard-btn-bordered">
+        Complete Pending Attendance
+    </a>
+{% endif %}
+</div>
+
+    <!-- Today's Schedule -->
+<div class="trainer-dashboard-card">
+    <h4 class="trainer-dashboard-title">
+        <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        Today's Class Schedule
+    </h4>
+
+    {% if today_sessions %}
+        <ul class="trainer-dashboard-list">
+            {% for session in today_sessions %}
+                <li>
+                    <strong class="new-schedule-item">
+                        {% if session.lesson_plan %}
+                            Session {{ session.lesson_plan.session_number }}
+                        {% else %}
+                            Session
+                        {% endif %}
+                    </strong>
+                    <div class="session-batch-name">
+                        {{ session.batch.name }}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No classes scheduled for today.</p>
+    {% endif %}
+</div>
+
+<!-- Batch Progress -->
+<div class="trainer-dashboard-card">
+    <h4 class="trainer-dashboard-title">
+        <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18"></path>
+            <path d="M18 17V9"></path>
+            <path d="M13 17V5"></path>
+            <path d="M8 17v-3"></path>
+        </svg>
+        Batch Progress
+    </h4>
+
+    <ul class="dashboard-attendance-list">
+        <li>
+            <span>Active Batches</span>
+            <strong>{{ active_batches_count }}</strong>
+        </li>
+
+        <li>
+            <span>Total Students</span>
+            <strong>{{ total_students }}</strong>
+        </li>
+
+        <li>
+            <span>Overall Progress</span>
+            <strong>{{ progress_percentage }}%</strong>
+        </li>
+    </ul>
+
+    <div class="trainer-dashboard-progress-wrapper">
+        <div class="trainer-dashboard-progress-bar">
+            <div class="trainer-dashboard-progress-fill"
+                 style="width: {{ progress_percentage }}%;"></div>
         </div>
+        <small>{{ progress_percentage }}% Completed</small>
     </div>
-
-    <!-- Today's Class Schedule -->
-    <div class="glass-card">
-        <h4 class="card-title">
-            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            Today's Class Schedule
-        </h4>
-
-        <ul class="simple-list">
-            <li><strong>07:00 – 08:00 AM</strong> — Data Science (DS-433)</li>
-            <li><strong>10:00 – 11:30 AM</strong> — Web Development (WD-221)</li>
-            <li><strong>05:00 – 06:00 PM</strong> — Python Basics (PY-109)</li>
-        </ul>
-    </div>
-
-    <!-- Newly Assigned Batches -->
-    <div class="glass-card">
-        <h4 class="card-title">
-            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <path d="M12 2v20"></path>
-                <path d="M2 12h20"></path>
-            </svg>
-            Newly Assigned Batches
-        </h4>
-
-        <ul class="simple-list">
-            <li>AI Fundamentals — Starts 01 Feb 2025</li>
-            <li>React JS Bootcamp — Starts 05 Feb 2025</li>
-        </ul>
-        <span class="badge badge-success">2 New</span>
-    </div>
+</div>
 
     <!-- Notifications -->
-    <div class="glass-card">
-        <h4 class="card-title">
-            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            Notifications
-        </h4>
+<div class="trainer-dashboard-card trainer-notification-card">
+    <h4 class="trainer-dashboard-title">
+        <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        Notifications
+    </h4>
 
-        <ul class="simple-list">
-            <li>Upload last week’s attendance</li>
-            <li>Submit student evaluation reports</li>
-            <li>New batch allocation coming soon</li>
-            <li>Check student feedback submissions</li>
-        </ul>
-    </div>
+    <ul class="trainer-dashboard-list">
 
-    <!-- Attendance Summary -->
-    <div class="glass-card">
-        <h4 class="card-title">
-            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-                <path d="M9 11l3 3L22 4"></path>
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-            </svg>
-            Attendance Summary
-        </h4>
+        {% if attendance_pending_count > 0 %}
+        <li>
+            {{ attendance_pending_count }} session{{ attendance_pending_count|pluralize }}
+            need attendance marking.
+        </li>
+        {% endif %}
 
-        <p><strong>Classes Conducted:</strong> 42</p>
-        <p><strong>Pending Attendance:</strong> 3 Days</p>
-        <p><strong>Last Updated:</strong> 20 Jan 2025</p>
+        {% if material_pending_count > 0 %}
+        <li>
+            {{ material_pending_count }} completed session{{ material_pending_count|pluralize }}
+            need study material upload.
+        </li>
+        {% endif %}
 
-        <a href="" class="btn btn-bordered">
-            Complete Pending Attendance
-        </a>
-    </div>
+        {% if pending_evaluations_count > 0 %}
+        <li>
+            {{ pending_evaluations_count }} student submission{{ pending_evaluations_count|pluralize }}
+            waiting for evaluation.
+        </li>
+        {% endif %}
+
+        {% if attendance_pending_count == 0 and material_pending_count == 0 and pending_evaluations_count == 0 %}
+        <li>No pending notifications 🎉</li>
+        {% endif %}
+
+    </ul>
+</div>
+
+    
 
     <!-- Class Uploads -->
-    <div class="glass-card">
-        <h4 class="card-title">
-            <svg class="card-icon" viewBox="0 0 24 24" fill="none"
+    <div class="trainer-dashboard-card">
+        <h4 class="trainer-dashboard-title">
+            <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
@@ -139,15 +299,22 @@
             Class Uploads
         </h4>
 
-        <ul class="simple-list">
-            <li>Recorded Sessions Uploaded: <strong>36</strong></li>
-            <li>Pending Uploads: <strong>2</strong></li>
+        <ul class="trainer-dashboard-list">
+            <ul class="trainer-dashboard-list">
+                <li>
+                    Recorded Sessions Uploaded:
+                    <strong>{{ uploaded_sessions_count }}</strong>
+                </li>
+                <li>
+                    Pending Uploads:
+                    <strong>{{ pending_uploads_count }}</strong>
+                </li>
+            </ul>
         </ul>
 
-        <a href="" class="btn btn-bordered">
-            Upload New Class
+        <a href=""{% url 'trainer:batches' %}"" class="trainer-dashboard-btn-bordered">
+            Manage Materials
         </a>
-        
     </div>
 
 </section>
