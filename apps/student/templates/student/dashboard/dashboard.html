@@ -238,25 +238,24 @@
 
     <!-- TASK PERFORMANCE + PENDING TASKS -->
     <div class="glass-card glass-card-3d overview-card task-performance-card">
-        <div class="task-header">
-            <h4 class="card-label">TASK PERFORMANCE <i class="fa-solid fa-chart-line" style="color:#3b82f6;"></i></h4>
+
+<div class="task-header">
+    <h4 class="card-label">TASK PERFORMANCE <i class="fa-solid fa-chart-line task-chart-icon"></i></h4>
+</div>
+
+<div class="task-stats-row">
+    <div class="stat-box stat-marks">
+        <div class="stat-label">Total Marks</div>
+        <div class="stat-value">{{ obtained_marks }} / {{ total_marks }}</div>
+    </div>
+    <div class="stat-box stat-percent">
+        <div class="stat-label">Percentage</div>
+        <div class="stat-value">{{ percentage }}%</div>
+        <div class="stat-progress-bar">
+            <div class="stat-progress-fill" style="width: {{ percentage }}%;"></div>
         </div>
-        <br>
-        <div class="task-stat">
-            
-            <div class="task-text">
-                <span>Total Marks:</span>
-                <strong>{{ obtained_marks }} / {{ total_marks }}</strong>
-            </div>
-        </div>
-        <br>
-        <div class="task-stat">
-            
-            <div class="task-text">
-                <span>Percentage:</span>
-                <strong style="color:#22c55e;">{{ percentage }}%</strong>
-            </div>
-        </div>
+    </div>
+</div>
 
         <!-- PENDING TASKS NOTIFICATION CARD -->
         {% if pending_task_count > 0 %}
@@ -312,31 +311,37 @@
             <h4 class="card-label2">QUICK LINKS</h4>
         </div>
         <div class="quick-links-body">
-            <a href="{% url 'student:stud_syllabus' %}" class="quick-link-btn blue">Syllabus</a>
-            <a href="{% url 'student:student_attendance' %}" class="quick-link-btn purple">Attendance</a>
-            <a href="{% url 'student:student_tasks' %}" class="quick-link-btn green">Submit Task</a>
-            <a href="{% url 'student:payment' %}" class="quick-link-btn orange">Pay Now</a>
-        </div>
-    </div>
-
-    <!-- LATEST MATERIALS -->
-<div class="glass-card glass-card-3d overview-card latest-materials-card">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:18px;">📁</span>
-            <h4 class="card-label">Latest Materials</h4>
-        </div>
-        <a href="{% url 'accounts:lms_login' %}" 
-           style="font-size:11px;color:#7c3aed;font-weight:600;text-decoration:none;">
-            View All →
+            <a href="{% url 'student:stud_syllabus' %}" class="quick-link-btn blue">
+                📘 Syllabus
+        </a>
+        <a href="{% url 'student:student_attendance' %}" class="quick-link-btn purple">
+            📋 Attendance
+        </a>
+        <a href="{% url 'student:student_tasks' %}" class="quick-link-btn green">
+            ✅ Submit Task
+        </a>
+        <a href="{% url 'student:payment' %}" class="quick-link-btn orange">
+            💳 Pay Now
         </a>
     </div>
-    <p class="card-subtitle" style="margin-bottom:12px;">Recently uploaded files</p>
+</div>
+
+   <!-- LATEST MATERIALS -->
+<div class="glass-card glass-card-3d overview-card latest-materials-card">
+
+    <div class="materials-header">
+        <div class="materials-title-group">
+            <span class="materials-icon">📁</span>
+            <h4 class="card-label">Latest Materials</h4>
+        </div>
+        <a href="{% url 'accounts:lms_login' %}" class="materials-view-all">View All →</a>
+    </div>
+
+    <p class="card-subtitle materials-subtitle">Recently uploaded files</p>
 
     <div class="materials-scroll">
         {% for m in latest_materials %}
-        <a href="{% url 'student:lms_view_material' m.id %}" class="material-item" style="text-decoration:none;">
+        <div class="material-item">
             <div class="material-icon">
                 {% if m.material_type == 'recording' %}🎬
                 {% elif m.material_type == 'notes' %}📝
@@ -348,22 +353,21 @@
             </div>
             <div class="material-info">
                 <div class="material-name">{{ m.title }}</div>
-                    <div class="material-time">
-                        {{ m.type_display }}
-                        {% if m.session_number %}· Session {{ m.session_number }}{% endif %}
-                    </div>
+                <div class="material-time">
+                    {{ m.type_display }}
+                    {% if m.session_number %}· Session {{ m.session_number }}{% endif %}
+                </div>
             </div>
-        </a>
+        </div>
         {% empty %}
-        <div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:13px;">
-            <span style="font-size:32px;display:block;margin-bottom:8px;">📂</span>
+        <div class="materials-empty">
+            <span class="materials-empty-icon">📂</span>
             No materials yet
         </div>
         {% endfor %}
     </div>
 
 </div>
-
 </div>
 <br>
 
@@ -394,12 +398,14 @@ function togglePendingTasks(el) {
 </div>
 
             
-           <!-- ================= ATTENDANCE CARD ================= -->
+         
+
+<!-- ================= ATTENDANCE CARD ================= -->
 <div class="glass-card">
 
     <div class="card-header">
         <div>
-            <h2 class="card-title">Attendance Performance</h2>
+            <h2 class="card-title">📅 Attendance Performance</h2>
             <p class="card-subtitle">Your attendance statistics</p>
         </div>
     </div>
@@ -409,52 +415,56 @@ function togglePendingTasks(el) {
         <div class="donut-chart">
             <svg width="140" height="140" viewBox="0 0 140 140">
 
-                <!-- ATTENDED (Present + Late) -->
+                <!-- BG ring -->
+                <circle class="donut-bg" cx="70" cy="70" r="54"/>
+
+                <!-- ATTENDED segment -->
                 <circle class="donut-segment"
                         cx="70" cy="70" r="54"
-                        stroke="var(--emerald-light)"
+                        stroke="#22c55e"
                         stroke-dasharray="{{ present_dash }} 339.3"
                         stroke-dashoffset="0"/>
 
-                <!-- ABSENT -->
-                <circle class="donut-segment"
+                
+                <!-- ABSENT segment (only show if absent > 0) -->
+                {% if absent_count > 0 %}
+                    <circle class="donut-segment"
                         cx="70" cy="70" r="54"
-                        stroke="var(--gold)"
+                        stroke="#fca5a5"
                         stroke-dasharray="{{ absent_dash }} 339.3"
                         stroke-dashoffset="-{{ present_dash }}"/>
-
+                {% endif %}
             </svg>
 
-            <!-- CENTER TEXT -->
             <div class="donut-center">
                 <div class="donut-value">{{ attendance_percentage }}%</div>
-                <div class="donut-label">Attendance</div>
+                <div class="donut-label">Present</div>
             </div>
         </div>
 
-        <!-- LEGEND -->
+        <!-- STATS CHIPS -->
         <div class="donut-legend">
-
-            <!-- ATTENDED -->
-            <div class="legend-item">
-                <span>
-                    <i class="fa-solid fa-circle-check" style="color:var(--emerald-light);"></i>
-                    Attended ({{ present_count|add:late_count }})
-                </span>
+            <div class="legend-chip legend-attended">
+                <i class="fa-solid fa-circle-check legend-icon-attended"></i>
+                <div class="legend-info">
+                    <span class="legend-label">Attended</span>
+                    <span class="legend-value">{{ present_count|add:late_count }}</span>
+                </div>
             </div>
-
-            <!-- ABSENT -->
-            <div class="legend-item">
-                <span>
-                    <i class="fa-solid fa-circle-xmark" style="color:var(--gold);"></i>
-                    Absent ({{ absent_count }})
-                </span>
+            <div class="legend-chip legend-absent">
+                <i class="fa-solid fa-circle-xmark legend-icon-absent"></i>
+                <div class="legend-info">
+                    <span class="legend-label">Absent</span>
+                    <span class="legend-value">{{ absent_count }}</span>
+                </div>
             </div>
-
         </div>
 
     </div>
 </div>
+
+
+
 
 <!-- ================= LEARNING PROGRESS ================= -->
 <div class="glass-card progress-card">
