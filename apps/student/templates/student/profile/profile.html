@@ -21,7 +21,7 @@
 
     <div class="profile-card">
 
-        <!-- ✅ IMAGE -->
+        <!-- ✅ PROFILE IMAGE -->
         <div class="image-row">
 
             {% if student.profile_photo %}
@@ -40,19 +40,10 @@
                        name="profile_photo"
                        form="profileForm"
                        hidden
-                       onchange="previewImage(event); showFileName(this)">
+                       onchange="previewImage(event)">
             </label>
+
         </div>
-
-        <!-- ✅ STORED FILE NAME -->
-        {% if student.profile_photo %}
-            <p class="file-name stored-file-name">
-                {{ student.profile_photo.name }}
-            </p>
-        {% endif %}
-
-        <!-- ✅ SELECTED FILE NAME -->
-        <p id="selectedFileName" class="file-name"></p>
 
         <!-- ✅ FORM -->
         <form id="profileForm"
@@ -107,20 +98,21 @@
 
             <div class="form-group">
                 <label>Current education</label>
-                <input type="text" name="current_education"
+                <input type="text"
+                       name="current_education"
                        value="{{ student.current_education }}">
             </div>
 
             <div class="form-group">
                 <label>Institution</label>
-                <input type="text" name="institution"
+                <input type="text"
+                       name="institution"
                        value="{{ student.institution }}">
             </div>
 
             <div class="form-group">
                 <label>Learning goals</label>
-                <textarea name="learning_goals" rows="3">
-{{ student.learning_goals }}</textarea>
+                <textarea name="learning_goals" rows="3">{{ student.learning_goals }}</textarea>
             </div>
 
             <div class="form-group">
@@ -149,19 +141,22 @@
 
             <div class="form-group">
                 <label>Portfolio URL</label>
-                <input type="url" name="portfolio_url"
+                <input type="url"
+                       name="portfolio_url"
                        value="{{ student.portfolio_url }}">
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-save">Save Changes</button>
+                <button type="submit" class="btn-save">
+                    Save Changes
+                </button>
             </div>
 
         </form>
     </div>
 </div>
 
-<!-- ✅ JAVASCRIPT -->
+<!-- ✅ IMAGE PREVIEW -->
 <script>
 function previewImage(event) {
     const reader = new FileReader();
@@ -176,14 +171,6 @@ function previewImage(event) {
     };
 
     reader.readAsDataURL(event.target.files[0]);
-}
-
-function showFileName(input) {
-    const fileName = input.files[0]?.name || "";
-    document.getElementById("selectedFileName").innerText = fileName;
-
-    const storedName = document.querySelector(".stored-file-name");
-    if (storedName) storedName.style.display = "none";
 }
 </script>
 
