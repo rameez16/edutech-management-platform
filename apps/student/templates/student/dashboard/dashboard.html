@@ -166,17 +166,33 @@
             </button>
 
             <div style="margin-left:14px; display:flex; align-items:center;">
-                {% if profile_photo and all_docs_verified %}
-                    <img src="{{ profile_photo.document_file.url }}"
-                         alt="Profile"
-                         style="width:60px;height:60px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid rgba(255,255,255,0.3);">
-                {% else %}
-                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#06b6d4);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-                        {{ student.full_name|first }}
-                    </div>
-                {% endif %}
-            </div>
 
+    {% if student.profile_photo %}
+        <img src="{{ student.profile_photo.url }}?v={{ student.id }}"
+             alt="Profile"
+             style="width:60px;
+                    height:60px;
+                    border-radius:50%;
+                    object-fit:cover;
+                    cursor:pointer;
+                    border:2px solid rgba(255,255,255,0.3);">
+    {% else %}
+        <div style="width:60px;
+                    height:60px;
+                    border-radius:50%;
+                    background:linear-gradient(135deg,#22c55e,#06b6d4);
+                    color:#fff;
+                    font-weight:600;
+                    font-size:20px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    cursor:pointer;">
+            {{ student.full_name|first|upper }}
+        </div>
+    {% endif %}
+
+</div>
         </div>
     </nav>
 
