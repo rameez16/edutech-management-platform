@@ -701,10 +701,34 @@ a {
         font-weight: 500;
         box-shadow: 0 6px 14px rgba(0,0,0,0.08);
         transition: transform 0.2s ease;
+        margin-bottom: 8px;
     }
 
     .announcement-item:hover {
         transform: translateY(-2px);
+    }
+
+
+    .announcement-mini {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 130px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .announcement-mini::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .announcement-mini::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .announcement-mini::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
     }
 
     
@@ -1484,6 +1508,44 @@ a {
 .legend-absent   .legend-value { color: #dc2626; }
 
 
+
+/* ============================================
+   ATTENDANCE ALERT BANNER
+============================================ */
+
+.attendance-alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff8ed;
+    border-left: 4px solid #f59e0b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 12px;
+}
+
+.attendance-alert-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.attendance-alert-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.attendance-alert-text strong {
+    font-size: 13px;
+    font-weight: 700;
+    color: #b45309;
+}
+
+.attendance-alert-text span {
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.4;
+}
 /* ============================================
    MOBILE MENU TOGGLE
 ============================================ */

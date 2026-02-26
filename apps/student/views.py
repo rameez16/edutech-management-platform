@@ -1281,6 +1281,31 @@ def dashboard(request):
         absent_dash = 0
         attendance_percentage = 0
 
+
+    #  ATTENDANCE ALERT — latest completed session not marked
+    attendance_alert = False
+
+    if batch:
+        latest_completed_session = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.COMPLETED
+        ).order_by('-completed_at').first()
+
+        if latest_completed_session:
+            already_marked = Attendance.objects.filter(
+                student=student,
+                batch=batch,
+            ).filter(
+                Q(lesson_session=latest_completed_session) |
+                Q(date=latest_completed_session.actual_date)
+            ).exists()
+
+            if not already_marked:
+                attendance_alert = True
+
+
+
+
     # ✅ LEARNING PROGRESS
     covered_percentage = 0
     pending_percentage = 0
@@ -1461,8 +1486,10 @@ def dashboard(request):
         "pending_tasks":      pending_tasks,
         "pending_task_count": pending_task_count,
         "latest_materials": latest_materials,
+        "attendance_alert": attendance_alert,
     }
 
+    print("DEBUG attendance_alert:", attendance_alert, "| latest_session:", latest_completed_session)
     return render(request, "student/dashboard/dashboard.html", context)
 
 

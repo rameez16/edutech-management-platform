@@ -409,6 +409,15 @@ function togglePendingTasks(el) {
             <p class="card-subtitle">Your attendance statistics</p>
         </div>
     </div>
+    {% if attendance_alert %}
+    <div class="attendance-alert">
+        <div class="attendance-alert-icon">⚠️</div>
+        <div class="attendance-alert-text">
+            <strong>Attendance Not Marked</strong>
+            <span>Your attendance for the latest session hasn't been recorded yet.</span>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="donut-container">
 
@@ -583,6 +592,7 @@ function togglePendingTasks(el) {
             </div>
 
         </div>
+    </section>
         <script>
 document.addEventListener("DOMContentLoaded", function () {
 
