@@ -870,7 +870,7 @@ def student_evaluation(request):
     student = request.user.student
     submission_id = request.GET.get("submission")
 
-    # ✅ PAGE 2 → INDIVIDUAL EVALUATION 
+    # ✅ PAGE 2 → INDIVIDUAL EVALUATION
     if submission_id:
 
         submission = (
@@ -884,10 +884,7 @@ def student_evaluation(request):
                 "task__lesson_session__trainer",
                 "task__lesson_session__lesson_plan",
             )
-            .filter(
-                id=submission_id,
-                student=student
-            )
+            .filter(id=submission_id, student=student)
             .first()
         )
 
@@ -897,7 +894,7 @@ def student_evaluation(request):
             {"submission": submission}
         )
 
-    # ✅ PAGE 1 → LIST PAGE 🔥
+    # ✅ PAGE 1 → LIST PAGE
     submissions = (
         TaskSubmission.objects
         .select_related("task", "task__batch")
@@ -905,9 +902,11 @@ def student_evaluation(request):
         .order_by("-submitted_at")
     )
 
-    totals = submissions.filter(
+    evaluated_submissions = submissions.filter(
         marks_obtained__isnull=False
-    ).aggregate(
+    )
+
+    totals = evaluated_submissions.aggregate(
         obtained=Sum("marks_obtained"),
         total=Sum("task__total_marks")
     )
