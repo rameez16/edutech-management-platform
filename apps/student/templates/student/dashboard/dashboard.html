@@ -159,50 +159,107 @@
             </div>
         </div>
 
-        <!-- Payment -->
-        <div class="glass-card payment-ui">
+        <!-- PAYMENT STATUS CARD -->
+<div class="glass-card stat-card payment-smart-card">
 
-    <div class="payment-header">
-        <h4>PAYMENT STATUS</h4>
-        <button class="payment-action-btn">₹</button>
-    </div>
-
-    <div class="payment-row {{ payment_css }}"
-         onclick="window.location.href='{% url 'student:payment' %}'">
-
-        <span class="payment-icon">
-            {% if payment_css == "danger" %}
-                ⚠️
-            {% elif payment_css == "warning" %}
-                ⏳
-            {% else %}
-                ✅
-            {% endif %}
-        </span>
-
-        <div class="payment-text">
-
-            <strong>{{ payment_notification }}</strong>
-
-            <span>
-                {% if payment_css == "danger" %}
-                    Immediate Action Required
-                {% elif payment_css == "warning" %}
-                    Please Complete Payment
-                {% else %}
-                    All Payments Clear
-                {% endif %}
-            </span>
-
-            {% if pending_payment %}
-                <span class="payment-meta">
-                    ₹{{ pending_payment.amount }}
-                    • Due {{ pending_payment.due_date|date:"d M Y" }}
-                </span>
-            {% endif %}
-
+    <div class="payment-smart-header">
+        <span class="payment-smart-label">PAYMENT STATUS</span>
+        <div class="payment-smart-icon
+            {% if payment_card_state == 'locked' %}psi-grey
+            {% elif payment_card_state == 'admission_due' %}psi-red
+            {% elif payment_card_state == 'full_paid' %}psi-green
+            {% elif payment_card_state == 'installment' and overdue_installment %}psi-red
+            {% elif payment_card_state == 'installment' %}psi-amber
+            {% else %}psi-amber{% endif %}">
+            ₹
         </div>
     </div>
+
+    {% if payment_card_state == 'locked' %}
+        <!-- STATE 1: Portal not unlocked -->
+        <div class="psb psb-locked">
+            <div class="psb-icon">🔒</div>
+            <div class="psb-content">
+                <strong>Payment Portal Locked</strong>
+                <span>Contact admin to unlock your payment portal</span>
+            </div>
+        </div>
+
+    {% elif payment_card_state == 'admission_due' %}
+        <!-- STATE 2: Admission fee not paid -->
+        <div class="psb psb-danger">
+            <div class="psb-icon">⚠️</div>
+            <div class="psb-content">
+                <strong>Admission Fee Pending</strong>
+                <span>Please complete your admission fee payment</span>
+            </div>
+        </div>
+        <a href="{% url 'payment_portal' %}" class="psb-action-btn psb-btn-red">
+            Pay Now →
+        </a>
+
+    {% elif payment_card_state == 'full_paid' %}
+        <!-- STATE 3: Fully paid -->
+        <div class="psb psb-success">
+            <div class="psb-icon">✅</div>
+            <div class="psb-content">
+                <strong>All Payments Cleared</strong>
+                <span>Total Paid: ₹{{ paid_amount }}</span>
+            </div>
+        </div>
+
+    {% elif payment_card_state == 'installment' %}
+        <!-- STATE 4: Installment plan -->
+        {% if overdue_installment %}
+        <div class="psb psb-danger">
+            <div class="psb-icon">🔴</div>
+            <div class="psb-content">
+                <strong>EMI Overdue — ₹{{ overdue_installment.amount }}</strong>
+                <span>Due date was {{ overdue_installment.due_date|date:"d M Y" }}</span>
+            </div>
+        </div>
+        {% elif next_installment %}
+        <div class="psb psb-warning">
+            <div class="psb-icon">📅</div>
+            <div class="psb-content">
+                <strong>Next EMI — ₹{{ next_installment.amount }}</strong>
+                <span>
+                    Due: {{ next_installment.due_date|date:"d M Y"|default:"—" }}
+                </span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Installment progress bar -->
+        <div class="psb-installment-progress">
+            <div class="psb-ip-labels">
+                <span>EMI {{ completed_installments }}/{{ total_installments }} paid</span>
+                <span>Balance: ₹{{ fee_balance }}</span>
+            </div>
+            <div class="psb-ip-bar">
+                <div class="psb-ip-fill"
+                    style="width: {% if total_installments > 0 %}{% widthratio completed_installments total_installments 100 %}{% else %}0{% endif %}%">
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'payment_portal' %}" class="psb-action-btn psb-btn-purple">
+            View Payment Portal →
+        </a>
+
+    {% else %}
+        <!-- STATE 5: Balance due (no installment plan) -->
+        <div class="psb psb-warning">
+            <div class="psb-icon">⏳</div>
+            <div class="psb-content">
+                <strong>Balance Due — ₹{{ fee_balance }}</strong>
+                <span>Paid: ₹{{ paid_amount }} of ₹{{ total_fee }}</span>
+            </div>
+        </div>
+        <a href="{% url 'payment_portal' %}" class="psb-action-btn psb-btn-amber">
+            Complete Payment →
+        </a>
+    {% endif %}
+
 </div>
 
         <!-- Announcements Card -->

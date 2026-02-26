@@ -1315,15 +1315,10 @@ def dashboard(request):
         pending_percentage = 100 - covered_percentage
 
     # =====================================================
-    # ✅ PAYMENT ENGINE
+    # ✅ PAYMENT CARD LOGIC
     # =====================================================
 
     today = timezone.now().date()
-
-    payment_notification = "No Pending Payments"
-    payment_css = "success"
-    pending_payment = None
-
     total_fee = Decimal("0")
 
     if batch and batch.course:
@@ -1336,24 +1331,88 @@ def dashboard(request):
 
     balance = total_fee - paid_amount
 
-    overdue_payment = FeePayment.objects.filter(
+    payment_portal_unlocked = checklist.onboarding_completed
+
+    # Admission fee check
+    admission_paid = checklist.admission_fee_paid
+
+    # Detect payment plan type
+    has_installments = FeePayment.objects.filter(
         student=student,
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
+    ).exists()
+
+    has_full_payment = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.FULL_PAYMENT,
+        payment_status=FeePayment.PaymentStatus.COMPLETED
+    ).exists()
+
+    # Next pending installment
+    next_installment = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
+        payment_status=FeePayment.PaymentStatus.PENDING
+    ).order_by("installment_number").first()
+
+    # Overdue installment
+    overdue_installment = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
         payment_status=FeePayment.PaymentStatus.PENDING,
         due_date__lt=today
     ).order_by("due_date").first()
 
-    upcoming_payment = FeePayment.objects.filter(
+    # Completed installments count
+    completed_installments = FeePayment.objects.filter(
         student=student,
-        payment_status=FeePayment.PaymentStatus.PENDING
-    ).order_by("due_date").first()
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
+        payment_status=FeePayment.PaymentStatus.COMPLETED
+    ).count()
+
+    total_installments = 0
+    if next_installment and next_installment.total_installments:
+        total_installments = next_installment.total_installments
+    elif has_installments:
+        total_installments = FeePayment.objects.filter(
+            student=student,
+            payment_type=FeePayment.PaymentType.INSTALLMENT,
+        ).count()
+
+    # Determine payment card state
+    # States: 'locked' | 'admission_due' | 'installment' | 'full_paid' | 'balance_due'
+    if not payment_portal_unlocked:
+        payment_card_state = "locked"
+    elif not admission_paid:
+        payment_card_state = "admission_due"
+    elif has_full_payment or balance <= 0:
+        payment_card_state = "full_paid"
+    elif has_installments:
+        payment_card_state = "installment"
+    else:
+        payment_card_state = "balance_due"
+
+    # Legacy — keep for other parts of template
+    payment_notification = "No Pending Payments"
+    payment_css = "success"
+    pending_payment = None
 
     if balance > 0:
+        overdue_payment = FeePayment.objects.filter(
+            student=student,
+            payment_status=FeePayment.PaymentStatus.PENDING,
+            due_date__lt=today
+        ).order_by("due_date").first()
+
+        upcoming_payment = FeePayment.objects.filter(
+            student=student,
+            payment_status=FeePayment.PaymentStatus.PENDING
+        ).order_by("due_date").first()
 
         if overdue_payment:
             payment_notification = "Payment Overdue"
             payment_css = "danger"
             pending_payment = overdue_payment
-
         else:
             payment_notification = "Payment Pending"
             payment_css = "warning"
@@ -1519,6 +1578,18 @@ def dashboard(request):
         "attendance_alert": attendance_alert,
         "announcements": announcements,
         "planned_sessions": planned_sessions,
+        "payment_card_state":      payment_card_state,
+        "payment_portal_unlocked": payment_portal_unlocked,
+        "admission_paid":          admission_paid,
+        "has_installments":        has_installments,
+        "has_full_payment":        has_full_payment,
+        "next_installment":        next_installment,
+        "overdue_installment":     overdue_installment,
+        "completed_installments":  completed_installments,
+        "total_installments":      total_installments,
+        "fee_balance":             balance,
+        "paid_amount":             paid_amount,
+        "total_fee":               total_fee,
     }
 
     return render(request, "student/dashboard/dashboard.html", context)
