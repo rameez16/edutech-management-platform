@@ -551,60 +551,44 @@ function togglePendingTasks(el) {
     <br>
     <br>
 
-    <!-- ================= RECENT ACTIVITY ================= -->
-    <section class="top-grid">
 
+
+    <!-- ================= ANNOUNCEMENTS ================= -->
+    <section class="top-grid">
         <div class="glass-card overview-card activity-column-card">
 
             <div class="activity-header">
                 <div>
-                    <h4 class="card-label">RECENT ACTIVITY</h4>
-                    <p class="card-subtitle">Latest transactions</p>
+                    <h4 class="card-label">ANNOUNCEMENTS</h4>
+                    <p class="card-subtitle">Last 48 hours</p>
                 </div>
             </div>
 
             <div class="activity-list-column">
 
-                <div class="activity-item">
-                    <div class="activity-avatar emerald">JD</div>
+                {% for ann in announcements %}
+                <div class="activity-item {% if ann.is_important %}important{% endif %}">
                     <div class="activity-content">
-                        <p><strong>John Doe</strong> purchased Premium Plan</p>
-                        <span>2 minutes ago</span>
+                        <p>
+                            {% if ann.is_important %}
+                                <span class="ann-important-badge">🔴 Important</span>
+                            {% endif %}
+                            <strong>{{ ann.title }}</strong>
+                        </p>
+                        <p class="ann-message">{{ ann.message }}</p>
+                        <span>
+                            by {{ ann.created_by.get_full_name|default:"Admin" }}
+                            &nbsp;·&nbsp;
+                            {{ ann.publish_date|timesince }} ago
+                        </span>
                     </div>
                 </div>
-
-                <div class="activity-item">
-                    <div class="activity-avatar gold">AS</div>
-                    <div class="activity-content">
-                        <p><strong>Anna Smith</strong> submitted a support ticket</p>
-                        <span>15 minutes ago</span>
-                    </div>
+                {% empty %}
+                <div class="ann-empty">
+                    <span class="ann-empty-icon">📭</span>
+                    <p>No announcements in the last 48 hours</p>
                 </div>
-
-                <div class="activity-item">
-                    <div class="activity-avatar coral">MJ</div>
-                    <div class="activity-content">
-                        <p><strong>Mike Johnson</strong> upgraded subscription</p>
-                        <span>1 hour ago</span>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-avatar success">EW</div>
-                    <div class="activity-content">
-                        <p><strong>Emily White</strong> completed onboarding</p>
-                        <span>2 hours ago</span>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-avatar warning">RB</div>
-                    <div class="activity-content">
-                        <p><strong>Robert Brown</strong> requested refund</p>
-                        <span>3 hours ago</span>
-                    </div>
-                </div>
-
+                {% endfor %}
             </div>
 
         </div>

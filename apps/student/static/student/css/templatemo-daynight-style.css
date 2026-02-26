@@ -481,7 +481,7 @@ a {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.625));
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.796));
 }
 
 .glass-card:hover {
@@ -1225,8 +1225,14 @@ a {
     padding: var(--card-padding);
 }
 
+
+
+
+
+
 .progress-item {
-    margin-bottom: 24px;
+
+    margin-top: 30px;
 }
 
 .progress-item:last-child {
@@ -1250,12 +1256,33 @@ a {
     color: var(--text-secondary);
 }
 
+
+
 .progress-bar {
     height: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: #b0b2b5;    /* visible grey track */
     border-radius: 10px;
     overflow: hidden;
 }
+
+
+
+.progress-card .card-title {
+    font-size: 22px;
+    font-weight: 800;
+    
+}
+
+.progress-card .card-subtitle {
+    font-size: 16px;
+    color: #4e16a3;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+
+
+
 
 .progress-fill {
     height: 100%;
@@ -1278,12 +1305,10 @@ a {
     background: linear-gradient(90deg, var(--emerald-light), var(--emerald));
     box-shadow: 0 0 20px rgba(52, 211, 153, 0.4);
 }
-
 .progress-fill.magenta {
-    background: linear-gradient(90deg, var(--gold-light), var(--gold));
-    box-shadow: 0 0 20px rgba(222, 155, 111, 0.471);
+    background: linear-gradient(90deg, #606060, #81858a); 
+    box-shadow: none;
 }
-
 .progress-fill.purple {
     background: linear-gradient(90deg, var(--coral), var(--amber));
     box-shadow: 0 0 20px rgba(224, 122, 95, 0.4);
@@ -1730,93 +1755,141 @@ a {
 
 
 
-/* ACTIVITY COLUMN CARD */
+
+/* ============================================
+   ANNOUNCEMENTS CARD
+============================================ */
+
 .activity-column-card {
     max-height: 420px;
     display: flex;
     flex-direction: column;
 }
 
-/* Header */
+
+
+/* Card header styling */
 .activity-header {
+    background: linear-gradient(135deg, #ded8fb, #ece8ff);
+    border-radius: 12px;
+    padding: 12px 16px;
     margin-bottom: 14px;
+    border-left: 4px solid #7c3aed;
 }
 
-.card-subtitle {
-    font-size: 12px;
-    color: var(--text-muted);
+.activity-header h4 {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #2b006c;
 }
 
-/* List */
+.activity-header .card-subtitle {
+    font-size: 11px;
+    color: #1f1530;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+
+
 .activity-list-column {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     overflow-y: auto;
-    padding-right: 6px;
+    padding-right: 4px;
 }
-
 
 .activity-list-column::-webkit-scrollbar {
     width: 4px;
 }
+
 .activity-list-column::-webkit-scrollbar-thumb {
-    background: var(--glass-border);
+    background: #bdadfe;
     border-radius: 4px;
 }
 
-/* Item */
+/* Each announcement row */
 .activity-item {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
+    background: #e0d4f9;
+    border-radius: 12px;
+    padding: 12px 14px;
+    border-left: 4px solid #7c3aed;
+    transition: transform 0.2s ease;
 }
 
-/* Avatar */
-.activity-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+.activity-item:hover {
+    transform: translateY(-2px);
+}
+
+/* Title line */
+.activity-content p {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000000;        /* purple title */
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: white;
-    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
-/* Avatar colors */
-.activity-avatar.emerald {
-    background: linear-gradient(135deg, var(--emerald-light), var(--emerald));
-}
-.activity-avatar.gold {
-    background: linear-gradient(135deg, var(--gold), var(--amber));
-}
-.activity-avatar.coral {
-    background: linear-gradient(135deg, var(--coral), var(--gold));
-}
-.activity-avatar.success {
-    background: linear-gradient(135deg, var(--success), var(--emerald));
-}
-.activity-avatar.warning {
-    background: linear-gradient(135deg, var(--warning), var(--gold));
+/* Message */
+.ann-message {
+    font-size: 12px;
+    color: #1a1a1a;        /* dark clear text */
+    margin: 4px 0 6px;
+    line-height: 1.5;
+    font-weight: 500;
 }
 
-/* Content */
-.activity-content p {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-bottom: 3px;
-}
-
-.activity-content p strong {
-    color: var(--text-primary);
-}
-
+/* Footer — by name · time */
 .activity-content span {
     font-size: 11px;
+    color: #4b5563;        /* darker grey */
+    font-weight: 600;
+}
+
+/* Important badge */
+.ann-important-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 800;
+    background: #ffcfcf;
+    color: #b91c1c;        /* bright red */
+    border-radius: 6px;
+    padding: 2px 8px;
+    border: 1px solid #fca5a5;
+}
+
+
+
+/* Important item gets red left border */
+.activity-item.important {
+    border-left-color: #dc2626;
+    background: #ffe6e6;
+}
+
+/* Empty state */
+.ann-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    gap: 8px;
     color: var(--text-muted);
+}
+
+.ann-empty-icon {
+    font-size: 32px;
+}
+
+.ann-empty p {
+    font-size: 13px;
 }
 
 

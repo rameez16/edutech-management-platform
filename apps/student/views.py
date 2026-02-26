@@ -13,14 +13,14 @@ from dateutil.relativedelta import relativedelta
 import uuid
 import os
 import calendar
-from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument
+from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement
 from apps.accounts.decorators import role_required
 from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial
 from apps.student.models import LeaveApplication
 from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCard,StudentFeedback
 from .forms import EnrollmentAgreementForm,TaskSubmissionForm
 from apps.student.forms import LeaveApplicationForm,StudentIssueForm
-
+from datetime import timedelta
 
 #rinta
 
@@ -1442,6 +1442,20 @@ def dashboard(request):
     year = today.year
     today_day = today.day
 
+    # ✅ ANNOUNCEMENTS — last 48 hours, for students or both
+    
+    cutoff = timezone.now() - timedelta(hours=48)
+
+    announcements = Announcement.objects.filter(
+        audience__in=['students', 'both'],
+        publish_date__gte=cutoff,
+    ).filter(
+        Q(expiry_date__isnull=True) | Q(expiry_date__gt=timezone.now())
+    ).order_by('-publish_date').select_related('created_by')
+
+
+
+
     context = {
         "student": student,
         "student_name": student_name,
@@ -1486,9 +1500,9 @@ def dashboard(request):
         "pending_task_count": pending_task_count,
         "latest_materials": latest_materials,
         "attendance_alert": attendance_alert,
+        "announcements": announcements,
     }
 
-    print("DEBUG attendance_alert:", attendance_alert, "| latest_session:", latest_completed_session)
     return render(request, "student/dashboard/dashboard.html", context)
 
 
