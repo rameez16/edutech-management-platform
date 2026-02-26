@@ -537,7 +537,7 @@ function togglePendingTasks(el) {
 
         </section>
 
-    </section>
+    
     
 
     <!-- Mobile Menu Toggle -->
@@ -553,46 +553,96 @@ function togglePendingTasks(el) {
 
 
 
-    <!-- ================= ANNOUNCEMENTS ================= -->
+    <!-- ================= ANNOUNCEMENTS + PLANNED SESSIONS ================= -->
+
     <section class="top-grid">
-        <div class="glass-card overview-card activity-column-card">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
 
-            <div class="activity-header">
-                <div>
-                    <h4 class="card-label">ANNOUNCEMENTS</h4>
-                    <p class="card-subtitle">Last 48 hours</p>
-                </div>
-            </div>
-
-            <div class="activity-list-column">
-
-                {% for ann in announcements %}
-                <div class="activity-item {% if ann.is_important %}important{% endif %}">
-                    <div class="activity-content">
-                        <p>
-                            {% if ann.is_important %}
-                                <span class="ann-important-badge">🔴 Important</span>
-                            {% endif %}
-                            <strong>{{ ann.title }}</strong>
-                        </p>
-                        <p class="ann-message">{{ ann.message }}</p>
-                        <span>
-                            by {{ ann.created_by.get_full_name|default:"Admin" }}
-                            &nbsp;·&nbsp;
-                            {{ ann.publish_date|timesince }} ago
-                        </span>
+            <!-- ANNOUNCEMENTS -->
+            <div class="glass-card overview-card activity-column-card">
+                <div class="activity-header">
+                    <div>
+                        <h4 class="card-label">ANNOUNCEMENTS</h4>
+                        <p class="card-subtitle">Last 48 hours</p>
                     </div>
                 </div>
-                {% empty %}
-                <div class="ann-empty">
-                    <span class="ann-empty-icon">📭</span>
-                    <p>No announcements in the last 48 hours</p>
+                <div class="activity-list-column">
+                    {% for ann in announcements %}
+                    <div class="activity-item {% if ann.is_important %}important{% endif %}">
+                        <div class="activity-content">
+                            <p>
+                                {% if ann.is_important %}
+                                    <span class="ann-important-badge">🔴 Important</span>
+                                {% endif %}
+                                <strong>{{ ann.title }}</strong>
+                            </p>
+                            <p class="ann-message">{{ ann.message }}</p>
+                            <span>
+                                by {{ ann.created_by.get_full_name|default:"Admin" }}
+                                &nbsp;·&nbsp;
+                                {{ ann.publish_date|timesince }} ago
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="ann-empty">
+                        <span class="ann-empty-icon">📭</span>
+                        <p>No announcements in the last 48 hours</p>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
 
+            <!-- PLANNED SESSIONS -->
+            <div class="glass-card overview-card planned-sessions-card">
+                <div class="activity-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 class="card-label" style="color: #3b0764;">📅 PLANNED SESSIONS</h4>
+                            <p class="card-subtitle" style="color: #4c1d95;">Upcoming scheduled classes</p>
+                        </div>
+                        <a href="{% url 'student:batch_details' %}" class="ps-view-all">View All →</a>
+                    </div>
+                </div>
+
+                <div class="activity-list-column">
+                    <div class="ps-list">
+                   {% for session in planned_sessions %}
+    <div class="ps-item">
+        <div class="ps-dot
+            {% if forloop.first %}ps-dot-green
+            {% elif forloop.counter == 2 %}ps-dot-blue
+            {% else %}ps-dot-amber{% endif %}">
         </div>
-    </section>
+        <div class="ps-meta">
+            <div class="ps-topic">Session {{ session.lesson_plan.session_number }}&nbsp;·&nbsp; {{ session.lesson_plan.topic }}</div>
+            <div class="ps-info">
+            
+                Module {{ session.lesson_plan.module.module_number }} - {{ session.lesson_plan.module.title }}
+            </div>
+            <div class="ps-tags">
+                <p style="font-size:14px;">Planned Date: {{ session.planned_date|date:"F d, Y" }}</p>
+                {% if forloop.first %}
+                    <span class="ps-tag ps-tag-green">Next Up</span>
+                {% else %}
+                    <span class="ps-tag ps-tag-blue">Scheduled</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+<div class="ann-empty">
+    <span class="ann-empty-icon">📆</span>
+    <p>No planned sessions yet</p>
+</div>
+{% endfor %} 
+                    
+</div>
+    </div>
+</div>
+
+</div>
+</section>
         <script>
 document.addEventListener("DOMContentLoaded", function () {
 

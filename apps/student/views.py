@@ -1456,6 +1456,23 @@ def dashboard(request):
 
 
 
+    # ✅ PLANNED SESSIONS
+    planned_sessions = []
+
+    if batch:
+        planned_sessions = list(
+            LessonSession.objects.filter(
+                batch=batch,
+                status=LessonSession.SessionStatus.PLANNED
+            )
+            .select_related("lesson_plan__module")
+            .order_by(
+                "lesson_plan__module__module_number",
+                "lesson_plan__session_number",
+            )[:5]  # limit to next 5 on dashboard
+        )
+
+
     context = {
         "student": student,
         "student_name": student_name,
@@ -1501,6 +1518,7 @@ def dashboard(request):
         "latest_materials": latest_materials,
         "attendance_alert": attendance_alert,
         "announcements": announcements,
+        "planned_sessions": planned_sessions,
     }
 
     return render(request, "student/dashboard/dashboard.html", context)
