@@ -1,0 +1,1446 @@
+{% extends "bdm/layout/base.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard — DeepSeek Bootcamp Admin{% endblock %}
+
+{% block extra_head %}
+{{block.super}}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+/* ═══════════════════════════════════════════════
+   DEEPSEEK DESIGN SYSTEM
+   ═══════════════════════════════════════════════ */
+
+:root {
+  /* DeepSeek Color Palette - Light Blue Evolution */
+  --ds-gray-50: #f9fafb;
+  --ds-gray-100: #f3f4f6;
+  --ds-gray-200: #e5e7eb;
+  --ds-gray-300: #d1d5db;
+  --ds-gray-400: #9ca3af;
+  --ds-gray-500: #6b7280;
+  --ds-gray-600: #4b5563;
+  --ds-gray-700: #374151;
+  --ds-gray-800: #1f2937;
+  --ds-gray-900: #111827;
+
+  /* DeepSeek Blue - Clean, Modern, Professional */
+  --ds-blue-50: #eff6ff;
+  --ds-blue-100: #dbeafe;
+  --ds-blue-200: #bfdbfe;
+  --ds-blue-300: #93c5fd;
+  --ds-blue-400: #60a5fa;
+  --ds-blue-500: #3b82f6;
+  --ds-blue-600: #2563eb;
+  --ds-blue-700: #1d4ed8;
+  --ds-blue-800: #1e40af;
+  --ds-blue-900: #1e3a8a;
+
+  /* Semantic Colors */
+  --ds-success: #10b981;
+  --ds-success-bg: #d1fae5;
+  --ds-warning: #f59e0b;
+  --ds-warning-bg: #fef3c7;
+  --ds-danger: #ef4444;
+  --ds-danger-bg: #fee2e2;
+  --ds-info: var(--ds-blue-500);
+  --ds-info-bg: var(--ds-blue-50);
+
+  /* Typography - Inter for perfect readability */
+  --ds-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Font Sizes - Perfect Scale */
+  --ds-text-xs: 1.2rem;    /* 12px - Small labels */
+  --ds-text-sm: 1.1rem;   /* 14px - Body small */
+  --ds-text-base: 1.1rem;     /* 16px - Body text */
+  --ds-text-lg: 1.1rem;   /* 18px - Large body */
+  --ds-text-xl: 1.1rem;    /* 20px - Subheadings */
+  --ds-text-2xl: 1.1rem;    /* 24px - Section titles */
+  --ds-text-3xl: 1.5rem;  /* 30px - Page titles */
+  --ds-text-4xl: 2.25rem;   /* 36px - Hero numbers */
+
+  /* Spacing - 4px base */
+  --ds-space-1: 0.25rem;    /* 4px */
+  --ds-space-2: 0.5rem;     /* 8px */
+  --ds-space-3: 0.75rem;    /* 12px */
+  --ds-space-4: 1rem;       /* 16px */
+  --ds-space-5: 1.25rem;    /* 20px */
+  --ds-space-6: 1.5rem;     /* 24px */
+  --ds-space-8: 2rem;       /* 32px */
+  --ds-space-10: 2.5rem;    /* 40px */
+  --ds-space-12: 3rem;      /* 48px */
+
+  /* Borders */
+  --ds-radius-sm: 0.375rem;  /* 6px */
+  --ds-radius-md: 0.5rem;    /* 8px */
+  --ds-radius-lg: 0.75rem;   /* 12px */
+  --ds-radius-xl: 1rem;      /* 16px */
+
+  /* Shadows - Subtle and clean */
+  --ds-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --ds-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --ds-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --ds-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--ds-font-family);
+  background: var(--ds-gray-50);
+  color: var(--ds-gray-900);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.ds-root {
+  min-height: 100vh;
+  /* padding: var(--ds-space-6); */
+  /* max-width: 1600px; */
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .ds-root {
+    padding: var(--ds-space-8);
+  }
+}
+
+/* Header Section */
+.ds-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4);
+  margin-bottom: var(--ds-space-8);
+}
+
+.ds-header-left {
+  flex: 1;
+}
+
+.ds-greeting {
+  font-size: var(--ds-text-3xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-gray-900);
+  margin-bottom: var(--ds-space-1);
+}
+
+.ds-greeting-accent {
+  color: var(--ds-blue-600);
+  font-weight: 700;
+}
+
+.ds-date {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  color: var(--ds-gray-500);
+  font-size: var(--ds-text-sm);
+  font-weight: 500;
+}
+
+.ds-date i {
+  font-size: var(--ds-text-base);
+}
+
+.ds-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+}
+
+/* Buttons */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-2) var(--ds-space-4);
+  font-size: var(--ds-text-sm);
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--ds-radius-md);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  background: white;
+  color: var(--ds-gray-700);
+  border-color: var(--ds-gray-200);
+}
+
+.ds-btn:hover {
+  background: var(--ds-gray-50);
+  border-color: var(--ds-gray-300);
+}
+
+.ds-btn-primary {
+  background: var(--ds-blue-600);
+  color: white;
+  border-color: var(--ds-blue-600);
+}
+
+.ds-btn-primary:hover {
+  background: var(--ds-blue-700);
+  border-color: var(--ds-blue-700);
+}
+
+.ds-btn-sm {
+  padding: var(--ds-space-1) var(--ds-space-3);
+  font-size: var(--ds-text-xs);
+}
+
+.ds-btn i {
+  font-size: var(--ds-text-base);
+}
+
+.ds-btn-sm i {
+  font-size: var(--ds-text-sm);
+}
+
+/* Stats Grid */
+.ds-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--ds-space-4);
+  margin-bottom: var(--ds-space-6);
+}
+
+@media (max-width: 1200px) {
+  .ds-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .ds-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-stat-card {
+  background: white;
+  padding: var(--ds-space-5);
+  border-radius: var(--ds-radius-lg);
+  border: 1px solid var(--ds-gray-200);
+  transition: all 0.2s ease;
+}
+
+.ds-stat-card:hover {
+  border-color: var(--ds-blue-200);
+  box-shadow: var(--ds-shadow-md);
+}
+
+.ds-stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--ds-space-3);
+}
+
+.ds-stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ds-blue-50);
+  color: var(--ds-blue-600);
+  border-radius: var(--ds-radius-md);
+  font-size: var(--ds-text-xl);
+}
+
+.ds-stat-value {
+  font-size: var(--ds-text-3xl);
+  font-weight: 600;
+  color: var(--ds-gray-900);
+  line-height: 1.2;
+  margin-bottom: var(--ds-space-1);
+}
+
+.ds-stat-label {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-gray-500);
+  font-weight: 500;
+  margin-bottom: var(--ds-space-2);
+}
+
+.ds-stat-trend {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  color: var(--ds-gray-600);
+}
+
+.ds-stat-trend.up { color: var(--ds-success); }
+.ds-stat-trend.down { color: var(--ds-danger); }
+.ds-stat-trend i { font-size: var(--ds-text-sm); }
+
+/* Grid System */
+.ds-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ds-space-4);
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--ds-space-4);
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-grid-6-4 {
+  display: grid;
+  grid-template-columns: 6fr 4fr;
+  gap: var(--ds-space-4);
+  margin-bottom: var(--ds-space-4);
+}
+
+@media (max-width: 1100px) {
+  .ds-grid-2,
+  .ds-grid-3,
+  .ds-grid-6-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cards */
+.ds-card {
+  background: white;
+  border-radius: var(--ds-radius-lg);
+  border: 1px solid var(--ds-gray-200);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.ds-card-header {
+  padding: var(--ds-space-4) var(--ds-space-5);
+  border-bottom: 1px solid var(--ds-gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-card-title {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  font-size: var(--ds-text-base);
+  font-weight: 600;
+  color: var(--ds-gray-700);
+}
+
+.ds-card-title i {
+  color: var(--ds-blue-500);
+  font-size: var(--ds-text-lg);
+}
+
+.ds-card-body {
+  padding: var(--ds-space-5);
+}
+
+/* Progress */
+.ds-progress-item {
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-progress-item:last-child {
+  margin-bottom: 0;
+}
+
+.ds-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--ds-space-1);
+}
+
+.ds-progress-label {
+  font-size: var(--ds-text-sm);
+  font-weight: 500;
+  color: var(--ds-gray-700);
+}
+
+.ds-progress-sub {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-gray-400);
+  margin-left: var(--ds-space-1);
+}
+
+.ds-progress-value {
+  font-size: var(--ds-text-sm);
+  font-weight: 600;
+  color: var(--ds-gray-900);
+}
+
+.ds-progress-track {
+  height: 8px;
+  background: var(--ds-gray-100);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ds-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+  width: 0;
+}
+
+.ds-progress-fill.blue { background: var(--ds-blue-500); }
+.ds-progress-fill.green { background: var(--ds-success); }
+.ds-progress-fill.amber { background: var(--ds-warning); }
+.ds-progress-fill.red { background: var(--ds-danger); }
+
+/* Pipeline */
+.ds-pipeline {
+  display: flex;
+  gap: 2px;
+  height: 40px;
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-pipeline-seg {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  color: white;
+  border-radius: var(--ds-radius-sm);
+  transition: all 0.2s ease;
+}
+
+/* KPI Cells */
+.ds-kpi-row {
+  display: flex;
+  gap: var(--ds-space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-kpi-cell {
+  flex: 1;
+  min-width: 80px;
+  background: var(--ds-gray-50);
+  padding: var(--ds-space-3);
+  border-radius: var(--ds-radius-md);
+  border: 1px solid var(--ds-gray-200);
+}
+
+.ds-kpi-value {
+  font-size: var(--ds-text-xl);
+  font-weight: 600;
+  color: var(--ds-gray-900);
+  line-height: 1.2;
+}
+
+.ds-kpi-label {
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  color: var(--ds-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Mini Chart */
+.ds-mini-chart {
+  margin: var(--ds-space-4) 0;
+  padding-bottom: var(--ds-space-5);
+}
+
+.ds-chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ds-space-1);
+  height: 80px;
+}
+
+.ds-chart-bar {
+  flex: 1;
+  background: var(--ds-blue-200);
+  border-radius: var(--ds-radius-sm) var(--ds-radius-sm) 0 0;
+  transition: height 0.5s ease;
+  position: relative;
+  cursor: default;
+  height: 0;
+}
+
+.ds-chart-bar:hover {
+  background: var(--ds-blue-400);
+}
+
+.ds-chart-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  color: var(--ds-gray-400);
+  white-space: nowrap;
+}
+
+/* Donut */
+.ds-donut {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-5);
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-donut-svg {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.ds-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ds-donut-percent {
+  font-size: var(--ds-text-2xl);
+  font-weight: 600;
+  color: var(--ds-blue-600);
+  line-height: 1;
+}
+
+.ds-donut-label {
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  color: var(--ds-gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ds-donut-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+
+.ds-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  font-size: var(--ds-text-sm);
+}
+
+.ds-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.ds-legend-value {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--ds-gray-900);
+}
+
+/* Activity Feed */
+.ds-feed-item {
+  display: flex;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) 0;
+  border-bottom: 1px solid var(--ds-gray-200);
+}
+
+.ds-feed-item:last-child {
+  border-bottom: none;
+}
+
+.ds-feed-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ds-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--ds-text-lg);
+  flex-shrink: 0;
+}
+
+.ds-feed-icon.payment { background: var(--ds-success-bg); color: var(--ds-success); }
+.ds-feed-icon.document { background: var(--ds-blue-100); color: var(--ds-blue-600); }
+.ds-feed-icon.lead { background: var(--ds-warning-bg); color: var(--ds-warning); }
+.ds-feed-icon.alert { background: var(--ds-danger-bg); color: var(--ds-danger); }
+
+.ds-feed-content {
+  flex: 1;
+}
+
+.ds-feed-text {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-gray-700);
+  margin-bottom: var(--ds-space-1);
+}
+
+.ds-feed-text strong {
+  color: var(--ds-gray-900);
+  font-weight: 600;
+}
+
+.ds-feed-time {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-gray-400);
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+
+/* Notifications */
+.ds-notification {
+  display: flex;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) 0;
+  border-bottom: 1px solid var(--ds-gray-200);
+  position: relative;
+}
+
+.ds-notification.unread::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: var(--ds-blue-500);
+  border-radius: 0 2px 2px 0;
+}
+
+.ds-notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ds-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--ds-text-lg);
+  flex-shrink: 0;
+}
+
+.ds-notification-content {
+  flex: 1;
+}
+
+.ds-notification-title {
+  font-size: var(--ds-text-sm);
+  font-weight: 600;
+  color: var(--ds-gray-900);
+  margin-bottom: 2px;
+}
+
+.ds-notification-message {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-gray-600);
+  margin-bottom: var(--ds-space-1);
+}
+
+.ds-notification-time {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-gray-400);
+}
+
+.ds-unread-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--ds-blue-500);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: var(--ds-space-2);
+}
+
+/* Quick Actions Grid */
+.ds-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ds-space-2);
+}
+
+.ds-action-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-3);
+  background: var(--ds-gray-50);
+  border: 1px solid var(--ds-gray-200);
+  border-radius: var(--ds-radius-md);
+  font-size: var(--ds-text-sm);
+  font-weight: 500;
+  color: var(--ds-gray-700);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.ds-action-item:hover {
+  background: white;
+  border-color: var(--ds-blue-200);
+  color: var(--ds-blue-600);
+}
+
+.ds-action-item i {
+  font-size: var(--ds-text-lg);
+  color: var(--ds-blue-500);
+}
+
+/* Onboarding Cards */
+.ds-onboarding-card {
+  background: var(--ds-gray-50);
+  border: 1px solid var(--ds-gray-200);
+  border-radius: var(--ds-radius-lg);
+  padding: var(--ds-space-4);
+  margin-bottom: var(--ds-space-3);
+}
+
+.ds-onboarding-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--ds-space-2);
+}
+
+.ds-onboarding-name {
+  font-size: var(--ds-text-base);
+  font-weight: 600;
+  color: var(--ds-gray-900);
+}
+
+.ds-onboarding-code {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-gray-400);
+  font-weight: 500;
+}
+
+.ds-onboarding-percent {
+  font-size: var(--ds-text-base);
+  font-weight: 600;
+}
+
+.ds-onboarding-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-3);
+}
+
+.ds-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--ds-danger-bg);
+  color: var(--ds-danger);
+  border-radius: 999px;
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+}
+
+.ds-tag i {
+  font-size: var(--ds-text-xs);
+}
+
+/* Issues */
+.ds-issue-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) 0;
+  border-bottom: 1px solid var(--ds-gray-200);
+}
+
+.ds-issue-priority {
+  width: 4px;
+  height: 40px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.ds-issue-priority.urgent { background: var(--ds-danger); }
+.ds-issue-priority.high { background: var(--ds-warning); }
+.ds-issue-priority.medium { background: var(--ds-blue-500); }
+.ds-issue-priority.low { background: var(--ds-success); }
+
+.ds-issue-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ds-issue-subject {
+  font-size: var(--ds-text-sm);
+  font-weight: 600;
+  color: var(--ds-gray-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.ds-issue-meta {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-gray-400);
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+
+/* Badges */
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ds-badge.blue { background: var(--ds-blue-100); color: var(--ds-blue-700); }
+.ds-badge.green { background: var(--ds-success-bg); color: var(--ds-success); }
+.ds-badge.amber { background: var(--ds-warning-bg); color: var(--ds-warning); }
+.ds-badge.red { background: var(--ds-danger-bg); color: var(--ds-danger); }
+.ds-badge.gray { background: var(--ds-gray-100); color: var(--ds-gray-600); }
+
+.ds-badge.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Alert Banner */
+.ds-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  font-size: var(--ds-text-sm);
+  font-weight: 500;
+  margin-top: var(--ds-space-4);
+}
+
+.ds-alert.red {
+  background: var(--ds-danger-bg);
+  border-left: 4px solid var(--ds-danger);
+  color: var(--ds-danger);
+}
+
+.ds-alert.amber {
+  background: var(--ds-warning-bg);
+  border-left: 4px solid var(--ds-warning);
+  color: var(--ds-warning);
+}
+
+/* Section Label */
+.ds-section-label {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ds-gray-400);
+  margin-bottom: var(--ds-space-3);
+}
+
+.ds-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ds-gray-200);
+}
+
+/* Empty State */
+.ds-empty {
+  text-align: center;
+  padding: var(--ds-space-8);
+  color: var(--ds-gray-400);
+}
+
+.ds-empty i {
+  font-size: 40px;
+  margin-bottom: var(--ds-space-2);
+  opacity: 0.5;
+}
+
+.ds-empty p {
+  font-size: var(--ds-text-sm);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ds-root">
+
+  <!-- Header -->
+  <div class="ds-header">
+    <div class="ds-header-left">
+      <h1 class="ds-greeting">
+        Good {% now "G" as hour %}{% if hour|add:"0" < 12 %}morning{% elif hour|add:"0" < 17 %}afternoon{% else %}evening{% endif %},
+        <span class="ds-greeting-accent">{{ request.user.get_full_name|default:request.user.username }}</span>
+      </h1>
+      <div class="ds-date">
+        <i class="bi bi-calendar3"></i>
+        {% now "l, j F Y" %}
+        <span class="ds-dot"></span>
+        Bootcamp Operations
+      </div>
+    </div>
+    <div class="ds-header-actions">
+      <button class="ds-btn ds-btn-sm">
+        <i class="bi bi-download"></i>
+        Export
+      </button>
+      <button class="ds-btn ds-btn-primary ds-btn-sm">
+        <i class="bi bi-plus-lg"></i>
+        New Batch
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="ds-stats-grid">
+    <div class="ds-stat-card">
+      <div class="ds-stat-header">
+        <div class="ds-stat-icon">
+          <i class="bi bi-people-fill"></i>
+        </div>
+      </div>
+      <div class="ds-stat-value">{{ active_students|default:"0" }}</div>
+      <div class="ds-stat-label">Active Students</div>
+      <div class="ds-stat-trend up">
+        <i class="bi bi-arrow-up-short"></i>
+        {{ total_students|default:"0" }} total enrolled
+      </div>
+    </div>
+
+    <div class="ds-stat-card">
+      <div class="ds-stat-header">
+        <div class="ds-stat-icon" style="background: var(--ds-success-bg); color: var(--ds-success);">
+          <i class="bi bi-collection-fill"></i>
+        </div>
+      </div>
+      <div class="ds-stat-value">{{ active_batches|default:"0" }}</div>
+      <div class="ds-stat-label">Running Batches</div>
+      <div class="ds-stat-trend">
+        <i class="bi bi-check-circle-fill"></i>
+        {{ completing_soon|default:"All" }} on schedule
+      </div>
+    </div>
+
+    <div class="ds-stat-card">
+      <div class="ds-stat-header">
+        <div class="ds-stat-icon" style="background: var(--ds-warning-bg); color: var(--ds-warning);">
+          <i class="bi bi-currency-rupee"></i>
+        </div>
+      </div>
+      <div class="ds-stat-value">₹{{ revenue_this_month|default:"0"|floatformat:0|intcomma }}</div>
+      <div class="ds-stat-label">Monthly Revenue</div>
+      <div class="ds-stat-trend up">
+        <i class="bi bi-arrow-up-short"></i>
+        {{ revenue_change_pct|default:"0"|floatformat:1 }}% vs last month
+      </div>
+    </div>
+
+    <div class="ds-stat-card">
+      <div class="ds-stat-header">
+        <div class="ds-stat-icon" style="background: var(--ds-danger-bg); color: var(--ds-danger);">
+          <i class="bi bi-funnel-fill"></i>
+        </div>
+      </div>
+      <div class="ds-stat-value">{{ total_leads|default:"0" }}</div>
+      <div class="ds-stat-label">Total Leads</div>
+      <div class="ds-stat-trend">
+        <i class="bi bi-clock-fill"></i>
+        {{ followup_due|default:"0" }} need follow-up
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 1: Lead Pipeline + Batch Progress -->
+  <div class="ds-grid-2">
+    <!-- Lead Pipeline -->
+    <div class="ds-card">
+      <div class="ds-card-header">
+        <div class="ds-card-title">
+          <i class="bi bi-bar-chart-steps"></i>
+          Lead Pipeline
+        </div>
+        <button class="ds-btn ds-btn-sm">View all <i class="bi bi-arrow-right"></i></button>
+      </div>
+      <div class="ds-card-body">
+        {% if total_leads %}
+        <div class="ds-pipeline">
+          {% if new_leads %}
+          <div class="ds-pipeline-seg" style="background: var(--ds-blue-400); flex: {{ new_leads }};">
+            {% if new_leads > 2 %}{{ new_leads }}{% endif %}
+          </div>
+          {% endif %}
+          {% if assigned_leads %}
+          <div class="ds-pipeline-seg" style="background: var(--ds-blue-600); flex: {{ assigned_leads }};">
+            {% if assigned_leads > 2 %}{{ assigned_leads }}{% endif %}
+          </div>
+          {% endif %}
+          {% if converted_leads %}
+          <div class="ds-pipeline-seg" style="background: var(--ds-success); flex: {{ converted_leads }};">
+            {% if converted_leads > 2 %}{{ converted_leads }}{% endif %}
+          </div>
+          {% endif %}
+          {% if idle_leads %}
+          <div class="ds-pipeline-seg" style="background: var(--ds-warning); flex: {{ idle_leads }};">
+            {% if idle_leads > 2 %}{{ idle_leads }}{% endif %}
+          </div>
+          {% endif %}
+          {% if dropped_leads %}
+          <div class="ds-pipeline-seg" style="background: var(--ds-danger); flex: {{ dropped_leads }};">
+            {% if dropped_leads > 2 %}{{ dropped_leads }}{% endif %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="ds-kpi-row">
+          <div class="ds-kpi-cell">
+            <div class="ds-kpi-value">{{ new_leads }}</div>
+            <div class="ds-kpi-label">New</div>
+          </div>
+          <div class="ds-kpi-cell">
+            <div class="ds-kpi-value">{{ assigned_leads }}</div>
+            <div class="ds-kpi-label">Assigned</div>
+          </div>
+          <div class="ds-kpi-cell">
+            <div class="ds-kpi-value" style="color: var(--ds-success);">{{ converted_leads }}</div>
+            <div class="ds-kpi-label">Converted</div>
+          </div>
+          <div class="ds-kpi-cell">
+            <div class="ds-kpi-value" style="color: var(--ds-warning);">{{ idle_leads }}</div>
+            <div class="ds-kpi-label">Idle</div>
+          </div>
+          <div class="ds-kpi-cell">
+            <div class="ds-kpi-value" style="color: var(--ds-danger);">{{ dropped_leads }}</div>
+            <div class="ds-kpi-label">Dropped</div>
+          </div>
+        </div>
+
+        <div class="ds-progress-item">
+          <div class="ds-progress-header">
+            <span class="ds-progress-label">Conversion Rate</span>
+            <span class="ds-progress-value" style="color: var(--ds-success);">{{ conversion_rate|default:"0" }}%</span>
+          </div>
+          <div class="ds-progress-track">
+            <div class="ds-progress-fill green" data-width="{{ conversion_rate|default:'0' }}"></div>
+          </div>
+        </div>
+        {% else %}
+        <div class="ds-empty">
+          <i class="bi bi-funnel"></i>
+          <p>No leads yet</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Batch Progress -->
+    <div class="ds-card">
+      <div class="ds-card-header">
+        <div class="ds-card-title">
+          <i class="bi bi-layers-fill"></i>
+          Batch Progress
+        </div>
+        <button class="ds-btn ds-btn-sm">View all <i class="bi bi-arrow-right"></i></button>
+      </div>
+      <div class="ds-card-body">
+        {% if batches_with_progress %}
+          {% for item in batches_with_progress %}
+          <div class="ds-progress-item">
+            <div class="ds-progress-header">
+              <div>
+                <span class="ds-progress-label">{{ item.batch.name }}</span>
+                <span class="ds-progress-sub">{{ item.batch.course.name|truncatechars:20 }}</span>
+              </div>
+              <span class="ds-progress-value">{{ item.progress }}%</span>
+            </div>
+            <div class="ds-progress-track">
+              <div class="ds-progress-fill {% if item.progress >= 80 %}green{% elif item.progress >= 50 %}blue{% else %}amber{% endif %}" 
+                   data-width="{{ item.progress }}"></div>
+            </div>
+            {% if item.trainer %}
+            <div class="ds-progress-sub" style="margin-top: 2px;">
+              <i class="bi bi-person"></i> {{ item.trainer.full_name }}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="ds-empty">
+          <i class="bi bi-collection"></i>
+          <p>No active batches</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Fee Collection + Attendance + Quick Actions -->
+  <div class="ds-grid-3">
+    <!-- Fee Collection -->
+    <div class="ds-card">
+      <div class="ds-card-header">
+        <div class="ds-card-title">
+          <i class="bi bi-credit-card-2-front-fill"></i>
+          Fee Collection
+        </div>
+        <span class="ds-badge gray">This month</span>
+      </div>
+      <div class="ds-card-body">
+        <div class="ds-donut">
+          <div class="ds-donut-svg">
+            <svg width="120" height="120" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--ds-gray-200)" stroke-width="3.5"/>
+              <circle cx="18" cy="18" r="15.9" fill="none"
+                      stroke="var(--ds-blue-500)" stroke-width="3.5"
+                      stroke-dasharray="{{ fee_collected_pct|default:'0' }} 100"
+                      stroke-dashoffset="25"
+                      stroke-linecap="round"/>
+            </svg>
+            <div class="ds-donut-center">
+              <div class="ds-donut-percent">{{ fee_collected_pct|default:"0" }}%</div>
+              <div class="ds-donut-label">Collected</div>
+            </div>
+          </div>
+          <div class="ds-donut-legend">
+            <div class="ds-legend-item">
+              <div class="ds-legend-color" style="background: var(--ds-blue-500);"></div>
+              Collected
+              <span class="ds-legend-value">₹{{ fee_collected|default:"0"|floatformat:0|intcomma }}</span>
+            </div>
+            <div class="ds-legend-item">
+              <div class="ds-legend-color" style="background: var(--ds-gray-200);"></div>
+              Pending
+              <span class="ds-legend-value" style="color: var(--ds-danger);">₹{{ fee_pending|default:"0"|floatformat:0|intcomma }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ds-section-label">Breakdown</div>
+        
+        <div class="ds-progress-item">
+          <div class="ds-progress-header">
+            <span class="ds-progress-label"><i class="bi bi-bookmark-fill" style="color: var(--ds-blue-400);"></i> Booking Fee</span>
+            <span class="ds-progress-value">₹{{ booking_amt|default:"0"|floatformat:0|intcomma }}</span>
+          </div>
+        </div>
+        
+        <div class="ds-progress-item">
+          <div class="ds-progress-header">
+            <span class="ds-progress-label"><i class="bi bi-check-circle-fill" style="color: var(--ds-success);"></i> Full Payment</span>
+            <span class="ds-progress-value">₹{{ full_pay_amt|default:"0"|floatformat:0|intcomma }}</span>
+          </div>
+        </div>
+        
+        <div class="ds-progress-item">
+          <div class="ds-progress-header">
+            <span class="ds-progress-label"><i class="bi bi-calendar2-week-fill" style="color: var(--ds-warning);"></i> EMI / Installments</span>
+            <span class="ds-progress-value">₹{{ emi_amt|default:"0"|floatformat:0|intcomma }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance -->
+    <div class="ds-card">
+      <div class="ds-card-header">
+        <div class="ds-card-title">
+          <i class="bi bi-person-check-fill"></i>
+          Attendance
+        </div>
+        <span class="ds-badge green pulse">Live</span>
+      </div>
+      <div class="ds-card-body">
+        <div style="text-align: center; margin-bottom: var(--ds-space-4);">
+          <div style="font-size: var(--ds-text-4xl); font-weight: 600; color: var(--ds-blue-600);">
+            {{ overall_avg|default:"0" }}%
+          </div>
+          <div style="font-size: var(--ds-text-sm); color: var(--ds-gray-400);">Monthly Average</div>
+        </div>
+
+        <div class="ds-mini-chart">
+          <div class="ds-chart-bars">
+            {% for day in attendance_week %}
+            <div class="ds-chart-bar" 
+                 data-height="{% if day.pct == 0 %}8{% else %}{{ day.pct }}{% endif %}"
+                 title="{{ day.day }}: {{ day.pct }}%">
+              <div class="ds-chart-label">{{ day.day|first }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="ds-progress-item">
+          <div class="ds-progress-header">
+            <span class="ds-progress-label">
+              <i class="bi bi-calendar-day"></i> Today
+            </span>
+            <span class="ds-progress-value" style="color: {% if today_attendance_pct >= 75 %}var(--ds-success){% elif today_attendance_pct >= 50 %}var(--ds-blue-600){% else %}var(--ds-danger){% endif %};">
+              {{ today_attendance_pct|default:"0" }}%
+            </span>
+          </div>
+          <div class="ds-progress-track">
+            <div class="ds-progress-fill {% if today_attendance_pct >= 75 %}green{% elif today_attendance_pct >= 50 %}blue{% else %}red{% endif %}"
+                 data-width="{{ today_attendance_pct|default:'0' }}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="ds-card">
+      <div class="ds-card-header">
+        <div class="ds-card-title">
+          <i class="bi bi-lightning-charge-fill"></i>
+          Quick Actions
+        </div>
+      </div>
+      <div class="ds-card-body">
+        <div class="ds-actions-grid">
+          <button class="ds-action-item"><i class="bi bi-collection-fill"></i> New Batch</button>
+          <button class="ds-action-item"><i class="bi bi-journal-bookmark-fill"></i> New Course</button>
+          <button class="ds-action-item"><i class="bi bi-person-plus-fill"></i> Add Lead</button>
+          <button class="ds-action-item"><i class="bi bi-mortarboard-fill"></i> Enroll</button>
+          <button class="ds-action-item"><i class="bi bi-person-badge-fill"></i> Add Trainer</button>
+          <button class="ds-action-item"><i class="bi bi-person-gear"></i> Add User</button>
+          <button class="ds-action-item"><i class="bi bi-receipt"></i> Record Fee</button>
+          <button class="ds-action-item"><i class="bi bi-clipboard2-check-fill"></i> Schedule Exam</button>
+        </div>
+
+        {% if urgent_issues %}
+        <div class="ds-alert red">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          {{ urgent_issues }} urgent issue{{ urgent_issues|pluralize }} pending
+          <button class="ds-btn ds-btn-sm" style="margin-left: auto;">View</button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Activity Feed + Onboarding -->
+  <div class="ds-grid-6-4">
+    <!-- Activity Feed -->
+    <div class="ds-card">
+      <div class="ds-card-header">
+        <div class="ds-card-title">
+          <i class="bi bi-bell-fill"></i>
+          Activity & Notifications
+        </div>
+        {% if unread_notif_count %}
+        <span class="ds-badge red">{{ unread_notif_count }} unread</span>
+        {% else %}
+        <span class="ds-badge green">All caught up</span>
+        {% endif %}
+      </div>
+      <div class="ds-card-body">
+        {% if activity_feed %}
+        <div class="ds-section-label">Recent Events</div>
+        <div class="ds-feed-list">
+          {% for item in activity_feed %}
+          <div class="ds-feed-item">
+            <div class="ds-feed-icon {{ item.type }}">
+              {% if item.type == 'payment' %}<i class="bi bi-credit-card-fill"></i>
+              {% elif item.type == 'document' %}<i class="bi bi-file-earmark-check-fill"></i>
+              {% elif item.type == 'lead' %}<i class="bi bi-person-raised-hand"></i>
+              {% else %}<i class="bi bi-bell-fill"></i>{% endif %}
+            </div>
+            <div class="ds-feed-content">
+              <div class="ds-feed-text">{{ item.text|safe }}</div>
+              <div class="ds-feed-time">
+                <i class="bi bi-clock"></i> {{ item.time_ago }}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if recent_notifications %}
+        <div class="ds-section-label" style="margin-top: var(--ds-space-4);">Notifications</div>
+        <div class="ds-feed-list">
+          {% for notif in recent_notifications|slice:":5" %}
+          <div class="ds-notification {% if not notif.is_read %}unread{% endif %}">
+            <div class="ds-notification-icon 
+              {% if 'payment' in notif.notification_type %}payment
+              {% elif 'issue' in notif.notification_type %}alert
+              {% elif 'lead' in notif.notification_type %}lead
+              {% else %}document{% endif %}">
+              {% if 'payment' in notif.notification_type %}<i class="bi bi-currency-rupee"></i>
+              {% elif 'issue' in notif.notification_type %}<i class="bi bi-exclamation-circle-fill"></i>
+              {% elif 'lead' in notif.notification_type %}<i class="bi bi-person-raised-hand"></i>
+              {% else %}<i class="bi bi-file-earmark-fill"></i>{% endif %}
+            </div>
+            <div class="ds-notification-content">
+              <div class="ds-notification-title">{{ notif.title }}</div>
+              <div class="ds-notification-message">{{ notif.message|truncatechars:60 }}</div>
+              <div class="ds-notification-time">{{ notif.created_at|timesince }} ago</div>
+            </div>
+            {% if not notif.is_read %}
+            <div class="ds-unread-dot"></div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Onboarding -->
+    <div class="ds-card">
+      <div class="ds-card-header">
+        <div class="ds-card-title">
+          <i class="bi bi-clipboard2-pulse-fill"></i>
+          Onboarding
+        </div>
+        <button class="ds-btn ds-btn-sm">View all <i class="bi bi-arrow-right"></i></button>
+      </div>
+      <div class="ds-card-body">
+        <div class="ds-kpi-row">
+          <div class="ds-kpi-cell">
+            <div class="ds-kpi-value" style="color: var(--ds-warning);">{{ pending_onboarding|length }}</div>
+            <div class="ds-kpi-label">Pending</div>
+          </div>
+          <div class="ds-kpi-cell">
+            <div class="ds-kpi-value" style="color: var(--ds-success);">{{ completed_onboarding_month|default:"0" }}</div>
+            <div class="ds-kpi-label">This Month</div>
+          </div>
+        </div>
+
+        {% if pending_onboarding %}
+        <div class="ds-section-label">Awaiting Completion</div>
+        {% for ob in pending_onboarding|slice:":3" %}
+        <div class="ds-onboarding-card">
+          <div class="ds-onboarding-header">
+            <div>
+              <div class="ds-onboarding-name">{{ ob.student.full_name|default:ob.student.user.get_full_name }}</div>
+              <div class="ds-onboarding-code">
+                {{ ob.student.admin_profile.student_code|default:"—" }}
+              </div>
+            </div>
+            <div class="ds-onboarding-percent" style="color: {% if ob.completion_percentage >= 75 %}var(--ds-success){% elif ob.completion_percentage >= 40 %}var(--ds-warning){% else %}var(--ds-danger){% endif %};">
+              {{ ob.completion_percentage|floatformat:0 }}%
+            </div>
+          </div>
+          <div class="ds-progress-track">
+            <div class="ds-progress-fill {% if ob.completion_percentage >= 75 %}green{% elif ob.completion_percentage >= 40 %}amber{% else %}red{% endif %}"
+                 data-width="{{ ob.completion_percentage|floatformat:0 }}"></div>
+          </div>
+          <div class="ds-onboarding-tags">
+            {% if not ob.documents_uploaded %}<span class="ds-tag"><i class="bi bi-file-earmark-x"></i> Docs</span>{% endif %}
+            {% if not ob.booking_fee_paid %}<span class="ds-tag"><i class="bi bi-credit-card"></i> Fee</span>{% endif %}
+            {% if not ob.id_card_generated %}<span class="ds-tag"><i class="bi bi-person-vcard"></i> ID</span>{% endif %}
+            {% if not ob.lms_access_created %}<span class="ds-tag"><i class="bi bi-display"></i> LMS</span>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="ds-empty">
+          <i class="bi bi-emoji-smile"></i>
+          <p>All students fully onboarded!</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: Open Issues -->
+  {% if open_issues %}
+  <div class="ds-card">
+    <div class="ds-card-header">
+      <div class="ds-card-title">
+        <i class="bi bi-exclamation-triangle-fill" style="color: var(--ds-warning);"></i>
+        Open Issues
+        {% if urgent_issues %}
+        <span class="ds-badge red">{{ urgent_issues }} urgent</span>
+        {% endif %}
+      </div>
+      <button class="ds-btn ds-btn-sm">View all <i class="bi bi-arrow-right"></i></button>
+    </div>
+    <div class="ds-card-body" style="padding-top: 0;">
+      {% for issue in open_issues|slice:":5" %}
+      <div class="ds-issue-row">
+        <div class="ds-issue-priority {{ issue.priority }}"></div>
+        <div class="ds-issue-content">
+          <div class="ds-issue-subject">{{ issue.subject|truncatechars:50 }}</div>
+          <div class="ds-issue-meta">
+            <i class="bi bi-person"></i> {{ issue.student.full_name }}
+            <i class="bi bi-tag" style="margin-left: 8px;"></i> {{ issue.get_issue_type_display }}
+            <i class="bi bi-clock" style="margin-left: 8px;"></i> {{ issue.created_at|timesince }} ago
+          </div>
+        </div>
+        <span class="ds-badge {% if issue.priority == 'urgent' %}red{% elif issue.priority == 'high' %}amber{% elif issue.priority == 'medium' %}blue{% else %}gray{% endif %}">
+          {{ issue.get_priority_display }}
+        </span>
+        <span class="ds-badge {% if issue.status == 'open' %}red{% else %}blue{% endif %}">
+          {{ issue.get_status_display }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Animate progress bars
+  document.querySelectorAll('.ds-progress-fill[data-width]').forEach(el => {
+    const width = el.getAttribute('data-width');
+    setTimeout(() => {
+      el.style.width = width + '%';
+    }, 200);
+  });
+
+  // Animate chart bars
+  document.querySelectorAll('.ds-chart-bar[data-height]').forEach((bar, index) => {
+    const height = bar.getAttribute('data-height');
+    setTimeout(() => {
+      bar.style.height = height + '%';
+    }, 300 + (index * 50));
+  });
+});
+</script>
+{% endblock %}

@@ -1,87 +1,96 @@
-/* ✅ PAGE BACKGROUND */
+
+/* ================= PAGE BACKGROUND ================= */
+
 .evaluation-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #c084fc, #93c5fd);
-    display: flex;
-    justify-content: center;
+    background: white;
+
     padding: 40px 20px;
-}
 
-/* ✅ MAIN CONTAINER (Glass Effect) */
-.evaluation-container {
-    width: 100%;
     max-width: 1100px;
-    background: rgba(255, 255, 255, 0.35);
-    backdrop-filter: blur(14px);
-    border-radius: 26px;
-    padding: 35px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    margin: auto;
 }
 
-/* ✅ HEADER */
+/* ================= HEADER ================= */
+
 .student-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
-/* ✅ STUDENT INFO */
+/* ================= STUDENT INFO ================= */
+
 .student-info {
     display: flex;
-    align-items: center;
-    gap: 15px;
+    flex-direction: column;
+    gap: 2px;
 }
 
-.student-avatar {
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid white;
-}
+/* ✅ NAME */
 
 .student-info h2 {
     margin: 0;
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 700;
+    color: #111;
 }
 
-.student-info p {
-    margin: 2px 0 0;
+/* ✅ EMAIL */
+
+.student-info h4 {
+    margin: 0;
     font-size: 13px;
-    color: #555;
+    color: #6b7280;
 }
 
-/* ✅ BATCH PILL */
+/* ✅ Accent Line */
+
+.student-info h2::after {
+    content: "";
+    display: block;
+    width: 32px;
+    height: 3px;
+    
+    border-radius: 10px;
+    margin-top: 6px;
+}
+
+/* ================= BATCH PILL ================= */
+
 .batch-pill {
     background: white;
     padding: 8px 18px;
     border-radius: 30px;
     font-size: 13px;
     font-weight: 500;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+
+    border: 1px solid #e5e7eb;   /* ✅ BORDER */
 }
 
-/* ✅ SUMMARY SECTION */
+/* ================= SUMMARY ================= */
+
 .summary-section {
     display: flex;
     gap: 15px;
     margin-bottom: 25px;
 }
 
-/* ✅ SUMMARY CARDS */
 .summary-card {
     flex: 1;
-    background: rgba(255, 255, 255, 0.75);
+    background: white;
     padding: 18px;
     border-radius: 18px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    transition: 0.2s ease;
+
+    border: 1px solid #e5e7eb;   /* ✅ BORDER */
+
+    transition: 0.25s ease;
 }
 
 .summary-card:hover {
     transform: translateY(-2px);
+    border-color: #d1d5db;       /* ✅ Subtle hover */
 }
 
 .summary-card p {
@@ -94,30 +103,35 @@
     margin: 5px 0 0;
     font-size: 22px;
     font-weight: 600;
+    color: #111;
 }
 
-/* ✅ TITLE */
+/* ================= SECTION TITLE ================= */
+
 .section-title {
     margin-bottom: 15px;
     font-size: 18px;
     font-weight: 600;
+    color: #111;
 }
 
-/* ✅ TABLE WRAPPER */
+/* ================= TABLE WRAPPER ================= */
+
 .table-wrapper {
-    background: rgba(255, 255, 255, 0.65);
+    background: white;
     border-radius: 18px;
     padding: 10px;
-    overflow-x: auto;
+
+    border: 1px solid #e5e7eb;   /* ✅ BORDER */
 }
 
-/* ✅ TABLE */
+/* ================= TABLE ================= */
+
 .evaluation-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-/* ✅ TABLE HEADER */
 .evaluation-table th {
     padding: 12px;
     font-size: 13px;
@@ -126,48 +140,58 @@
     font-weight: 600;
 }
 
-/* ✅ TABLE CELLS */
 .evaluation-table td {
     padding: 14px 12px;
     font-size: 14px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid #f1f5f9;
+    color: #333;
 }
 
-/* ✅ ROW HOVER EFFECT */
+/* ================= ROW HOVER ================= */
+
 .evaluation-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.4);
+    background: #f8fafc;
 }
 
-/* ✅ STATUS BADGES */
+/* ================= STATUS BADGES ================= */
+
 .status-badge {
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
+
+    border: 1px solid transparent;   /* ✅ CLEAN EDGE */
 }
 
-/* ✅ STATUS COLORS */
+/* ✅ Soft Premium Status Colors */
+
 .status-completed {
     background: #dcfce7;
-    color: #16a34a;
+    color: #166534;
+    border-color: #bbf7d0;
 }
 
 .status-pending {
     background: #fef3c7;
-    color: #d97706;
+    color: #92400e;
+    border-color: #fde68a;
 }
 
 .status-submitted {
     background: #dbeafe;
-    color: #2563eb;
+    color: #1e3a8a;
+    border-color: #bfdbfe;
 }
 
 .status-evaluated {
     background: #e0e7ff;
-    color: #4f46e5;
+    color: #4338ca;
+    border-color: #c7d2fe;
 }
 
-/* ✅ VIEW BUTTON */
+/* ================= VIEW BUTTON ================= */
+
 .view-btn {
     text-decoration: none;
     background: white;
@@ -175,16 +199,20 @@
     border-radius: 12px;
     font-size: 13px;
     color: #333;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+
+    border: 1px solid #e5e7eb;   /* ✅ BORDER */
+
     transition: 0.2s ease;
     display: inline-block;
 }
 
 .view-btn:hover {
-    transform: translateY(-1px);
+    background: #f8fafc;
+    border-color: #d1d5db;
 }
 
-/* ✅ EMPTY STATE */
+/* ================= EMPTY STATE ================= */
+
 .empty-row {
     text-align: center;
     padding: 25px;
@@ -192,7 +220,8 @@
     font-size: 14px;
 }
 
-/* ✅ MOBILE RESPONSIVE 🔥 */
+/* ================= RESPONSIVE ================= */
+
 @media (max-width: 768px) {
 
     .student-header {
@@ -203,11 +232,6 @@
 
     .summary-section {
         flex-direction: column;
-    }
-
-    .student-avatar {
-        width: 50px;
-        height: 50px;
     }
 
     .student-info h2 {

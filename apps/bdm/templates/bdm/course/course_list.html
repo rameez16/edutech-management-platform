@@ -29,7 +29,7 @@
     background: var(--bg);
     color: var(--text-primary);
     min-height: 100vh;
-    max-width: 1180px;
+    /*max-width: 1180px;*/
     margin: 0 auto;
     padding: 40px 24px 80px;
   }
@@ -92,6 +92,44 @@
     border-radius: 50%;
     background: var(--success);
     box-shadow: 0 0 5px rgba(22,163,74,0.5);
+  }
+
+  /* ── Create Course Button ── */
+  .btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb 0%, #4a90d9 100%);
+    border: none;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    letter-spacing: 0.1px;
+  }
+
+  .btn-create i {
+    font-size: 12px;
+    background: rgba(255,255,255,0.25);
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(37,99,235,0.42);
+    filter: brightness(1.06);
+  }
+
+  .btn-create:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(37,99,235,0.3);
   }
 
   /* ── Divider ── */
@@ -174,7 +212,6 @@
     color: var(--accent);
   }
 
-  /* ── Light Blue Arrow Button ── */
   .card-arrow {
     display: flex; align-items: center; justify-content: center;
     gap: 5px;
@@ -277,7 +314,6 @@
 
   .fee-btn i { font-size: 11px; }
 
-  /* ── View Details Button ── */
   .view-btn {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 7px 14px;
@@ -341,6 +377,272 @@
   }
 
   .empty-state p { font-size: 13px; color: var(--text-secondary); opacity: 0.7; }
+
+  /* ───────── MODAL ───────── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(74,144,217,0.12);
+    transform: translateY(16px) scale(0.98);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .modal-overlay.active .modal-container {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  /* Modal Header — fixed */
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    background: #fff;
+  }
+
+  .modal-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-header-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--accent-light);
+    border: 1px solid var(--accent-mid);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    color: var(--accent-dark);
+    flex-shrink: 0;
+  }
+
+  .modal-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+
+  .modal-subtitle {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    margin-top: 1px;
+  }
+
+  .modal-close {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+    flex-shrink: 0;
+  }
+
+  .modal-close:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #dc2626;
+  }
+
+  /* Modal Body — scrollable */
+  .modal-body {
+    padding: 18px 22px;
+    overflow-y: auto;
+    flex: 1;
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-mid) transparent;
+  }
+
+  .modal-body::-webkit-scrollbar { width: 5px; }
+  .modal-body::-webkit-scrollbar-track { background: transparent; }
+  .modal-body::-webkit-scrollbar-thumb { background: var(--accent-mid); border-radius: 99px; }
+
+  /* Modal Footer — fixed */
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    background: #fafcff;
+  }
+
+  /* ── Form Grid ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .full-width { grid-column: 1 / -1; }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+
+
+  .form-input {
+    padding: 8px 11px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-primary);
+    background: var(--bg);
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    outline: none;
+    resize: vertical;
+  }
+
+  .form-input:focus {
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(74,144,217,0.12);
+  }
+
+  .form-input::placeholder { color: #b0bec5; }
+
+  textarea.form-input {
+    min-height: 72px;
+    resize: vertical;
+  }
+
+  /* Checkbox */
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+    padding: 9px 11px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    transition: border-color 0.18s, background 0.18s;
+    user-select: none;
+  }
+
+  .checkbox-label:hover {
+    border-color: var(--accent-mid);
+    background: var(--accent-light);
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 15px; height: 15px;
+    accent-color: var(--accent-dark);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ── Footer Buttons ── */
+  .btn-cancel {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+  }
+
+  .btn-cancel:hover {
+    background: var(--bg);
+    border-color: var(--accent-mid);
+    color: var(--text-primary);
+  }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #2563eb 0%, #4a90d9 100%);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(37,99,235,0.3);
+    transition: filter 0.18s, box-shadow 0.18s, transform 0.15s;
+  }
+
+  .btn-submit:hover {
+    filter: brightness(1.07);
+    box-shadow: 0 5px 16px rgba(37,99,235,0.38);
+    transform: translateY(-1px);
+  }
+
+  .btn-submit i { font-size: 11px; }
+
+  /* Section divider inside form */
+  .form-section-label {
+    grid-column: 1 / -1;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--accent);
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+    margin-top: 4px;
+  }
 </style>
 
 <div class="course-wrapper">
@@ -362,18 +664,20 @@
       {{ courses|length }} course{{ courses|length|pluralize }} available
     </div>
     {% endif %}
+
+    <button class="btn-create" id="createCourseBtn">
+      <i class="fas fa-plus"></i>
+      Create Course
+    </button>
   </div>
 
   <div class="divider"></div>
 
   <!-- Grid -->
   <div class="course-grid">
-
     {% if courses %}
       {% for course in courses %}
       <a href="{% url 'bdm:course_detail' course.id %}" class="course-card">
-
-        <!-- Icon + arrow button -->
         <div class="card-icon-row">
           <div class="card-icon-wrap">
             <i class="fas fa-graduation-cap"></i>
@@ -383,15 +687,11 @@
           </div>
         </div>
 
-        <!-- Title + desc -->
         <div>
           <div class="card-title">{{ course.name }}</div>
-          <div class="card-desc">
-            {{ course.description|default:"No description available." }}
-          </div>
+          <div class="card-desc">{{ course.description|default:"No description available." }}</div>
         </div>
 
-        <!-- Meta -->
         <div class="card-meta">
           <div class="meta-pill">
             <i class="fas fa-clock"></i>
@@ -399,7 +699,6 @@
           </div>
         </div>
 
-        <!-- Tech badges -->
         {% if course.tech_stack_list %}
         <div class="badge-row" id="badges-{{ forloop.counter }}">
           {% for tech in course.tech_stack_list %}
@@ -417,7 +716,6 @@
         </div>
         {% endif %}
 
-        <!-- Footer -->
         <div class="card-footer">
           <div class="fee-btn">
             <i class="fas fa-indian-rupee-sign"></i>
@@ -427,21 +725,109 @@
             View Details <i class="fas fa-chevron-right"></i>
           </span>
         </div>
-
       </a>
       {% endfor %}
 
     {% else %}
       <div class="empty-state">
-        <div class="empty-icon">
-          <i class="fas fa-book-open"></i>
-        </div>
+        <div class="empty-icon"><i class="fas fa-book-open"></i></div>
         <h3>No Courses Yet</h3>
         <p>Courses will appear here once they're added.</p>
       </div>
     {% endif %}
-
   </div>
+
+
+  <!-- ── Create Course Modal ── -->
+  <div class="modal-overlay" id="createCourseModal">
+    <div class="modal-container">
+
+      <!-- Header (sticky) -->
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-header-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div>
+            <div class="modal-title">Create New Course</div>
+            <div class="modal-subtitle">Fill in the details below</div>
+          </div>
+        </div>
+        <button class="modal-close" id="closeCourseModal" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Body (scrollable) -->
+      <div class="modal-body">
+        <form method="post" action="{% url 'bdm:course_create' %}" id="createCourseForm">
+          {% csrf_token %}
+          <div class="form-grid">
+
+            <div class="form-section-label">Basic Info</div>
+
+            <!-- Course Name -->
+            <div class="form-group full-width">
+              <label class="form-label">Course Name</label>
+              <input type="text" name="name" class="form-input" placeholder="e.g., Full-Stack Web Development" required>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-input" placeholder="Brief overview of the course..."></textarea>
+            </div>
+
+            <div class="form-section-label">Details</div>
+
+            <!-- Duration -->
+            <div class="form-group">
+              <label class="form-label">Duration</label>
+              <input type="text" name="duration" class="form-input" placeholder="e.g., 6 months" required>
+            </div>
+
+            <!-- Course Fee -->
+            <div class="form-group">
+              <label class="form-label">Course Fee (₹)</label>
+              <input type="number" name="course_fee" class="form-input" placeholder="e.g., 25000" step="0.01" required>
+            </div>
+
+            <!-- Tech Stack -->
+            <div class="form-group full-width">
+              <label class="form-label">Tech Stack</label>
+              <input type="text" name="tech_stack" class="form-input"
+                     placeholder="Python, Django, React, PostgreSQL" required>
+            </div>
+
+            <!-- Syllabus -->
+            <div class="form-group full-width">
+              <label class="form-label">Syllabus</label>
+              <textarea name="syllabus" class="form-input" placeholder="Module-wise syllabus breakdown..."></textarea>
+            </div>
+
+            <!-- Is Active -->
+            <div class="form-group full-width" style="margin-top:2px;">
+              <label class="checkbox-label">
+                <input type="checkbox" name="is_active" checked>
+                <span>Set course as <strong>Active</strong> immediately</span>
+              </label>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer (sticky) -->
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" id="cancelCourseBtn">Cancel</button>
+        <button type="submit" form="createCourseForm" class="btn-submit">
+          <i class="fas fa-plus"></i> Create Course
+        </button>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -450,10 +836,28 @@
     const hiddenBadges = row.querySelectorAll(".badge-hidden");
     const moreBtn = row.querySelector(".badge-more");
     const isHidden = hiddenBadges[0].style.display === "none" || hiddenBadges[0].style.display === "";
-
     hiddenBadges.forEach(b => b.style.display = isHidden ? "inline-flex" : "none");
     moreBtn.textContent = isHidden ? "Show less" : "+" + (total - 4) + " more";
   }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const createBtn = document.getElementById('createCourseBtn');
+    const modal = document.getElementById('createCourseModal');
+    const closeBtn = document.getElementById('closeCourseModal');
+    const cancelBtn = document.getElementById('cancelCourseBtn');
+
+    createBtn.addEventListener('click', () => modal.classList.add('active'));
+    closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+    cancelBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') modal.classList.remove('active');
+    });
+  });
 </script>
 
 {% endblock %}

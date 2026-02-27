@@ -3,7 +3,7 @@
 
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'student/css/attendance.css' %}?v=5">
+<link rel="stylesheet" href="{% static 'student/css/attendance.css' %}?v=7">
 
 <div class="page-center">
 
@@ -19,24 +19,24 @@
         <div class="student-info-card">
 
             <div class="student-info-item">
-                <label>Student ID</label>
+                <label>Student ID:</label>
                 <span>{{ student.id }}</span>
             </div>
 
             <div class="student-info-item">
-                <label>Name</label>
+                <label>Name:</label>
                 <span>
                     {{ student.full_name|default:student.user.get_full_name|default:student.user.username }}
                 </span>
             </div>
 
             <div class="student-info-item">
-                <label>Email</label>
+                <label>Email:</label>
                 <span>{{ student.user.email }}</span>
             </div>
 
             <div class="student-info-item">
-                <label>Batch</label>
+                <label>Batch:</label>
                 <span>{{ batch.name|default:"Not Assigned" }}</span>
             </div>
 
@@ -45,22 +45,22 @@
         <!-- SUMMARY -->
         <div class="summary-grid">
 
-            <div class="summary-card gradient-main">
+            <div class="summary-card">
                 <h3>{{ percentage }}%</h3>
                 <p>Overall</p>
             </div>
 
-            <div class="summary-card gradient-present">
+            <div class="summary-card">
                 <h3>{{ present_days }}</h3>
                 <p>Present</p>
             </div>
 
-            <div class="summary-card gradient-absent">
+            <div class="summary-card">
                 <h3>{{ absent_days }}</h3>
                 <p>Absent</p>
             </div>
 
-            <div class="summary-card gradient-excused">
+            <div class="summary-card">
                 <h3>{{ excused_days }}</h3>
                 <p>Excused</p>
             </div>
@@ -112,6 +112,7 @@
                         </td>
 
                         <td>
+                            <!-- ✅ STATUS COLOUR ACTIVATION -->
                             <span class="badge {{ record.status }}">
                                 {{ record.status|title }}
                             </span>
@@ -126,7 +127,7 @@
                     {% empty %}
                     <tr>
                         <td colspan="5" class="empty-state">
-                            No attendance records yet 😎
+                            No attendance records yet
                         </td>
                     </tr>
                     {% endfor %}

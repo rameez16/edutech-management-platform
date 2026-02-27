@@ -1,0 +1,176 @@
+/* ================= PAGE ================= */
+
+.notifications-page {
+    max-width: 950px;
+    margin: auto;
+    padding: 35px 20px;
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 30px;
+    font-weight: 700;
+    color: #222;
+}
+
+/* ================= CARD ================= */
+
+.notification-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.25s ease;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.notification-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.08);
+}
+
+/* ================= UNREAD STYLE ================= */
+
+.notification-card.unread {
+    border-left: 5px solid #5b5bff;
+    background: rgba(248, 249, 255, 0.95);
+}
+
+/* ================= ICON ================= */
+
+.notification-icon {
+    font-size: 24px;
+    margin-right: 16px;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: #f3f4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================= CONTENT ================= */
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-header h4 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 600;
+    color: #222;
+}
+
+.time {
+    font-size: 15px;
+    color: #888;
+}
+
+.notification-content p {
+    margin: 6px 0 4px;
+    font-size: 16px;
+    color: #555;
+}
+
+.view-details {
+    font-size: 15px;
+    font-weight: 600;
+    color: #5b5bff;
+}
+
+/* ================= NEW BADGE ================= */
+
+.new-badge {
+    background: linear-gradient(135deg, #5b5bff, #7a7aff);
+    color: white;
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+/* ================= EMPTY STATE ================= */
+
+.empty-state {
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+    text-align: center;
+    font-weight: 600;
+    color: #666;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* ================= PAGINATION ================= */
+
+.pagination {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.page-btn {
+    display: inline-block;
+    padding: 9px 16px;
+    margin: 5px;
+    background: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #5b5bff;
+    font-weight: 600;
+    border: 1px solid #eee;
+    transition: 0.2s ease;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.04);
+}
+
+.page-btn:hover {
+    background: #5b5bff;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.page-info {
+    display: inline-block;
+    margin: 0 12px;
+    font-weight: 600;
+    color: #444;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+
+    .notification-card {
+        padding: 16px;
+    }
+
+    .notification-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .time {
+        margin-top: 4px;
+    }
+
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+}

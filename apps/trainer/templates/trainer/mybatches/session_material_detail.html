@@ -1,0 +1,142 @@
+{% extends "trainer/mybatches/base.html" %}
+{% load static %}
+
+{% block tab_content %}
+
+<div class="material-details-wrapper">
+    <div class="material-details-card">
+
+        <!-- Header -->
+        <div class="material-details-header">
+        <h4 class="material-details-title material-title-with-back">
+
+            <a href="{% url 'trainer:add-session-material' material.lesson_session.id %}"
+            class="material-back-link">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    width="20"
+                    height="20">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </a>
+
+            {{ material.title }}
+
+        </h4>
+
+        <p class="material-details-session-info">
+            Batch: {{ material.lesson_session.batch.name }} |
+            Session {{ material.lesson_session.lesson_plan.session_number }}
+        </p>
+
+    </div>
+
+        <!-- Body -->
+        <div class="material-details-body">
+
+            <div class="material-details-grid">
+
+                <div class="material-details-row">
+                    <span class="material-details-label">Material Type</span>
+                    <span class="material-details-value">
+                        {{ material.get_material_type_display }}
+                    </span>
+                </div>
+
+                {% if material.description %}
+                <div class="material-details-row">
+                    <span class="material-details-label">Description</span>
+                    <span class="material-details-value">
+                        {{ material.description }}
+                    </span>
+                </div>
+                {% endif %}
+
+                {% if material.external_link %}
+                <div class="material-details-row">
+                    <span class="material-details-label">External Link</span>
+                    <span class="material-details-value">
+                        <a href="{{ material.external_link }}" target="_blank">
+                            {{ material.external_link }}
+                        </a>
+                    </span>
+                </div>
+                {% endif %}
+
+                {% if material.duration_minutes %}
+                <div class="material-details-row">
+                    <span class="material-details-label">Duration</span>
+                    <span class="material-details-value">
+                        {{ material.duration_minutes }} minutes
+                    </span>
+                </div>
+                {% endif %}
+
+                {% if material.video_platform %}
+                <div class="material-details-row">
+                    <span class="material-details-label">Video Platform</span>
+                    <span class="material-details-value">
+                        {{ material.video_platform }}
+                    </span>
+                </div>
+                {% endif %}
+
+                <div class="material-details-row">
+                    <span class="material-details-label">Mandatory</span>
+                    <span class="material-details-value">
+                        {% if material.is_mandatory %}
+                            <span class="material-details-badge material-details-badge-yes">
+                                Yes
+                            </span>
+                        {% else %}
+                            <span class="material-details-badge material-details-badge-no">
+                                No
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="material-details-row">
+                    <span class="material-details-label">Visibility</span>
+                    <span class="material-details-value">
+                        {% if material.is_public %}
+                            <span class="material-details-badge material-details-badge-yes">
+                                Public
+                            </span>
+                        {% else %}
+                            <span class="material-details-badge material-details-badge-no">
+                                Private
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            {% if material.file %}
+            <div class="material-details-file-section">
+
+                <div class="material-details-file-info">
+                    <span class="material-details-file-label">File</span>
+                </div>
+
+                <div class="material-details-file-actions">
+                    <a href="{{ material.file.url }}"
+                    target="_blank"
+                    class="material-btn-primary">
+                        Open File
+                    </a>
+                </div>
+
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

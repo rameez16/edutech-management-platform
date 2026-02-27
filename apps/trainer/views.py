@@ -1,12 +1,15 @@
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
+from django.db.models import Max
+from decimal import Decimal
 
-from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm,TrainerIssueResolveForm
+from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm,TrainerIssueResolveForm,AnnouncementForm
 
-from apps.bdm.models import Trainer, Batch, Student, StudentIssue
-from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission
+from apps.bdm.models import Trainer, Batch, Student, StudentIssue, Announcement
+from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission, SessionMaterial
 from apps.student.models import StudentFeedback, LeaveApplication
 
 
@@ -15,8 +18,186 @@ from apps.student.models import StudentFeedback, LeaveApplication
 # dashboard
 def dashboard(request):
     """Dashboard view"""
+    
+    trainer = request.user.trainer
+    
+    
+    #upcoming planned sections
+    # Get last 4 planned sessions for this trainer
+    planned_sessions = (
+        LessonSession.objects
+        .filter(
+            trainer=trainer,
+            status=LessonSession.SessionStatus.PLANNED
+        )
+        .select_related("batch", "lesson_plan")
+        .order_by("-planned_date")[:4]
+    )
+    
+    # Newly assigned batches - e.g.,
+    newly_assigned_batches = (
+        Batch.objects
+        .filter(trainers=trainer, is_active=True)
+        .order_by('-start_date')[:4]  # latest 4 batches
+    )
+    
+    
+    # attendance summary
+    # All completed sessions by this trainer
+    completed_sessions = LessonSession.objects.filter(
+        trainer=trainer,
+        status=LessonSession.SessionStatus.COMPLETED
+    )
+
+    classes_conducted = completed_sessions.count()
+
+    # Sessions where attendance is already marked
+    marked_session_ids = Attendance.objects.filter(
+        lesson_session__trainer=trainer
+    ).values_list("lesson_session_id", flat=True).distinct()
+
+    # Sessions where attendance is NOT marked
+    pending_sessions = completed_sessions.exclude(
+        id__in=marked_session_ids
+    ).order_by("actual_date")
+
+    pending_attendance = pending_sessions.count()
+
+    # First pending session (for redirect button)
+    first_pending_session = pending_sessions.first()
+
+    # Last attendance update date
+    last_updated = Attendance.objects.filter(
+        lesson_session__trainer=trainer
+    ).aggregate(last=Max("date"))["last"]
+    
+    completed_attendance = classes_conducted - pending_attendance
+    
+    # todays schedule
+    today = timezone.now().date()
+    today_sessions = (
+    LessonSession.objects
+    .filter(
+        trainer=trainer,
+        planned_date=today  # or actual_date if you use that
+    )
+    .select_related("batch", "lesson_plan")
+    .order_by("planned_date")[:4]
+    )
+    
+    # batch progress 
+    
+    active_batches = Batch.objects.filter(
+    trainers=trainer,
+    is_active=True
+)
+
+    active_batches_count = active_batches.count()
+
+    total_students = Student.objects.filter(
+        batches__in=active_batches
+    ).distinct().count()
+    total_sessions_count = LessonSession.objects.filter(
+        trainer=trainer
+    ).count()
+
+    completed_sessions_count = LessonSession.objects.filter(
+        trainer=trainer,
+        status=LessonSession.SessionStatus.COMPLETED
+    ).count()
+
+    if total_sessions_count > 0:
+        progress_percentage = round((completed_sessions_count / total_sessions_count) * 100)
+    else:
+        progress_percentage = 0
+        
+    # Class Uploads
+    # Completed sessions (queryset)
+    completed_sessions_qs = LessonSession.objects.filter(
+        trainer=trainer,
+        status=LessonSession.SessionStatus.COMPLETED
+    )
+
+    # Sessions that have at least one material uploaded
+    uploaded_session_ids = SessionMaterial.objects.filter(
+        lesson_session__trainer=trainer
+    ).values_list("lesson_session_id", flat=True).distinct()
+
+    uploaded_sessions_count = completed_sessions_qs.filter(
+        id__in=uploaded_session_ids
+    ).count()
+
+    # Completed but no material uploaded
+    pending_uploads_count = completed_sessions_qs.exclude(
+        id__in=uploaded_session_ids
+    ).count()
+    
+    pending_upload_sessions = completed_sessions_qs.exclude(
+    id__in=uploaded_session_ids
+    ).order_by('-completed_at')
+
+    last_pending_upload_session = pending_upload_sessions.first()
+        
+    #notification
+    # attendance
+    # completed_sessions,marked_session_ids
+    
+    attendance_pending_count = completed_sessions.exclude(
+        id__in=marked_session_ids
+    ).count()
+    # upload materials
+    uploaded_session_ids = SessionMaterial.objects.filter(
+    lesson_session__trainer=trainer
+    ).values_list("lesson_session_id", flat=True)
+
+    material_pending_count = completed_sessions.exclude(
+        id__in=uploaded_session_ids
+    ).count()
+    
+    # student evaluation task
+    
+    pending_evaluations_count = TaskSubmission.objects.filter(
+        task__lesson_session__trainer=trainer,
+        status=TaskSubmission.SubmissionStatus.SUBMITTED
+    ).count()
+            
+    
+    # announcements
+    announcement_notifications = Announcement.objects.filter(
+    created_by__is_staff=True,
+    audience__in=['trainers', 'both']
+    ).order_by('-publish_date')[:4]
+
+    announcement_count = announcement_notifications.count()
+    
     context = {
         'page_title': 'Dashboard',
+        "planned_sessions": planned_sessions,
+        "newly_assigned_batches": newly_assigned_batches,
+        
+        "classes_conducted": classes_conducted,
+        "pending_attendance": pending_attendance,
+        "last_updated": last_updated,
+        "first_pending_session": first_pending_session,
+        "completed_attendance": completed_attendance,
+        
+        "today_sessions": today_sessions,
+        
+        "active_batches_count": active_batches_count,
+        "total_students": total_students,
+        "progress_percentage": progress_percentage,
+        
+        
+        "attendance_pending_count": attendance_pending_count,
+        "material_pending_count": material_pending_count,
+        "pending_evaluations_count": pending_evaluations_count,
+        
+        "uploaded_sessions_count": uploaded_sessions_count,
+        "pending_uploads_count": pending_uploads_count,
+        "last_pending_upload_session": last_pending_upload_session,
+        
+        "announcement_notifications": announcement_notifications,
+        "announcement_count": announcement_count,
     }
     return render(request, 'trainer/dashboard/overview.html', context)
 
@@ -68,7 +249,7 @@ def my_batches(request):
         Batch.objects
         .filter(trainers=trainer, is_active=True)
         .select_related("course")
-        .prefetch_related("students")
+        .prefetch_related("students","lesson_sessions")
         .order_by("-start_date")
     )
 
@@ -76,16 +257,14 @@ def my_batches(request):
     batch_list = []
 
     for batch in batches:
-        total_days = (batch.expected_finish_date - batch.start_date).days
-        completed_days = max((today - batch.start_date).days, 0)
+        
+        progress_data = LessonSession.get_batch_progress(batch)
+        
 
         progress = 0
-        if total_days > 0:
-            progress = min(round((completed_days / total_days) * 100), 100)
-            
-        if progress >= 100:
+        if progress_data["progress_percentage"] >= 100:
             status = "Completed"
-        elif today < batch.start_date:
+        elif progress_data["completed"] == 0:
             status = "Upcoming"
         else:
             status = "Ongoing"
@@ -97,9 +276,9 @@ def my_batches(request):
             "start_date": batch.start_date,
             "end_date": batch.expected_finish_date,
             "duration": f"{batch.duration_months} Months",
-            "classes_completed": completed_days,
+            "classes_completed": progress_data["completed"],
+            "progress": progress_data["progress_percentage"],
             "total_students": batch.students.count(),
-            "progress": progress,
             "status": status,
         })
 
@@ -280,6 +459,12 @@ def attendance_session_list(request, batch_id):
         status=LessonSession.SessionStatus.COMPLETED
     ).select_related("lesson_plan").order_by("-completed_at")
     # ).select_related("lesson_plan").order_by("-lesson_plan__session_number","-planned_date")
+    
+     # Attach attendance status manually
+    for session in sessions:
+        session.attendance_marked = Attendance.objects.filter(
+            lesson_session=session
+        ).exists()
 
     return render(request, "trainer/attendance/session_list.html", {
         "batch": batch,
@@ -601,35 +786,153 @@ def task_submissions(request):
         "active_tab": "submissions"
     })
   
-@login_required  
+
+@login_required
 def evaluate_submission(request, submission_id):
-    submission = get_object_or_404(TaskSubmission, id=submission_id)
+    trainer = getattr(request.user, "trainer", None)
+
+    submission = get_object_or_404(
+        TaskSubmission,
+        id=submission_id,
+        task__created_by=trainer,
+        task__batch__in=trainer.batches.all()
+    )
 
     if request.method == "POST":
         action = request.POST.get("action")
-
         if action == "evaluate":
-            marks = request.POST.get("marks")
-            feedback = request.POST.get("feedback")
+            marks_input = request.POST.get("marks")
+            feedback = request.POST.get("feedback", "").strip()
 
+            try:
+                marks = Decimal(marks_input)
+            except (TypeError, ValueError):
+                messages.error(request, "Invalid marks value.")
+                return redirect("trainer:task-evaluate", submission_id=submission.id)
+
+            if marks > submission.task.total_marks:
+                messages.error(request, "Marks cannot exceed total marks.")
+                return redirect("trainer:task-evaluate", submission_id=submission.id)
+
+            # Update submission
             submission.marks_obtained = marks
             submission.feedback = feedback
+            submission.evaluator = trainer
+            submission.evaluated_at = timezone.now()
             submission.status = TaskSubmission.SubmissionStatus.EVALUATED
             submission.needs_revision = False
+            submission.revision_count += 1
+            submission.is_pass = marks >= submission.task.passing_marks
+
             submission.save()
 
+            messages.success(request, "Submission evaluated successfully.")
+            return redirect("trainer:task-submissions")
+        
         elif action == "resubmit":
-            feedback = request.POST.get("feedback")
-            submission.request_resubmission(feedback)
+            feedback = request.POST.get("feedback", "").strip()
 
-        return redirect("trainer:task-submissions")
+            submission.status = TaskSubmission.SubmissionStatus.RESUBMIT
+            submission.needs_revision = True
+            submission.feedback = feedback
+            submission.revision_count += 1
+            submission.save()
+
+            messages.warning(request, "Resubmission requested.")
+            return redirect("trainer:task-submissions")
 
     return render(request, "trainer/tasks/evaluate.html", {
         "submission": submission,
         "active_tab": "submissions"
     })
     
+
+@login_required
+def task_view(request, task_id):
+    trainer = request.user.trainer
+
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        created_by=trainer,
+        batch__in=trainer.batches.all()
+    )
+
+    stats = task.get_completion_stats()
+
+    return render(request, "trainer/tasks/view.html", {
+        "task": task,
+        "stats": stats,
+        "active_tab": "list"
+    })
     
+@login_required
+def task_edit(request, task_id):
+    trainer = request.user.trainer
+
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        created_by=trainer,
+        batch__in=trainer.batches.all()
+    )
+
+    if request.method == "POST":
+        form = TaskForm(request.POST, request.FILES, instance=task)
+        form.fields["lesson_session"].queryset = LessonSession.objects.filter(
+            trainer=trainer,
+            batch__in=trainer.batches.all(),
+            status=LessonSession.SessionStatus.COMPLETED
+        )
+
+        if form.is_valid():
+            
+            if not form.has_changed():
+                messages.info(request, "No changes were made.")
+                return redirect("trainer:task-list")
+            
+            edited_task = form.save(commit=False)
+            edited_task.batch = edited_task.lesson_session.batch
+            edited_task.save()
+            messages.success(request, "Task updated successfully.")
+            return redirect("trainer:task-list")
+    else:
+        form = TaskForm(instance=task)
+        form.fields["lesson_session"].queryset = LessonSession.objects.filter(
+            trainer=trainer,
+            batch__in=trainer.batches.all(),
+            status=LessonSession.SessionStatus.COMPLETED
+        )
+
+    return render(request, "trainer/tasks/create.html", {
+        "form": form,
+        "active_tab": "list",
+        "is_edit": True
+    })
+    
+
+@login_required
+@require_POST
+def task_delete(request, task_id):
+    trainer = request.user.trainer
+
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        created_by=trainer,
+        batch__in=trainer.batches.all()
+    )
+
+    if request.method == "POST":
+        if task.submissions.exists():
+            messages.error(request, "Cannot delete task with submissions.")
+            return redirect("trainer:task-list")
+
+        task.delete()
+        messages.success(request, "Task deleted successfully.")
+        return redirect("trainer:task-list")
+
+    return redirect("trainer:task-list")
 # my batches - lessonsessions    
 @login_required
 def batch_lesson_sessions(request, batch_id):
@@ -737,6 +1040,55 @@ def add_session_material(request, session_id):
         'active_tab': 'lesson_sessions',
     })
     
+@login_required
+def session_material_detail(request, material_id):
+    material = get_object_or_404(SessionMaterial, id=material_id)
+    
+    session = material.lesson_session
+    batch = session.batch
+
+    return render(request, 'trainer/mybatches/session_material_detail.html', {
+        'material': material,
+        'session': session,
+        'batch': batch,
+        'active_tab': 'lesson_sessions',
+    })
+    
+@login_required
+def edit_session_material(request, material_id):
+    material = get_object_or_404(SessionMaterial, id=material_id)
+
+    session = material.lesson_session
+    batch = session.batch
+
+    if material.uploaded_by != request.user.trainer:
+        messages.error(request, "You are not allowed to edit this material.")
+        return redirect('trainer:batch-overview', batch_id=batch.id)
+
+    if request.method == "POST":
+        form = SessionMaterialForm(request.POST, request.FILES, instance=material)
+
+        if form.is_valid():
+
+            # ✅ CHECK IF CHANGED
+            if not form.has_changed():
+                messages.info(request, "No changes were made.")
+                return redirect('trainer:edit-session-material', material_id=material.id)
+
+            form.save()
+            messages.success(request, "Material updated successfully.")
+            return redirect('trainer:session-material-detail', material_id=material.id)
+
+    else:
+        form = SessionMaterialForm(instance=material)
+
+    return render(request, 'trainer/mybatches/edit_session_material.html', {
+        'form': form,
+        'material': material,
+        'session': session,
+        'batch': batch,
+        'active_tab': 'lesson_sessions',
+    })
 # // student lssue 
 
 @login_required
@@ -782,3 +1134,148 @@ def trainer_issue_detail_view(request, pk):
         'issue': issue,
         'form': form
     })
+    
+# announcements
+
+@login_required
+def all_announcements(request):
+    trainer = request.user
+
+    selected_audience = request.GET.get('audience', '')
+    selected_publish_date = request.GET.get('publish_date', '')
+    selected_created_by = request.GET.get('created_by', '')
+
+    # Trainer announcements (apply filters)
+    trainer_announcements = Announcement.objects.filter(
+        created_by=trainer,
+        audience='students'
+    )
+
+    # Admin/BDM announcements
+    admin_announcements = Announcement.objects.filter(
+        created_by__is_staff=True,
+        audience__in=['trainers', 'both']
+    )
+
+    # Apply filters individually
+    if selected_audience:
+        trainer_announcements = trainer_announcements.filter(audience=selected_audience)
+        admin_announcements = admin_announcements.filter(audience=selected_audience)
+
+    if selected_publish_date:
+        trainer_announcements = trainer_announcements.filter(publish_date__date=selected_publish_date)
+        admin_announcements = admin_announcements.filter(publish_date__date=selected_publish_date)
+
+    if selected_created_by:
+        if selected_created_by == 'trainer':
+            admin_announcements = admin_announcements.none()  # remove admin if filtering trainer
+        elif selected_created_by == 'bdm':
+            trainer_announcements = trainer_announcements.none()  # remove trainer if filtering BDM
+
+    # Combine final querysets
+    announcements = trainer_announcements.union(admin_announcements).order_by('-publish_date')
+
+    return render(request, "trainer/announcements/list.html", {
+        "announcements": announcements,
+        "active_tab": "announcements",
+        "selected_audience": selected_audience,
+        "selected_publish_date": selected_publish_date,
+        "selected_created_by": selected_created_by,
+    })
+    
+@login_required
+def create_announcement(request):
+    """Trainer can create an announcement for students"""
+    if request.method == "POST":
+        form = AnnouncementForm(request.POST)
+        if form.is_valid():
+            announcement = form.save(commit=False)
+            announcement.created_by = request.user
+            announcement.audience = 'students'  # fixed audience
+            announcement.save()
+            messages.success(request, "Announcement created successfully!")
+            return redirect('trainer:all_announcements')
+    else:
+        form = AnnouncementForm()
+
+    return render(request, "trainer/announcements/create.html", {
+        "form": form,
+    })
+    
+@login_required
+def view_announcement(request, announcement_id):
+    """
+    View an announcement.
+    Trainers can view their own announcements and announcements created by BDM/admin.
+    """
+    trainer = request.user
+
+    # Fetch announcement by ID only
+    announcement = get_object_or_404(Announcement, id=announcement_id)
+
+    # Permission check: trainer can view if they created it OR it was created by staff/admin
+    if announcement.created_by != trainer and not announcement.created_by.is_staff:
+        messages.error(request, "You do not have permission to view this announcement.")
+        return redirect('trainer:all_announcements')
+
+    return render(request, "trainer/announcements/view.html", {
+        "announcement": announcement,
+    })
+
+
+@login_required
+def edit_announcement(request, announcement_id):
+    """
+    Edit an announcement.
+    Trainers can only edit their own announcements (not BDM/admin announcements).
+    """
+    trainer = request.user
+
+    # Only allow editing of announcements created by this trainer
+    announcement = get_object_or_404(
+        Announcement,
+        id=announcement_id,
+        created_by=trainer,
+        audience='students'
+    )
+
+    if request.method == "POST":
+        form = AnnouncementForm(request.POST, instance=announcement)
+        if form.is_valid():
+
+            # Check if any changes were made
+            if not form.has_changed():
+                messages.warning(request, "No changes were made.")
+                return redirect('trainer:edit_announcement', announcement_id=announcement.id)
+
+            updated = form.save(commit=False)
+            updated.audience = 'students'
+            updated.save()
+            messages.success(request, "Announcement updated successfully!")
+            return redirect('trainer:all_announcements')
+    else:
+        form = AnnouncementForm(instance=announcement)
+
+    return render(request, "trainer/announcements/edit.html", {
+        "form": form,
+        "announcement": announcement,
+    })
+@login_required
+@require_POST
+def delete_announcement(request, announcement_id):
+    """
+    Delete an announcement.
+    Trainers can only delete their own announcements.
+    """
+    trainer = request.user
+
+    announcement = get_object_or_404(
+        Announcement,
+        id=announcement_id,
+        created_by=trainer,
+        audience='students'
+    )
+
+    announcement.delete()
+    messages.success(request, "Announcement deleted successfully.")
+    return redirect('trainer:all_announcements')
