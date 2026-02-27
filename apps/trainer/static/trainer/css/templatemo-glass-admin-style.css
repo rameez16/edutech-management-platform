@@ -3879,7 +3879,7 @@ details[open] .module-summary {
 .btn-reject,
 .btn-reapprove {
     font-size: 12px;
-    padding: 4px 10px;
+    padding: 4px 15px;
     min-width: 80px;
     height: 30px;
     border-radius: 5px;
@@ -4010,76 +4010,177 @@ textarea.form-control {
         font-size: 11px;
     }
 }
+/* //  */
+/* =====================================
+   LEAVE DETAIL PAGE
+===================================== */
 
-/* ===============================
-   LEAVE Sections in Detail 
-=============================== */
-
-
-.leave-section {
-    margin-bottom: 18px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+.leave-detail-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.leave-section:last-child {
-    border-bottom: none;
-}
-
-.section-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: #1e3a8a;
-    margin-bottom: 6px;
-}
-
-.actions {
-    margin-top: 12px;
-}
-
-/* Empty Row */
-.empty-row {
-    text-align: center;
-    padding: 20px;
-    color: #6b7280;
-}
-
-
-.leave-section.actions form {
-    display: inline-block;
-    margin: 0 8px 4px 0; 
-}
-
-.leave-section.actions textarea.form-control {
-    width: 100%;
-    margin-bottom: 4px; 
-}
-
-.leave-title {
-    display: flex;                 
-    align-items: center;           
-    justify-content: flex-start;   
-    gap: 8px;                      
-    font-size: 22px;
-    font-weight: 600;
-    color: #1e3a8a;
-    margin-bottom: 16px;
-    text-align: left;              
-}
-
-/* back button */
-.leave-title .back-btn {
+.leave-detail-back {
     display: inline-flex;
     align-items: center;
     text-decoration: none;
     color: inherit;
 }
 
-.leave-title .back-btn svg {
-    width: 20px;
-    height: 20px;
+/* Grid */
+.leave-detail-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 1rem;
 }
 
+.leave-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .leave-detail-row {
+    background: #f8fafc;
+}
+
+/* Label & Value */
+.leave-detail-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.leave-detail-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+/* Status Badge */
+.leave-detail-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.leave-detail-badge.pending {
+    background: var(--warning);
+    color: #000000;
+}
+
+.leave-detail-badge.approved {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.leave-detail-badge.rejected {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+/* Reason Box */
+.leave-detail-reason {
+    margin-top: 1.5rem;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .leave-detail-reason {
+    background: #f1f5f9;
+}
+/* =====================================
+   LEAVE DETAIL IMPROVED ACTIONS
+===================================== */
+
+/* Document Link */
+.leave-detail-doc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    color: #ffff;
+    background-color: var(--primary) ;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.leave-detail-doc-link:hover {
+    text-decoration: underline;
+}
+/* =====================================
+   LEAVE DETAIL BUTTON ALIGNMENT
+===================================== */
+
+.leave-detail-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+/* Button Row (Right Aligned) */
+.leave-detail-btn-row {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Buttons Base */
+.leave-detail-btn {
+    padding: 9px 22px;
+    border-radius: 30px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    min-width: 120px;
+    transition: all 0.25s ease;
+}
+
+/* Approve */
+.leave-detail-btn.approve {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+}
+
+/* Reject */
+.leave-detail-btn.reject {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+/* Review */
+.leave-detail-btn.review {
+    background: linear-gradient(135deg, var(--primary), #1e40af);
+    color: white;
+}
+
+/* Hover Effect */
+.leave-detail-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+}
+
+
+.reject-form textarea {
+    width: 100%;
+    padding: 6px 10px;        /* reduced padding */
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    resize: none;
+    font-size: 0.85rem;       /* slightly smaller text */
+    line-height: 1.3;
+}
 
 /* ==========================================
    TASK MODULE – HEADER & TABS
@@ -4253,7 +4354,7 @@ textarea.form-control {
 }
 
 .task-table td {
-    padding: 12px 16px;
+    padding: 12px 12px;
     border-bottom: 1px solid var(--glass-border);
     font-weight: 500;
 }
@@ -4406,7 +4507,22 @@ textarea.form-control {
 .task-btn-edit:hover {
     background-color: #e0a800;
 }
+/* Delete Button */
+.task-btn-delete {
+    background-color: #dc3545;  /* Bootstrap danger red */
+    color: #fff;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
 
+.task-btn-delete:hover {
+    background-color: #c82333;  /* Darker red on hover */
+}
 /* ======================
    TASK PROFESSIONAL FORM
 ========================= */
@@ -5410,7 +5526,180 @@ input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] 
 .existing-materials li:last-child {
     border-bottom: none;
 }
+/* ==========================================
+   MATERIAL LIST ITEM ALIGNMENT
+========================================== */
 
+.material-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.material-item:last-child {
+    border-bottom: none;
+}
+
+.material-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.material-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* View Button */
+.material-btn-view {
+    background: var(--primary);
+    color: #ffffff;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.material-btn-view:hover {
+    background: #1d4ed8;
+}
+
+/* Edit Button */
+.material-btn-edit {
+    background: var(--success);
+    color: #ffffff;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.material-btn-edit:hover {
+    background: #059669;
+}
+
+/* //  */
+
+/* ==========================================
+   MATERIAL DETAILS VIEW PAGE
+========================================== */
+
+.material-details-wrapper {
+    max-width: 880px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+.material-details-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.material-details-body {
+    margin-top: 15px;
+}
+
+.material-details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.material-details-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.material-details-row:last-child {
+    border-bottom: none;
+}
+
+.material-details-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.material-details-value {
+    font-size: 0.85rem;
+    color: #4b5563;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+/* Badges */
+.material-details-badge {
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.material-details-badge-yes {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.material-details-badge-no {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* File Section */
+.material-details-file-section {
+    margin-top: 20px;
+}
+.material-details-file-section {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.material-details-file-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+}
+/* Title + Back alignment */
+.material-title-with-back {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Back button styling */
+.material-back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+.material-back-link:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
 /* ==========================================
    RESPONSIVE
 ========================================== */
@@ -6109,4 +6398,768 @@ input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] 
 .trainer-notification-card .trainer-dashboard-list li strong {
     font-size: 14px;     
     font-weight: 600;
+}
+/* ==========================================
+   ANNOUNCEMENTS TABLE
+============================================= */
+
+.announcement-table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.announcement-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.announcement-table thead {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.announcement-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.announcement-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 500;
+}
+
+.announcement-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: background 0.3s ease;
+}
+
+/* ==========================================
+   FILTER FORM
+============================================= */
+
+.announcement-filter-form {
+    margin-bottom: 1rem;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.announcement-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+}
+
+.announcement-filter-row select,
+.announcement-filter-row input[type="date"] {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    min-width: 130px;
+    height: 32px;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.announcement-filter-row select:focus,
+.announcement-filter-row input[type="date"]:focus {
+    outline: none;
+    border-color: var(--info);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.announcement-filter-buttons {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.announcement-filter-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: none;
+    background: var(--info);
+    color: var(--bg-dark);
+    font-weight: 600;
+    cursor: pointer;
+    height: 32px;
+    font-size: 0.85rem;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.announcement-filter-btn:hover {
+    background: var(--info-hover);
+    transform: translateY(-1px);
+}
+
+.announcement-filter-btn.reset {
+    background: var(--danger);
+}
+
+.announcement-filter-btn.reset:hover {
+    background: var(--danger-hover);
+}
+
+/* ==========================================
+   ANNOUNCEMENT ACTION BUTTONS
+============================================= */
+
+.announcement-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.announcement-actions a {
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.announcement-btn-view {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.announcement-btn-view:hover {
+    background-color: #138496;
+}
+
+.announcement-btn-edit {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.announcement-btn-edit:hover {
+    background-color: #e0a800;
+}
+
+.btn-announcement-create {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: #4CAF50;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.btn-announcement-create:hover {
+    background-color: #45a049;
+}
+
+/* ==========================================
+   ANNOUNCEMENTS PAGE
+============================================= */
+
+
+/* ========================
+   HEADER
+============================ */
+.announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.announcement-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Create button */
+.btn-announcement-create {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: #4CAF50;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.btn-announcement-create:hover {
+    background-color: #45a049;
+}
+
+/* ==========================================
+   FILTER FORM
+============================================= */
+.announcement-filter-form {
+    margin-bottom: 1rem;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.announcement-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+}
+
+.announcement-filter-row select,
+.announcement-filter-row input[type="date"] {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    min-width: 130px;
+    height: 32px;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.announcement-filter-row select:focus,
+.announcement-filter-row input[type="date"]:focus {
+    outline: none;
+    border-color: var(--info);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.announcement-filter-buttons {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.announcement-filter-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: none;
+    background: var(--info);
+    color: var(--bg-dark);
+    font-weight: 600;
+    cursor: pointer;
+    height: 32px;
+    font-size: 0.85rem;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.announcement-filter-btn:hover {
+    background: var(--info-hover);
+    transform: translateY(-1px);
+}
+
+.announcement-filter-btn.reset {
+    background: var(--danger);
+}
+
+.announcement-filter-btn.reset:hover {
+    background: var(--danger-hover);
+}
+
+/* ==========================================
+   ANNOUNCEMENT TABLE
+============================================= */
+.announcement-table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.announcement-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.announcement-table thead {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.announcement-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.announcement-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 500;
+}
+
+.announcement-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: background 0.3s ease;
+}
+
+/* ==========================================
+   AUDIENCE BADGES
+============================================= */
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 10px;
+    color: #fff;
+    text-align: center;
+}
+
+.badge-student {
+    background-color: #0d6efd; /* blue */
+}
+
+.badge-trainer {
+    background-color: #fd7e14; /* orange */
+}
+
+.badge-both {
+    background-color: #6c757d; /* gray */
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
+/* ==========================================
+   ACTION BUTTONS
+============================================= */
+.announcement-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.announcement-actions a {
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.announcement-btn-view {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.announcement-btn-view:hover {
+    background-color: #138496;
+}
+
+.announcement-btn-edit {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.announcement-btn-edit:hover {
+    background-color: #e0a800;
+}
+
+/* ======================
+   ANNOUNCEMENT PROFESSIONAL FORM
+========================= */
+
+.announcement-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.announcement-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.announcement-form-group input,
+.announcement-form-group select,
+.announcement-form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.announcement-form-group input:focus,
+.announcement-form-group select:focus,
+.announcement-form-group textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.announcement-error {
+    background: rgba(255, 99, 71, 0.1);
+    color: var(--danger);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.announcement-field-error {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--danger);
+    margin-top: 2px;
+}
+/* =========================
+   ANNOUNCEMENT FORM
+========================= */
+
+.announcement-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.announcement-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.announcement-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.announcement-form input,
+.announcement-form select,
+.announcement-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.announcement-form input:focus,
+.announcement-form select:focus,
+.announcement-form textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+/* =========================
+   CHECKBOX INLINE
+========================= */
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--primary);
+}
+
+.announcement-help-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.announcement-field-error {
+    color: var(--danger);
+    font-size: 0.75rem;
+    margin-top: 2px;
+}
+
+/* =========================
+   FORM ACTION BUTTONS
+========================= */
+/* =========================
+   ANNOUNCEMENT CREATE HEADER & BACK
+============================ */
+.announcement-create-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.announcement-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.announcement-back-btn:hover {
+    background: rgba(0,0,0,0.05);
+    transform: translateX(-2px);
+}
+
+.announcement-create-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.announcement-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.announcement-btn-create {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.announcement-btn-create:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.announcement-btn-cancel {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: var(--danger);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.announcement-btn-cancel:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.announcement-btn-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-left: 6px;
+}
+
+.announcement-btn-delete:hover {
+    background: #b52a37;
+}
+/* ==========================================
+   ANNOUNCEMENT EDIT HEADER
+============================================= */
+
+.announcement-edit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.announcement-edit-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Back Button */
+.announcement-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--bg-glass);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+
+.announcement-back-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-primary);
+    transition: all 0.25s ease;
+}
+
+.announcement-back-btn:hover {
+    background: var(--glass-hover);
+    color: var(--primary);
+}
+
+.announcement-back-btn:hover svg {
+    stroke: var(--primary);
+}
+/* =========================================
+   ANNOUNCEMENT DETAIL VIEW
+========================================= */
+
+.announcement-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    word-break: break-word;
+}
+
+[data-theme="light"] .detail-row {
+    background: #f8fafc;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    max-width: 70%;
+    text-align: right;
+}
+
+/* Make the Message field taller */
+.detail-row .detail-value {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* Action Buttons */
+.detail-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 10px;
+}
+
+/* Edit Button - bright color */
+.action-btn.edit-btn {
+    background-color: var(--primary); /* yellow/orange */
+    color: #FFF;
+}
+
+.action-btn.edit-btn:hover {
+    background-color: #e0a800;
+}
+
+/* Back Button - neutral gray */
+.action-btn.back-btn {
+    background-color: #e2e8f0; /* light gray */
+    color: var(--primary); /* dark text */
+}
+
+.action-btn.back-btn:hover {
+    background-color: #cbd5e1;
+}
+
+/* Optional: make buttons same height and aligned text */
+.action-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.nested-notification-list {
+    margin: 4px 0 0 0;   /* remove top & bottom extra gap */
+    padding-left: 14px;  /* smaller indent */
+    list-style-type: disc;
+}
+
+.nested-notification-list li {
+    margin: 2px 0;       /* reduce spacing between announcements */
+    padding: 0;
+    line-height: 1.3;    /* tighter text */
+}
+
+
+.trainer-dashboard-scrollable {
+    max-height: 300px; /* adjust as needed */
+    overflow-y: auto;
+    padding-right: 8px; /* prevent content from hiding behind scrollbar */
+}
+
+/* Optional: style scrollbar for modern browsers */
+.trainer-dashboard-scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+
+.trainer-dashboard-scrollable::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 3px;
+}
+
+.trainer-dashboard-scrollable::-webkit-scrollbar-track {
+    background-color: transparent;
 }

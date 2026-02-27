@@ -1,0 +1,109 @@
+{% extends "trainer/tasks/base.html" %}
+{% block content %}
+
+<div class="glass-card">
+    <div class="announcement-header">
+        <h4>All Announcements</h4>
+        <a href="{% url 'trainer:create_announcement' %}" class="btn-announcement-create">Create New Announcement</a>
+    </div>
+
+    <!-- Filter Form -->
+    <form method="get" class="announcement-filter-form">
+    <div class="announcement-filter-row">
+        <select name="audience">
+            <option value="">All Audiences</option>
+            <option value="students" {% if selected_audience == 'students' %}selected{% endif %}>Students</option>
+            <option value="trainers" {% if selected_audience == 'trainers' %}selected{% endif %}>Trainers</option>
+            <option value="both" {% if selected_audience == 'both' %}selected{% endif %}>Both</option>
+        </select>
+
+        <select name="created_by">
+            <option value="">All Creators</option>
+            <option value="trainer" {% if selected_created_by == 'trainer' %}selected{% endif %}>Trainer</option>
+            <option value="bdm" {% if selected_created_by == 'bdm' %}selected{% endif %}>BDM/Admin</option>
+        </select>
+
+        <input type="date" name="publish_date" value="{{ selected_publish_date }}">
+
+        <div class="announcement-filter-buttons">
+            <button type="submit" class="announcement-filter-btn">Filter</button>
+            <a href="{% url 'trainer:all_announcements' %}" class="announcement-filter-btn reset">Reset</a>
+        </div>
+    </div>
+</form>
+
+    <div class="announcement-table-wrapper">
+        <table class="announcement-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Audience</th>
+                    <th>Created By</th>
+                    <th>Important</th>
+                    <th>Publish Date</th>
+                    <th>Expiry Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for announcement in announcements %}
+                <tr>
+                    <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" 
+                        title="{{ announcement.title }}">
+                        {{ announcement.title }}
+                    </td>
+                    <td>
+                        {% if announcement.audience == 'students' %}
+                            <span class="badge badge-student">Students</span>
+                        {% elif announcement.audience == 'trainers' %}
+                            <span class="badge badge-trainer">Trainers</span>
+                        {% elif announcement.audience == 'both' %}
+                            <span class="badge badge-both">Both</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if announcement.created_by %}
+                            {% if announcement.created_by.is_staff %}
+                                {{ announcement.created_by.get_full_name|default:announcement.created_by.username }} (BDM)
+                            {% else %}
+                                {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}
+                            {% endif %}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{% if announcement.is_important %}Yes{% else %}-{% endif %}</td>
+                    <td>{{ announcement.publish_date|date:"d M Y" }}</td>
+                    <td>{{ announcement.expiry_date|date:"d M Y" }}</td>
+                    <td class="announcement-actions">
+                        <a href="{% url 'trainer:view_announcement' announcement.id %}" 
+                        class="announcement-btn-view">View</a>
+
+                        {% if not announcement.created_by.is_staff and announcement.created_by == user %}
+                            <a href="{% url 'trainer:edit_announcement' announcement.id %}" 
+                            class="announcement-btn-edit">Edit</a>
+
+                            <form action="{% url 'trainer:delete_announcement' announcement.id %}" 
+                                method="post" 
+                                style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="announcement-btn-delete"
+                                        onclick="return confirm('Are you sure you want to delete this announcement?');">
+                                    Delete
+                                </button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center;">No announcements found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

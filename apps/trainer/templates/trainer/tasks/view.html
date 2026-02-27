@@ -23,7 +23,9 @@
         <div>
             <h2 class="task-view-title">{{ task.title }}</h2>
             <div class="task-view-submeta">
-                {{ task.batch.name }} • {{ task.get_task_type_display }}
+                {{ task.batch.name }} 
+                • {{ task.lesson_session.lesson_plan.topic }} 
+                • {{ task.get_task_type_display }}
             </div>
         </div>
 
@@ -91,12 +93,20 @@
 
             <div class="task-view-card">
                 <div class="task-view-meta">
+                    <span>Assigned Date</span>
+                    <strong>{{ task.assigned_date|date:"d M Y" }}</strong>
+                </div>
+                <div class="task-view-meta">
                     <span>Due Date</span>
                     <strong>{{ task.due_date|date:"d M Y"|default:"—" }}</strong>
                 </div>
                 <div class="task-view-meta">
                     <span>Difficulty</span>
                     <strong>{{ task.get_difficulty_level_display|default:"—" }}</strong>
+                </div>
+                <div class="task-view-meta">
+                    <span>Mandatory</span>
+                    <strong>{% if task.is_mandatory %}Yes{% else %}No{% endif %}</strong>
                 </div>
                 <div class="task-view-meta">
                     <span>Total Marks</span>

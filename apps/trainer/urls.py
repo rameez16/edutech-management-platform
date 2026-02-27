@@ -24,6 +24,8 @@ urlpatterns = [
     path('lesson-session/skip/<int:session_id>/', views.mark_session_skipped, name='mark-session-skipped'),
     path('lesson-session/completed/<int:session_id>/', views.completed_session_detail, name='completed-session-detail'),
     path('lesson-session/<int:session_id>/add-material/',views.add_session_material,name='add-session-material'),
+    path('session-material/<int:material_id>/',views.session_material_detail,name='session-material-detail'),
+    path('session-material/<int:material_id>/edit/',views.edit_session_material,name='edit-session-material'),
 
     # attendance
     path("attendance/", views.attendance_batch_list, name="attendance-batch-list"),
@@ -43,11 +45,18 @@ urlpatterns = [
     path("tasks/list/", views.task_list, name="task-list"),
     path("tasks/<int:task_id>/", views.task_view, name="task-view"),
     path("tasks/<int:task_id>/edit/", views.task_edit, name="task-edit"),
+    path("task/<int:task_id>/delete/",views.task_delete,name="task-delete"),
     path("tasks/submissions/", views.task_submissions, name="task-submissions"),
     path("tasks/evaluate/<int:submission_id>/",views.evaluate_submission,name="task-evaluate"),
     
     # Student Issues
     path('assigned-issues/', views.trainer_issues_list_view, name='trainer_assigned_issues'),
     path('assigned-issues/<int:pk>/', views.trainer_issue_detail_view, name='trainer_issue_detail'),
+    
+    path("announcements/", views.all_announcements, name="all_announcements"),
+    path("announcements/create/", views.create_announcement, name="create_announcement"),
+    path("announcements/<int:announcement_id>/view/", views.view_announcement, name="view_announcement"),
+    path("announcements/<int:announcement_id>/edit/", views.edit_announcement, name="edit_announcement"),
+    path("announcements/<int:announcement_id>/delete/",views.delete_announcement,name="delete_announcement"),
     
 ]

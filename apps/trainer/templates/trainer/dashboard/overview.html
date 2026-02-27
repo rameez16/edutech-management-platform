@@ -54,6 +54,78 @@
         </div>
     </div>
 
+    {% comment %} //  {% endcomment %}
+    <!-- Notifications -->
+    <div class="trainer-dashboard-card trainer-notification-card">
+    <h4 class="trainer-dashboard-title">
+        <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        Notifications
+    </h4>
+
+    <!-- Scrollable container -->
+    <div class="trainer-dashboard-scrollable">
+        <ul class="trainer-dashboard-list">
+
+            {% if attendance_pending_count > 0 %}
+            <li>
+                <a href="{% url 'trainer:attendance-batch-list' %}">
+                    {{ attendance_pending_count }} session{{ attendance_pending_count|pluralize }}
+                    need attendance marking.
+                </a>
+            </li>
+            {% endif %}
+
+            {% if material_pending_count > 0 %}
+            <li>
+                <a href="{% url 'trainer:batches' %}">
+                    {{ material_pending_count }} completed session{{ material_pending_count|pluralize }}
+                    need study material upload.
+                </a>
+            </li>
+            {% endif %}
+
+            {% if pending_evaluations_count > 0 %}
+            <li>
+                <a href="{% url 'trainer:task-submissions' %}">
+                    {{ pending_evaluations_count }} student submission{{ pending_evaluations_count|pluralize }}
+                    waiting for evaluation.
+                </a>
+            </li>
+            {% endif %}
+
+            {% if attendance_pending_count == 0 and material_pending_count == 0 and pending_evaluations_count == 0 %}
+            <li>No pending notifications 🎉</li>
+            {% endif %}
+
+            {% if announcement_count > 0 %}
+            <li>
+                🔔 {{ announcement_count }} New Announcement{{ announcement_count|pluralize }}
+
+                <ul class="nested-notification-list">
+                    {% for ann in announcement_notifications %}
+                        <li>
+                            <a href="{% url 'trainer:view_announcement' ann.id %}"
+                            style="text-decoration:none; color:inherit;">
+                            
+                                {% if ann.is_important %}
+                                    🔴
+                                {% endif %}
+                                
+                                {{ ann.title|truncatechars:40 }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
 <!-- Upcoming Planned Sessions -->
 <div class="trainer-dashboard-card">
     <h4 class="trainer-dashboard-title">
@@ -244,48 +316,6 @@
     </div>
 </div>
 
-    <!-- Notifications -->
-<div class="trainer-dashboard-card trainer-notification-card">
-    <h4 class="trainer-dashboard-title">
-        <svg class="trainer-dashboard-icon" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2">
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-        </svg>
-        Notifications
-    </h4>
-
-    <ul class="trainer-dashboard-list">
-
-        {% if attendance_pending_count > 0 %}
-        <li>
-            {{ attendance_pending_count }} session{{ attendance_pending_count|pluralize }}
-            need attendance marking.
-        </li>
-        {% endif %}
-
-        {% if material_pending_count > 0 %}
-        <li>
-            {{ material_pending_count }} completed session{{ material_pending_count|pluralize }}
-            need study material upload.
-        </li>
-        {% endif %}
-
-        {% if pending_evaluations_count > 0 %}
-        <li>
-            {{ pending_evaluations_count }} student submission{{ pending_evaluations_count|pluralize }}
-            waiting for evaluation.
-        </li>
-        {% endif %}
-
-        {% if attendance_pending_count == 0 and material_pending_count == 0 and pending_evaluations_count == 0 %}
-        <li>No pending notifications 🎉</li>
-        {% endif %}
-
-    </ul>
-</div>
-
-    
 
     <!-- Class Uploads -->
     <div class="trainer-dashboard-card">
@@ -312,9 +342,16 @@
             </ul>
         </ul>
 
-        <a href=""{% url 'trainer:batches' %}"" class="trainer-dashboard-btn-bordered">
+        {% if last_pending_upload_session %}
+        <a href="{% url 'trainer:completed-session-detail' session_id=last_pending_upload_session.id %}" 
+        class="trainer-dashboard-btn-bordered">
             Manage Materials
         </a>
+        {% else %}
+        <a href="{% url 'trainer:batches' %}" class="trainer-dashboard-btn-bordered">
+            Manage Materials
+        </a>
+        {% endif %}
     </div>
 
 </section>

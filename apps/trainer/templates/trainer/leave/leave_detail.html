@@ -1,105 +1,209 @@
 {% extends "base/base.html" %}
-{% load static %}
-
 {% block content %}
 
-<h2 class="leave-title">
-    <a href="{% url 'trainer:leave-dashboard' %}" class="back-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 18l-6-6 6-6"/>
-        </svg>
-    </a>
-    Leave Detail – {{ leave.student.full_name }}
-</h2>
+<div class="glass-card leave-detail-container">
 
+    <!-- Header -->
+    <h4 class="leave-detail-title">
+        <a href="{% url 'trainer:leave-dashboard' %}" class="leave-detail-back">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20" height="20"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 viewBox="0 0 24 24">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </a>
+        Leave Details – {{ leave.student.full_name }}
+    </h4>
 
+    <!-- Leave Detail Grid -->
+    <div class="leave-detail-grid">
 
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Student</span>
+            <span class="leave-detail-value">
+                {{ leave.student.full_name }}
+            </span>
+        </div>
 
-<div class="leave-card-wrapper">
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Batch</span>
+            <span class="leave-detail-value">
+                {{ leave.batch.name }}
+            </span>
+        </div>
 
-    <!-- Student & Batch -->
-    <div class="leave-section">
-        <h3 class="section-title">Student & Batch</h3>
-        <p><strong>Student:</strong> {{ leave.student.full_name }}</p>
-        <p><strong>Batch:</strong> {{ leave.batch.name }}</p>
-        <p><strong>Leave Type:</strong> {{ leave.get_leave_type_display }}</p>
-    </div>
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Leave Type</span>
+            <span class="leave-detail-value">
+                {{ leave.get_leave_type_display }}
+            </span>
+        </div>
 
-    <!-- Dates & Duration -->
-    <div class="leave-section">
-        <h3 class="section-title">Dates & Duration</h3>
-        <p><strong>From:</strong> {{ leave.from_date }}</p>
-        <p><strong>To:</strong> {{ leave.to_date }}</p>
-        <p><strong>Total Days:</strong> {{ leave.total_days }}</p>
-        <p><strong>Submitted:</strong>{{ leave.created_at|date:"M d, Y" }}</p>
-    </div>
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">From</span>
+            <span class="leave-detail-value">
+                {{ leave.from_date }}
+            </span>
+        </div>
 
-    <!-- Reason -->
-    <div class="leave-section">
-        <h3 class="section-title">Reason</h3>
-        <p>{{ leave.reason }}</p>
-    </div>
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">To</span>
+            <span class="leave-detail-value">
+                {{ leave.to_date }}
+            </span>
+        </div>
 
-    <!-- Supporting Document -->
-    <div class="leave-section">
-        <h3 class="section-title">Supporting Document</h3>
-        {% if leave.supporting_document %}
-            <a href="{{ leave.supporting_document.url }}" target="_blank" class="document-link">
-                View Document
-            </a>
-        {% else %}
-            <p>No document submitted.</p>
-        {% endif %}
-    </div>
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Total Days</span>
+            <span class="leave-detail-value">
+                {{ leave.total_days }}
+            </span>
+        </div>
 
-    <!-- Approval Status -->
-    <div class="leave-section">
-        <h3 class="section-title">Approval Status</h3>
-        <p><strong>Status:</strong>
-            {% if leave.status == "pending" %}
-                <span class="status-badge status-pending">Pending</span>
-            {% elif leave.status == "approved" %}
-                <span class="status-badge status-approved">Approved</span>
-            {% elif leave.status == "rejected" %}
-                <span class="status-badge status-rejected">Rejected</span>
-            {% endif %}
-        </p>
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Submitted</span>
+            <span class="leave-detail-value">
+                {{ leave.created_at|date:"M d, Y" }}
+            </span>
+        </div>
+
+        <!-- Status -->
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Status</span>
+            <span class="leave-detail-value">
+                {% if leave.status == "pending" %}
+                    <span class="leave-detail-badge pending">Pending</span>
+                {% elif leave.status == "approved" %}
+                    <span class="leave-detail-badge approved">Approved</span>
+                {% elif leave.status == "rejected" %}
+                    <span class="leave-detail-badge rejected">Rejected</span>
+                {% endif %}
+            </span>
+        </div>
 
         {% if leave.approved_by %}
-            <p><strong>Reviewed By:</strong> {{ leave.approved_by.full_name }}</p>
-            <p><strong>Date:</strong> {{ leave.approval_date|date:"M d, Y" }}</p>
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Reviewed By</span>
+            <span class="leave-detail-value">
+                {{ leave.approved_by.full_name }}
+            </span>
+        </div>
+
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Approval Date</span>
+            <span class="leave-detail-value">
+                {{ leave.approval_date|date:"M d, Y" }}
+            </span>
+        </div>
         {% endif %}
 
         {% if leave.status == "rejected" and leave.rejection_reason %}
-            <p><strong>Rejection Reason:</strong> {{ leave.rejection_reason }}</p>
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Rejection Reason</span>
+            <span class="leave-detail-value">
+                {{ leave.rejection_reason }}
+            </span>
+        </div>
         {% endif %}
+
+        <!-- Supporting Document -->
+        <div class="leave-detail-row">
+            <span class="leave-detail-label">Supporting Document</span>
+            <span class="leave-detail-value">
+                {% if leave.supporting_document %}
+                    <a href="{{ leave.supporting_document.url }}"
+                       target="_blank"
+                       class="leave-detail-doc-link">
+
+                        <!-- Download Icon -->
+                        
+
+                        View Document
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="16"
+                             height="16"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             viewBox="0 0 24 24">
+                            <path d="M12 3v12"/>
+                            <path d="M7 10l5 5 5-5"/>
+                            <path d="M5 21h14"/>
+                        </svg>
+                    </a>
+                {% else %}
+                    —
+                {% endif %}
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Reason Section -->
+    <div class="leave-detail-reason">
+        <h5>Reason</h5>
+        <p>{{ leave.reason }}</p>
     </div>
 
     <!-- Action Buttons -->
-    <div class="leave-section actions">
-        {% if leave.status == "pending" %}
-            <!-- Approve -->
-            <form method="post" action="{% url 'trainer:leave-process' leave.id %}" style="display:inline-block; margin-right:8px;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="approve">
-                <button type="submit" class="btn-approve">Approve</button>
-            </form>
+    <!-- Action Buttons -->
+<div class="leave-detail-actions">
 
-            <!-- Reject -->
-            <form method="post" action="{% url 'trainer:leave-process' leave.id %}" style="display:inline-block;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="reject">
-                <textarea name="rejection_reason" rows="3" placeholder="Reason" required class="form-control"></textarea>
-                <button type="submit" class="btn-reject" style="margin-top:4px;">Reject</button>
-            </form>
-        {% else %}
-            <!-- Re-approve -->
-            <form method="post" action="{% url 'trainer:leave-reapprove' leave.id %}" style="display:inline-block;">
-                {% csrf_token %}
-                <button type="submit" class="btn-reapprove">Review Again</button>
-            </form>
-        {% endif %}
-    </div>
+    {% if leave.status == "pending" %}
+
+        <form method="post"
+              action="{% url 'trainer:leave-process' leave.id %}"
+              class="leave-detail-form">
+            {% csrf_token %}
+
+            <!-- Buttons Row -->
+            <div class="leave-detail-btn-row">
+                <input type="hidden" name="action" value="approve">
+                <button type="submit"
+                        class="leave-detail-btn approve">
+                    Approve
+                </button>
+            </div>
+        </form>
+
+        <form method="post"
+              action="{% url 'trainer:leave-process' leave.id %}"
+              class="leave-detail-form reject-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+
+            <!-- Rejection Textarea -->
+            <textarea name="rejection_reason"
+                      rows="2"
+                      placeholder="Enter rejection reason..."
+                      required></textarea>
+
+            <!-- Reject Button Row -->
+            <div class="leave-detail-btn-row">
+                <button type="submit"
+                        class="leave-detail-btn reject">
+                    Reject
+                </button>
+            </div>
+        </form>
+
+    {% else %}
+        <form method="post"
+              action="{% url 'trainer:leave-reapprove' leave.id %}">
+            {% csrf_token %}
+            <div class="leave-detail-btn-row">
+                <button type="submit"
+                        class="leave-detail-btn review">
+                    Review Again
+                </button>
+            </div>
+        </form>
+    {% endif %}
+
+</div>
 
 </div>
 
