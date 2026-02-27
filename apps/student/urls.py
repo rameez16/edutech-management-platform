@@ -17,13 +17,16 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('installment/qr/<int:student_id>/<int:installment_number>/',views.install_qr,name='install_qr'),
                path('admission/',views.admission,name='admission'),
                path('stud_feedback/', views.stud_feedback, name='stud_feedback'),
-               path('lms_login/',views.lms_login,name='lms_login'),
                path("fees/", views.payment_gateway, name="payment_gateway"),
                path("student_attendance/", views.student_attendance, name="student_attendance"),
                path("student_leave/", views.student_leave, name="student_leave"),
                path("student_evaluation/",views.student_evaluation, name="student_evaluation"),
                path('student_issues/', views.student_issues, name='student_issues'),
+               path('announcement_view/', views.announcement_view, name='announcement_view'),
+               path('notification_view/', views.notification_view, name='notification_view'),
               
+               
+               
                
                
                

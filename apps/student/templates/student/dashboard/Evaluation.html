@@ -6,24 +6,25 @@
 <link rel="stylesheet" href="{% static 'student/css/evaluation.css' %}">
 
 <div class="evaluation-page">
+              
+ <div class="evaluation-container">
 
-    <div class="evaluation-container">
+    <center><h1>Evaluate Your Score</h1></center>
 
-        <!-- ✅ HEADER -->
-        <div class="student-header">
+    <!-- HEADER -->
+    <div class="student-header">
 
-            <div class="student-info">
-                <h2>{{ request.user.get_full_name }}</h2>
-                <br>
-                <p>{{ request.user.email }}</p>
-            </div>
-
-            <div class="batch-pill">
-                {{ student.batches.first.name }}
-            </div>
-
+        <div class="student-info">
+            <h4><span>Name:</span> {{ request.user.get_full_name }}</h4>
+            <h4><span>Email:</span> {{ request.user.email }}</h4>
         </div>
 
+        <div class="batch-pill">
+            {{ student.batches.first.name }}
+        </div>
+
+    </div>
+</div>
         <!-- ✅ SUMMARY -->
         <div class="summary-section">
 

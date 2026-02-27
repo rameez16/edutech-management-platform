@@ -13,21 +13,21 @@ from dateutil.relativedelta import relativedelta
 import uuid
 import os
 import calendar
-from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument
+from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement,Notification
 from apps.accounts.decorators import role_required
 from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial
 from apps.student.models import LeaveApplication
 from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCard,StudentFeedback
 from .forms import EnrollmentAgreementForm,TaskSubmissionForm
 from apps.student.forms import LeaveApplicationForm,StudentIssueForm
-
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
+from collections import defaultdict
+from datetime import date
 
 #rinta
 
-from django.db.models import Count, Q
-from collections import defaultdict
 
-from datetime import date
 #one time payment
 @login_required
 def payment(request):
@@ -677,9 +677,14 @@ def QR_pay(request):
 
 
 def stud_feedback(request):
+
+    student = Student.objects.get(user=request.user)
+
+    # ✅ Student → Batch (ManyToMany)
+    batch = student.batches.filter(is_active=True).first()
+
     if request.method == "POST":
 
-        # 🔴 BASIC VALIDATION
         if not request.POST.get("feedback_type"):
             messages.error(request, "❌ Please select feedback type")
             return redirect("student:stud_feedback")
@@ -688,13 +693,15 @@ def stud_feedback(request):
             messages.error(request, "❌ Overall rating is required")
             return redirect("student:stud_feedback")
 
-        # ✅ SAVE FEEDBACK
         StudentFeedback.objects.create(
-            student_id=request.POST.get("student") or None,
+            student=student,
             feedback_type=request.POST.get("feedback_type"),
             trainer_id=request.POST.get("trainer") or None,
-            course_id=request.POST.get("course") or None,
-            batch_id=request.POST.get("batch") or None,
+
+            # ✅ SAFE RELATIONS
+            course=batch.course if batch else None,
+            batch=batch,
+
             content_quality=request.POST.get("content_quality") or None,
             teaching_methodology=request.POST.get("teaching_methodology") or None,
             responsiveness=request.POST.get("responsiveness") or None,
@@ -704,27 +711,21 @@ def stud_feedback(request):
             is_anonymous=True if request.POST.get("is_anonymous") else False,
         )
 
-        # ✅ SUCCESS MESSAGE
-        messages.success(
-            request,
-            "✅ Thank you! Your feedback has been submitted successfully."
-        )
-
+        messages.success(request, "✅ Feedback submitted successfully.")
         return redirect("student:stud_feedback")
 
-    # GET REQUEST
     context = {
-        "students": Student.objects.all(),
-        "trainers": Trainer.objects.all(),
-        "courses": Course.objects.all(),
-        "batches": Batch.objects.all(),
+        "student": student,
+        "batch": batch,
+
+        # ✅ Batch → Trainers (ManyToMany)
+        "trainers": batch.trainers.filter(user__is_active=True) if batch else [],
     }
 
     return render(request, "student/dashboard/stud_feedback.html", context)
 
 
-def lms_login(request):
-    return render(request,'student/LMS/lms_login.html')
+
 
 
 @login_required
@@ -1004,12 +1005,76 @@ def student_issues(request):
 
 
 
+@login_required
+def announcement_view(request):
 
+    now = timezone.now()
 
+    base_qs = Announcement.objects.filter(
+        audience__in=["students", "both"]
+    ).filter(
+        Q(expiry_date__isnull=True) |
+        Q(expiry_date__gt=now)
+    ).order_by("-publish_date")
 
+    # ✅ Active Tab
+    active_tab = request.GET.get("tab", "all")
 
+    # ✅ Pagination
+    paginator = Paginator(base_qs, 5)   # 5 per page
+    page_number = request.GET.get("page")
 
+    announcements_all = paginator.get_page(page_number)
 
+    announcements_trainer = base_qs.filter(
+        created_by__trainer__isnull=False
+    )
+
+    announcements_bdm = base_qs.filter(
+        created_by__trainer__isnull=True
+    )
+
+    return render(request, "student/dashboard/announcement.html", {
+        "announcements_all": announcements_all,
+        "announcements_trainer": announcements_trainer,
+        "announcements_bdm": announcements_bdm,
+        "active_tab": active_tab,
+    })
+@login_required
+def notification_view(request):
+
+    # ✅ SAFETY CHECK (extra protection)
+    if not request.user.is_authenticated:
+        return redirect("login")  # change if needed
+
+    # ✅ MARK AS READ
+    read_id = request.GET.get("read")
+    page_number = request.GET.get("page")
+
+    if read_id:
+        notification = Notification.objects.filter(
+            id=read_id,
+            recipient_id=request.user.id   # ✅ SAFER
+        ).first()
+
+        if notification:
+            notification.mark_as_read()
+
+            if notification.link_url:
+                return redirect(notification.link_url)
+
+    # ✅ FETCH NOTIFICATIONS
+    notifications_list = Notification.objects.filter(
+        recipient_id=request.user.id   # ✅ prevents AnonymousUser error
+    ).order_by("-created_at")
+
+    # ✅ PAGINATION (10 per page)
+    paginator = Paginator(notifications_list, 10)
+    notifications = paginator.get_page(page_number)
+
+    return render(request, "student/dashboard/notification.html", {
+        "notifications": notifications
+    })
 
 
 
