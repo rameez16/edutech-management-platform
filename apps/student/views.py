@@ -2456,21 +2456,15 @@ def lmsdashboard(request):
 
 
 
-
 @role_required("student")
 def lms_view_material(request, pk):
     material = get_object_or_404(SessionMaterial, pk=pk)
     material.increment_views()
-
-    embed_url = None
-
     if material.external_link:
-        embed_url = material.external_link
-
-    return render(request, "student/lms_material_view.html", {
-        "material": material,
-        "embed_url": embed_url
-    })
+        return redirect(material.external_link)
+    if material.file:
+        return redirect(material.file.url)
+    return redirect('student:lms_dashboard')
 
 
 @role_required("student")
@@ -2493,4 +2487,3 @@ def extract_video_thumbnail(url):
     if yt:
         return f"https://img.youtube.com/vi/{yt.group(1)}/mqdefault.jpg"
     return None
-
