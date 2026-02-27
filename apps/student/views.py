@@ -21,7 +21,7 @@ from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCa
 from .forms import EnrollmentAgreementForm,TaskSubmissionForm
 from apps.student.forms import LeaveApplicationForm,StudentIssueForm
 from datetime import timedelta
-
+import re
 #rinta
 
 from django.db.models import Count, Q
@@ -1331,10 +1331,20 @@ def dashboard(request):
 
     balance = total_fee - paid_amount
 
-    payment_portal_unlocked = checklist.onboarding_completed
+    payment_portal_unlocked = (
+        checklist.onboarding_completed
+        or (checklist.documents_verified and checklist.enrollment_letter_signed)
+    )
 
     # Admission fee check
-    admission_paid = checklist.admission_fee_paid
+    # Admission fee check — derived from actual payment records, not checklist flag
+    admission_paid = FeePayment.objects.filter(
+        student=student,
+        payment_type__in=[
+            FeePayment.PaymentType.ADMISSION,
+            FeePayment.PaymentType.FULL_PAYMENT,
+        ]
+    ).exists()
 
     # Detect payment plan type
     has_installments = FeePayment.objects.filter(
@@ -1370,14 +1380,22 @@ def dashboard(request):
         payment_status=FeePayment.PaymentStatus.COMPLETED
     ).count()
 
-    total_installments = 0
-    if next_installment and next_installment.total_installments:
+    try:
+        plan = student.enrollment_agreement.payment_plan.lower()
+    except Exception:
+        plan = ""
+
+    if plan == "installment":
+        total_installments = 4
+    elif next_installment and next_installment.total_installments:
         total_installments = next_installment.total_installments
     elif has_installments:
         total_installments = FeePayment.objects.filter(
             student=student,
             payment_type=FeePayment.PaymentType.INSTALLMENT,
         ).count()
+    else:
+        total_installments = 0
 
     # Determine payment card state
     # States: 'locked' | 'admission_due' | 'installment' | 'full_paid' | 'balance_due'
@@ -2318,7 +2336,15 @@ def lmsdashboard(request):
             mats = session.materials.all()
             if filter_type != "all":
                 mats = mats.filter(material_type=filter_type)
-            mats = list(mats)
+                mats = list(mats)
+    
+            # Attach thumbnail to each recording
+            for mat in mats:
+                if mat.material_type == SessionMaterial.MaterialType.RECORDING:
+                    mat.thumbnail_url = extract_video_thumbnail(mat.external_link)
+                else:
+                    mat.thumbnail_url = None
+
             if mats:
                 sessions_with_materials.append({
                     "session": session,
@@ -2366,5 +2392,12 @@ def lms_download_material(request, pk):
 
 
 
-
+def extract_video_thumbnail(url):
+    """Extract thumbnail URL from YouTube links."""
+    if not url:
+        return None
+    yt = re.search(r'(?:youtube\.com/(?:watch\?v=|embed/)|youtu\.be/)([\w-]{11})', url)
+    if yt:
+        return f"https://img.youtube.com/vi/{yt.group(1)}/mqdefault.jpg"
+    return None
 
