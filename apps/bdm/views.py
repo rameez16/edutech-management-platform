@@ -58,113 +58,113 @@ from .utils import role_required
 
 
 
-@login_required
-@role_required('admin')
-def dashboard(request):
-    """
-    Dashboard view with comprehensive statistics and latest data
-    """
-    # Get current date for time-based filtering
-    today = timezone.now().date()
-    week_ago = today - timedelta(days=7)
+# @login_required
+# @role_required('admin')
+# def dashboard(request):
+#     """
+#     Dashboard view with comprehensive statistics and latest data
+#     """
+#     # Get current date for time-based filtering
+#     today = timezone.now().date()
+#     week_ago = today - timedelta(days=7)
     
-    # Lead Statistics
-    total_leads = Lead.objects.count()
-    new_leads_count = Lead.objects.filter(
-        enquiry_date__gte=week_ago
-    ).count()
-    pending_leads = Lead.objects.filter(
-        status=Lead.LeadStatus.NEW
-    ).count()
+#     # Lead Statistics
+#     total_leads = Lead.objects.count()
+#     new_leads_count = Lead.objects.filter(
+#         enquiry_date__gte=week_ago
+#     ).count()
+#     pending_leads = Lead.objects.filter(
+#         status=Lead.LeadStatus.NEW
+#     ).count()
     
-    # Get latest 10 leads ordered by enquiry date
-    latest_leads = Lead.objects.select_related(
-        'preferred_course', 'assigned_to'
-    ).order_by('-enquiry_date')[:10]
+#     # Get latest 10 leads ordered by enquiry date
+#     latest_leads = Lead.objects.select_related(
+#         'preferred_course', 'assigned_to'
+#     ).order_by('-enquiry_date')[:10]
     
-    # Student Statistics
-    total_students = Student.objects.count()
-    active_students = Student.objects.count()
+#     # Student Statistics
+#     total_students = Student.objects.count()
+#     active_students = Student.objects.count()
     
-    # Trainer Statistics
-    trainer_count = Trainer.objects.count()
-    active_trainers = Trainer.objects.filter(admin_profile__is_active=True).count()
+#     # Trainer Statistics
+#     trainer_count = Trainer.objects.count()
+#     active_trainers = Trainer.objects.filter(admin_profile__is_active=True).count()
     
-    # Course Statistics
-    course_count = Course.objects.filter(is_active=True).count()
+#     # Course Statistics
+#     course_count = Course.objects.filter(is_active=True).count()
     
-    # Batch Statistics
-    batch_count = Batch.objects.filter(is_active=True).count()
+#     # Batch Statistics
+#     batch_count = Batch.objects.filter(is_active=True).count()
     
-    # Get upcoming batches (starting in the next 30 days)
-    upcoming_batches = Batch.objects.filter(
-        is_active=True,
-        start_date__gte=today,
-        start_date__lte=today + timedelta(days=30)
-    ).select_related('course').prefetch_related('students')[:5]
+#     # Get upcoming batches (starting in the next 30 days)
+#     upcoming_batches = Batch.objects.filter(
+#         is_active=True,
+#         start_date__gte=today,
+#         start_date__lte=today + timedelta(days=30)
+#     ).select_related('course').prefetch_related('students')[:5]
     
-    # Certificate requests (students who are eligible)
+#     # Certificate requests (students who are eligible)
   
     
-    # Pending payments (students who haven't paid booking fee)
-    # pending_payments = Student.objects.filter(
-    #     booking_fee_received=False,
-    #     is_active=True
-    # ).count()
+#     # Pending payments (students who haven't paid booking fee)
+#     # pending_payments = Student.objects.filter(
+#     #     booking_fee_received=False,
+#     #     is_active=True
+#     # ).count()
     
-    # Classes today (batches that are currently active)
-    classes_today = Batch.objects.filter(
-        is_active=True,
-        start_date__lte=today,
-        expected_finish_date__gte=today
-    ).count()
+#     # Classes today (batches that are currently active)
+#     classes_today = Batch.objects.filter(
+#         is_active=True,
+#         start_date__lte=today,
+#         expected_finish_date__gte=today
+#     ).count()
     
-    # Lead status breakdown for analytics
-    lead_status_breakdown = Lead.objects.values('status').annotate(
-        count=Count('id')
-    )
+#     # Lead status breakdown for analytics
+#     lead_status_breakdown = Lead.objects.values('status').annotate(
+#         count=Count('id')
+#     )
     
-    # Conversion rate calculation
-    converted_leads = Lead.objects.filter(
-        status=Lead.LeadStatus.CONVERTED
-    ).count()
-    conversion_rate = (converted_leads / total_leads * 100) if total_leads > 0 else 0
+#     # Conversion rate calculation
+#     converted_leads = Lead.objects.filter(
+#         status=Lead.LeadStatus.CONVERTED
+#     ).count()
+#     conversion_rate = (converted_leads / total_leads * 100) if total_leads > 0 else 0
     
-    context = {
-        # Lead Data
-        'total_leads': total_leads,
-        'new_leads_count': new_leads_count,
-        'pending_leads': pending_leads,
-        'latest_leads': latest_leads,
-        'conversion_rate': round(conversion_rate, 1),
+#     context = {
+#         # Lead Data
+#         'total_leads': total_leads,
+#         'new_leads_count': new_leads_count,
+#         'pending_leads': pending_leads,
+#         'latest_leads': latest_leads,
+#         'conversion_rate': round(conversion_rate, 1),
         
-        # Student Data
-        'total_students': total_students,
-        'active_students': active_students,
+#         # Student Data
+#         'total_students': total_students,
+#         'active_students': active_students,
         
-        # Trainer Data
-        'trainer_count': trainer_count,
-        'active_trainers': active_trainers,
+#         # Trainer Data
+#         'trainer_count': trainer_count,
+#         'active_trainers': active_trainers,
         
-        # Course & Batch Data
-        'course_count': course_count,
-        'batch_count': batch_count,
-        'upcoming_batches': upcoming_batches,
+#         # Course & Batch Data
+#         'course_count': course_count,
+#         'batch_count': batch_count,
+#         'upcoming_batches': upcoming_batches,
         
-        # Pending Actions
-        # 'certificate_requests': certificate_requests,
-        # 'pending_payments': pending_payments,
-        'classes_today': classes_today,
+#         # Pending Actions
+#         # 'certificate_requests': certificate_requests,
+#         # 'pending_payments': pending_payments,
+#         'classes_today': classes_today,
         
-        # Analytics
-        'lead_status_breakdown': lead_status_breakdown,
+#         # Analytics
+#         'lead_status_breakdown': lead_status_breakdown,
         
-        # Notifications (placeholder - implement as needed)
-        'notification_count': 0,
-        'notifications': [],
-    }
+#         # Notifications (placeholder - implement as needed)
+#         'notification_count': 0,
+#         'notifications': [],
+#     }
     
-    return render(request, 'bdm/dashboard/dashboard.html', context)
+#     return render(request, 'bdm/dashboard/dashboard.html', context)
 
 
 # Optional: View for lead detail/management
@@ -1871,4 +1871,336 @@ class ToggleStudentStatusView(View):
         return redirect("student_dashboard", pk=pk)
     
     
-    
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, Count, Q, Avg
+from django.utils import timezone
+from datetime import timedelta
+
+# Import all models from bdm
+from apps.bdm.models import (
+    Lead, Course, Trainer, Student, Batch,
+    StudentAdminProfile, TeleCallerProfile,
+    CallHistory, PaymentReminder, PDCCollection,
+    OnboardingChecklist, StudentIssue, Notification,
+    BatchSchedule,
+)
+
+# Import student app models
+from apps.student.models import FeePayment, StudentDocument, EnrollmentAgreement
+
+
+
+
+
+
+
+# New dashboard -ramees
+
+@login_required
+def dashboard(request):
+    today = timezone.now().date()
+    now = timezone.now()
+    month_start = today.replace(day=1)
+
+    # ── STAT CARDS ──────────────────────────────────────────────
+    total_students = Student.objects.count()
+    active_students = StudentAdminProfile.objects.filter(is_active=True).count()
+
+    active_batches = Batch.objects.filter(is_active=True).count()
+    completing_soon = Batch.objects.filter(
+        is_active=True,
+        expected_finish_date__lte=today + timedelta(days=14)
+    ).count()
+
+    # Revenue this month
+    revenue_this_month = FeePayment.objects.filter(
+        payment_date__date__gte=month_start,
+        payment_status=FeePayment.PaymentStatus.COMPLETED,
+    ).aggregate(total=Sum('amount'))['total'] or 0
+
+    revenue_last_month = FeePayment.objects.filter(
+        payment_date__date__gte=(month_start - timedelta(days=30)).replace(day=1),
+        payment_date__date__lt=month_start,
+        payment_status=FeePayment.PaymentStatus.COMPLETED,
+    ).aggregate(total=Sum('amount'))['total'] or 1  # avoid div-by-zero
+
+    revenue_change_pct = round(
+        ((revenue_this_month - revenue_last_month) / revenue_last_month) * 100, 1
+    )
+
+    # Leads
+    total_leads = Lead.objects.count()
+    new_leads = Lead.objects.filter(status=Lead.LeadStatus.NEW).count()
+    assigned_leads = Lead.objects.filter(status=Lead.LeadStatus.ASSIGNED).count()
+    converted_leads = Lead.objects.filter(status=Lead.LeadStatus.CONVERTED).count()
+    idle_leads = Lead.objects.filter(status=Lead.LeadStatus.IDLE).count()
+    dropped_leads = Lead.objects.filter(status=Lead.LeadStatus.DROPPED).count()
+
+    conversion_rate = round(
+        (converted_leads / total_leads * 100) if total_leads else 0, 1
+    )
+
+    # Leads needing follow-up (last_followup > 3 days ago or never)
+    followup_due = Lead.objects.filter(
+        status__in=[Lead.LeadStatus.ASSIGNED, Lead.LeadStatus.IDLE],
+    ).filter(
+        Q(last_followup__isnull=True) |
+        Q(last_followup__lt=now - timedelta(days=3))
+    ).count()
+
+    # ── BATCH PROGRESS ──────────────────────────────────────────
+    batches_with_progress = []
+    for batch in Batch.objects.filter(is_active=True).select_related('course').prefetch_related('trainers')[:6]:
+        total_sessions = batch.lesson_sessions.count()
+        completed_sessions = batch.lesson_sessions.filter(
+            status='completed'
+        ).count()
+        progress_pct = round(
+            (completed_sessions / total_sessions * 100) if total_sessions else 0
+        )
+        trainer = batch.trainers.first()
+        batches_with_progress.append({
+            'batch': batch,
+            'progress': progress_pct,
+            'completed': completed_sessions,
+            'total': total_sessions,
+            'trainer': trainer,
+        })
+
+    # ── ATTENDANCE OVERVIEW ─────────────────────────────────────
+    # Import Attendance from the tracker app
+    try:
+        from apps.student.models import Attendance
+        # Today's attendance across all batches
+        today_records = Attendance.objects.filter(date=today)
+        today_present = today_records.filter(status__in=['present', 'late']).count()
+        today_total = today_records.count()
+        today_attendance_pct = round(
+            (today_present / today_total * 100) if today_total else 0
+        )
+
+        # Last 6 days for mini bar chart
+        attendance_week = []
+        for i in range(6, 0, -1):
+            day = today - timedelta(days=i)
+            recs = Attendance.objects.filter(date=day)
+            present = recs.filter(status__in=['present', 'late']).count()
+            total = recs.count()
+            pct = round((present / total * 100) if total else 0)
+            attendance_week.append({'day': day.strftime('%a'), 'pct': pct})
+
+        # Overall average
+        overall_attendance = Attendance.objects.filter(
+            date__gte=month_start
+        ).aggregate(
+            present=Count('id', filter=Q(status__in=['present', 'late'])),
+            total=Count('id')
+        )
+        overall_avg = round(
+            (overall_attendance['present'] / overall_attendance['total'] * 100)
+            if overall_attendance['total'] else 0
+        )
+    except Exception:
+        today_attendance_pct = 0
+        attendance_week = [
+            {'day': (today - timedelta(days=i)).strftime('%a'), 'pct': 0}
+            for i in range(6, 0, -1)
+        ]
+        overall_avg = 0
+
+    # ── FEE COLLECTION ──────────────────────────────────────────
+    fee_summary = FeePayment.objects.filter(
+        payment_date__date__gte=month_start
+    ).aggregate(
+        completed=Sum('amount', filter=Q(payment_status=FeePayment.PaymentStatus.COMPLETED)),
+        pending=Sum('amount', filter=Q(payment_status=FeePayment.PaymentStatus.PENDING)),
+    )
+    fee_collected = fee_summary['completed'] or 0
+    fee_pending = fee_summary['pending'] or 0
+    fee_total = fee_collected + fee_pending
+    fee_collected_pct = round((fee_collected / fee_total * 100) if fee_total else 0)
+
+    # Fee by type breakdown (for donut)
+    booking_amt = FeePayment.objects.filter(
+        payment_date__date__gte=month_start,
+        payment_type=FeePayment.PaymentType.BOOKING,
+        payment_status=FeePayment.PaymentStatus.COMPLETED,
+    ).aggregate(t=Sum('amount'))['t'] or 0
+
+    full_pay_amt = FeePayment.objects.filter(
+        payment_date__date__gte=month_start,
+        payment_type=FeePayment.PaymentType.FULL_PAYMENT,
+        payment_status=FeePayment.PaymentStatus.COMPLETED,
+    ).aggregate(t=Sum('amount'))['t'] or 0
+
+    emi_amt = FeePayment.objects.filter(
+        payment_date__date__gte=month_start,
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
+        payment_status=FeePayment.PaymentStatus.COMPLETED,
+    ).aggregate(t=Sum('amount'))['t'] or 0
+
+    # ── ONBOARDING STATUS ───────────────────────────────────────
+    pending_onboarding = OnboardingChecklist.objects.filter(
+        onboarding_completed=False
+    ).select_related('student').order_by('-updated_at')[:5]
+
+    completed_onboarding_month = OnboardingChecklist.objects.filter(
+        onboarding_completed=True,
+        completed_date__gte=month_start,
+    ).count()
+
+    # ── NOTIFICATIONS / RECENT ACTIVITY ─────────────────────────
+    recent_notifications = Notification.objects.filter(
+        recipient=request.user
+    ).order_by('-created_at')[:10]
+
+    # Recent fee payments (admission fee received events)
+    recent_payments = FeePayment.objects.filter(
+        payment_status=FeePayment.PaymentStatus.COMPLETED,
+    ).select_related('student').order_by('-payment_date')[:5]
+
+    # Recent document uploads
+    recent_docs = StudentDocument.objects.select_related(
+        'student'
+    ).order_by('-uploaded_at')[:4]
+
+    # Recent enrollment agreements signed
+    recent_enrollments = EnrollmentAgreement.objects.filter(
+        is_signed=True
+    ).select_related('student').order_by('-signed_at')[:4]
+
+    # Recent leads
+    recent_leads = Lead.objects.order_by('-enquiry_date')[:5]
+
+    # Build a unified activity feed sorted by time
+    activity_feed = []
+
+    for p in recent_payments:
+        activity_feed.append({
+            'type': 'payment',
+            'icon': '💳',
+            'color': 'green',
+            'text': f"<strong>{p.student.full_name or p.student.user.get_full_name()}</strong> paid ₹{p.amount:,.0f} ({p.get_payment_type_display()})",
+            'time': p.payment_date,
+        })
+
+    for d in recent_docs:
+        activity_feed.append({
+            'type': 'document',
+            'icon': '📄',
+            'color': 'blue',
+            'text': f"<strong>{d.student.full_name or d.student.user.get_full_name()}</strong> uploaded {d.get_document_type_display()}",
+            'time': d.uploaded_at,
+        })
+
+    for e in recent_enrollments:
+        activity_feed.append({
+            'type': 'enrollment',
+            'icon': '✍️',
+            'color': 'violet',
+            'text': f"<strong>{e.student.full_name or e.student.user.get_full_name()}</strong> signed enrollment agreement",
+            'time': e.signed_at,
+        })
+
+    for lead in recent_leads:
+        activity_feed.append({
+            'type': 'lead',
+            'icon': '🎯',
+            'color': 'amber',
+            'text': f"New lead <strong>{lead.name}</strong> enquired about {lead.preferred_course.name if lead.preferred_course else 'a course'}",
+            'time': lead.enquiry_date,
+        })
+
+    # Sort by time descending, take top 12
+    activity_feed.sort(key=lambda x: x['time'], reverse=True)
+    activity_feed = activity_feed[:12]
+
+    # Format time as "X min ago" etc.
+    def time_ago(dt):
+        if not dt:
+            return ''
+        diff = now - dt
+        s = int(diff.total_seconds())
+        if s < 60:
+            return 'just now'
+        if s < 3600:
+            return f"{s // 60} min ago"
+        if s < 86400:
+            return f"{s // 3600} hr ago"
+        return f"{diff.days} days ago"
+
+    for item in activity_feed:
+        item['time_ago'] = time_ago(item['time'])
+
+    # ── PENDING ISSUES ───────────────────────────────────────────
+    open_issues = StudentIssue.objects.filter(
+        status__in=[StudentIssue.Status.OPEN, StudentIssue.Status.IN_PROGRESS]
+    ).select_related('student').order_by('-created_at')[:5]
+
+    urgent_issues = StudentIssue.objects.filter(
+        status=StudentIssue.Status.OPEN,
+        priority=StudentIssue.Priority.URGENT
+    ).count()
+
+    # ── COURSES ──────────────────────────────────────────────────
+    total_courses = Course.objects.filter(is_active=True).count()
+
+    # ── UNREAD NOTIFICATIONS ─────────────────────────────────────
+    unread_notif_count = Notification.objects.filter(
+        recipient=request.user, is_read=False
+    ).count()
+
+    context = {
+        # Stats
+        'total_students': total_students,
+        'active_students': active_students,
+        'active_batches': active_batches,
+        'completing_soon': completing_soon,
+        'revenue_this_month': revenue_this_month,
+        'revenue_change_pct': revenue_change_pct,
+        'total_leads': total_leads,
+        'new_leads': new_leads,
+        'assigned_leads': assigned_leads,
+        'converted_leads': converted_leads,
+        'idle_leads': idle_leads,
+        'dropped_leads': dropped_leads,
+        'followup_due': followup_due,
+        'conversion_rate': conversion_rate,
+        'total_courses': total_courses,
+
+        # Batch progress
+        'batches_with_progress': batches_with_progress,
+
+        # Attendance
+        'today_attendance_pct': today_attendance_pct,
+        'attendance_week': attendance_week,
+        'overall_avg': overall_avg,
+
+        # Fee collection
+        'fee_collected': fee_collected,
+        'fee_pending': fee_pending,
+        'fee_collected_pct': fee_collected_pct,
+        'booking_amt': booking_amt,
+        'full_pay_amt': full_pay_amt,
+        'emi_amt': emi_amt,
+
+        # Onboarding
+        'pending_onboarding': pending_onboarding,
+        'completed_onboarding_month': completed_onboarding_month,
+
+        # Activity
+        'activity_feed': activity_feed,
+        'recent_notifications': recent_notifications,
+        'unread_notif_count': unread_notif_count,
+
+        # Issues
+        'open_issues': open_issues,
+        'urgent_issues': urgent_issues,
+
+        # Meta
+        'today': today,
+        'now': now,
+    }
+
+    return render(request, 'bdm/dashboard/dashboard2.html', context)    

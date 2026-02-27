@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     # Custom auth 
     'apps.accounts.apps.AccountsConfig',
@@ -72,6 +73,8 @@ INSTALLED_APPS = [
     "cloudinary",
     "cloudinary_storage",
 ]
+
+
 
 
 MIDDLEWARE = [
