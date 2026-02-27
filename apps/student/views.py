@@ -13,15 +13,15 @@ from dateutil.relativedelta import relativedelta
 import uuid
 import os
 import calendar
-from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument
+from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement
 from apps.accounts.decorators import role_required
 from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial
 from apps.student.models import LeaveApplication
 from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCard,StudentFeedback
 from .forms import EnrollmentAgreementForm,TaskSubmissionForm
 from apps.student.forms import LeaveApplicationForm,StudentIssueForm
-
-
+from datetime import timedelta
+import re
 #rinta
 
 from django.db.models import Count, Q
@@ -870,7 +870,7 @@ def student_evaluation(request):
     student = request.user.student
     submission_id = request.GET.get("submission")
 
-    # ✅ PAGE 2 → INDIVIDUAL EVALUATION 
+    # ✅ PAGE 2 → INDIVIDUAL EVALUATION
     if submission_id:
 
         submission = (
@@ -884,10 +884,7 @@ def student_evaluation(request):
                 "task__lesson_session__trainer",
                 "task__lesson_session__lesson_plan",
             )
-            .filter(
-                id=submission_id,
-                student=student
-            )
+            .filter(id=submission_id, student=student)
             .first()
         )
 
@@ -897,7 +894,7 @@ def student_evaluation(request):
             {"submission": submission}
         )
 
-    # ✅ PAGE 1 → LIST PAGE 🔥
+    # ✅ PAGE 1 → LIST PAGE
     submissions = (
         TaskSubmission.objects
         .select_related("task", "task__batch")
@@ -905,9 +902,11 @@ def student_evaluation(request):
         .order_by("-submitted_at")
     )
 
-    totals = submissions.filter(
+    evaluated_submissions = submissions.filter(
         marks_obtained__isnull=False
-    ).aggregate(
+    )
+
+    totals = evaluated_submissions.aggregate(
         obtained=Sum("marks_obtained"),
         total=Sum("task__total_marks")
     )
@@ -1185,7 +1184,35 @@ def student_issues(request):
 
 
 
-#rinta+niranjana
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Niranjana
 
 @role_required("student")
 def dashboard(request):
@@ -1281,6 +1308,31 @@ def dashboard(request):
         absent_dash = 0
         attendance_percentage = 0
 
+
+    #  ATTENDANCE ALERT — latest completed session not marked
+    attendance_alert = False
+
+    if batch:
+        latest_completed_session = LessonSession.objects.filter(
+            batch=batch,
+            status=LessonSession.SessionStatus.COMPLETED
+        ).order_by('-completed_at').first()
+
+        if latest_completed_session:
+            already_marked = Attendance.objects.filter(
+                student=student,
+                batch=batch,
+            ).filter(
+                Q(lesson_session=latest_completed_session) |
+                Q(date=latest_completed_session.actual_date)
+            ).exists()
+
+            if not already_marked:
+                attendance_alert = True
+
+
+
+
     # ✅ LEARNING PROGRESS
     covered_percentage = 0
     pending_percentage = 0
@@ -1291,15 +1343,10 @@ def dashboard(request):
         pending_percentage = 100 - covered_percentage
 
     # =====================================================
-    # ✅ PAYMENT ENGINE
+    # ✅ PAYMENT CARD LOGIC
     # =====================================================
 
     today = timezone.now().date()
-
-    payment_notification = "No Pending Payments"
-    payment_css = "success"
-    pending_payment = None
-
     total_fee = Decimal("0")
 
     if batch and batch.course:
@@ -1312,28 +1359,185 @@ def dashboard(request):
 
     balance = total_fee - paid_amount
 
-    overdue_payment = FeePayment.objects.filter(
+    payment_portal_unlocked = (
+        checklist.onboarding_completed
+        or (checklist.documents_verified and checklist.enrollment_letter_signed)
+    )
+
+    # Admission fee check
+    # Admission fee check — derived from actual payment records, not checklist flag
+    admission_paid = FeePayment.objects.filter(
         student=student,
+        payment_type__in=[
+            FeePayment.PaymentType.ADMISSION,
+            FeePayment.PaymentType.FULL_PAYMENT,
+        ]
+    ).exists()
+
+    # Detect payment plan type
+    has_installments = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
+    ).exists()
+
+    has_full_payment = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.FULL_PAYMENT,
+        payment_status=FeePayment.PaymentStatus.COMPLETED
+    ).exists()
+
+    # Next pending installment
+    next_installment = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
+        payment_status=FeePayment.PaymentStatus.PENDING
+    ).order_by("installment_number").first()
+
+    # Overdue installment
+    overdue_installment = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
         payment_status=FeePayment.PaymentStatus.PENDING,
         due_date__lt=today
     ).order_by("due_date").first()
 
-    upcoming_payment = FeePayment.objects.filter(
+    # Completed installments count
+    completed_installments = FeePayment.objects.filter(
         student=student,
-        payment_status=FeePayment.PaymentStatus.PENDING
-    ).order_by("due_date").first()
+        payment_type=FeePayment.PaymentType.INSTALLMENT,
+        payment_status=FeePayment.PaymentStatus.COMPLETED
+    ).count()
+
+    try:
+        plan = student.enrollment_agreement.payment_plan.lower()
+    except Exception:
+        plan = ""
+
+    if plan == "installment":
+        total_installments = 4
+    elif next_installment and next_installment.total_installments:
+        total_installments = next_installment.total_installments
+    elif has_installments:
+        total_installments = FeePayment.objects.filter(
+            student=student,
+            payment_type=FeePayment.PaymentType.INSTALLMENT,
+        ).count()
+    else:
+        total_installments = 0
+
+    # Determine payment card state
+    # States: 'locked' | 'admission_due' | 'installment' | 'full_paid' | 'balance_due'
+    if not payment_portal_unlocked:
+        payment_card_state = "locked"
+    elif not admission_paid:
+        payment_card_state = "admission_due"
+    elif has_full_payment or balance <= 0:
+        payment_card_state = "full_paid"
+    elif has_installments:
+        payment_card_state = "installment"
+    else:
+        payment_card_state = "balance_due"
+
+    # Legacy — keep for other parts of template
+    payment_notification = "No Pending Payments"
+    payment_css = "success"
+    pending_payment = None
 
     if balance > 0:
+        overdue_payment = FeePayment.objects.filter(
+            student=student,
+            payment_status=FeePayment.PaymentStatus.PENDING,
+            due_date__lt=today
+        ).order_by("due_date").first()
+
+        upcoming_payment = FeePayment.objects.filter(
+            student=student,
+            payment_status=FeePayment.PaymentStatus.PENDING
+        ).order_by("due_date").first()
 
         if overdue_payment:
             payment_notification = "Payment Overdue"
             payment_css = "danger"
             pending_payment = overdue_payment
-
         else:
             payment_notification = "Payment Pending"
             payment_css = "warning"
             pending_payment = upcoming_payment
+
+    # =====================================================
+    # ✅ PENDING TASKS (not_started + in_progress)
+    # =====================================================
+
+    pending_tasks = []
+
+    if batch:
+        # Get all tasks belonging to sessions in this student's batch
+        batch_tasks = Task.objects.filter(
+            batch=batch
+        ).order_by("due_date")
+
+        for task in batch_tasks:
+            # Find this student's submission for the task (if any)
+            submission = TaskSubmission.objects.filter(
+                task=task,
+                student=student
+            ).first()
+
+            # Determine current status
+            if submission:
+                status = submission.status  # 'submitted', 'evaluated', 'in_progress', 'resubmit'
+            else:
+                status = "not_started"
+
+            # Only include pending statuses
+            if status in ["not_started", "in_progress"]:
+                # Auto-priority based on days until due date
+                if task.due_date:
+                    days_left = (task.due_date - today).days
+                    if days_left < 0:
+                        priority = "high"   # overdue
+                    elif days_left <= 1:
+                        priority = "high"
+                    elif days_left <= 4:
+                        priority = "medium"
+                    else:
+                        priority = "low"
+                else:
+                    priority = "low"
+
+                pending_tasks.append({
+                    "id":       task.id,
+                    "title":    task.title,
+                    "due_date": task.due_date,
+                    "priority": priority,
+                    "status":   status,
+                })
+
+    pending_task_count = len(pending_tasks)
+
+
+    #LATEST MATERIALS (from LMS SessionMaterial)
+
+
+    latest_materials = []
+
+    if batch:
+        materials = SessionMaterial.objects.filter(
+            lesson_session__batch=batch
+        ).select_related('lesson_session__lesson_plan').order_by('-id')[:5]
+
+        for m in materials:
+            latest_materials.append({
+                'id':            m.id,
+                'title':         m.title,
+                'material_type': m.material_type,
+                'type_display':  m.get_material_type_display(),
+                'session_number': m.lesson_session.lesson_plan.session_number if m.lesson_session and m.lesson_session.lesson_plan else '',
+            })
+
+
+
+
 
     # ✅ CALENDAR
     cal = calendar.Calendar()
@@ -1342,6 +1546,37 @@ def dashboard(request):
     month_name = calendar.month_name[today.month]
     year = today.year
     today_day = today.day
+
+    # ✅ ANNOUNCEMENTS — last 48 hours, for students or both
+    
+    cutoff = timezone.now() - timedelta(hours=48)
+
+    announcements = Announcement.objects.filter(
+        audience__in=['students', 'both'],
+        publish_date__gte=cutoff,
+    ).filter(
+        Q(expiry_date__isnull=True) | Q(expiry_date__gt=timezone.now())
+    ).order_by('-publish_date').select_related('created_by')
+
+
+
+
+    # ✅ PLANNED SESSIONS
+    planned_sessions = []
+
+    if batch:
+        planned_sessions = list(
+            LessonSession.objects.filter(
+                batch=batch,
+                status=LessonSession.SessionStatus.PLANNED
+            )
+            .select_related("lesson_plan__module")
+            .order_by(
+                "lesson_plan__module__module_number",
+                "lesson_plan__session_number",
+            )[:5]  # limit to next 5 on dashboard
+        )
+
 
     context = {
         "student": student,
@@ -1381,6 +1616,26 @@ def dashboard(request):
         "month_name": month_name,
         "year": year,
         "today_day": today_day,
+
+
+        "pending_tasks":      pending_tasks,
+        "pending_task_count": pending_task_count,
+        "latest_materials": latest_materials,
+        "attendance_alert": attendance_alert,
+        "announcements": announcements,
+        "planned_sessions": planned_sessions,
+        "payment_card_state":      payment_card_state,
+        "payment_portal_unlocked": payment_portal_unlocked,
+        "admission_paid":          admission_paid,
+        "has_installments":        has_installments,
+        "has_full_payment":        has_full_payment,
+        "next_installment":        next_installment,
+        "overdue_installment":     overdue_installment,
+        "completed_installments":  completed_installments,
+        "total_installments":      total_installments,
+        "fee_balance":             balance,
+        "paid_amount":             paid_amount,
+        "total_fee":               total_fee,
     }
 
     return render(request, "student/dashboard/dashboard.html", context)
@@ -1391,14 +1646,6 @@ def dashboard(request):
 
 
 
-   
-
-
-
-
-
-
-#niranjana
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
@@ -2109,7 +2356,15 @@ def lmsdashboard(request):
             mats = session.materials.all()
             if filter_type != "all":
                 mats = mats.filter(material_type=filter_type)
-            mats = list(mats)
+                mats = list(mats)
+    
+            # Attach thumbnail to each recording
+            for mat in mats:
+                if mat.material_type == SessionMaterial.MaterialType.RECORDING:
+                    mat.thumbnail_url = extract_video_thumbnail(mat.external_link)
+                else:
+                    mat.thumbnail_url = None
+
             if mats:
                 sessions_with_materials.append({
                     "session": session,
@@ -2157,5 +2412,12 @@ def lms_download_material(request, pk):
 
 
 
-
+def extract_video_thumbnail(url):
+    """Extract thumbnail URL from YouTube links."""
+    if not url:
+        return None
+    yt = re.search(r'(?:youtube\.com/(?:watch\?v=|embed/)|youtu\.be/)([\w-]{11})', url)
+    if yt:
+        return f"https://img.youtube.com/vi/{yt.group(1)}/mqdefault.jpg"
+    return None
 

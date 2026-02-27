@@ -3,127 +3,7 @@
 
 {% block title %}Student Dashboard{% endblock %}
 {% block extra_css %}
-<style>
-    /* Profile Card Custom Styles */
-    .profile-card .stat-value {
-        font-size: 20px; /* Bigger name */
-        font-weight: 600;
-        color: #111; /* You can adjust */
-    }
 
-    .profile-card .stat-change {
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .profile-card .stat-change.positive {
-        color: green; /* Active Student */
-    }
-
-    .profile-card .stat-change.inactive {
-        color: red; /* Inactive Student */
-        background-color: rgba(255, 0, 0, 0.1); /* light red bg */
-    }
-
-    
-    /* Center everything inside profile card */
-    .profile-card .stat-card-inner {
-        display: flex;
-        align-items: center;        /* vertical center */
-        justify-content: center;    /* horizontal center */
-        gap: 16px;
-        
-        
-    }
-
-    /* Center text block */
-    .profile-card .stat-info {
-        text-align: center;
-        margin-top: 15px;
-    }
-
-    .announcement-mini {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-height: 100px;       /* adjust height as needed */
-        overflow-y: auto;        /* vertical scroll if content exceeds height */
-        padding-right: 8px;      /* optional: prevent scrollbar from overlapping content */
-    }
-
-    /* Batch Info Card Custom Styles - Same as Profile Card */
-    .batch-info-card .stat-value {
-        font-size: 14px; /* Bigger batch name */
-        font-weight: 600;
-        color: #111;
-    }
-
-    .batch-info-card .stat-change {
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .batch-info-card .stat-change.positive {
-        color: green; /* Active/Assigned */
-    }
-
-    .batch-info-card .stat-change.inactive {
-        color: red; /* Not assigned */
-        background-color: rgba(255, 0, 0, 0.1); /* light red bg */
-    }
-
-    /* Center everything inside batch info card */
-    .batch-info-card .stat-card-inner {
-        display: flex;
-        align-items: center;        /* vertical center */
-        justify-content: center;    /* horizontal center */
-        gap: 16px;
-    }
-
-    /* Center text block */
-    .batch-info-card .stat-info {
-        text-align: center;
-        margin-top: 15px;
-    }
-
-
-
-    /* Common notification box */
-    .announcement-item {
-        padding: 12px 16px;
-        border-radius: 10px;
-        font-size: 14px;
-        line-height: 1.5;
-        font-weight: 500;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-        transition: transform 0.2s ease;
-    }
-
-    .announcement-item:hover {
-        transform: translateY(-2px);
-    }
-
-    /* Status colors */
-    .announcement-item.warning {
-        background: #fff4e5;
-        color: #a15c00;
-        border-left: 4px solid #ff9800;
-    }
-
-    .announcement-item.success {
-        background: #e8f7ee;
-        color: #1b7a46;
-        border-left: 4px solid #22c55e;
-    }
-
-    .announcement-item.info {
-        background: #eef5ff;
-        color: #1e4ed8;
-        border-left: 4px solid #3b82f6;
-    }
-
-
-</style>
 {% endblock %}
 
 {% block content %}
@@ -166,17 +46,33 @@
             </button>
 
             <div style="margin-left:14px; display:flex; align-items:center;">
-                {% if profile_photo and all_docs_verified %}
-                    <img src="{{ profile_photo.document_file.url }}"
-                         alt="Profile"
-                         style="width:60px;height:60px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid rgba(255,255,255,0.3);">
-                {% else %}
-                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#06b6d4);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-                        {{ student.full_name|first }}
-                    </div>
-                {% endif %}
-            </div>
 
+    {% if student.profile_photo %}
+        <img src="{{ student.profile_photo.url }}?v={{ student.id }}"
+             alt="Profile"
+             style="width:60px;
+                    height:60px;
+                    border-radius:50%;
+                    object-fit:cover;
+                    cursor:pointer;
+                    border:2px solid rgba(255,255,255,0.3);">
+    {% else %}
+        <div style="width:60px;
+                    height:60px;
+                    border-radius:50%;
+                    background:linear-gradient(135deg,#22c55e,#06b6d4);
+                    color:#fff;
+                    font-weight:600;
+                    font-size:20px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    cursor:pointer;">
+            {{ student.full_name|first|upper }}
+        </div>
+    {% endif %}
+
+</div>
         </div>
     </nav>
 
@@ -263,51 +159,135 @@
             </div>
         </div>
 
-        <!-- Payment -->
-        <div class="glass-card payment-ui">
+        <!-- PAYMENT STATUS CARD -->
+<div class="glass-card stat-card payment-smart-card">
 
-    <div class="payment-header">
-        <h4>PAYMENT STATUS</h4>
-        <button class="payment-action-btn">₹</button>
-    </div>
-
-    <div class="payment-row {{ payment_css }}"
-         onclick="window.location.href='{% url 'student:payment' %}'">
-
-        <span class="payment-icon">
-            {% if payment_css == "danger" %}
-                ⚠️
-            {% elif payment_css == "warning" %}
-                ⏳
-            {% else %}
-                ✅
-            {% endif %}
-        </span>
-
-        <div class="payment-text">
-
-            <strong>{{ payment_notification }}</strong>
-
-            <span>
-                {% if payment_css == "danger" %}
-                    Immediate Action Required
-                {% elif payment_css == "warning" %}
-                    Please Complete Payment
-                {% else %}
-                    All Payments Clear
-                {% endif %}
-            </span>
-
-            {% if pending_payment %}
-                <span class="payment-meta">
-                    ₹{{ pending_payment.amount }}
-                    • Due {{ pending_payment.due_date|date:"d M Y" }}
-                </span>
-            {% endif %}
-
+    <div class="payment-smart-header">
+        <span class="payment-smart-label">PAYMENT STATUS</span>
+        <div class="payment-smart-icon
+            {% if payment_card_state == 'locked' %}psi-grey
+            {% elif payment_card_state == 'admission_due' %}psi-red
+            {% elif payment_card_state == 'full_paid' %}psi-green
+            {% elif payment_card_state == 'installment' and overdue_installment %}psi-red
+            {% elif payment_card_state == 'installment' %}psi-amber
+            {% else %}psi-amber{% endif %}">
+            ₹
         </div>
     </div>
+
+    {% if payment_card_state == 'locked' %}
+        <!-- STATE 1: Portal not unlocked -->
+        <div class="psb psb-locked">
+            <div class="psb-icon">🔒</div>
+            <div class="psb-content">
+                <strong>Payment Portal Locked</strong>
+                
+            </div>
+        </div>
+
+    {% elif payment_card_state == 'admission_due' %}
+        <!-- STATE 2: Admission fee not paid -->
+        <div class="psb psb-danger">
+            <div class="psb-icon">⚠️</div>
+            <div class="psb-content">
+                <strong>Admission Fee Pending</strong>
+                <span>Please complete your admission fee payment</span>
+            </div>
+        </div>
+        <a href=" {% url 'student:payment_gateway' %}" class="psb-action-btn psb-btn-red">
+            Pay Now →
+        </a>
+
+    {% elif payment_card_state == 'full_paid' %}
+        <!-- STATE 3: Fully paid -->
+        <div class="psb psb-success">
+            <div class="psb-icon">✅</div>
+            <div class="psb-content">
+                <strong>All Payments Cleared</strong>
+                <span>Total Paid: ₹{{ paid_amount }}</span>
+            </div>
+        </div>
+
+    {% elif payment_card_state == 'installment' %}
+    <!-- STATE 4: Installment plan -->
+        {% if overdue_installment %}
+        <!-- Overdue -->
+            <div class="psb psb-danger">
+                <div class="psb-icon">🔴</div>
+                <div class="psb-content">
+                    <strong>EMI Overdue — ₹{{ overdue_installment.amount }}</strong>
+                    <span>Due date was {{ overdue_installment.due_date|date:"d M Y" }}</span>
+                </div>
+            </div>
+            <div class="psb-installment-progress">
+                <div class="psb-ip-labels">
+                    <span>EMI {{ completed_installments }}/{{ total_installments }} paid</span>
+                    <span>Balance: ₹{{ fee_balance }}</span>
+                </div>
+                <div class="psb-ip-bar">
+                    <div class="psb-ip-fill"
+                        style="width: {% if total_installments > 0 %}{% widthratio completed_installments total_installments 100 %}{% else %}0{% endif %}%">
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'student:payment_gateway' %}" class="psb-action-btn psb-btn-purple">
+                View Payment Portal →
+            </a>
+
+        {% elif next_installment %}
+            <!-- Next EMI is due -->
+            <div class="psb psb-warning">
+                <div class="psb-icon">📅</div>
+                <div class="psb-content">
+                    <strong>Next EMI — ₹{{ next_installment.amount }}</strong>
+                    <span>Due: {{ next_installment.due_date|date:"d M Y"|default:"—" }}</span>
+                </div>
+            </div>
+            <div class="psb-installment-progress">
+                <div class="psb-ip-labels">
+                    <span>EMI {{ completed_installments }}/{{ total_installments }} paid</span>
+                    <span>Balance: ₹{{ fee_balance }}</span>
+                </div>
+                <div class="psb-ip-bar">
+                    <div class="psb-ip-fill"
+                        style="width: {% if total_installments > 0 %}{% widthratio completed_installments total_installments 100 %}{% else %}0{% endif %}%">
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'student:payment_gateway' %}" class="psb-action-btn psb-btn-purple">
+                View Payment Portal →
+            </a>
+
+        {% else %}
+        <!-- No overdue, no pending due yet — next installment not due -->
+            <div class="psb psb-success">
+                <div class="psb-icon">✅</div>
+                <div class="psb-content">
+                    <strong>EMI {{ completed_installments }}/{{ total_installments }} Paid</strong>
+                    <span>Next installment not due yet</span>
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% else %}
+        <!-- STATE 5: Balance due (no installment plan) -->
+        <div class="psb psb-warning">
+            <div class="psb-icon">⏳</div>
+            <div class="psb-content">
+                <strong>Balance Due — ₹{{ fee_balance }}</strong>
+                <span>Paid: ₹{{ paid_amount }} of ₹{{ total_fee }}</span>
+            </div>
+        </div>
+        <a href="{% url 'student:payment_gateway' %}" class="psb-action-btn psb-btn-amber">
+            Complete Payment →
+        </a>
+
+    {% endif %}
+
 </div>
+
+
 
         <!-- Announcements Card -->
         <div class="glass-card glass-card-3d stat-card">
@@ -354,55 +334,150 @@
 
         <br>
 
-    <div class="overview-row">
-<div class="glass-card overview-card task-performance-card">
+   <div class="overview-row">
 
-    <div class="task-header">
-        <h4 class="card-label">TASK PERFORMANCE <i class="fa-solid fa-chart-line"style="color:#3b82f6;" > </i></h4>
-       
-    </div>
-    <br>
+    <!-- TASK PERFORMANCE + PENDING TASKS -->
+    <div class="glass-card glass-card-3d overview-card task-performance-card">
 
-    <div class="task-stat">
-        <div class="task-icon marks">
-          <center>  <i class="fa-solid fa-trophy" style="color:#f59e0b;"></i></center>
-        </div>
-        <div class="task-text">
-            <span>Total Marks:</span>
-            <strong>{{ obtained_marks }} / {{ total_marks }}</strong>
+<div class="task-header">
+    <h4 class="card-label">TASK PERFORMANCE <i class="fa-solid fa-chart-line task-chart-icon"></i></h4>
+</div>
+
+<div class="task-stats-row">
+    <div class="stat-box stat-marks">
+        <div class="stat-label">Total Marks</div>
+        <div class="stat-value">{{ obtained_marks }} / {{ total_marks }}</div>
+    </div>
+    <div class="stat-box stat-percent">
+        <div class="stat-label">Percentage</div>
+        <div class="stat-value">{{ percentage }}%</div>
+        <div class="stat-progress-bar">
+            <div class="stat-progress-fill" style="width: {{ percentage }}%;"></div>
         </div>
     </div>
-<br>
-    <div class="task-stat">
-        <div class="task-icon percentage">
-           <center> <i class="fa-solid fa-chart-pie" style="color:#22c55e;"></i><center>
+</div>
+
+        <!-- PENDING TASKS NOTIFICATION CARD -->
+        {% if pending_task_count > 0 %}
+        <div class="pending-task-card" onclick="togglePendingTasks(this)">
+            <div class="pending-task-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:16px;">⚠️</span>
+                    <div>
+                        <div class="pending-task-title">Pending Tasks</div>
+                        <div class="pending-task-sub">
+                            {{ pending_task_count }} task{{ pending_task_count|pluralize }} need attention
+                        </div>
+                    </div>
+                </div>
+                <div class="pending-task-badge">{{ pending_task_count }}</div>
+            </div>
+            <div class="pending-task-list">
+                {% for task in pending_tasks %}
+                <div class="pending-task-row">
+                    <div>
+                        <div class="pending-task-name">{{ task.title }}</div>
+                        <div class="pending-task-due">
+                            Due: {{ task.due_date|date:"M d, Y" }}
+                            {% if task.status == 'in_progress' %}
+                                <span class="pending-status-tag">In Progress</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <span class="pending-priority {{ task.priority }}">Priority : {{ task.priority }}</span>
+                </div>
+                {% endfor %}
+                <a href="{% url 'student:student_tasks' %}" class="pending-goto-btn">
+                    → Go to Task Portal
+                </a>
+            </div>
         </div>
-        <div class="task-text">
-            <span>Percentage:</span>
-            <strong>{{ percentage }}%</strong>
+
+        {% else %}
+        <div class="pending-all-done">
+            <span>✅</span>
+            <div>
+                <div style="font-weight:700;font-size:13px;color:#065f46;">All Tasks Done!</div>
+                <div style="font-size:11px;color:#047857;margin-top:2px;">No pending tasks right now.</div>
+            </div>
         </div>
+        {% endif %}
+
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="glass-card overview-card quick-links-card">
+        <div class="quick-links-header">
+            <h4 class="card-label2">QUICK LINKS</h4>
+        </div>
+        <div class="quick-links-body">
+            <a href="{% url 'student:stud_syllabus' %}" class="quick-link-btn blue">
+                📘 Syllabus
+        </a>
+        <a href="{% url 'student:student_attendance' %}" class="quick-link-btn purple">
+            📋 Attendance
+        </a>
+        <a href="{% url 'student:student_tasks' %}" class="quick-link-btn green">
+            ✅ Submit Task
+        </a>
+        <a href="{% url 'student:payment' %}" class="quick-link-btn orange">
+            💳 Pay Now
+        </a>
+    </div>
+</div>
+
+   <!-- LATEST MATERIALS -->
+<div class="glass-card glass-card-3d overview-card latest-materials-card">
+
+    <div class="materials-header">
+        <div class="materials-title-group">
+            <span class="materials-icon">📁</span>
+            <h4 class="card-label">Latest Materials</h4>
+        </div>
+        <a href="{% url 'accounts:lms_login' %}" class="materials-view-all">View All →</a>
+    </div>
+
+    <p class="card-subtitle materials-subtitle">Recently uploaded files</p>
+
+    <div class="materials-scroll">
+        {% for m in latest_materials %}
+        <div class="material-item">
+            <div class="material-icon">
+                {% if m.material_type == 'recording' %}🎬
+                {% elif m.material_type == 'notes' %}📝
+                {% elif m.material_type == 'slides' %}📊
+                {% elif m.material_type == 'code' %}💻
+                {% elif m.material_type == 'assignment' %}🎯
+                {% elif m.material_type == 'reference' %}📚
+                {% else %}📎{% endif %}
+            </div>
+            <div class="material-info">
+                <div class="material-name">{{ m.title }}</div>
+                <div class="material-time">
+                    {{ m.type_display }}
+                    {% if m.session_number %}· Session {{ m.session_number }}{% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="materials-empty">
+            <span class="materials-empty-icon">📂</span>
+            No materials yet
+        </div>
+        {% endfor %}
     </div>
 
 </div>
+</div>
+<br>
+
+<script>
+function togglePendingTasks(el) {
+    el.querySelector('.pending-task-list').classList.toggle('open');
+}
+</script>
 
 
-            <!-- QUICK LINKS -->
-            <div class="glass-card overview-card quick-links-card">
-                <div class="quick-links-header">
-                    <h4 class="card-label2">QUICK LINKS</h4>
-                </div>
-
-                <div class="quick-links-body">
-                    <a href="{% url 'student:stud_syllabus' %}" class="quick-link-btn blue">Syllabus</a>
-                    <a href="{% url 'student:student_attendance' %}" class="quick-link-btn purple">Attendance</a>
-                    <a href="{% url 'student:student_tasks' %}" class="quick-link-btn green">Submit Task</a>
-                    <a href="{% url 'student:payment' %}" class="quick-link-btn orange">Pay Now</a>
-                </div>
-            </div>
-
-        </div>
-
-        <br>
         
 
         <!-- ================= CALENDAR + ATTENDANCE + PROGRESS ================= -->
@@ -423,67 +498,82 @@
 </div>
 
             
-           <!-- ================= ATTENDANCE CARD ================= -->
+         
+
+<!-- ================= ATTENDANCE CARD ================= -->
 <div class="glass-card">
 
     <div class="card-header">
         <div>
-            <h2 class="card-title">Attendance Performance</h2>
+            <h2 class="card-title">📅 Attendance Performance</h2>
             <p class="card-subtitle">Your attendance statistics</p>
         </div>
     </div>
+    {% if attendance_alert %}
+    <div class="attendance-alert">
+        <div class="attendance-alert-icon">⚠️</div>
+        <div class="attendance-alert-text">
+            <strong>Attendance Not Marked</strong>
+            <span>Your attendance for the latest session hasn't been recorded yet.</span>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="donut-container">
 
         <div class="donut-chart">
             <svg width="140" height="140" viewBox="0 0 140 140">
 
-                <!-- ATTENDED (Present + Late) -->
+                <!-- BG ring -->
+                <circle class="donut-bg" cx="70" cy="70" r="54"/>
+
+                <!-- ATTENDED segment -->
                 <circle class="donut-segment"
                         cx="70" cy="70" r="54"
-                        stroke="var(--emerald-light)"
+                        stroke="#22c55e"
                         stroke-dasharray="{{ present_dash }} 339.3"
                         stroke-dashoffset="0"/>
 
-                <!-- ABSENT -->
-                <circle class="donut-segment"
+                
+                <!-- ABSENT segment (only show if absent > 0) -->
+                {% if absent_count > 0 %}
+                    <circle class="donut-segment"
                         cx="70" cy="70" r="54"
-                        stroke="var(--gold)"
+                        stroke="#fca5a5"
                         stroke-dasharray="{{ absent_dash }} 339.3"
                         stroke-dashoffset="-{{ present_dash }}"/>
-
+                {% endif %}
             </svg>
 
-            <!-- CENTER TEXT -->
             <div class="donut-center">
                 <div class="donut-value">{{ attendance_percentage }}%</div>
-                <div class="donut-label">Attendance</div>
+                <div class="donut-label">Present</div>
             </div>
         </div>
 
-        <!-- LEGEND -->
+        <!-- STATS CHIPS -->
         <div class="donut-legend">
-
-            <!-- ATTENDED -->
-            <div class="legend-item">
-                <span>
-                    <i class="fa-solid fa-circle-check" style="color:var(--emerald-light);"></i>
-                    Attended ({{ present_count|add:late_count }})
-                </span>
+            <div class="legend-chip legend-attended">
+                <i class="fa-solid fa-circle-check legend-icon-attended"></i>
+                <div class="legend-info">
+                    <span class="legend-label">Attended</span>
+                    <span class="legend-value">{{ present_count|add:late_count }}</span>
+                </div>
             </div>
-
-            <!-- ABSENT -->
-            <div class="legend-item">
-                <span>
-                    <i class="fa-solid fa-circle-xmark" style="color:var(--gold);"></i>
-                    Absent ({{ absent_count }})
-                </span>
+            <div class="legend-chip legend-absent">
+                <i class="fa-solid fa-circle-xmark legend-icon-absent"></i>
+                <div class="legend-info">
+                    <span class="legend-label">Absent</span>
+                    <span class="legend-value">{{ absent_count }}</span>
+                </div>
             </div>
-
         </div>
 
     </div>
 </div>
+
+
+
 
 <!-- ================= LEARNING PROGRESS ================= -->
 <div class="glass-card progress-card">
@@ -531,7 +621,7 @@
 
         </section>
 
-    </section>
+    
     
 
     <!-- Mobile Menu Toggle -->
@@ -545,63 +635,98 @@
     <br>
     <br>
 
-    <!-- ================= RECENT ACTIVITY ================= -->
+
+
+    <!-- ================= ANNOUNCEMENTS + PLANNED SESSIONS ================= -->
+
     <section class="top-grid">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
 
-        <div class="glass-card overview-card activity-column-card">
-
-            <div class="activity-header">
-                <div>
-                    <h4 class="card-label">RECENT ACTIVITY</h4>
-                    <p class="card-subtitle">Latest transactions</p>
+            <!-- ANNOUNCEMENTS -->
+            <div class="glass-card overview-card activity-column-card">
+                <div class="activity-header">
+                    <div>
+                        <h4 class="card-label">ANNOUNCEMENTS</h4>
+                        <p class="card-subtitle">Last 48 hours</p>
+                    </div>
+                </div>
+                <div class="activity-list-column">
+                    {% for ann in announcements %}
+                    <div class="activity-item {% if ann.is_important %}important{% endif %}">
+                        <div class="activity-content">
+                            <p>
+                                {% if ann.is_important %}
+                                    <span class="ann-important-badge">🔴 Important</span>
+                                {% endif %}
+                                <strong>{{ ann.title }}</strong>
+                            </p>
+                            <p class="ann-message">{{ ann.message }}</p>
+                            <span>
+                                by {{ ann.created_by.get_full_name|default:"Admin" }}
+                                &nbsp;·&nbsp;
+                                {{ ann.publish_date|timesince }} ago
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="ann-empty">
+                        <span class="ann-empty-icon">📭</span>
+                        <p>No announcements in the last 48 hours</p>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
 
-            <div class="activity-list-column">
-
-                <div class="activity-item">
-                    <div class="activity-avatar emerald">JD</div>
-                    <div class="activity-content">
-                        <p><strong>John Doe</strong> purchased Premium Plan</p>
-                        <span>2 minutes ago</span>
+            <!-- PLANNED SESSIONS -->
+            <div class="glass-card overview-card planned-sessions-card">
+                <div class="activity-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 class="card-label" style="color: #3b0764;">📅 PLANNED SESSIONS</h4>
+                            <p class="card-subtitle" style="color: #4c1d95;">Upcoming scheduled classes</p>
+                        </div>
+                        <a href="{% url 'student:batch_details' %}" class="ps-view-all">View All →</a>
                     </div>
                 </div>
 
-                <div class="activity-item">
-                    <div class="activity-avatar gold">AS</div>
-                    <div class="activity-content">
-                        <p><strong>Anna Smith</strong> submitted a support ticket</p>
-                        <span>15 minutes ago</span>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-avatar coral">MJ</div>
-                    <div class="activity-content">
-                        <p><strong>Mike Johnson</strong> upgraded subscription</p>
-                        <span>1 hour ago</span>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-avatar success">EW</div>
-                    <div class="activity-content">
-                        <p><strong>Emily White</strong> completed onboarding</p>
-                        <span>2 hours ago</span>
-                    </div>
-                </div>
-
-                <div class="activity-item">
-                    <div class="activity-avatar warning">RB</div>
-                    <div class="activity-content">
-                        <p><strong>Robert Brown</strong> requested refund</p>
-                        <span>3 hours ago</span>
-                    </div>
-                </div>
-
-            </div>
-
+                <div class="activity-list-column">
+                    <div class="ps-list">
+                   {% for session in planned_sessions %}
+    <div class="ps-item">
+        <div class="ps-dot
+            {% if forloop.first %}ps-dot-green
+            {% elif forloop.counter == 2 %}ps-dot-blue
+            {% else %}ps-dot-amber{% endif %}">
         </div>
+        <div class="ps-meta">
+            <div class="ps-topic">Session {{ session.lesson_plan.session_number }}&nbsp;·&nbsp; {{ session.lesson_plan.topic }}</div>
+            <div class="ps-info">
+            
+                Module {{ session.lesson_plan.module.module_number }} - {{ session.lesson_plan.module.title }}
+            </div>
+            <div class="ps-tags">
+                <p style="font-size:14px;">Planned Date: {{ session.planned_date|date:"F d, Y" }}</p>
+                {% if forloop.first %}
+                    <span class="ps-tag ps-tag-green">Next Up</span>
+                {% else %}
+                    <span class="ps-tag ps-tag-blue">Scheduled</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+<div class="ann-empty">
+    <span class="ann-empty-icon">📆</span>
+    <p>No planned sessions yet</p>
+</div>
+{% endfor %} 
+                    
+</div>
+    </div>
+</div>
+
+</div>
+</section>
         <script>
 document.addEventListener("DOMContentLoaded", function () {
 

@@ -97,10 +97,17 @@
             {% endif %}
 
         {% elif submission.status == "in_progress" %}
-            <a href="{% url 'student:do_task' task.id %}" 
-               class="do-task-btn">
-                Continue Task
-            </a>
+            
+            {% if task.is_overdue %}
+                <span class="status overdue">
+                    Submission Closed
+                </span>
+            {% else %}
+                <a href="{% url 'student:do_task' task.id %}" 
+                class="do-task-btn">
+                    Continue Task
+                </a>
+            {% endif %}
 
         {% endif %}
 

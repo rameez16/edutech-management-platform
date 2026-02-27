@@ -125,7 +125,7 @@
                             <div class="tab-content active" data-tab="completed">
                                 {% for session in md.completed %}
                                 <div class="session-card">
-                                    <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                                    <h5>Session {{ session.lesson_plan.session_number }} - {{ session.lesson_plan.topic }}</h5>
                                     <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
                                     <p><strong>Completed Date:</strong> {{ session.completed_at|date:"F d, Y" }}</p>
                                     {% if session.topics_covered %}<p><strong>Topics Covered:</strong> {{ session.topics_covered|linebreaksbr }}</p>{% endif %}
@@ -140,7 +140,7 @@
                             <div class="tab-content" data-tab="planned">
                                 {% for session in md.planned %}
                                 <div class="session-card">
-                                    <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                                    <h5>Session {{ session.lesson_plan.session_number }} - {{ session.lesson_plan.topic }}</h5>
                                     <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
                                     {% if session.topics_covered %}<p><strong>Topics:</strong> {{ session.topics_covered|linebreaksbr }}</p>{% endif %}
                                 </div>
@@ -153,7 +153,7 @@
                             <div class="tab-content" data-tab="pending">
                                 {% for session in md.pending %}
                                 <div class="session-card">
-                                    <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                                    <h5>Session {{ session.lesson_plan.session_number }} - {{ session.lesson_plan.topic }}</h5>
                                     <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
                                 </div>
                                 {% empty %}
@@ -165,7 +165,7 @@
                             <div class="tab-content" data-tab="skipped">
                                 {% for session in md.skipped %}
                                 <div class="session-card">
-                                    <h5>Session {{ session.lesson_plan.session_number }}</h5>
+                                    <h5>Session {{ session.lesson_plan.session_number }} - {{ session.lesson_plan.topic }}</h5>
                                     <p><strong>Planned Date:</strong> {{ session.planned_date|date:"F d, Y" }}</p>
                                 </div>
                                 {% empty %}
