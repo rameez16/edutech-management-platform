@@ -13,27 +13,21 @@ from dateutil.relativedelta import relativedelta
 import uuid
 import os
 import calendar
-<<<<<<< HEAD
 from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement,Notification
-=======
 from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement
->>>>>>> 98104d9ac80eec8bee4f2e28dc7d781fb2643c6b
 from apps.accounts.decorators import role_required
 from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial
 from apps.student.models import LeaveApplication
 from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCard,StudentFeedback
 from .forms import EnrollmentAgreementForm,TaskSubmissionForm
 from apps.student.forms import LeaveApplicationForm,StudentIssueForm
-<<<<<<< HEAD
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from collections import defaultdict
 from datetime import date
 
-=======
 from datetime import timedelta
 import re
->>>>>>> 98104d9ac80eec8bee4f2e28dc7d781fb2643c6b
 #rinta
 
 
