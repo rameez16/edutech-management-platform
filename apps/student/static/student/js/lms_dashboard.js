@@ -238,11 +238,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div id="lms-mini-header">
                     <span id="lms-mini-title"></span>
                     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                        <a id="lms-mini-yt-link" href="#" target="_blank" rel="noopener"
+                        <a id="lms-mini-ext-link" href="#" target="_blank" rel="noopener"
                            style="display:none;font-size:11px;color:#a78bfa;text-decoration:none;
                                   background:rgba(167,139,250,0.15);padding:4px 10px;
                                   border-radius:20px;white-space:nowrap;font-family:Segoe UI,sans-serif;">
-                            ↗ Open on YouTube
+                            ↗ Open externally
                         </a>
                         <button id="lms-mini-close" title="Close">✕</button>
                     </div>
@@ -297,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: calc(100% - 140px);
+            max-width: calc(100% - 160px);
             font-family: 'Segoe UI', sans-serif;
         }
         #lms-mini-close {
@@ -344,36 +344,56 @@ document.addEventListener("DOMContentLoaded", function () {
     const iframe   = document.getElementById("lms-mini-iframe");
     const titleEl  = document.getElementById("lms-mini-title");
     const closeBtn = document.getElementById("lms-mini-close");
-    const ytLink   = document.getElementById("lms-mini-yt-link");
+    const extLink  = document.getElementById("lms-mini-ext-link");
 
-    /* ── Helper: YouTube/Vimeo → embed URL ── */
+    /* ── Convert known platform URLs to embed URLs.
+          Falls back to raw URL for everything else. ── */
     function toEmbedUrl(url) {
         if (!url) return null;
+
+        // YouTube
         const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
         if (yt) return `https://www.youtube.com/embed/${yt[1]}?autoplay=1&rel=0`;
+
+        // Vimeo
         const vi = url.match(/vimeo\.com\/(\d+)/);
         if (vi) return `https://player.vimeo.com/video/${vi[1]}?autoplay=1`;
-        return null;
+
+        // Google Drive
+        const gd = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
+        if (gd) return `https://drive.google.com/file/d/${gd[1]}/preview`;
+
+        // Everything else — try loading directly in the iframe
+        return url;
     }
 
-    /* ── Open ── */
+    /* ── Human-readable label for the fallback link ── */
+    function getFallbackLabel(url) {
+        if (!url) return "↗ Open externally";
+        if (url.includes("youtube.com") || url.includes("youtu.be")) return "↗ Open on YouTube";
+        if (url.includes("drive.google.com"))                         return "↗ Open on Drive";
+        if (url.includes("vimeo.com"))                                return "↗ Open on Vimeo";
+        return "↗ Open externally";
+    }
+
+    /* ── Open player ── */
     function openPlayer(embedUrl, title, fallbackUrl) {
         iframe.src = embedUrl;
         titleEl.textContent = title || "Video";
 
-        // Show "Open on YouTube" link as fallback for embed-blocked videos
         if (fallbackUrl) {
-            ytLink.href = fallbackUrl;
-            ytLink.style.display = "";
+            extLink.href = fallbackUrl;
+            extLink.textContent = getFallbackLabel(fallbackUrl);
+            extLink.style.display = "";
         } else {
-            ytLink.style.display = "none";
+            extLink.style.display = "none";
         }
 
         player.style.display = "block";
         document.body.style.overflow = "hidden";
     }
 
-    /* ── Close ── */
+    /* ── Close player ── */
     function closePlayer() {
         player.style.display = "none";
         iframe.src = "";
@@ -386,33 +406,31 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.key === "Escape") closePlayer();
     });
 
-    /* ── Attach click to thumbnails ── */
+    /* ── Thumbnail click → open mini player ── */
+    /* Watch button is NOT intercepted — it navigates normally via its href */
     document.querySelectorAll(".lms-material-thumb").forEach(thumb => {
         thumb.style.cursor = "pointer";
 
-        thumb.addEventListener("click", function () {
-            const card       = this.closest(".lms-material-card");
-            const watchBtn   = card.querySelector(".lms-btn-primary");
-            const title      = card.querySelector(".lms-material-title")?.textContent?.trim();
+        thumb.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const card     = this.closest(".lms-material-card");
+            const watchBtn = card.querySelector(".lms-btn-primary");
+            const title    = card.querySelector(".lms-material-title")?.textContent?.trim();
 
             if (!watchBtn) return;
 
-            const externalUrl = watchBtn.dataset.externalUrl;
+            // Prefer data-external-url, fall back to data-file-url
+            const videoUrl = watchBtn.dataset.externalUrl || watchBtn.dataset.fileUrl;
 
-            if (!externalUrl) {
-                // No external URL — follow the watch button normally
-                watchBtn.click();
+            if (!videoUrl) {
+                // No video URL on the button — navigate normally
+                window.location.href = watchBtn.href;
                 return;
             }
 
-            const embedUrl = toEmbedUrl(externalUrl);
-
-            if (embedUrl) {
-                openPlayer(embedUrl, title, externalUrl);
-            } else {
-                // Not a YouTube/Vimeo link — open directly
-                window.open(externalUrl, "_blank", "noopener");
-            }
+            openPlayer(toEmbedUrl(videoUrl), title, videoUrl);
         });
     });
 

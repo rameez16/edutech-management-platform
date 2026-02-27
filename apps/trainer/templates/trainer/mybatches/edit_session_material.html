@@ -1,0 +1,61 @@
+{% extends "trainer/mybatches/base.html" %}
+
+{% block tab_content %}
+
+<div class="material-page-wrapper">
+    <div class="material-card">
+
+        <div class="material-card-header">
+            <h4 class="material-card-title material-title-with-back">
+
+                <a href="{% url 'trainer:add-session-material' material.lesson_session.id %}"
+                   class="material-back-link">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    width="20"
+                    height="20">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+                </a>
+
+                Edit Material – {{ material.title }}
+            </h4>
+        </div>
+
+        <div class="material-form-section">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="material-field-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+
+                        {% if field.errors %}
+                            <div class="material-error-text">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="material-actions">
+                    <button type="submit" class="material-btn-primary">
+                        Update Material
+                    </button>
+
+                    <a href="{% url 'trainer:session-material-detail' material.id %}"
+                       class="material-btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

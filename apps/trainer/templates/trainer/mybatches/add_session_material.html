@@ -42,9 +42,23 @@
         <h5>Uploaded Materials</h5>
         <ul>
             {% for material in session.materials.all %}
-                <li>
-                    {{ material.title }}
-                    ({{ material.get_material_type_display }})
+                <li class="material-item">
+                    <div class="material-info">
+                        <strong>{{ material.title }}</strong>
+                        <span>({{ material.get_material_type_display }})</span>
+                    </div>
+
+                    <div class="material-item-actions">
+                        <a href="{% url 'trainer:session-material-detail' material.id %}"
+                        class="material-btn-view">
+                            View
+                        </a>
+
+                        <a href="{% url 'trainer:edit-session-material' material.id %}"
+                        class="material-btn-edit">
+                            Edit
+                        </a>
+                    </div>
                 </li>
             {% endfor %}
         </ul>

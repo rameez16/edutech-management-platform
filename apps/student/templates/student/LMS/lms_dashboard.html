@@ -20,8 +20,8 @@
     <div class="lms-header">
         <h2 class="lms-title">LMS Portal</h2>
         <p class="lms-meta">
-            <span class="lms-batch-name">{{ batch.name }}</span>
-            &middot;
+            
+           
             <span class="lms-course-name">{{ batch.course.name }}</span>
             &middot;
             <span class="lms-duration">{{ batch.duration_months }} months</span>
@@ -162,38 +162,45 @@
                         </div>
 
                         <!-- ACTION BUTTONS -->
-                        <div class="lms-material-actions">
-                            {% if material.external_link %}
-                                {% if material.material_type == 'recording' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}" data-external-url="{{ material.external_link }}">▶ Watch</a>
-                                {% elif material.material_type == 'assignment' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
-                                {% elif material.material_type == 'slides' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">🖼 View</a>
-                                {% elif material.material_type == 'reference' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📚 Open</a>
-                                {% elif material.material_type == 'other' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📎 Open</a>
-                                {% else %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">👁 View PDF</a>
-                                {% endif %}
-                            {% elif material.file %}
-                                {% if material.material_type == 'recording' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}" data-external-url="{{ material.external_link }}">▶ Watch</a>
-                                {% elif material.material_type == 'notes' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📄 View PDF</a>
-                                {% elif material.material_type == 'slides' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">🖼 View</a>
-                                {% elif material.material_type == 'assignment' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
-                                {% elif material.material_type == 'reference' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📚 Open</a>
-                                {% else %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📎 Open</a>
-                                {% endif %}
-                                <a href="{% url 'student:lms_download_material' material.id %}" class="lms-btn lms-btn-secondary" data-material-id="{{ material.id }}">⬇ Download</a>
-                            {% endif %}
-                        </div>
+                        
+<div class="lms-material-actions">
+    {% if material.external_link %}
+        {% if material.material_type == 'recording' %}
+        <a href="{{ material.external_link }}" target="_blank"
+           class="lms-btn lms-btn-primary"
+           data-material-id="{{ material.id }}"
+           data-external-url="{{ material.external_link }}">▶ Watch</a>
+        {% elif material.material_type == 'assignment' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
+        {% elif material.material_type == 'slides' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">🖼 View</a>
+        {% elif material.material_type == 'reference' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📚 Open</a>
+        {% elif material.material_type == 'other' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📎 Open</a>
+        {% else %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">👁 View PDF</a>
+        {% endif %}
+    {% elif material.file %}
+        {% if material.material_type == 'recording' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" target="_blank"
+           class="lms-btn lms-btn-primary"
+           data-material-id="{{ material.id }}"
+           data-file-url="{{ material.file.url }}">▶ Watch</a>
+        {% elif material.material_type == 'notes' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📄 View PDF</a>
+        {% elif material.material_type == 'slides' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">🖼 View</a>
+        {% elif material.material_type == 'assignment' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
+        {% elif material.material_type == 'reference' %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📚 Open</a>
+        {% else %}
+        <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📎 Open</a>
+        {% endif %}
+        <a href="{% url 'student:lms_download_material' material.id %}" class="lms-btn lms-btn-secondary" data-material-id="{{ material.id }}">⬇ Download</a>
+    {% endif %}
+</div>
 
                     </div><!-- /lms-material-card -->
                     {% endfor %}

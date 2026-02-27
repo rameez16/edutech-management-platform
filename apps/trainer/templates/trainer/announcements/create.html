@@ -1,0 +1,73 @@
+{% extends "trainer/tasks/base.html" %}
+{% block content %}
+
+<div class="glass-card">
+    <!-- Header -->
+  <div class="announcement-create-header">
+    <!-- Back Button -->
+    <a href="{% url 'trainer:all_announcements' %}" class="announcement-back-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </a>
+
+    <h4>Create New Announcement</h4>
+  </div>
+
+    <form method="POST" class="announcement-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="announcement-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            {% if field.name == 'is_important' %}
+                <!-- Inline checkbox for important -->
+                <div class="announcement-form-group checkbox-group">
+                    <label class="checkbox-label">
+                        {{ field }} {{ field.label }}
+                    </label>
+
+                    {% if field.errors %}
+                        <small class="announcement-field-error">
+                            {{ field.errors|striptags }}
+                        </small>
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <small class="announcement-help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="announcement-form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+
+                    {% if field.errors %}
+                        <small class="announcement-field-error">
+                            {{ field.errors|striptags }}
+                        </small>
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <small class="announcement-help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="announcement-form-actions">
+            <button type="submit" class="announcement-btn-create">
+                Create Announcement
+            </button>
+            <a href="{% url 'trainer:all_announcements' %}" class="announcement-btn-cancel">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

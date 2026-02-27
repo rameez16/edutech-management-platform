@@ -2,7 +2,7 @@ from django import forms
 from apps.bdm.models import Trainer
 from apps.trainer.models import Task, TaskSubmission, LessonSession, SessionMaterial
 from django.utils import timezone 
-from apps.bdm.models import StudentIssue
+from apps.bdm.models import StudentIssue, Announcement
 class TrainerProfileForm(forms.ModelForm):
     class Meta:
         model = Trainer
@@ -97,18 +97,64 @@ class CompletedSessionForm(forms.ModelForm):
         }
         
 class SessionMaterialForm(forms.ModelForm):
+
     class Meta:
         model = SessionMaterial
-        exclude = [
-            'lesson_session',
-            'uploaded_by',
-            'upload_date',
-            'file_size_mb',
-            'view_count',
-            'download_count',
-            'created_at',
-            'updated_at'
+        fields = [
+            'title',
+            'material_type',
+            'description',
+            'file',
+            'external_link',
+            'duration_minutes',
+            'video_platform',
+            'is_mandatory',
+            'is_public',
         ]
+
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter material title'
+            }),
+
+            'material_type': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional description'
+            }),
+
+            'file': forms.ClearableFileInput(attrs={
+                'class': 'form-control'
+            }),
+
+            'external_link': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'https://...'
+            }),
+
+            'duration_minutes': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Duration in minutes'
+            }),
+
+            'video_platform': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'YouTube, Vimeo, etc.'
+            }),
+
+            'is_mandatory': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+
+            'is_public': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+        }
         
         
 class TrainerIssueResolveForm(forms.ModelForm):
@@ -124,4 +170,27 @@ class TrainerIssueResolveForm(forms.ModelForm):
                     "placeholder": "Enter resolution notes here..."
                 }
             ),
+        }
+        
+class AnnouncementForm(forms.ModelForm):
+    """
+    Form for trainers to create or edit announcements.
+    Audience is fixed to 'students' and not shown in the form.
+    """
+    class Meta:
+        model = Announcement
+        fields = ['title', 'message', 'is_important', 'expiry_date']
+        widgets = {
+            'expiry_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'message': forms.Textarea(attrs={'rows': 4}),
+        }
+        labels = {
+            'title': 'Announcement Title',
+            'message': 'Message',
+            'is_important': 'Mark as Important',
+            'expiry_date': 'Expiry Date (optional)',
+        }
+        help_texts = {
+            'is_important': 'Important announcements may be highlighted.',
+            'expiry_date': 'Optional. Leave blank if the announcement should not expire.',
         }

@@ -1,0 +1,218 @@
+/* ================= HEADER ================= */
+
+.announcement-header-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 15px 10px;
+    text-align: center;
+}
+
+.announcement-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.heading-icon {
+    font-size: 26px;
+}
+
+.announcement-heading h2 {
+    margin: 0;
+    font-size: 40px;
+   
+}
+
+.announcement-heading p {
+    margin: 3px 0 0;
+    font-size: 30px;
+    opacity: 0.6;
+}
+
+/* ================= TABS ================= */
+
+.announcement-tabs {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.tab {
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    font-size: 20px;
+    opacity: 0.75;
+    transition: 0.2s ease;
+}
+
+.tab:hover {
+    opacity: 1;
+}
+
+.tab.active {
+    background: rgba(22, 119, 255, 0.15);
+    color: #1677ff;
+    font-weight: 600;
+    opacity: 1;
+}
+
+/* ================= WRAPPER ================= */
+
+.announcement-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 10px 15px 20px;
+}
+
+/* ================= CARD BASE ================= */
+
+.announcement-card {
+    border-radius: 14px;
+    padding: 16px;
+    background: white;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: 0.25s ease;
+    border-left: 4px solid transparent;
+}
+
+.announcement-card:hover {
+    transform: translateY(-2px);
+}
+
+/* ================= CARD HEADER ================= */
+
+.announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.left-section {
+    display: flex;
+    gap: 10px;
+}
+
+.announcement-icon {
+    font-size: 20px;
+}
+
+/* Category */
+
+.announcement-category {
+    font-size: 20px;
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+/* Title */
+
+.announcement-card h4 {
+    margin: 4px 0;
+    font-size: 18px;
+}
+
+/* Date */
+
+.announcement-date {
+    font-size: 15px;
+    opacity: 0.5;
+}
+
+/* ================= MESSAGE ================= */
+
+.announcement-message {
+    font-size: 16px;
+    opacity: 0.75;
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+/* ================= FOOTER ================= */
+
+.announcement-footer {
+    display: flex;
+    gap: 15px;
+    font-size: 16px;
+    opacity: 0.6;
+}
+
+/* ================= TRAINER STYLE ================= */
+
+.announcement-card.trainer {
+    border-left-color: #1677ff;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* ================= BDM / ADMIN STYLE ================= */
+
+.announcement-card.bdm {
+    border-left-color: #52c41a;
+    background: rgba(245, 247, 250, 0.95);
+}
+
+/* ================= IMPORTANT STYLE ================= */
+
+.announcement-card.important {
+    border-left-color: #ff4d4f;
+}
+
+/* Badge */
+
+.priority-tag {
+    background: rgba(255, 77, 79, 0.15);
+    color: #ff4d4f;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+/* ================= EMPTY STATE ================= */
+
+.no-announcements {
+    text-align: center;
+    opacity: 0.5;
+    font-size: 18px;
+}
+
+/* ================= TAB CONTROL ================= */
+
+.hidden {
+    display: none;
+}
+
+/* Pagination */
+
+.pagination {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 8px 14px;
+    margin: 0 5px;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.pagination a:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+}
+
+.current-page {
+    margin: 0 10px;
+    font-weight: 600;
+    color: #444;
+}

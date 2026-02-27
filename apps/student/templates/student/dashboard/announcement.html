@@ -1,0 +1,160 @@
+{% extends "student/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'student/css/announcement.css' %}">
+
+<div class="announcement-top-bar">
+
+    <div class="announcement-header-bar">
+        <div>
+            <h1>Announcements</h1>
+            <p>Latest updates & notices</p>
+        </div>
+
+        <div class="announcement-tabs">
+            <button class="tab {% if active_tab == 'all' %}active{% endif %}" 
+                    onclick="showTab('all')">All</button>
+
+            <button class="tab {% if active_tab == 'trainer' %}active{% endif %}" 
+                    onclick="showTab('trainer')">Trainer</button>
+
+            <button class="tab {% if active_tab == 'bdm' %}active{% endif %}" 
+                    onclick="showTab('bdm')">Admin</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ================= ALL ================= -->
+<div id="tab-all" class="announcement-wrapper {% if active_tab != 'all' %}hidden{% endif %}">
+
+    {% for a in announcements_all %}
+    <div class="announcement-card 
+        {% if a.created_by.trainer %}trainer{% else %}bdm{% endif %}
+        {% if a.is_important %}important{% endif %}
+    ">
+
+        <div class="announcement-header">
+            <div class="left">
+                <span class="icon">
+                    {% if a.created_by.trainer %}👨‍🏫{% else %}📢{% endif %}
+                </span>
+
+                <div>
+                    <span class="category">
+                        {% if a.created_by.trainer %}
+                            TRAINER UPDATE
+                        {% else %}
+                            ADMIN NOTICE
+                        {% endif %}
+                    </span>
+                    <h4>{{ a.title }}</h4>
+                </div>
+            </div>
+
+            <div class="right">
+                {% if a.is_important %}
+                    <span class="priority">IMPORTANT</span>
+                {% endif %}
+                <span class="date">{{ a.publish_date|date:"M d, Y" }}</span>
+            </div>
+        </div>
+
+        <p class="message">{{ a.message }}</p>
+
+        <div class="footer">
+            <span>Created by: {{ a.created_by }}</span>
+
+            {% if a.expiry_date %}
+                <span>Expires: {{ a.expiry_date|date:"M d, Y" }}</span>
+            {% endif %}
+        </div>
+
+    </div>
+    {% empty %}
+        <p class="empty">No announcements available</p>
+    {% endfor %}
+
+    <!-- ✅ PAGINATION -->
+    <div class="pagination">
+
+        {% if announcements_all.has_previous %}
+            <a href="?page=1&tab=all">« First</a>
+            <a href="?page={{ announcements_all.previous_page_number }}&tab=all">‹ Prev</a>
+        {% endif %}
+
+        <span>
+            Page {{ announcements_all.number }} / {{ announcements_all.paginator.num_pages }}
+        </span>
+
+        {% if announcements_all.has_next %}
+            <a href="?page={{ announcements_all.next_page_number }}&tab=all">Next ›</a>
+            <a href="?page={{ announcements_all.paginator.num_pages }}&tab=all">Last »</a>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- ================= TRAINER ================= -->
+<div id="tab-trainer" class="announcement-wrapper {% if active_tab != 'trainer' %}hidden{% endif %}">
+    {% for a in announcements_trainer %}
+        <div class="announcement-card trainer {% if a.is_important %}important{% endif %}">
+            <h4>{{ a.title }}</h4>
+            <p>{{ a.message }}</p>
+        </div>
+    {% empty %}
+        <p class="empty">No trainer announcements</p>
+    {% endfor %}
+</div>
+
+<!-- ================= ADMIN ================= -->
+<div id="tab-bdm" class="announcement-wrapper {% if active_tab != 'bdm' %}hidden{% endif %}">
+    {% for a in announcements_bdm %}
+        <div class="announcement-card bdm {% if a.is_important %}important{% endif %}">
+            <h4>{{ a.title }}</h4>
+            <p>{{ a.message }}</p>
+        </div>
+    {% empty %}
+        <p class="empty">No admin announcements</p>
+    {% endfor %}
+</div>
+
+<!-- ✅ TAB SCRIPT -->
+<script>
+function showTab(tabName) {
+
+    document.querySelectorAll(".announcement-wrapper")
+        .forEach(tab => tab.classList.add("hidden"));
+
+    document.getElementById("tab-" + tabName)
+        .classList.remove("hidden");
+
+    document.querySelectorAll(".tab")
+        .forEach(btn => btn.classList.remove("active"));
+
+    document.querySelector(`[onclick="showTab('${tabName}')"]`)
+        .classList.add("active");
+
+    const url = new URL(window.location);
+    url.searchParams.set("tab", tabName);
+
+    if (tabName !== "all") {
+        url.searchParams.delete("page");  
+    }
+
+    window.history.replaceState({}, '', url);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const params = new URLSearchParams(window.location.search);
+    const activeTab = params.get("tab") || "all";
+
+    showTab(activeTab);
+});
+</script>
+
+{% endblock %}

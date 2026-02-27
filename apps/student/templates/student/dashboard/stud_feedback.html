@@ -10,7 +10,7 @@
 <div class="admin-container">
     <h1>Student Feedback</h1>
 
-    <!-- 🔔 MESSAGE DISPLAY -->
+    <!-- ✅ Messages -->
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -24,17 +24,28 @@
     <form method="post" action="{% url 'student:stud_feedback' %}">
         {% csrf_token %}
 
-        <!-- Student -->
+        <!-- ✅ Student Locked -->
         <div class="form-row">
             <label>Student:</label>
-            <select name="student">
-                <option value="">---------</option>
-                {% for s in students %}
-                    <option value="{{ s.id }}">
-                        {{ s.full_name|default:s.user.username }}
-                    </option>
-                {% endfor %}
-            </select>
+            <input type="text"
+                   value="{{ student.full_name|default:student.user.username }}"
+                   disabled>
+        </div>
+
+        <!-- ✅ Course Locked -->
+        <div class="form-row">
+            <label>Course:</label>
+            <input type="text"
+                   value="{% if batch %}{{ batch.course.name }}{% else %}Not Assigned{% endif %}"
+                   disabled>
+        </div>
+
+        <!-- ✅ Batch Locked -->
+        <div class="form-row">
+            <label>Batch:</label>
+            <input type="text"
+                   value="{% if batch %}{{ batch.name }}{% else %}Not Assigned{% endif %}"
+                   disabled>
         </div>
 
         <!-- Feedback Type -->
@@ -51,38 +62,21 @@
             </select>
         </div>
 
-        <!-- Trainer -->
+        <!-- ✅ Trainer Filtered -->
         <div class="form-row">
             <label>Trainer:</label>
             <select name="trainer">
                 <option value="">---------</option>
-                {% for t in trainers %}
-                    <option value="{{ t.id }}">
-                        {{ t.full_name|default:t.user.username }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
 
-        <!-- Course -->
-        <div class="form-row">
-            <label>Course:</label>
-            <select name="course">
-                <option value="">---------</option>
-                {% for c in courses %}
-                    <option value="{{ c.id }}">{{ c.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Batch -->
-        <div class="form-row">
-            <label>Batch:</label>
-            <select name="batch">
-                <option value="">---------</option>
-                {% for b in batches %}
-                    <option value="{{ b.id }}">{{ b.name }}</option>
-                {% endfor %}
+                {% if trainers %}
+                    {% for t in trainers %}
+                        <option value="{{ t.id }}">
+                            {{ t.full_name|default:t.user.username }}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">No Trainers Available</option>
+                {% endif %}
             </select>
         </div>
 
@@ -110,13 +104,17 @@
         <!-- Comments -->
         <div class="form-row textarea-row">
             <label>Comments:</label>
-            <textarea name="comments" rows="4" placeholder="Write your feedback here..."></textarea>
+            <textarea name="comments"
+                      rows="4"
+                      placeholder="Write your feedback here..."></textarea>
         </div>
 
         <!-- Suggestions -->
         <div class="form-row textarea-row">
             <label>Suggestions:</label>
-            <textarea name="suggestions" rows="4" placeholder="Any suggestions for improvement?"></textarea>
+            <textarea name="suggestions"
+                      rows="4"
+                      placeholder="Any suggestions for improvement?"></textarea>
         </div>
 
         <!-- Anonymous -->
@@ -129,8 +127,11 @@
 
         <!-- Submit -->
         <div class="actions">
-            <button type="submit" class="btn primary">Submit Feedback</button>
+            <button type="submit" class="btn primary">
+                Submit Feedback
+            </button>
         </div>
+
     </form>
 </div>
 
