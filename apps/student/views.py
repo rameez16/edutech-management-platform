@@ -1184,7 +1184,35 @@ def student_issues(request):
 
 
 
-#rinta+niranjana
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Niranjana
 
 @role_required("student")
 def dashboard(request):
@@ -1618,14 +1646,6 @@ def dashboard(request):
 
 
 
-   
-
-
-
-
-
-
-#niranjana
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
