@@ -37,7 +37,7 @@
         <!-- My Batches -->
         <li class="nav-item">
             <a href="{% url 'trainer:batches' %}"
-               class="nav-link {% if request.resolver_match.url_name == 'batches' or request.resolver_match.url_name == 'batch-overview' or request.resolver_match.url_name == 'batch-students' or request.resolver_match.url_name == 'batch-student-details' or request.resolver_match.url_name == 'batch-lesson-plan' or request.resolver_match.url_name == 'batch-feedback' or request.resolver_match.url_name == 'batch-sessions' or request.resolver_match.url_name == 'completed-session-detail' or request.resolver_match.url_name == 'add-session-material'%}active{% endif %}">
+               class="nav-link {% if request.resolver_match.url_name == 'batches' or request.resolver_match.url_name == 'batch-overview' or request.resolver_match.url_name == 'batch-students' or request.resolver_match.url_name == 'batch-student-details' or request.resolver_match.url_name == 'batch-lesson-plan' or request.resolver_match.url_name == 'batch-feedback' or request.resolver_match.url_name == 'batch-sessions' or request.resolver_match.url_name == 'completed-session-detail' or request.resolver_match.url_name == 'add-session-material' or request.resolver_match.url_name == 'session-material-detail' or request.resolver_match.url_name == 'edit-session-material' %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="18" height="6"/>
                     <rect x="3" y="9" width="18" height="6"/>
@@ -63,7 +63,7 @@
         <!-- Task Management -->
         <li class="nav-item">
             <a href="{% url 'trainer:task-dashboard' %}"
-                class="nav-link {% if request.resolver_match.url_name == 'task-list' or request.resolver_match.url_name == 'task-dashboard' or request.resolver_match.url_name == 'task-create' or request.resolver_match.url_name == 'task-list' or request.resolver_match.url_name == 'task-submissions' or request.resolver_match.url_name == 'task-evaluate'%}active{% endif %}">
+                class="nav-link {% if request.resolver_match.url_name == 'task-list' or request.resolver_match.url_name == 'task-dashboard' or request.resolver_match.url_name == 'task-create' or request.resolver_match.url_name == 'task-list' or request.resolver_match.url_name == 'task-view' or request.resolver_match.url_name == 'task-edit' or request.resolver_match.url_name == 'task-submissions' or request.resolver_match.url_name == 'task-evaluate'%}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 11l3 3L22 4"/>
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
@@ -74,7 +74,8 @@
 
         <!-- Announcements -->
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{% url 'trainer:all_announcements' %}" 
+               class="nav-link {% if request.resolver_match.url_name == 'all_announcements' or request.resolver_match.url_name == 'create_announcement' or request.resolver_match.url_name == 'view_announcement' or request.resolver_match.url_name == 'edit_announcement' %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 11l18-5v12l-18-5z"/>
                     <path d="M11 15v4"/>
