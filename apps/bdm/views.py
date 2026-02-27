@@ -1254,9 +1254,13 @@ def payment_history(request, student_id):
     balance = course_fee
     progress = 0
 
-    # Only include course-related payments: installments + full payment
+    # Include ADMISSION + INSTALLMENT + FULL PAYMENT
     course_payments = payments.filter(
-        payment_type__in=[FeePayment.PaymentType.INSTALLMENT, FeePayment.PaymentType.FULL_PAYMENT]
+    payment_type__in=[
+        FeePayment.PaymentType.ADMISSION,
+        FeePayment.PaymentType.INSTALLMENT,
+        FeePayment.PaymentType.FULL_PAYMENT,
+    ]
     )
 
     # Sum only COMPLETED payments
@@ -1617,6 +1621,32 @@ def module_detail_view(request, pk):
     return render(request, 'bdm/course/module_detail.html', context)
 
 
+@login_required
+def course_create(request):
+    if request.method == "POST":
+        try:
+            Course.objects.create(
+                name=request.POST.get("name"),
+                description=request.POST.get("description"),
+                duration=request.POST.get("duration"),
+                tech_stack=request.POST.get("tech_stack"),
+                course_fee=request.POST.get("course_fee"),
+                syllabus=request.POST.get("syllabus"),
+                is_active=request.POST.get("is_active") == "on",
+            )
+
+            messages.success(request, "Course created successfully!")
+            return redirect("bdm:course_list")
+
+        except Exception as e:
+            messages.error(request, f"Error creating course: {e}")
+            return redirect("bdm:course_list")
+
+    return redirect("bdm:course_list")
+
+
+
+
 
 #trainer-page-aleena
 def trainer_list_view(request):
@@ -1769,7 +1799,7 @@ def student_issue_detail(request, pk):
             issue.save()
 
             messages.success(request, "Issue assigned successfully.")
-            return redirect('bdm/student_issue/student_issue_detail', pk=issue.pk)
+            return redirect('bdm:student_issue_detail', pk=issue.pk)
 
     context = {
         'issue': issue,
