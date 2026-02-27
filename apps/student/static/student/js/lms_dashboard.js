@@ -346,16 +346,33 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeBtn = document.getElementById("lms-mini-close");
     const ytLink   = document.getElementById("lms-mini-yt-link");
 
-    /* ── Helper: YouTube/Vimeo → embed URL ── */
-    function toEmbedUrl(url) {
-        if (!url) return null;
-        const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
-        if (yt) return `https://www.youtube.com/embed/${yt[1]}?autoplay=1&rel=0`;
-        const vi = url.match(/vimeo\.com\/(\d+)/);
-        if (vi) return `https://player.vimeo.com/video/${vi[1]}?autoplay=1`;
-        return null;
+        /* ── Helper: YouTube/Vimeo → embed URL ── */
+function toEmbedUrl(url) {
+    if (!url) return null;
+
+    // YouTube match
+    const yt = url.match(
+        /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/
+    );
+
+    if (yt) {
+        return `https://www.youtube.com/embed/${yt[1]}?` +
+               `autoplay=1` +
+               `&rel=0` +
+               `&modestbranding=1` +
+               `&playsinline=1` +
+               `&enablejsapi=1` +
+               `&origin=${window.location.origin}`;
     }
 
+    // Vimeo match
+    const vi = url.match(/vimeo\.com\/(\d+)/);
+    if (vi) {
+        return `https://player.vimeo.com/video/${vi[1]}?autoplay=1`;
+    }
+
+    return null;
+}
     /* ── Open ── */
     function openPlayer(embedUrl, title, fallbackUrl) {
         iframe.src = embedUrl;

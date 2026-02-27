@@ -2393,11 +2393,16 @@ def lmsdashboard(request):
 def lms_view_material(request, pk):
     material = get_object_or_404(SessionMaterial, pk=pk)
     material.increment_views()
+
+    embed_url = None
+
     if material.external_link:
-        return redirect(material.external_link)
-    if material.file:
-        return redirect(material.file.url)
-    return redirect('student:lms_dashboard')
+        embed_url = material.external_link
+
+    return render(request, "student/lms_material_view.html", {
+        "material": material,
+        "embed_url": embed_url
+    })
 
 
 @role_required("student")
