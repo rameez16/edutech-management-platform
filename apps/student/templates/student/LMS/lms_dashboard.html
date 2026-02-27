@@ -113,16 +113,26 @@
                         <div class="lms-material-type-bar lms-bar-{{ material.material_type }}"></div>
 
                         <!-- ICON -->
-                        <div class="lms-material-icon lms-icon-{{ material.material_type }}">
-                            {% if material.material_type == 'recording' %}🎬
-                            {% elif material.material_type == 'notes' %}📝
-                            {% elif material.material_type == 'slides' %}📊
-                            {% elif material.material_type == 'code' %}💻
-                            {% elif material.material_type == 'assignment' %}🎯
-                            {% elif material.material_type == 'reference' %}📚
-                            {% else %}📎
-                            {% endif %}
-                        </div>
+                        {% if material.material_type == 'recording' %}
+                            <div class="lms-material-thumb">
+                                {% if material.thumbnail_url %}
+                                    <img src="{{ material.thumbnail_url }}" alt="{{ material.title }}" loading="lazy">
+                                {% else %}
+                                    <div class="lms-thumb-fallback">🎬</div>
+                                {% endif %}
+                                <div class="lms-thumb-play">▶</div>
+                            </div>
+                        {% else %}
+                            <div class="lms-material-icon lms-icon-{{ material.material_type }}">
+                                {% if material.material_type == 'notes' %}📝
+                                {% elif material.material_type == 'slides' %}📊
+                                {% elif material.material_type == 'code' %}💻
+                                {% elif material.material_type == 'assignment' %}🎯
+                                {% elif material.material_type == 'reference' %}📚
+                                {% else %}📎
+                                {% endif %}
+                            </div>
+                        {% endif %}
 
                         <!-- MATERIAL INFO -->
                         <div class="lms-material-info">
@@ -155,7 +165,7 @@
                         <div class="lms-material-actions">
                             {% if material.external_link %}
                                 {% if material.material_type == 'recording' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">▶ Watch</a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}" data-external-url="{{ material.external_link }}">▶ Watch</a>
                                 {% elif material.material_type == 'assignment' %}
                                 <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📋 View Task</a>
                                 {% elif material.material_type == 'slides' %}
@@ -169,7 +179,7 @@
                                 {% endif %}
                             {% elif material.file %}
                                 {% if material.material_type == 'recording' %}
-                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">▶ Watch</a>
+                                <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}" data-external-url="{{ material.external_link }}">▶ Watch</a>
                                 {% elif material.material_type == 'notes' %}
                                 <a href="{% url 'student:lms_view_material' material.id %}" class="lms-btn lms-btn-primary" data-material-id="{{ material.id }}">📄 View PDF</a>
                                 {% elif material.material_type == 'slides' %}
