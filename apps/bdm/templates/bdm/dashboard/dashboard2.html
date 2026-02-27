@@ -1,6 +1,8 @@
 {% extends "bdm/layout/base.html" %}
 {% load humanize %}
 
+{% load static %}
+
 {% block title %}Dashboard — DeepSeek Bootcamp Admin{% endblock %}
 
 {% block extra_head %}
@@ -918,7 +920,7 @@ body {
         <i class="bi bi-calendar3"></i>
         {% now "l, j F Y" %}
         <span class="ds-dot"></span>
-        Bootcamp Operations
+        Batch Operations
       </div>
     </div>
     <div class="ds-header-actions">
@@ -926,10 +928,11 @@ body {
         <i class="bi bi-download"></i>
         Export
       </button>
-      <button class="ds-btn ds-btn-primary ds-btn-sm">
-        <i class="bi bi-plus-lg"></i>
-        New Batch
-      </button>
+      <a href="{% url 'bdm:create_user' %}" 
+   class="ds-btn ds-btn-primary ds-btn-sm">
+    <i class="bi bi-plus-lg"></i>
+    Add User
+</a>
     </div>
   </div>
 
@@ -1132,14 +1135,14 @@ body {
             <svg width="120" height="120" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--ds-gray-200)" stroke-width="3.5"/>
               <circle cx="18" cy="18" r="15.9" fill="none"
-                      stroke="var(--ds-blue-500)" stroke-width="3.5"
+                      stroke="var(--ds-blue-500)" stroke-width="2.5"
                       stroke-dasharray="{{ fee_collected_pct|default:'0' }} 100"
                       stroke-dashoffset="25"
                       stroke-linecap="round"/>
             </svg>
             <div class="ds-donut-center">
               <div class="ds-donut-percent">{{ fee_collected_pct|default:"0" }}%</div>
-              <div class="ds-donut-label">Collected</div>
+              <div class="ds-donut-label"></div>
             </div>
           </div>
           <div class="ds-donut-legend">
@@ -1237,14 +1240,37 @@ body {
       </div>
       <div class="ds-card-body">
         <div class="ds-actions-grid">
-          <button class="ds-action-item"><i class="bi bi-collection-fill"></i> New Batch</button>
-          <button class="ds-action-item"><i class="bi bi-journal-bookmark-fill"></i> New Course</button>
-          <button class="ds-action-item"><i class="bi bi-person-plus-fill"></i> Add Lead</button>
-          <button class="ds-action-item"><i class="bi bi-mortarboard-fill"></i> Enroll</button>
-          <button class="ds-action-item"><i class="bi bi-person-badge-fill"></i> Add Trainer</button>
-          <button class="ds-action-item"><i class="bi bi-person-gear"></i> Add User</button>
-          <button class="ds-action-item"><i class="bi bi-receipt"></i> Record Fee</button>
-          <button class="ds-action-item"><i class="bi bi-clipboard2-check-fill"></i> Schedule Exam</button>
+            <a href="{% url 'bdm:batch_list' %}" class="ds-action-item">
+                <i class="bi bi-collection-fill"></i> Manage Batch
+              </a>
+              
+              <a href="{% url 'bdm:course_create' %}" class="ds-action-item">
+                <i class="bi bi-journal-bookmark-fill"></i> New Course
+              </a>
+              
+              <a href="{% url 'bdm:create_lead' %}" class="ds-action-item">
+                <i class="bi bi-person-plus-fill"></i> Add Lead
+              </a>
+              
+              <a href="{% url 'bdm:student_onboarding' %}" class="ds-action-item">
+                <i class="bi bi-mortarboard-fill"></i>  Manage Onboarding
+              </a>
+              
+              <a href="{% url 'bdm:batch_list_manage' %}" class="ds-action-item">
+                <i class="bi bi-person-badge-fill"></i> Schedule class
+              </a>
+              
+              <a href="{% url 'bdm:payments_dashboard' %}" class="ds-action-item">
+                <i class="bi bi-person-gear"></i> Track payments
+              </a>
+              
+              <a href="{% url 'bdm:student_issue_list' %}" class="ds-action-item">
+                <i class="bi bi-receipt"></i> Track student issues
+              </a>
+              
+              <a  class="ds-action-item">
+                <i class="bi bi-clipboard2-check-fill"></i> Schedule Exam
+              </a>
         </div>
 
         {% if urgent_issues %}

@@ -1928,6 +1928,8 @@ from apps.student.models import FeePayment, StudentDocument, EnrollmentAgreement
 # New dashboard -ramees
 
 @login_required
+@login_required
+@role_required('admin')
 def dashboard(request):
     today = timezone.now().date()
     now = timezone.now()
@@ -2001,7 +2003,7 @@ def dashboard(request):
     # ── ATTENDANCE OVERVIEW ─────────────────────────────────────
     # Import Attendance from the tracker app
     try:
-        from apps.student.models import Attendance
+        from apps.trainer.models import Attendance
         # Today's attendance across all batches
         today_records = Attendance.objects.filter(date=today)
         today_present = today_records.filter(status__in=['present', 'late']).count()
