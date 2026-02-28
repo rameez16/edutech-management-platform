@@ -301,15 +301,12 @@ def batch_overview_view(request, batch_id):
         .get(id=batch_id, trainers=trainer)
     )
 
-    today = timezone.now().date()
+    # Progress calculation based on LessonSession
+    progress_data = LessonSession.get_batch_progress(batch)
 
-    # Progress calculation
-    total_days = (batch.expected_finish_date - batch.start_date).days
-    completed_days = max((today - batch.start_date).days, 0)
-
-    progress = 0
-    if total_days > 0:
-        progress = min(round((completed_days / total_days) * 100), 100)
+    progress = progress_data["progress_percentage"]
+    classes_completed = progress_data["completed"]
+    total_classes = progress_data["total"]
 
     # Student stats
     total_students = batch.students.count()
@@ -319,7 +316,8 @@ def batch_overview_view(request, batch_id):
     context = {
         "batch": batch,
         "progress": progress,
-        "classes_completed": completed_days,
+        "classes_completed": classes_completed,
+        "total_classes": total_classes,
         "total_students": total_students,
         "active_students": active_students,
         "inactive_students": inactive_students,
