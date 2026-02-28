@@ -376,9 +376,13 @@ class Exam(models.Model):
     
     # Scheduling
     scheduled_date = models.DateField()
+    exam_time = models.TimeField(null=True, blank=True) 
     duration_minutes = models.IntegerField()
     total_marks = models.IntegerField()
     passing_marks = models.IntegerField()
+    
+    questions_file = models.FileField(upload_to='exam_docs/%Y/%m/', null=True, blank=True,
+                           help_text="Upload files like PDF, PPTX, ZIP, etc.",storage=RawMediaCloudinaryStorage())
     
     # Prerequisites
     minimum_attendance_required = models.IntegerField(
@@ -386,12 +390,10 @@ class Exam(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(100)],
         help_text="Minimum attendance % required to appear for exam"
     )
-    fees_paid_required = models.BooleanField(default=True)
-    phase_required = models.CharField(max_length=10, choices=[
-        ('phase1', 'Phase 1'),
-        ('phase2', 'Phase 2'),
-        ('phase3', 'Phase 3')
-    ], null=True, blank=True)
+    fees_paid_required = models.BooleanField(default=False)
+    
+    
+  
     
     # Exam details
     syllabus_modules = models.ManyToManyField(Module, related_name='exams', blank=True)
@@ -410,6 +412,90 @@ class Exam(models.Model):
     
     def __str__(self):
         return f"{self.batch.name} - {self.exam_type} - {self.title}"
+
+
+
+class ExamSubmission(models.Model):
+
+    class SubmissionStatus(models.TextChoices):
+        SUBMITTED = "submitted", "Submitted"
+        LATE = "late", "Late Submission"
+        EVALUATED = "evaluated", "Evaluated"
+        REJECTED = "rejected", "Rejected"
+
+    exam = models.ForeignKey(
+        "Exam",
+        on_delete=models.CASCADE,
+        related_name="submissions"
+    )
+
+    student = models.ForeignKey(
+        "bdm.Student",
+        on_delete=models.CASCADE,
+        related_name="exam_submissions"
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="exam_submissions"
+    )
+
+    # -----------------------------
+    # File Upload
+    # -----------------------------
+
+    answer_file = models.FileField(
+        upload_to="exam_submissions/%Y/%m/",
+        null=True,
+        blank=True
+    )
+
+    # -----------------------------
+    # Tracking
+    # -----------------------------
+
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=SubmissionStatus.choices,
+        default=SubmissionStatus.SUBMITTED
+    )
+
+    # -----------------------------
+    # Evaluation
+    # -----------------------------
+
+    marks_obtained = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)]
+    )
+
+    evaluated_by = models.ForeignKey(
+        "bdm.Trainer",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="evaluated_submissions"
+    )
+
+    evaluated_at = models.DateTimeField(null=True, blank=True)
+
+    feedback = models.TextField(blank=True)
+
+    # -----------------------------
+
+    class Meta:
+        unique_together = ('exam', 'student')  # One submission per exam
+        ordering = ['-submitted_at']
+
+    def __str__(self):
+        return f"{self.student.user.username} - {self.exam.title}"
+
+
+
 
 
 class ExamResult(models.Model):
@@ -819,3 +905,84 @@ class SubstituteTeaching(models.Model):
     
     def __str__(self):
         return f"{self.batch.name} - {self.date} - {self.substitute_trainer.name} for {self.original_trainer.name}"
+    
+    
+from django.db import models
+from django.utils.timezone import now
+
+
+
+
+class TrainerLeave(models.Model):
+
+    class LeaveType(models.TextChoices):
+        SICK = "sick", "Sick Leave"
+        CASUAL = "casual", "Casual Leave"
+        EMERGENCY = "emergency", "Emergency Leave"
+        VACATION = "vacation", "Vacation"
+
+    class LeaveStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
+    # ----------------------------
+    # Relationships
+    # ----------------------------
+
+    trainer = models.ForeignKey(
+        "bdm.Trainer",
+        on_delete=models.CASCADE,
+        related_name="leave_applications"
+    )
+
+
+    # ----------------------------
+    # Leave Details
+    # ----------------------------
+
+    leave_type = models.CharField(
+        max_length=20,
+        choices=LeaveType.choices
+    )
+
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    total_days = models.PositiveIntegerField(blank=True, null=True)
+
+    reason = models.TextField()
+
+    attachment = models.FileField(
+        upload_to="leave_documents/%Y/%m/",
+        null=True,
+        blank=True
+    )
+
+    # ----------------------------
+    # Status
+    # ----------------------------
+
+    status = models.CharField(
+        max_length=20,
+        choices=LeaveStatus.choices,
+        default=LeaveStatus.PENDING
+    )
+
+    applied_at = models.DateTimeField(auto_now_add=True)
+    decision_at = models.DateTimeField(null=True, blank=True)
+
+    bdm_remarks = models.TextField(blank=True)
+
+    # ----------------------------
+
+    class Meta:
+        ordering = ['-applied_at']
+
+    def save(self, *args, **kwargs):
+        if self.start_date and self.end_date:
+            self.total_days = (self.end_date - self.start_date).days + 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.trainer.user.username} - {self.status}"    
