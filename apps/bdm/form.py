@@ -20,7 +20,7 @@ class CreateUserForm(forms.ModelForm):
             ("trainer", "Trainer"),
             ("student", "Student"),
             ("counselor", "Counselor"),
-            ("tele_caller", "Tele Caller"),
+            ("tele_caller", "Tele_Caller"),
         ],
         label="User Role"
     )
