@@ -32,6 +32,54 @@ class Lead(models.Model):
     mode = models.CharField(max_length=10, choices=ModeChoice.choices, default=ModeChoice.OFFLINE)
     status = models.CharField(max_length=10, choices=LeadStatus.choices, default=LeadStatus.NEW)
     
+    
+        # -----------------------------------
+    # 2️⃣ Telecaller Collected Information
+    # -----------------------------------
+
+    educational_qualification = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True
+    )
+
+    confirmed_course = models.ForeignKey(
+        'Course',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="confirmed_leads"
+    )
+
+    interested_batch = models.ForeignKey(
+        'Batch',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="lead_batches"
+    )
+
+    discussed_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    payment_plan = models.CharField(
+        max_length=20,
+        choices=[
+            ("full", "Full Payment"),
+            ("installment", "Installment"),
+            ("emi", "EMI"),
+            ("pdc", "PDC"),
+        ],
+        blank=True,
+        null=True
+    )
+   
+    telecaller_notes = models.TextField(blank=True)
+    
     # Assignment and Tracking
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, 
                                    limit_choices_to={'groups__name': 'TELE-CALLER'})
@@ -927,3 +975,115 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.title    
+    
+    
+    
+    
+    
+
+
+
+class Admission(models.Model):
+
+    class PaymentPlan(models.TextChoices):
+        FULL = "full", "Full Payment"
+        INSTALLMENT = "installment", "Installment"
+        EMI = "emi", "EMI"
+        PDC = "pdc", "Post Dated Cheque"
+
+    class AdmissionStatus(models.TextChoices):
+        ACTIVE = "active", "Active"
+        COMPLETED = "completed", "Completed"
+        CANCELLED = "cancelled", "Cancelled"
+        ON_HOLD = "on_hold", "On Hold"
+
+    # -------------------------
+    # Core Relations
+    # -------------------------
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="admissions"
+    )
+
+    student = models.ForeignKey(
+        "Student",
+        on_delete=models.CASCADE,
+        related_name="admissions"
+    )
+
+    course = models.ForeignKey(
+        "Course",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="admissions"
+    )
+
+    batch = models.ForeignKey(
+        "Batch",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="admissions"
+    )
+
+    # -------------------------
+    # Optional Details
+    # -------------------------
+
+    educational_qualification = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True
+    )
+
+    payment_plan = models.CharField(
+        max_length=20,
+        choices=PaymentPlan.choices,
+        blank=True,
+        null=True
+    )
+
+    total_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
+
+    admission_fee_paid = models.BooleanField(
+        default=False
+    )
+
+    admission_fee_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
+
+    # -------------------------
+    # Status & Tracking
+    # -------------------------
+
+    status = models.CharField(
+        max_length=20,
+        choices=AdmissionStatus.choices,
+        default=AdmissionStatus.ACTIVE
+    )
+
+    admitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="admissions_done"
+    )
+
+    admission_date = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.student.user.username} - {self.course if self.course else 'No Course'}"    
