@@ -50,6 +50,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path('lms_dashboard/', views.lmsdashboard, name='lms_dashboard'),
                 path('lms/material/<int:pk>/view/', views.lms_view_material, name='lms_view_material'),
                 path('lms/material/<int:pk>/download/', views.lms_download_material, name='lms_download_material'),
+                path('stud_exam/', views.exam, name='student_exam'),
 
 
             

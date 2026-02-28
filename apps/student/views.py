@@ -16,7 +16,7 @@ import calendar
 from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement,Notification
 from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial
+from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial,Exam,ExamResult
 from apps.student.models import LeaveApplication
 from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCard,StudentFeedback
 from .forms import EnrollmentAgreementForm,TaskSubmissionForm
@@ -2487,3 +2487,71 @@ def extract_video_thumbnail(url):
     if yt:
         return f"https://img.youtube.com/vi/{yt.group(1)}/mqdefault.jpg"
     return None
+
+
+@role_required("student")
+def exam(request):
+    student = request.user.student
+    batch = student.batches.filter(is_active=True).select_related("course").first()
+
+    exam_data = []
+
+    if batch:
+        # ── Same logic as dashboard ──
+        total_fee = batch.course.course_fee or Decimal("0.00")
+
+        paid_amount = FeePayment.objects.filter(
+            student=student,
+            payment_status=FeePayment.PaymentStatus.COMPLETED
+        ).aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
+
+        fees_ok = paid_amount >= total_fee
+        pending_amount = total_fee - paid_amount
+
+        exams = Exam.objects.filter(
+            batch=batch,
+            is_published=True
+        ).prefetch_related("syllabus_modules").order_by("-scheduled_date")
+
+        for ex in exams:
+
+            # ── Attendance check ──
+            attendance_pct = Attendance.calculate_attendance_percentage(student, batch)
+            att_ok = attendance_pct >= ex.minimum_attendance_required
+
+            is_eligible = att_ok and fees_ok
+
+            criteria = [
+                {
+                    "label": "Attendance",
+                    "detail": f"{attendance_pct:.0f}% (Required: {ex.minimum_attendance_required}%)",
+                    "ok": att_ok,
+                    "value": f"{attendance_pct:.0f}%",
+                    "bar": int(attendance_pct),
+                },
+                {
+                    "label": "Course Fees",
+                    "detail": "All payments completed" if fees_ok else f"₹{pending_amount} still pending",
+                    "ok": fees_ok,
+                    "value": "Fully Paid" if fees_ok else f"₹{pending_amount} due",
+                    "bar": None,
+                },
+            ]
+
+            try:
+                result = ExamResult.objects.get(exam=ex, student=student)
+            except ExamResult.DoesNotExist:
+                result = None
+
+            exam_data.append({
+                "exam": ex,
+                "result": result,
+                "is_eligible": is_eligible,
+                "criteria": criteria,
+                "failed_count": sum(1 for c in criteria if not c["ok"]),
+            })
+
+    return render(request, "student/exam/exam.html", {
+        "batch": batch,
+        "exam_data": exam_data,
+    })
