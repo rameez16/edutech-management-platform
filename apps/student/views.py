@@ -1897,11 +1897,9 @@ def onboard(request):
 
 
 
-
-
-
 @role_required("student")
 def upload_signed_enrollment_letter(request):
+
     if request.method != "POST":
         return JsonResponse({"success": False}, status=400)
 
@@ -1909,45 +1907,12 @@ def upload_signed_enrollment_letter(request):
     checklist = student.onboarding_checklist
 
     agreement, _ = EnrollmentAgreement.objects.get_or_create(
-        student=student,
-        defaults={"course_fee_agreed": 0}
+        student=student
     )
-    # -----------------------------
-    # 0️⃣ COURSE FEE SAVE
-    # -----------------------------
-    # -----------------------------
-# 0️⃣ COURSE FEE SAVE
-# -----------------------------
-    course_fee = request.POST.get("course_fee_agreed")
-    if course_fee:
-        try:
-            agreement.course_fee_agreed = float(course_fee)
-            agreement.save(update_fields=["course_fee_agreed"])
-            return JsonResponse({"success": True, "type": "course_fee_saved"})
-        except ValueError:
-            return JsonResponse({"success": False, "message": "Invalid fee value"})
 
-
-    # -----------------------------
-    # 1️⃣ PAYMENT PLAN SAVE
-    # -----------------------------
-    payment_plan = request.POST.get("payment_plan")
-
-    if payment_plan:
-        agreement.payment_plan = payment_plan
-        agreement.save(update_fields=["payment_plan"])
-
-        checklist.payment_plan_created = True
-        checklist.save(update_fields=["payment_plan_created"])
-
-        return JsonResponse({
-            "success": True,
-            "type": "payment_saved"
-        })
-
-    # -----------------------------
-    # 2️⃣ SIGNED LETTER UPLOAD
-    # -----------------------------
+    # ─────────────────────────────
+    # SIGNED LETTER UPLOAD ONLY
+    # ─────────────────────────────
     signed_file = request.FILES.get("signed_letter")
 
     if signed_file:
@@ -1955,7 +1920,6 @@ def upload_signed_enrollment_letter(request):
         agreement.is_signed = True
         agreement.signed_at = timezone.now()
         agreement.signature_ip = request.META.get("REMOTE_ADDR")
-
         agreement.save()
 
         checklist.enrollment_letter_signed = True
@@ -1966,8 +1930,10 @@ def upload_signed_enrollment_letter(request):
             "type": "file_uploaded"
         })
 
-    return JsonResponse({"success": False}, status=400)
-
+    return JsonResponse({
+        "success": False,
+        "message": "No file uploaded"
+    }, status=400)
 
 
 
