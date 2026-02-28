@@ -23,7 +23,7 @@ from .form import StudentAdminProfileForm, TrainerAdminProfileForm
 from django.db.models import Sum, Avg
 
 from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
-from apps.bdm.models import Student ,PaymentDocument ,StudentIssue
+from apps.bdm.models import Student ,PaymentDocument ,StudentIssue ,Announcement ,BatchSchedule
 
 from apps.trainer.models import Module
 from apps.trainer.models import Module
@@ -853,10 +853,12 @@ def batch_detail(request, pk):
         .prefetch_related('trainers', 'students'),
         pk=pk
     )
-    
+
+    trainers = Trainer.objects.all()   # 👈 ADD THIS
 
     return render(request, 'bdm/batch/batch_detail.html', {
-        'batch': batch
+        'batch': batch,
+        'trainers': trainers,          # 👈 ADD THIS
     })
  
      
@@ -916,6 +918,32 @@ def batch_create(request):
         "students": students,
         "courses": courses,
     })
+
+def add_batch_schedule(request, pk):
+    batch = get_object_or_404(Batch, pk=pk)
+
+    if request.method == "POST":
+        day = request.POST.get("day_of_week")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+        trainer_id = request.POST.get("trainer")
+
+        trainer = None
+        if trainer_id:
+            trainer = Trainer.objects.get(id=trainer_id)
+
+        BatchSchedule.objects.create(
+            batch=batch,
+            day_of_week=day,
+            start_time=start_time,
+            end_time=end_time,
+            trainer=trainer
+        )
+
+        messages.success(request, "Schedule added successfully!")
+
+    return redirect(f"{reverse('bdm:batch_detail', args=[batch.id])}?open_schedule=1")
+
 
 
 #payments
@@ -2236,3 +2264,32 @@ def dashboard(request):
     }
 
     return render(request, 'bdm/dashboard/dashboard2.html', context)    
+
+#announcement -aleena
+
+def announcement_list(request):
+    now = timezone.now()
+
+    announcements = Announcement.objects.filter(
+        models.Q(expiry_date__isnull=True) | 
+        models.Q(expiry_date__gt=now)
+    ).order_by('-publish_date')
+
+    return render(request, "bdm/announcements/announcement_list.html", {
+        "announcements": announcements
+    })
+
+
+def announcement_create(request):
+    if request.method == "POST":
+        Announcement.objects.create(
+            title=request.POST.get("title"),
+            message=request.POST.get("message"),
+            audience=request.POST.get("audience"),
+            is_important=bool(request.POST.get("is_important")),
+            expiry_date=request.POST.get("expiry_date") or None,
+            created_by=request.user
+        )
+
+        messages.success(request, "Announcement created successfully 🎉")
+        return redirect("bdm:announcement_list")

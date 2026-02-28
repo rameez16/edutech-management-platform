@@ -38,6 +38,7 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path('batches/<int:pk>/', views.batch_detail, name='batch_detail'),
                 path("batches/<int:pk>/toggle-extension/",views.toggle_batch_extension,name="toggle_batch_extension"),
                 path('batches/create/', views.batch_create, name='batch_create'),
+                path('batch/<int:pk>/add_schedule/',views.add_batch_schedule,name='add_batch_schedule'),
                 
                 
                 
@@ -93,6 +94,9 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("students/", views.StudentListView.as_view(), name="student_list"),
                 path("students/<int:pk>/", views.StudentDashboardView.as_view(), name="student_dashboard"),
                 
+                
+                path("announcements/", views.announcement_list, name="announcement_list"),
+                path("announcements/create/", views.announcement_create, name="announcement_create"),
                 ]
 
 

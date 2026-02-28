@@ -1260,6 +1260,11 @@
                     <!-- Management -->
                     <div class="sidebar-section">
                         <h4 class="sidebar-section-title">Management</h4>
+                        <a href="{% url 'bdm:announcement_list' %}"
+                           class="sidebar-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                            <div class="sidebar-link-icon"><i class="bi bi-megaphone-fill"></i></div>
+                            <span class="sidebar-link-text">Announcements</span>
+                        </a>
 
                         <a href="{% url 'bdm:user_list' %}"
                            class="sidebar-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
