@@ -26,7 +26,7 @@ def setup_user_role(sender, instance, created, **kwargs):
         "admin":"Admin",
         "trainer": "Trainer",
         "student": "Student",
-        "telecaller": "TeleCaller",
+        "tele_caller": "Tele_Caller",
         "counselor": "Counselor",
     }
 
@@ -43,10 +43,10 @@ def setup_user_role(sender, instance, created, **kwargs):
            
         )
 
-    elif role == "student":
-        from apps.bdm.models import Student
-        Student.objects.get_or_create(
-            user=instance,
-        )
+    # elif role == "student":
+    #     from apps.bdm.models import Student
+    #     Student.objects.get_or_create(
+    #         user=instance,
+    #     )
 
     print("🔥 ROLE SETUP DONE FOR:", instance.username)
