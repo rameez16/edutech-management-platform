@@ -41,11 +41,11 @@
         <span class="label">Payment Mode:</span>
 
         <div class="mode-tabs">
-            <a href="{% url 'student:admission' %}" class="mode-btn">Admission Fee</a>
+            
             <a href="{% url 'student:payment' %}" class="mode-btn">One-Time Payment</a>
             <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
             <a href="{% url 'student:emi' %}" class="mode-btn active ">EMI</a>
-            <a href="{% url 'student:installments' student.id %}" class="mode-btn">Installments</a>
+            <a href="{% url 'student:installments' %}" class="mode-btn">Installments</a>
         </div>
     </div>
 
