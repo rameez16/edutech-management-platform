@@ -62,7 +62,7 @@
         <!-- BATCH DETAILS CARD -->
         <div class="batch-card">
             <div class="batch-card-header">
-                <h4>Batch schedule Details</h4>
+                <h4>Session schedule Details</h4>
                 <span class="arrow-icon">&#9662;</span>
             </div>
 
@@ -228,6 +228,47 @@
 
             </div><!-- /batch-content -->
         </div><!-- /batch-card -->
+
+        <!-- BATCH SCHEDULE CARD (NEW) -->
+    <div class="batch-card">
+        <div class="batch-card-header">
+            <h4>Batch Schedule</h4>
+            <span class="arrow-icon">&#9662;</span>
+        </div>
+        <div class="batch-content">
+            {% if schedules %}
+            <div class="schedule-grid">
+                {% for slot in schedules %}
+                <div class="schedule-slot">
+                    <div class="schedule-day">{{ slot.get_day_of_week_display }}</div>
+                    <div class="schedule-time">
+                        🕐 {{ slot.start_time|time:"g:i A" }} – {{ slot.end_time|time:"g:i A" }}
+                    </div>
+                    {% if slot.trainer %}
+                    <div class="schedule-trainer">
+                        👤 {{ slot.trainer.full_name|default:slot.trainer.user.get_full_name|default:slot.trainer.user.username }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="no-trainers">No schedule set for this batch.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SESSION SCHEDULE (renamed from Batch schedule Details) -->
+    <div class="batch-card">
+        <div class="batch-card-header">
+            <h4>Session Schedule</h4>
+            <span class="arrow-icon">&#9662;</span>
+        </div>
+        <div class="batch-content">
+            <!-- ... rest of your existing session/module content unchanged ... -->
+        </div>
+    </div>
+
 
     </div><!-- /batch-wrapper-card -->
 

@@ -1314,6 +1314,22 @@ def dashboard(request):
     if profile_photo and profile_photo.verification_status != StudentDocument.VerificationStatus.VERIFIED:
         profile_photo = None
 
+    
+    
+
+    # ✅ BATCH SCHEDULE
+    batch_schedules = []
+    if batch:
+        batch_schedules = list(
+            batch.schedules.filter(is_active=True)
+            .select_related("trainer__user")
+            .order_by("day_of_week", "start_time")
+        )
+    
+    
+    
+    
+    
     # ✅ ONBOARDING PROGRESS
     completed_steps = 0
 
@@ -1654,6 +1670,7 @@ def dashboard(request):
         "profile_photo": profile_photo,
         "all_docs_verified": checklist.documents_verified,
         "batch": batch,
+        "batch_schedules": batch_schedules,
         "today": today,
         "checklist": checklist,
         "completed_steps": completed_steps,
@@ -2104,6 +2121,17 @@ def batch_details(request):
         "trainers__user"
     ).first()
 
+
+    schedules = []
+    if batch:
+        schedules = list(
+            batch.schedules.filter(is_active=True)
+            .select_related("trainer__user")
+            .order_by("day_of_week", "start_time")
+        )
+
+
+
     modules_data       = []
     completed_sessions = []
     planned_sessions   = []
@@ -2160,6 +2188,7 @@ def batch_details(request):
 
     return render(request, "student/batch/batch.html", {
         "batch":              batch,
+        "schedules":          schedules,
         "modules":            modules_data,       # list of dicts — one per module
         "completed_sessions": completed_sessions,  # flat fallback
         "planned_sessions":   planned_sessions,

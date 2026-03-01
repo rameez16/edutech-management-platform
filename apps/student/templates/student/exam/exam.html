@@ -98,10 +98,7 @@
                     </div>
                 </div>
 
-                {# — DESCRIPTION — #}
-                {% if exam.description %}
-                <p class="exam-description">{{ exam.description }}</p>
-                {% endif %}
+               
 
                 {# ══════════════════════════════════════════ #}
                 {#  STATE 1 — RESULT (exam is_completed)      #}
@@ -245,13 +242,7 @@
                 </div>
                 {% endif %}
 
-                {# — INSTRUCTIONS — #}
-                {% if exam.instructions and not exam.is_completed %}
-                <div class="exam-instructions">
-                    <div class="instructions-label">📋 Instructions</div>
-                    <p>{{ exam.instructions }}</p>
-                </div>
-                {% endif %}
+                
 
                 {# — ACTION ROW — #}
                 {% if not exam.is_completed %}
