@@ -51,6 +51,8 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path('lms/material/<int:pk>/view/', views.lms_view_material, name='lms_view_material'),
                 path('lms/material/<int:pk>/download/', views.lms_download_material, name='lms_download_material'),
                 path('stud_exam/', views.exam, name='student_exam'),
+                path('stud_exam/<int:exam_id>/attend/', views.attend_exam, name='attend_exam'),
+                path('exam/<int:exam_id>/submit/', views.submit_exam, name='submit_exam'),
 
 
             

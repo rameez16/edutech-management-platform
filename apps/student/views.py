@@ -16,7 +16,7 @@ import calendar
 from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement,Notification
 from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial,Exam,ExamResult
+from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial,Exam,ExamResult,ExamSubmission
 from apps.student.models import LeaveApplication
 from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCard,StudentFeedback
 from .forms import EnrollmentAgreementForm,TaskSubmissionForm
@@ -2492,7 +2492,7 @@ def exam(request):
     exam_data = []
 
     if batch:
-        # ── Same logic as dashboard ──
+        # ── Fee calculation ──
         total_fee = batch.course.course_fee or Decimal("0.00")
 
         paid_amount = FeePayment.objects.filter(
@@ -2503,9 +2503,26 @@ def exam(request):
         fees_ok = paid_amount >= total_fee
         pending_amount = total_fee - paid_amount
 
+        # ── Task completion (batch-level, calculated once) ──
+        total_tasks = Task.objects.filter(batch=batch, is_mandatory=True).count()
+
+        if total_tasks > 0:
+            completed_tasks = TaskSubmission.objects.filter(
+                student=student,
+                task__batch=batch,
+                task__is_mandatory=True,
+                is_submitted=True
+            ).count()
+            task_completion_pct = (completed_tasks / total_tasks) * 100
+        else:
+            completed_tasks = 0
+            task_completion_pct = 100  # no mandatory tasks = no blocker
+
+        task_ok = task_completion_pct >= 80
+
+        # ── Exams ──
         exams = Exam.objects.filter(
             batch=batch,
-            is_published=True
         ).prefetch_related("syllabus_modules").order_by("-scheduled_date")
 
         for ex in exams:
@@ -2514,7 +2531,7 @@ def exam(request):
             attendance_pct = Attendance.calculate_attendance_percentage(student, batch)
             att_ok = attendance_pct >= ex.minimum_attendance_required
 
-            is_eligible = att_ok and fees_ok
+            is_eligible = att_ok and fees_ok and task_ok
 
             criteria = [
                 {
@@ -2530,6 +2547,14 @@ def exam(request):
                     "ok": fees_ok,
                     "value": "Fully Paid" if fees_ok else f"₹{pending_amount} due",
                     "bar": None,
+                },
+                {
+                    "label": "Task Completion",
+                    "detail": f"{completed_tasks}/{total_tasks} mandatory tasks submitted (Required: 80%)"
+                              if total_tasks > 0 else "No mandatory tasks assigned",
+                    "ok": task_ok,
+                    "value": f"{task_completion_pct:.0f}%",
+                    "bar": int(task_completion_pct),
                 },
             ]
 
@@ -2550,3 +2575,95 @@ def exam(request):
         "batch": batch,
         "exam_data": exam_data,
     })
+
+
+
+
+@role_required("student")
+def attend_exam(request, exam_id):
+    student  = request.user.student
+    exam     = get_object_or_404(Exam, id=exam_id)
+    batch    = student.batches.filter(is_active=True, id=exam.batch.id).first()
+
+    # ── Guard: must belong to this batch ──
+    if not batch:
+        return redirect('student:exam')
+
+    # ── Re-verify eligibility server-side ──
+    attendance_pct = Attendance.calculate_attendance_percentage(student, batch)
+    att_ok = attendance_pct >= exam.minimum_attendance_required
+
+    total_fee    = batch.course.course_fee or Decimal("0.00")
+    paid_amount  = FeePayment.objects.filter(
+        student=student,
+        payment_status=FeePayment.PaymentStatus.COMPLETED
+    ).aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
+    fees_ok = paid_amount >= total_fee
+
+    total_tasks     = Task.objects.filter(batch=batch, is_mandatory=True).count()
+    completed_tasks = TaskSubmission.objects.filter(
+        student=student,
+        task__batch=batch,
+        task__is_mandatory=True,
+        is_submitted=True
+    ).count()
+    task_pct = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 100
+    task_ok  = task_pct >= 80
+
+    if not (att_ok and fees_ok and task_ok):
+        return redirect('student:exam')
+
+    # ── Existing submission (if any) ──
+    try:
+        submission = ExamSubmission.objects.get(exam=exam, student=student)
+    except ExamSubmission.DoesNotExist:
+        submission = None
+
+    return render(request, 'student/exam/attend_exam.html', {
+        'exam':       exam,
+        'batch':      batch,
+        'submission': submission,
+    })
+
+
+@role_required("student")
+def submit_exam(request, exam_id):
+    if request.method != "POST":
+        return redirect('student:exam')
+
+    student     = request.user.student
+    exam        = get_object_or_404(Exam, id=exam_id)
+    answer_file = request.FILES.get('answer_file')
+
+    if not answer_file:
+        return redirect('student:attend_exam', exam_id=exam_id)
+
+    # Determine if submission is late
+    now          = timezone.now()
+    is_late      = False
+    if exam.exam_time:
+        from datetime import datetime, timezone as dt_tz
+        exam_end = datetime.combine(exam.scheduled_date, exam.exam_time)
+        exam_end = exam_end.replace(tzinfo=dt_tz.utc)
+        from datetime import timedelta
+        exam_end += timedelta(minutes=exam.duration_minutes)
+        is_late  = now > exam_end
+
+    status = ExamSubmission.SubmissionStatus.LATE if is_late else ExamSubmission.SubmissionStatus.SUBMITTED
+
+    # One submission per exam (unique_together enforced at model level)
+    submission, created = ExamSubmission.objects.get_or_create(
+        exam=exam,
+        student=student,
+        defaults={
+            'user':        request.user,
+            'answer_file': answer_file,
+            'status':      status,
+        }
+    )
+
+    if not created:
+        # Already submitted — don't overwrite
+        pass
+
+    return redirect('student:attend_exam', exam_id=exam_id)

@@ -12,7 +12,6 @@
 
 /* ── Outer gradient wrapper — matches task/syllabus pages ── */
 .exam-wrapper-card {
-    
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -169,6 +168,9 @@
 
 /* ════════════════════════════════
    STATS ROW
+   — Now supports 6 boxes, so min-width
+     reduced from 110px → 90px so they
+     fit comfortably without wrapping
 ════════════════════════════════ */
 .exam-stats-row {
     display: flex;
@@ -178,11 +180,17 @@
 
 .stat-box {
     flex: 1;
-    min-width: 110px;
+    min-width: 90px;       /* ← was 110px; reduced for 6 boxes */
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 12px 14px;
+}
+
+/* ── Task completion stat box gets a subtle teal tint ── */
+.stat-box.stat-tasks {
+    background: #f0fdfa;
+    border-color: #99f6e4;
 }
 
 .stat-label {
@@ -211,6 +219,23 @@
 
 .val-success { color: #16a34a; }
 .val-danger  { color: #dc2626; }
+
+/* ── Inline mini-bar inside stat box (task completion) ── */
+.stat-mini-bar-wrap {
+    width: 100%;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+.stat-mini-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.7s ease;
+}
+.stat-mini-bar.bar-pass { background: #10b981; }
+.stat-mini-bar.bar-fail { background: #f87171; }
 
 /* ════════════════════════════════
    CRITERIA BOX  (locked / eligible)
@@ -291,7 +316,7 @@
     color: #64748b;
 }
 
-/* Mini progress bar */
+/* Mini progress bar (inside criteria rows) */
 .mini-bar-wrap {
     width: 64px;
     height: 5px;
@@ -520,8 +545,13 @@
     .exam-container      { padding: 14px; }
     .exam-card-header    { flex-direction: column; }
     .exam-card-left      { flex-direction: column; gap: 8px; }
-    .exam-stats-row .stat-box { min-width: 80px; }
+    .exam-stats-row      { gap: 8px; }
+    .exam-stats-row .stat-box { min-width: 42%; } /* 2-column grid on mobile */
     .result-grid         { gap: 16px; }
     .exam-action-row     { flex-direction: column; align-items: stretch; }
     .btn                 { justify-content: center; }
+}
+
+@media (max-width: 400px) {
+    .exam-stats-row .stat-box { min-width: 100%; } /* single column on very small screens */
 }

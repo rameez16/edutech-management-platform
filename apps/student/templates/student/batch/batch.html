@@ -236,6 +236,10 @@
             <span class="arrow-icon">&#9662;</span>
         </div>
         <div class="batch-content">
+            <div>
+            Start Date :    📅 {{ batch.start_date|date:"d M Y" }}<br>
+            Expected End date : 📅 {{ batch.expected_finish_date|date:"d M Y" }}
+            </div>
             {% if schedules %}
             <div class="schedule-grid">
                 {% for slot in schedules %}
@@ -244,11 +248,7 @@
                     <div class="schedule-time">
                         🕐 {{ slot.start_time|time:"g:i A" }} – {{ slot.end_time|time:"g:i A" }}
                     </div>
-                    {% if slot.trainer %}
-                    <div class="schedule-trainer">
-                        👤 {{ slot.trainer.full_name|default:slot.trainer.user.get_full_name|default:slot.trainer.user.username }}
-                    </div>
-                    {% endif %}
+                    
                 </div>
                 {% endfor %}
             </div>
@@ -258,16 +258,7 @@
         </div>
     </div>
 
-    <!-- SESSION SCHEDULE (renamed from Batch schedule Details) -->
-    <div class="batch-card">
-        <div class="batch-card-header">
-            <h4>Session Schedule</h4>
-            <span class="arrow-icon">&#9662;</span>
-        </div>
-        <div class="batch-content">
-            <!-- ... rest of your existing session/module content unchanged ... -->
-        </div>
-    </div>
+    
 
 
     </div><!-- /batch-wrapper-card -->

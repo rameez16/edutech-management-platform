@@ -96,9 +96,17 @@
                         </div>
                         {% endif %}{% endfor %}
                     </div>
+                    {# ── NEW: Task Completion stat box ── #}
+                    <div class="stat-box">
+                        <div class="stat-label">Task Completion</div>
+                        {% for c in ed.criteria %}{% if c.label == "Task Completion" %}
+                        <div class="stat-value {% if c.ok %}val-success{% else %}val-danger{% endif %}">
+                            {{ c.value }}
+                            <span class="stat-your">Min: 80%</span>
+                        </div>
+                        {% endif %}{% endfor %}
+                    </div>
                 </div>
-
-               
 
                 {# ══════════════════════════════════════════ #}
                 {#  STATE 1 — RESULT (exam is_completed)      #}
@@ -242,13 +250,12 @@
                 </div>
                 {% endif %}
 
-                
-
                 {# — ACTION ROW — #}
+                
                 {% if not exam.is_completed %}
                 <div class="exam-action-row">
                     {% if ed.is_eligible %}
-                        <button class="btn btn-primary">🚀 Start Exam</button>
+                        <a href="{% url 'student:attend_exam' exam.id %}" class="btn btn-primary">🚀 Start Exam</a>
                     {% else %}
                         <span class="lock-hint">🔒 Resolve {{ ed.failed_count }} issue{{ ed.failed_count|pluralize }} to unlock</span>
                         <button class="btn btn-disabled" disabled>Start Exam</button>

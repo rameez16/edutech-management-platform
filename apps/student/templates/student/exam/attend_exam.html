@@ -1,0 +1,156 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Exam{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/attendexam.css' %}">
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="{% static 'student/js/attendexam.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="attend-container">
+
+    {# ── HEADER ── #}
+    <div class="attend-header">
+        <div class="attend-header-left">
+            <span class="attend-type-badge">🎓 {{ exam.get_exam_type_display }}</span>
+            <h2>{{ exam.title }}</h2>
+            <p>{{ batch.name }}</p>
+        </div>
+        <div class="attend-header-right">
+            {# data-duration and data-datetime are read by attend_exam.js #}
+            <div class="exam-timer-block"
+                 id="examTimer"
+                 data-duration="{{ exam.duration_minutes }}"
+                 data-datetime="{% if exam.exam_time %}{{ exam.scheduled_date|date:'Y-m-d' }}T{{ exam.exam_time|time:'H:i:s' }}{% endif %}">
+                <div class="timer-label">⏱ Time Remaining</div>
+                <div class="timer-display" id="timerDisplay">--:--</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── META ROW ── #}
+    <div class="attend-meta-row">
+        <div class="meta-chip">📅 {{ exam.scheduled_date|date:"M d, Y" }}</div>
+        {% if exam.exam_time %}
+        <div class="meta-chip">🕐 {{ exam.exam_time|time:"g:i A" }}</div>
+        {% endif %}
+        <div class="meta-chip">⏱ {{ exam.duration_minutes }} min</div>
+        <div class="meta-chip">📝 {{ exam.total_marks }} Marks</div>
+        <div class="meta-chip">✅ Pass: {{ exam.passing_marks }} Marks</div>
+    </div>
+
+    <div class="attend-body">
+
+        {# ── INSTRUCTIONS ── #}
+        {% if exam.instructions %}
+        <div class="attend-card instructions-card">
+            <div class="attend-card-head">
+                <span class="card-head-icon">📋</span>
+                <span class="card-head-title">Instructions</span>
+            </div>
+            <div class="attend-card-body instructions-body">
+                {{ exam.instructions|linebreaksbr }}
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── QUESTION PAPER + ANSWER SHEET ── #}
+        <div class="attend-actions-row">
+
+            {# — Question Paper Download — #}
+            <div class="attend-card action-card">
+                <div class="action-card-icon download-icon">⬇️</div>
+                <div class="action-card-title">Question Paper</div>
+                <div class="action-card-sub">
+                    Download and read through all questions carefully before answering.
+                </div>
+                {% if exam.questions_file %}
+                    <a href="{{ exam.questions_file.url }}"
+                       target="_blank"
+                       class="action-btn btn-download">
+                        ⬇️ Download Question Paper
+                    </a>
+                {% else %}
+                    <span class="action-btn btn-unavailable">Not Yet Uploaded</span>
+                {% endif %}
+            </div>
+
+            {# — Answer Sheet Upload — #}
+            <div class="attend-card action-card">
+                <div class="action-card-icon upload-icon">⬆️</div>
+                <div class="action-card-title">Answer Sheet</div>
+                <div class="action-card-sub">
+                    Upload your completed answer sheet before the timer runs out.
+                </div>
+
+                {% if submission %}
+                    <span class="action-btn btn-submitted">✅ Already Submitted</span>
+                    {% if submission.answer_file %}
+                    <a href="{{ submission.answer_file.url }}"
+                       target="_blank"
+                       class="resubmit-link">
+                        📄 View Submitted File
+                    </a>
+                    {% endif %}
+                    <div class="submission-meta">
+                        Submitted {{ submission.submitted_at|date:"M d, Y — g:i A" }}
+                        {% if submission.status == 'late' %}
+                            <span class="late-tag">⚠️ Late</span>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <form method="post"
+                          action="{% url 'student:submit_exam' exam.id %}"
+                          enctype="multipart/form-data"
+                          class="upload-form">
+                        {% csrf_token %}
+                        <label class="file-upload-label" for="answerFile">
+                            <span class="file-upload-icon">📎</span>
+                            <span class="file-upload-text" id="fileLabel">Choose file…</span>
+                            <input type="file"
+                                   id="answerFile"
+                                   name="answer_file"
+                                   accept=".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png"
+                                   onchange="updateLabel(this)"
+                                   required>
+                        </label>
+                        <button type="submit" class="action-btn btn-upload">
+                            ⬆️ Submit Answer Sheet
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+        </div>{# /attend-actions-row #}
+
+        {# ── DESCRIPTION ── #}
+        {% if exam.description %}
+        <div class="attend-card">
+            <div class="attend-card-head">
+                <span class="card-head-icon">📝</span>
+                <span class="card-head-title">About This Exam</span>
+            </div>
+            <div class="attend-card-body instructions-body">
+                {{ exam.description|linebreaksbr }}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>{# /attend-body #}
+
+    {# ── FOOTER ── #}
+    <div class="attend-footer">
+        <a href="{% url 'student:student_exam' %}" class="back-link">← Back to Exam Portal</a>
+    </div>
+
+</div>
+
+<script src="{% static 'student/js/attend_exam.js' %}"></script>
+{% endblock %}
