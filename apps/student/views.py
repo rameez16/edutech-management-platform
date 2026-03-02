@@ -1098,6 +1098,90 @@ def notification_view(request):
 
 
 
+@login_required
+def payment_portal(request):
+
+    student = request.user.student
+
+    # Get ACTIVE admission
+    admission = Admission.objects.filter(
+        student=student,
+        status=Admission.AdmissionStatus.ACTIVE
+    ).first()
+
+    if not admission:
+        messages.error(request, "No active admission found.")
+        return redirect("student:stud_dashboard")
+
+    if not admission.payment_plan:
+        messages.error(request, "Payment plan not assigned.")
+        return redirect("student:stud_dashboard")
+
+    # Check existing completed payment
+    completed_payment = FeePayment.objects.filter(
+        student=student,
+        payment_status=FeePayment.PaymentStatus.COMPLETED
+    ).first()
+
+    # 👉 If payment approved → show summary
+    if completed_payment:
+        return render(request, "student/payment/payment_summary.html", {
+            "admission": admission,
+            "payment": completed_payment
+        })
+
+    # 👉 Handle payment submission
+    if request.method == "POST":
+
+        receipt = request.FILES.get("receipt")
+
+        if not receipt:
+            messages.error(request, "Please upload receipt.")
+            return redirect("student:payment_portal")
+
+        payment = FeePayment.objects.create(
+            student=student,
+            admission=admission,
+            payment_type=admission.payment_plan.upper(),
+            amount=admission.total_fee,
+            payment_method=FeePayment.PaymentMethod.UPI,
+            payment_status=FeePayment.PaymentStatus.PENDING,
+            transaction_id=f"TXN-{uuid.uuid4().hex[:8]}",
+        )
+
+        PaymentDocument.objects.create(
+            fee_payment=payment,
+            document_file=receipt,
+            uploaded_by=request.user,
+            description="Payment receipt uploaded"
+        )
+
+        messages.success(request, "Payment submitted successfully.")
+        return redirect("student:payment_portal")
+
+    # 👉 If not approved → show plan-based template
+    template = f"student/payment/{admission.payment_plan}_payment.html"
+
+    return render(request, template, {
+        "admission": admission
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

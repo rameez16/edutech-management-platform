@@ -1,0 +1,320 @@
+/* =========================================
+   PAYMENT PLAN COMMON STYLES
+========================================= */
+
+/* PAGE CENTER */
+.page-center {
+    display: flex;
+    justify-content: center;
+    padding: 40px 15px;
+}
+
+/* MAIN CARD */
+.payment-container {
+    width: 100%;
+    max-width: 1050px;
+    padding: 30px;
+    border-radius: 20px;
+}
+
+/* HEADER */
+.payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    gap: 20px;
+}
+
+.payment-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.student-info {
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: right;
+}
+
+.student-info p {
+    margin: 0;
+}
+
+/* SUMMARY SECTION */
+.fee-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.fee-box {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.fee-box h3 {
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+.fee-box.highlight {
+    background: #eef2ff;
+}
+
+/* PAYMENT MODE LABEL */
+.payment-mode-switch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.mode-tabs {
+    display: flex;
+}
+
+.mode-btn {
+    padding: 6px 18px;
+    font-size: 13px;
+    border-radius: 20px;
+    background: #4f46e5;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* MAIN ROW */
+.payment-row {
+    display: flex;
+    gap: 25px;
+    margin-top: 10px;
+}
+
+/* LEFT COLUMN */
+.left-column {
+    flex: 1;
+}
+
+.fee-summary-box {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.fee-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.fee-row:last-child {
+    border-bottom: none;
+}
+
+/* STATUS BUTTON */
+.status-btn {
+    display: block;
+    margin-top: 15px;
+    padding: 10px;
+    background: #16a34a;
+    color: #fff;
+    text-align: center;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+/* RIGHT COLUMN */
+.right-column {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* QR PAYMENT BOX */
+.qr-payment-box {
+    width: 280px;
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.qr-image {
+    max-width: 180px;
+    margin: 12px auto;
+}
+
+/* FILE UPLOAD */
+input[type="file"] {
+    display: none;
+}
+
+.upload-btn {
+    display: block;
+    margin-top: 12px;
+    padding: 10px;
+    border: 2px dashed #4f46e5;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.file-name {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #555;
+}
+
+/* SUBMIT BUTTON */
+.submit-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    background: #16a34a;
+    color: #ffffff;
+    border-radius: 10px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    opacity: 0.9;
+}
+
+/* PAYMENT STATUS */
+.payment-status {
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.payment-status.success {
+    color: #16a34a;
+}
+
+.payment-status.warning {
+    color: #f59e0b;
+}
+
+.payment-status.error {
+    color: #dc2626;
+}
+
+/* REMINDER BOX */
+.reminder-box {
+    width: 220px;
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    font-size: 13px;
+}
+
+/* INSTALLMENT TABLE */
+.loan-table-box {
+    margin-top: 20px;
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.loan-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.loan-table th,
+.loan-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.loan-table th {
+    background: #f3f4f6;
+    font-weight: 600;
+}
+
+/* INSTALLMENT STATUS */
+.status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.status.paid {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.status.pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status.upcoming {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.status.not-started {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* NOTE */
+.note {
+    margin-top: 25px;
+    font-size: 12px;
+    color: #555;
+}
+
+/* SUMMARY PAGE */
+.summary-box {
+    text-align: center;
+    padding: 25px;
+}
+
+.summary-box h2 {
+    color: #16a34a;
+    margin-bottom: 15px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .payment-row,
+    .right-column {
+        flex-direction: column;
+    }
+
+    .qr-payment-box,
+    .reminder-box {
+        width: 100%;
+    }
+
+    .payment-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .student-info {
+        text-align: left;
+    }
+
+    .fee-summary {
+        grid-template-columns: 1fr;
+    }
+}

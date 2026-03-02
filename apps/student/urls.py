@@ -26,7 +26,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('notification_view/', views.notification_view, name='notification_view'),
               
                
-               
+               path('payment_portal/',views.payment_portal,name='payment_portal'),
                
                
                

@@ -1,0 +1,79 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/payment_plan.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-center">
+    <div class="payment-container glass-card">
+
+        <!-- HEADER -->
+        <div class="payment-header">
+            <h2>Student Admission & Fee Management</h2>
+
+            <div class="student-info">
+                <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+                <p><strong>Email:</strong> {{ student.user.email }}</p>
+                <p><strong>Student ID:</strong> {{ student.id }}</p>
+            </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="fee-summary">
+            <div class="fee-box">
+                <p>Total Fee</p>
+                <h3>₹{{ total_fee|floatformat:2 }}</h3>
+            </div>
+
+            <div class="fee-box">
+                <p>Paid Amount</p>
+                <h3>₹{{ paid_amount|floatformat:2 }}</h3>
+            </div>
+
+            <div class="fee-box highlight">
+                <p>Pending Amount</p>
+                <h3>₹{{ pending_amount|floatformat:2 }}</h3>
+            </div>
+        </div>
+
+        <!-- PAYMENT MODE -->
+        <div class="payment-mode-switch">
+            <span>Payment Mode:</span>
+            <div class="mode-tabs">
+                <span class="mode-btn active">
+                    {{ admission.get_payment_plan_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- PAYMENT FORM -->
+        <div class="right-column">
+            <form method="POST" enctype="multipart/form-data" class="qr-payment-box">
+                {% csrf_token %}
+
+                <img src="{% static 'student/images/image.png' %}" class="qr-image" alt="QR Code">
+                <p>Scan QR & Complete Full Payment</p>
+
+                {% if not existing_payment %}
+                    <label class="upload-btn">Upload Payment Receipt</label>
+                    <input type="file" name="receipt" required>
+                    <button type="submit" class="submit-btn">Submit Payment</button>
+                {% else %}
+                    {% if existing_payment.payment_status == existing_payment.PaymentStatus.PENDING %}
+                        <p class="payment-status warning">⏳ Under Verification</p>
+                    {% endif %}
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="note">
+            <p><strong>Note:</strong> Full payment is non-refundable.</p>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
