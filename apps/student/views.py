@@ -2571,15 +2571,13 @@ def exam(request):
                 "criteria": criteria,
                 "failed_count": sum(1 for c in criteria if not c["ok"]),
             })
-    if exam.exam_time:
-            exam_start   = timezone.make_aware(datetime.combine(exam.scheduled_date, exam.exam_time))
-            exam_end_iso = (exam_start + timedelta(minutes=exam.duration_minutes)).isoformat()
-            print(f"DEBUG: exam_time={exam.exam_time}  exam_start={exam_start}  exam_end_iso={exam_end_iso}  server_now={timezone.now()}")
-
+    
     return render(request, "student/exam/exam.html", {
         "batch": batch,
         "exam_data": exam_data,
     })
+
+
 
 
 
@@ -2622,10 +2620,14 @@ def attend_exam(request, exam_id):
 
     # ── Compute real fixed end time for JS timer ──
     from datetime import datetime, timedelta
+    import zoneinfo
+    IST = zoneinfo.ZoneInfo("Asia/Kolkata")
     exam_end_iso = None
     if exam.exam_time:
-        exam_start   = timezone.make_aware(datetime.combine(exam.scheduled_date, exam.exam_time))
-        exam_end_iso = (exam_start + timedelta(minutes=exam.duration_minutes)).isoformat()
+        exam_start   = datetime.combine(exam.scheduled_date, exam.exam_time).replace(tzinfo=IST)
+        exam_end     = exam_start + timedelta(minutes=exam.duration_minutes)
+        exam_end_iso = exam_end.isoformat()
+        print(f"DEBUG: exam_start={exam_start}  exam_end={exam_end}  now={timezone.now()}")
 
     return render(request, 'student/exam/attend_exam.html', {
         'exam':          exam,
@@ -2649,12 +2651,14 @@ def submit_exam(request, exam_id):
         return redirect('student:attend_exam', exam_id=exam_id)
 
     from datetime import datetime, timedelta
+    import zoneinfo
+    IST = zoneinfo.ZoneInfo("Asia/Kolkata")
     now     = timezone.now()
     is_late = False
     if exam.exam_time:
-        exam_end = timezone.make_aware(datetime.combine(exam.scheduled_date, exam.exam_time))
+        exam_end  = datetime.combine(exam.scheduled_date, exam.exam_time).replace(tzinfo=IST)
         exam_end += timedelta(minutes=exam.duration_minutes)
-        is_late  = now > exam_end
+        is_late   = now > exam_end
 
     status = ExamSubmission.SubmissionStatus.LATE if is_late else ExamSubmission.SubmissionStatus.SUBMITTED
 
