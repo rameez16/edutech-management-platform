@@ -2562,6 +2562,7 @@ def exam(request):
                 result = ExamResult.objects.get(exam=ex, student=student)
             except ExamResult.DoesNotExist:
                 result = None
+        
 
             exam_data.append({
                 "exam": ex,
@@ -2570,12 +2571,15 @@ def exam(request):
                 "criteria": criteria,
                 "failed_count": sum(1 for c in criteria if not c["ok"]),
             })
+    if exam.exam_time:
+            exam_start   = timezone.make_aware(datetime.combine(exam.scheduled_date, exam.exam_time))
+            exam_end_iso = (exam_start + timedelta(minutes=exam.duration_minutes)).isoformat()
+            print(f"DEBUG: exam_time={exam.exam_time}  exam_start={exam_start}  exam_end_iso={exam_end_iso}  server_now={timezone.now()}")
 
     return render(request, "student/exam/exam.html", {
         "batch": batch,
         "exam_data": exam_data,
     })
-
 
 
 
@@ -2585,11 +2589,9 @@ def attend_exam(request, exam_id):
     exam     = get_object_or_404(Exam, id=exam_id)
     batch    = student.batches.filter(is_active=True, id=exam.batch.id).first()
 
-    # ── Guard: must belong to this batch ──
     if not batch:
         return redirect('student:exam')
 
-    # ── Re-verify eligibility server-side ──
     attendance_pct = Attendance.calculate_attendance_percentage(student, batch)
     att_ok = attendance_pct >= exam.minimum_attendance_required
 
@@ -2613,16 +2615,24 @@ def attend_exam(request, exam_id):
     if not (att_ok and fees_ok and task_ok):
         return redirect('student:exam')
 
-    # ── Existing submission (if any) ──
     try:
         submission = ExamSubmission.objects.get(exam=exam, student=student)
     except ExamSubmission.DoesNotExist:
         submission = None
 
+    # ── Compute real fixed end time for JS timer ──
+    from datetime import datetime, timedelta
+    exam_end_iso = None
+    if exam.exam_time:
+        exam_start   = timezone.make_aware(datetime.combine(exam.scheduled_date, exam.exam_time))
+        exam_end_iso = (exam_start + timedelta(minutes=exam.duration_minutes)).isoformat()
+
     return render(request, 'student/exam/attend_exam.html', {
-        'exam':       exam,
-        'batch':      batch,
-        'submission': submission,
+        'exam':          exam,
+        'batch':         batch,
+        'submission':    submission,
+        'exam_started':  exam.is_published,
+        'exam_end_iso':  exam_end_iso,
     })
 
 
@@ -2638,20 +2648,16 @@ def submit_exam(request, exam_id):
     if not answer_file:
         return redirect('student:attend_exam', exam_id=exam_id)
 
-    # Determine if submission is late
-    now          = timezone.now()
-    is_late      = False
+    from datetime import datetime, timedelta
+    now     = timezone.now()
+    is_late = False
     if exam.exam_time:
-        from datetime import datetime, timezone as dt_tz
-        exam_end = datetime.combine(exam.scheduled_date, exam.exam_time)
-        exam_end = exam_end.replace(tzinfo=dt_tz.utc)
-        from datetime import timedelta
+        exam_end = timezone.make_aware(datetime.combine(exam.scheduled_date, exam.exam_time))
         exam_end += timedelta(minutes=exam.duration_minutes)
         is_late  = now > exam_end
 
     status = ExamSubmission.SubmissionStatus.LATE if is_late else ExamSubmission.SubmissionStatus.SUBMITTED
 
-    # One submission per exam (unique_together enforced at model level)
     submission, created = ExamSubmission.objects.get_or_create(
         exam=exam,
         student=student,
@@ -2663,7 +2669,5 @@ def submit_exam(request, exam_id):
     )
 
     if not created:
-        # Already submitted — don't overwrite
         pass
-
     return redirect('student:attend_exam', exam_id=exam_id)

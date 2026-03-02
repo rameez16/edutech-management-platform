@@ -7,11 +7,9 @@
 <link rel="stylesheet" href="{% static 'student/css/attendexam.css' %}">
 {% endblock %}
 
-
 {% block extra_js %}
 <script src="{% static 'student/js/attendexam.js' %}"></script>
 {% endblock %}
-
 
 {% block content %}
 <div class="attend-container">
@@ -24,14 +22,21 @@
             <p>{{ batch.name }}</p>
         </div>
         <div class="attend-header-right">
-            {# data-duration and data-datetime are read by attend_exam.js #}
-            <div class="exam-timer-block"
-                 id="examTimer"
-                 data-duration="{{ exam.duration_minutes }}"
-                 data-datetime="{% if exam.exam_time %}{{ exam.scheduled_date|date:'Y-m-d' }}T{{ exam.exam_time|time:'H:i:s' }}{% endif %}">
-                <div class="timer-label">⏱ Time Remaining</div>
-                <div class="timer-display" id="timerDisplay">--:--</div>
-            </div>
+            {% if exam_started %}
+                <div class="exam-timer-block"
+                     id="examTimer"
+                     data-duration="{{ exam.duration_minutes }}"
+                     data-starttime="{% if exam_start_iso %}{{ exam_start_iso }}{% endif %}"
+                     data-endtime="{% if exam_end_iso %}{{ exam_end_iso }}{% endif %}">
+                    <div class="timer-label">⏱ Time Remaining</div>
+                    <div class="timer-display" id="timerDisplay">--:--</div>
+                </div>
+            {% else %}
+                <div class="exam-waiting-block">
+                    <div class="timer-label">📋 Exam Status</div>
+                    <div class="exam-status-badge">Waiting to Start</div>
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -48,99 +53,131 @@
 
     <div class="attend-body">
 
-        {# ── INSTRUCTIONS ── #}
-        {% if exam.instructions %}
-        <div class="attend-card instructions-card">
-            <div class="attend-card-head">
-                <span class="card-head-icon">📋</span>
-                <span class="card-head-title">Instructions</span>
-            </div>
-            <div class="attend-card-body instructions-body">
-                {{ exam.instructions|linebreaksbr }}
-            </div>
-        </div>
-        {% endif %}
+        {% if exam_started %}
 
-        {# ── QUESTION PAPER + ANSWER SHEET ── #}
-        <div class="attend-actions-row">
-
-            {# — Question Paper Download — #}
-            <div class="attend-card action-card">
-                <div class="action-card-icon download-icon">⬇️</div>
-                <div class="action-card-title">Question Paper</div>
-                <div class="action-card-sub">
-                    Download and read through all questions carefully before answering.
+            {# ── INSTRUCTIONS ── #}
+            {% if exam.instructions %}
+            <div class="attend-card instructions-card">
+                <div class="attend-card-head">
+                    <span class="card-head-icon">📋</span>
+                    <span class="card-head-title">Instructions</span>
                 </div>
-                {% if exam.questions_file %}
-                    <a href="{{ exam.questions_file.url }}"
-                       target="_blank"
-                       class="action-btn btn-download">
-                        ⬇️ Download Question Paper
-                    </a>
-                {% else %}
-                    <span class="action-btn btn-unavailable">Not Yet Uploaded</span>
-                {% endif %}
-            </div>
-
-            {# — Answer Sheet Upload — #}
-            <div class="attend-card action-card">
-                <div class="action-card-icon upload-icon">⬆️</div>
-                <div class="action-card-title">Answer Sheet</div>
-                <div class="action-card-sub">
-                    Upload your completed answer sheet before the timer runs out.
+                <div class="attend-card-body instructions-body">
+                    {{ exam.instructions|linebreaksbr }}
                 </div>
+            </div>
+            {% endif %}
 
-                {% if submission %}
-                    <span class="action-btn btn-submitted">✅ Already Submitted</span>
-                    {% if submission.answer_file %}
-                    <a href="{{ submission.answer_file.url }}"
-                       target="_blank"
-                       class="resubmit-link">
-                        📄 View Submitted File
-                    </a>
-                    {% endif %}
-                    <div class="submission-meta">
-                        Submitted {{ submission.submitted_at|date:"M d, Y — g:i A" }}
-                        {% if submission.status == 'late' %}
-                            <span class="late-tag">⚠️ Late</span>
-                        {% endif %}
+            {# ── QUESTION PAPER + ANSWER SHEET ── #}
+            <div class="attend-actions-row">
+
+                {# — Question Paper Download — #}
+                <div class="attend-card action-card">
+                    <div class="action-card-icon download-icon">⬇️</div>
+                    <div class="action-card-title">Question Paper</div>
+                    <div class="action-card-sub">
+                        Download and read through all questions carefully before answering.
                     </div>
-                {% else %}
-                    <form method="post"
-                          action="{% url 'student:submit_exam' exam.id %}"
-                          enctype="multipart/form-data"
-                          class="upload-form">
-                        {% csrf_token %}
-                        <label class="file-upload-label" for="answerFile">
-                            <span class="file-upload-icon">📎</span>
-                            <span class="file-upload-text" id="fileLabel">Choose file…</span>
-                            <input type="file"
-                                   id="answerFile"
-                                   name="answer_file"
-                                   accept=".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png"
-                                   onchange="updateLabel(this)"
-                                   required>
-                        </label>
-                        <button type="submit" class="action-btn btn-upload">
-                            ⬆️ Submit Answer Sheet
-                        </button>
-                    </form>
-                {% endif %}
+                    {% if exam.questions_file %}
+                        <a href="{{ exam.questions_file.url }}"
+                           target="_blank"
+                           class="action-btn btn-download">
+                            ⬇️ Download Question Paper
+                        </a>
+                    {% else %}
+                        <span class="action-btn btn-unavailable">Not Yet Uploaded</span>
+                    {% endif %}
+                </div>
+
+                {# — Answer Sheet Upload — #}
+                <div class="attend-card action-card">
+                    <div class="action-card-icon upload-icon">⬆️</div>
+                    <div class="action-card-title">Answer Sheet</div>
+                    <div class="action-card-sub">
+                        Upload your completed answer sheet before the timer runs out.
+                    </div>
+
+                    {% if submission %}
+                        <span class="action-btn btn-submitted">✅ Already Submitted</span>
+                        {% if submission.answer_file %}
+                        <a href="{{ submission.answer_file.url }}"
+                           target="_blank"
+                           class="resubmit-link">
+                            📄 View Submitted File
+                        </a>
+                        {% endif %}
+                        <div class="submission-meta">
+                            Submitted {{ submission.submitted_at|date:"M d, Y — g:i A" }}
+                            {% if submission.status == 'late' %}
+                                <span class="late-tag">⚠️ Late</span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <form method="post"
+                              action="{% url 'student:submit_exam' exam.id %}"
+                              enctype="multipart/form-data"
+                              class="upload-form">
+                            {% csrf_token %}
+                            <label class="file-upload-label" for="answerFile">
+                                <span class="file-upload-icon">📎</span>
+                                <span class="file-upload-text" id="fileLabel">Choose file…</span>
+                                <input type="file"
+                                       id="answerFile"
+                                       name="answer_file"
+                                       accept=".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png"
+                                       onchange="updateLabel(this)"
+                                       required>
+                            </label>
+                            <button type="submit" class="action-btn btn-upload">
+                                ⬆️ Submit Answer Sheet
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+
+            </div>{# /attend-actions-row #}
+
+            {# ── DESCRIPTION ── #}
+            {% if exam.description %}
+            <div class="attend-card">
+                <div class="attend-card-head">
+                    <span class="card-head-icon">📝</span>
+                    <span class="card-head-title">About This Exam</span>
+                </div>
+                <div class="attend-card-body instructions-body">
+                    {{ exam.description|linebreaksbr }}
+                </div>
+            </div>
+            {% endif %}
+
+        {% else %}
+
+            {# ── EXAM NOT STARTED ── #}
+            <div class="attend-card exam-pending-card">
+                <div class="exam-pending-inner">
+                    <div class="exam-pending-icon-wrap">
+                        <div class="exam-pending-pulse"></div>
+                        <div class="exam-pending-icon">🕐</div>
+                    </div>
+                    <h3 class="exam-pending-title">Exam Has Not Started Yet</h3>
+                    <p class="exam-pending-sub">
+                        Your instructor hasn't started the exam yet. Please stay on this page —
+                        it will refresh automatically when the exam goes live.
+                    </p>
+                    <div class="exam-pending-meta">
+                        <span>📅 {{ exam.scheduled_date|date:"M d, Y" }}</span>
+                        {% if exam.exam_time %}
+                        <span>🕐 {{ exam.exam_time|time:"g:i A" }}</span>
+                        {% endif %}
+                        <span>⏱ {{ exam.duration_minutes }} min</span>
+                    </div>
+                    <div class="exam-pending-refresh-info">
+                        <span class="refresh-dot"></span>
+                        Auto-refreshing every 30 seconds…
+                    </div>
+                </div>
             </div>
 
-        </div>{# /attend-actions-row #}
-
-        {# ── DESCRIPTION ── #}
-        {% if exam.description %}
-        <div class="attend-card">
-            <div class="attend-card-head">
-                <span class="card-head-icon">📝</span>
-                <span class="card-head-title">About This Exam</span>
-            </div>
-            <div class="attend-card-body instructions-body">
-                {{ exam.description|linebreaksbr }}
-            </div>
-        </div>
         {% endif %}
 
     </div>{# /attend-body #}
@@ -151,6 +188,4 @@
     </div>
 
 </div>
-
-<script src="{% static 'student/js/attend_exam.js' %}"></script>
 {% endblock %}
