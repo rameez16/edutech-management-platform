@@ -1,143 +1,119 @@
-{% extends 'student/layout/base.html' %}
+{% extends "student/layout/base.html" %}
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'student/css/Installments.css' %}">
+<link rel="stylesheet" href="{% static 'student/css/installments.css' %}">
 
-<div class="payment-container glass-card">
+<div class="main-wrapper">
+    <div class="main-container">
 
-    <!-- HEADER -->
-    <div class="payment-header">
-        <h2>Student Admission & Fee Management</h2>
+        <h2 class="page-title">Student Admission & Fee Management</h2>
 
+        <!-- ================= STUDENT DETAILS ================= -->
         <div class="student-info">
-            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
-            <p><strong>Email:</strong> {{ student.user.email }}</p>
-            <p><strong>Student ID:</strong> {{ student.id }}</p>
+
+            <div class="info-box">
+                <span>Student Name</span>
+                <h4>{{ student.full_name }}</h4>
+            </div>
+
+            <div class="info-box">
+                <span>Email</span>
+                <h4>{{ student.user.email }}</h4>
+            </div>
+
+            <div class="info-box">
+                <span>Student ID</span>
+                <h4>{{ student.id }}</h4>
+            </div>
+
+            <div class="info-box">
+                <span>Course</span>
+                <h4>{{ course_name }}</h4>
+            </div>
+
+            <div class="info-box">
+                <span>Batch</span>
+                <h4>{{ batch.name }}</h4>
+            </div>
+
         </div>
-    </div>
 
-    <!-- SUMMARY -->
-    <div class="fee-summary">
+        <!-- ================= SUMMARY ================= -->
+        <div class="summary-section">
 
-        <div class="fee-box">
-            <p>Total Course Fee</p>
-            <h3>₹{{ total_fee }}</h3>
+            <div class="summary-card">
+                <p>Total Fee</p>
+                <h3>₹{{ course_fee }}</h3>
+            </div>
+
+            <div class="summary-card">
+                <p>Admission Fee Paid</p>
+                <h3>₹{{ admission_fee }}</h3>
+            </div>
+
+            <div class="summary-card paid-card">
+                <p>Total Paid</p>
+                <h3>₹{{ paid_amount }}</h3>
+            </div>
+
+            <div class="summary-card pending-card">
+                <p>Pending Amount</p>
+                <h3>₹{{ pending_amount }}</h3>
+            </div>
+
         </div>
 
-        <div class="fee-box">
-            <p>Admission Fee</p>
-            <h3>₹{{ admission_fee }}</h3>
+        <!-- ================= INSTALLMENTS TABLE ================= -->
+        {% if installments %}
+        <div class="table-wrapper">
+            <table class="installment-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Installment Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for installment in installments %}
+                    <tr>
+                        <td>{{ installment.installment_number }}</td>
+                        <td>₹{{ installment.amount }}</td>
+                        <td>{{ installment.due_date|date:"F d, Y" }}</td>
+
+                        <td>
+                            {% if installment.payment_status == "completed" %}
+                                <span class="status-badge paid">Paid</span>
+                            {% else %}
+                                <span class="status-badge pending">Pending</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if installment.payment_status == "completed" %}
+                                <span class="completed-text">Completed</span>
+
+                            {% elif next_pending and installment.id == next_pending.id %}
+                                <a href="{% url 'student:install_qr' installment.installment_number %}"
+                                   class="pay-button">
+                                   Pay Now
+                                </a>
+                            {% else %}
+                                <span class="locked-text">Locked</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-
-        <div class="fee-box">
-            <p>Paid Amount</p>
-            <h3>₹{{ paid_amount }}</h3>
-        </div>
-
-        <div class="fee-box highlight">
-            <p>Pending Amount</p>
-            <h3>₹{{ pending_amount }}</h3>
-        </div>
-
-    </div>
-
-    <center><h2>Installments</h2></center>
-
-    <!-- PAYMENT MODES -->
-    <div class="payment-mode-switch">
-        <span class="label">Payment Mode:</span>
-
-        <div class="mode-tabs">
-            <a href="{% url 'student:admission' %}" class="mode-btn">Admission Fee</a>
-            <a href="{% url 'student:payment' %}" class="mode-btn">One-Time Payment</a>
-            <a href="{% url 'student:emi' %}" class="mode-btn">EMI</a>
-            <a href="{% url 'student:pdc' %}" class="mode-btn">PDC</a>
-            <a href="{% url 'student:installments' student.id %}" class="mode-btn active">
-                Installments
-            </a>
-        </div>
-    </div>
-
-    <!-- INSTALLMENT TABLE -->
-    <div class="loan-table-box">
-        <h4>Installment Payment Details</h4>
-
-        <table class="loan-table">
-            <thead>
-                <tr>
-                    <th>Installment</th>
-                    <th>Amount</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-{% for ins in installments %}
-<tr>
-
-    <!-- Installment Number -->
-    <td>Installment {{ ins.number }}</td>
-
-    <!-- Amount -->
-    <td>₹{{ ins.amount }}</td>
-
-    <!-- Due Date -->
-    <td>
-        {{ ins.due_date|date:"M d, Y" }}
-    </td>
-
-    <!-- Status -->
-    <td>
-        {% if ins.display_status == "Paid" %}
-            <span class="status paid">Paid</span>
-
-        {% elif ins.display_status == "Pending" %}
-            <span class="status pending">Pending</span>
-
-        {% elif ins.display_status == "Upcoming" %}
-            <span class="status upcoming">Upcoming</span>
-
-        {% elif ins.display_status == "Not Started" %}
-            <span class="status not-started">Not Started</span>
         {% endif %}
-    </td>
 
-    <!-- Action -->
-    <td>
-        {% if ins.display_status == "Not Started" %}
-            <a href="{% url 'student:install_qr' student.id ins.number %}" class="pay-btn">
-                Pay Installment
-            </a>
-
-        {% elif ins.display_status == "Upcoming" %}
-            <span class="disabled-btn">
-                Not Due Yet
-            </span>
-
-        {% elif ins.display_status == "Pending" %}
-            <span class="disabled-btn">
-                Waiting for Verification
-            </span>
-
-        {% else %}
-            —
-        {% endif %}
-    </td>
-
-</tr>
-{% endfor %}
-</tbody>
-        </table>
     </div>
-
-    <!-- NOTE -->
-    <div class="note">
-        <b>Note:</b> Installments are due on the 21st of every month.
-    </div>
-
 </div>
 
 {% endblock %}

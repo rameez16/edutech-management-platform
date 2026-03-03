@@ -1,80 +1,51 @@
-{% extends 'student/layout/base.html' %}
+{% extends "student/layout/base.html" %}
 {% load static %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'student/css/install_qr.css' %}">
+{% endblock %}
 
-<div class="main-content qr-main">
+{% block content %}
+
+<div class="qr-wrapper">
+
     <div class="qr-card">
 
-        <!-- TITLE -->
-        <h2 class="qr-title">Scan & Pay Installment</h2>
+        <h3>Installment #{{ installment.installment_number }}</h3>
 
-        <!-- ================= STUDENT DETAILS ================= -->
-        <div class="student-info-box">
-            <p><strong>Student ID:</strong> {{ student.id }}</p>
-            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
-            <p><strong>Email:</strong> {{ student.user.email }}</p>
-        </div>
+        <p class="amount">
+            Amount: ₹{{ installment.amount|floatformat:2 }}
+        </p>
 
-        <!-- ================= QR IMAGE ================= -->
-        <div class="qr-image">
+        <div class="qr-image-box">
             <img src="{% static 'student/images/image.png' %}" alt="QR Code">
         </div>
 
-        <!-- ================= INSTALLMENT DETAILS ================= -->
-        <div class="qr-info">
-            <p><strong>Installment No:</strong> {{ installment_number }}</p>
-            <p><strong>Amount:</strong> ₹{{ amount }}</p>
-            <p><strong>Due Date:</strong> {{ due_date|default:"—" }}</p>
+        <p class="instruction">
+            Scan the QR code and upload your payment receipt.
+        </p>
 
-            <!-- ===== STATUS (CORRECT LOGIC) ===== -->
-            <p>
-                <strong>Status:</strong>
-                {% if installment.payment_status == 'completed' %}
-                    Paid
-                {% elif receipt_exists %}
-                    Submitted (Verification Pending)
-                {% else %}
-                    Not Submitted
-                {% endif %}
-            </p>
-        </div>
+        <form method="POST" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
 
-        <!-- ================= ACTION SECTION ================= -->
-        {% if installment.payment_status == 'completed' %}
+            <input type="file"
+                   name="receipt"
+                   required
+                   class="file-input">
 
-            <p class="paid-msg">
-                ✅ Payment verified successfully
-            </p>
-
-        {% elif receipt_exists %}
-
-            <p class="pending-msg">
-                ⏳ Receipt already submitted.<br>
-                Waiting for admin verification.
-            </p>
-
-        {% else %}
-
-            <!-- ===== UPLOAD FORM (ONLY WHEN NOT SUBMITTED) ===== -->
-            <form method="post" enctype="multipart/form-data" class="receipt-form">
-                {% csrf_token %}
-                <input type="file" name="receipt" required>
+            <div class="button-group">
                 <button type="submit" class="submit-btn">
-                    Submit Payment
+                    Upload Receipt
                 </button>
-            </form>
 
-        {% endif %}
-
-        <!-- ================= BACK BUTTON ================= -->
-        <a href="{% url 'student:installments' student.id %}"
-           class="back-btn">
-            ← Back to Installments
-        </a>
+                <a href="{% url 'student:installments' %}" class="back-btn">
+                    Back
+                </a>
+            </div>
+        </form>
 
     </div>
+
 </div>
 
 {% endblock %}

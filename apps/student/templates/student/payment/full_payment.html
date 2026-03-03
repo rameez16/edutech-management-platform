@@ -1,0 +1,106 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/payment_plan.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-center">
+    <div class="payment-container">
+
+        <!-- HEADER -->
+        <div class="payment-header">
+            <h2>Student Admission & Fee Management</h2>
+
+            <div class="student-info-card">
+                <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+                <p><strong>Email:</strong> {{ student.user.email }}</p>
+                <p><strong>Student ID:</strong> {{ student.id }}</p>
+            </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="fee-summary">
+            <div class="fee-box">
+                <p>Total Fee</p>
+                <h3>₹{{ total_fee|floatformat:2 }}</h3>
+            </div>
+
+            <div class="fee-box">
+                <p>Paid Amount</p>
+                <h3>₹{{ paid_amount|floatformat:2 }}</h3>
+            </div>
+
+            <div class="fee-box highlight">
+                <p>Pending Amount</p>
+                <h3>₹{{ pending_amount|floatformat:2 }}</h3>
+            </div>
+        </div>
+
+        <!-- PAYMENT MODE -->
+        <div class="payment-mode">
+            <span>Payment Mode:</span>
+            <span class="mode-badge">
+                {{ admission.get_payment_plan_display }}
+            </span>
+        </div>
+
+        <!-- CENTERED PAYMENT CARD -->
+        <div class="payment-center">
+            <form method="POST" enctype="multipart/form-data" class="payment-card">
+                {% csrf_token %}
+
+                <img src="{% static 'student/images/image.png' %}" class="qr-image" alt="QR Code">
+                <p class="qr-text">Scan QR & Complete Full Payment</p>
+
+                {% if not existing_payment %}
+                    <!-- FIRST TIME SUBMIT -->
+                    <input type="file" name="receipt" required>
+                    <button type="submit" class="submit-btn">
+                        Submit Payment
+                    </button>
+
+                {% elif existing_payment.payment_status == "pending" %}
+                    <!-- PENDING -->
+                    <div class="payment-status warning">
+                        ⏳ Payment Under Verification
+                    </div>
+
+                {% elif existing_payment.payment_status == "failed" %}
+                    <!-- REJECTED -->
+                    <div class="payment-status error">
+                        ❌ Payment Rejected. Please Re-upload Receipt.
+                    </div>
+
+                    <input type="file" name="receipt" required>
+                    <button type="submit" class="submit-btn">
+                        Re-Submit Payment
+                    </button>
+
+                {% elif existing_payment.payment_status == "completed" %}
+                    <!-- COMPLETED -->
+                    <div class="payment-status success">
+                        ✅ Payment Completed Successfully
+                    </div>
+
+                    <div class="no-payment">
+                        🎉 No Payment Remaining
+                    </div>
+                     <a href="#" class="submit-btn" style="text-decoration:none; text-align:center; display:block; margin-top:12px;">
+                         Download Payment Receipt
+                    </a>
+                {% endif %}
+
+            </form>
+        </div>
+
+        <div class="note">
+            <p><strong>Note:</strong> Full payment is non-refundable.</p>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -13,132 +13,21 @@ document.addEventListener("DOMContentLoaded", () => {
         ? uploadForm.querySelector('[name=csrfmiddlewaretoken]').value
         : null;
 
-    /* ======================================================
-       STEP 0: SAVE COURSE FEE
-    ====================================================== */
-    const courseFeeInput = document.getElementById('courseFeeInput');
-    const saveCourseFeeBtn = document.getElementById('saveCourseFeeBtn');
-    const courseFeeStatus = document.getElementById('courseFeeStatus');
+    
 
-    let courseFeeSaved = false;
-    let paymentPlanSaved = false;
-
-    if (courseFeeInput && saveCourseFeeBtn) {
-        saveCourseFeeBtn.addEventListener('click', () => {
-            const feeValue = courseFeeInput.value.trim();
-            const url = courseFeeInput.dataset.url;
-
-            if (!feeValue || isNaN(feeValue) || Number(feeValue) < 0) {
-                courseFeeStatus.textContent = "Please enter a valid course fee.";
-                courseFeeStatus.style.color = "red";
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('course_fee_agreed', feeValue);
-
-            fetch(url, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    courseFeeStatus.textContent = "Course fee saved ✔";
-                    courseFeeStatus.style.color = "green";
-                    courseFeeInput.disabled = true;
-                    saveCourseFeeBtn.disabled = true;
-                    courseFeeSaved = true;
-
-                    // Enable upload only if payment plan also saved
-                    if (paymentPlanSaved && uploadBtn) uploadBtn.disabled = false;
-                } else {
-                    courseFeeStatus.textContent = data.message || "Failed to save course fee";
-                    courseFeeStatus.style.color = "red";
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                courseFeeStatus.textContent = "Something went wrong";
-                courseFeeStatus.style.color = "red";
-            });
-        });
-    }
-
-    /* ======================================================
-       STEP 1: SAVE PAYMENT PLAN
-    ====================================================== */
-    const savePaymentBtn = document.getElementById('savePaymentPlanBtn');
-    const paymentSelect = document.getElementById('paymentPlanSelect');
-    const paymentStatus = document.getElementById('paymentStatus');
-    const uploadBtn = document.getElementById('uploadSignedBtn');
-
-    if (savePaymentBtn && paymentSelect && uploadForm) {
-        savePaymentBtn.addEventListener('click', () => {
-            const selectedPlan = paymentSelect.value;
-
-            if (!selectedPlan) {
-                paymentStatus.textContent = "Please select a payment plan first.";
-                paymentStatus.style.color = "red";
-                return;
-            }
-
-            const url = uploadForm.dataset.url;
-            const formData = new FormData();
-            formData.append("payment_plan", selectedPlan);
-
-            fetch(url, {
-                method: "POST",
-                headers: { "X-CSRFToken": csrfToken },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    paymentStatus.textContent = "Payment plan saved ✔";
-                    paymentStatus.style.color = "green";
-                    paymentSelect.disabled = true;
-                    savePaymentBtn.disabled = true;
-                    paymentPlanSaved = true;
-
-                    // Enable upload only if course fee also saved
-                    if (courseFeeSaved && uploadBtn) uploadBtn.disabled = false;
-                } else {
-                    paymentStatus.textContent = data.message || "Failed to save payment plan";
-                    paymentStatus.style.color = "red";
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                paymentStatus.textContent = "Something went wrong";
-                paymentStatus.style.color = "red";
-            });
-        });
-    }
 
     /* ======================================================
        STEP 2: UPLOAD SIGNED ENROLLMENT LETTER
     ====================================================== */
+    const uploadBtn = document.getElementById('uploadSignedBtn');
     const fileInput = document.getElementById('signedLetterInput');
     const uploadStatus = document.getElementById('uploadStatus');
 
     if (uploadBtn && fileInput && uploadForm) {
 
-        // Initially disable upload button until both previous steps complete
-        if (!courseFeeSaved || !paymentPlanSaved) uploadBtn.disabled = true;
-
         // Trigger file selector
         uploadBtn.addEventListener('click', () => {
-            if (!uploadBtn.disabled) {
-                fileInput.click();
-            } else {
-                let msg = "";
-                if (!courseFeeSaved) msg += "Please enter and save course fee first. ";
-                if (!paymentPlanSaved) msg += "Please select and save a payment plan first.";
-                uploadStatus.textContent = msg.trim();
-                uploadStatus.style.color = "red";
-            }
+            fileInput.click();
         });
 
         // Upload file when selected
@@ -157,10 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
+
                     alertify.success("Enrollment letter uploaded successfully ✔");
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
 
                     uploadBtn.disabled = true;
                     uploadBtn.textContent = "Uploaded Successfully ✔";
@@ -179,11 +66,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         stepCard.classList.add('completed');
 
                         const stepDesc = stepCard.querySelector('.step-desc');
-                        if (stepDesc) stepDesc.textContent = "Enrollment letter signed successfully.";
+                        if (stepDesc) {
+                            stepDesc.textContent = "Enrollment letter signed successfully.";
+                        }
 
                         const checkbox = stepCard.querySelector('input[type="checkbox"]');
                         if (checkbox) checkbox.checked = true;
                     }
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
 
                 } else {
                     alertify.error(data.message || "Upload failed ❌");
@@ -198,6 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+
+    
 
 
 

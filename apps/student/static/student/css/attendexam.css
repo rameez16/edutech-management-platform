@@ -1,0 +1,562 @@
+/* ═══════════════════════════════════════════════
+   attend_exam.css  —  Exam Taking Page
+═══════════════════════════════════════════════ */
+
+.attend-container {
+    padding: 24px;
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ════════════════════════════════
+   HEADER
+════════════════════════════════ */
+.attend-header {
+    background: #fff;
+    border-radius: 12px;
+    padding: 22px 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    border-top: 4px solid #6366f1;
+}
+
+.attend-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.attend-type-badge {
+    display: inline-block;
+    background: #ede9fe;
+    color: #5b21b6;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: fit-content;
+}
+
+.attend-header-left h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #1e1b4b;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.attend-header-left p {
+    font-size: 0.84rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* ── Timer ── */
+.exam-timer-block {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 130px;
+    flex-shrink: 0;
+    transition: background 0.4s, border-color 0.4s;
+}
+
+.timer-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+
+.timer-display {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #1e293b;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+
+.timer-warning                  { background: #fffbeb; border-color: #fde68a; }
+.timer-warning .timer-display   { color: #b45309; }
+
+.timer-danger                   { background: #fff5f5; border-color: #fca5a5;
+                                  animation: pulse-danger 1s ease-in-out infinite; }
+.timer-danger .timer-display    { color: #dc2626; }
+
+.timer-expired                  { background: #fff5f5; border-color: #f87171; }
+.timer-expired .timer-display   { color: #dc2626; }
+
+@keyframes pulse-danger {
+    0%, 100% { box-shadow: 0 0 0 0   rgba(248,113,113,0.35); }
+    50%       { box-shadow: 0 0 0 7px rgba(248,113,113,0);    }
+}
+
+/* ════════════════════════════════
+   META ROW
+════════════════════════════════ */
+.attend-meta-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.meta-chip {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* ════════════════════════════════
+   BODY
+════════════════════════════════ */
+.attend-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ════════════════════════════════
+   BASE CARD
+════════════════════════════════ */
+.attend-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.attend-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: #fafbff;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.card-head-icon  { font-size: 1rem; }
+.card-head-title { font-size: 0.9rem; font-weight: 800; color: #1e293b; }
+
+.attend-card-body   { padding: 18px 20px; }
+.instructions-body  { font-size: 0.875rem; color: #475569; line-height: 1.75; }
+
+/* ════════════════════════════════
+   TWO-COLUMN ACTION ROW
+════════════════════════════════ */
+.attend-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 28px 24px;
+    gap: 10px;
+}
+
+.action-card-icon {
+    font-size: 2rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+.download-icon { background: #ede9fe; }
+.upload-icon   { background: #dcfce7; }
+
+.action-card-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.action-card-sub {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    line-height: 1.55;
+    max-width: 240px;
+}
+
+/* ── Buttons ── */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-top: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-download {
+    background: #6366f1;
+    color: #fff;
+}
+.btn-download:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+}
+
+.btn-upload {
+    background: #10b981;
+    color: #fff;
+}
+.btn-upload:hover {
+    background: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(16,185,129,0.3);
+}
+
+.btn-submitted {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1.5px solid #86efac;
+    cursor: default;
+}
+
+.btn-unavailable {
+    background: #f8fafc;
+    color: #94a3b8;
+    border: 1.5px dashed #cbd5e1;
+    cursor: default;
+}
+
+.resubmit-link {
+    font-size: 0.78rem;
+    color: #6366f1;
+    text-decoration: underline;
+    margin-top: -4px;
+}
+
+.submission-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: -4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.late-tag {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+    border-radius: 20px;
+    padding: 1px 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+/* ════════════════════════════════
+   FILE UPLOAD
+════════════════════════════════ */
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.file-upload-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1.5px dashed #c4b5fd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.file-upload-label:hover {
+    border-color: #6366f1;
+    background: #f5f3ff;
+}
+
+.file-upload-icon { font-size: 1rem; flex-shrink: 0; }
+
+.file-upload-text {
+    font-size: 0.78rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    text-align: left;
+}
+
+.file-upload-label input[type="file"] { display: none; }
+
+/* ════════════════════════════════
+   FOOTER
+════════════════════════════════ */
+.attend-footer { padding-bottom: 8px; }
+
+.back-link {
+    font-size: 0.82rem;
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.back-link:hover { color: #4f46e5; }
+
+/* ════════════════════════════════
+   WAITING / NOT PUBLISHED STATE
+════════════════════════════════ */
+
+/* Header right — dashed waiting block */
+.exam-waiting-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: #f8f7ff;
+    border: 2px dashed #c4b5fd;
+    border-radius: 10px;
+    padding: 12px 20px;
+    min-width: 160px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.exam-status-badge {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #7c3aed;
+    background: #ede9fe;
+    padding: 4px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+}
+
+/* Pending card body */
+.exam-pending-card {
+    margin-top: 0;
+}
+
+.exam-pending-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 3rem 2rem 2.5rem;
+}
+
+/* Pulsing clock icon */
+.exam-pending-icon-wrap {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.exam-pending-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(124, 58, 237, 0.12);
+    animation: pendingPulse 2s ease-in-out infinite;
+}
+
+@keyframes pendingPulse {
+    0%, 100% { transform: scale(1);   opacity: 0.7; }
+    50%       { transform: scale(1.35); opacity: 0;  }
+}
+
+.exam-pending-icon {
+    font-size: 2.8rem;
+    line-height: 1;
+    z-index: 1;
+    animation: tickTock 1s ease-in-out infinite alternate;
+}
+
+@keyframes tickTock {
+    from { transform: rotate(-8deg); }
+    to   { transform: rotate( 8deg); }
+}
+
+/* Text */
+.exam-pending-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #1e1b4b;
+    margin: 0 0 0.5rem;
+}
+
+.exam-pending-sub {
+    font-size: 0.9rem;
+    color: #64748b;
+    max-width: 420px;
+    line-height: 1.65;
+    margin: 0 0 1.4rem;
+}
+
+/* Mini meta chips */
+.exam-pending-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 1.4rem;
+}
+
+.exam-pending-meta span {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 0.78rem;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* Auto-refresh indicator */
+.exam-pending-refresh-info {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.refresh-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    flex-shrink: 0;
+    animation: blinkDot 1.2s ease-in-out infinite;
+}
+
+@keyframes blinkDot {
+    0%, 100% { opacity: 1;   }
+    50%       { opacity: 0.2; }
+}
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+@media (max-width: 640px) {
+    .attend-container    { padding: 14px; }
+    .attend-header       { flex-direction: column; }
+    .exam-timer-block,
+    .exam-waiting-block  { width: 100%; }
+    .attend-actions-row  { grid-template-columns: 1fr; }
+    .action-card         { padding: 20px 16px; }
+    .exam-pending-inner  { padding: 2rem 1rem 1.5rem; }
+}
+
+/* ════════════════════════════════
+   LATE SUBMISSION NOTICE
+════════════════════════════════ */
+.late-submission-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background: #fff7ed;
+    border: 1.5px solid #fed7aa;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #92400e;
+}
+
+.late-submit-btn {
+    background: #f97316;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.late-submit-btn:hover {
+    background: #ea580c;
+}
+
+/* ════════════════════════════════
+   LATE / LOCKED SUBMISSION
+════════════════════════════════ */
+.timer-late {
+    background: #fff7ed;
+    border-color: #fed7aa;
+    animation: pulse-late 1.5s ease-in-out infinite;
+}
+.timer-late .timer-display { color: #c2410c; }
+
+@keyframes pulse-late {
+    0%, 100% { box-shadow: 0 0 0 0   rgba(249,115,22,0.3); }
+    50%       { box-shadow: 0 0 0 7px rgba(249,115,22,0);   }
+}
+
+.late-submission-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #fff7ed;
+    border: 1.5px solid #fed7aa;
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 0.83rem;
+    color: #92400e;
+    font-weight: 500;
+}
+
+.submission-locked {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #64748b;
+}

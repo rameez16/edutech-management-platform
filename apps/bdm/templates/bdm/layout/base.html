@@ -1032,6 +1032,79 @@
         .user-name { display: none; }
     }
 
+    /* ── Alertify Theme Override ── */
+
+/* Success */
+.alertify-notifier .ajs-message.ajs-success {
+    background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding: 0.875rem 1.25rem;
+}
+
+/* Error */
+.alertify-notifier .ajs-message.ajs-error {
+    background: linear-gradient(135deg, #dc2626, #f87171);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.35);
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding: 0.875rem 1.25rem;
+}
+
+/* Warning */
+.alertify-notifier .ajs-message.ajs-warning {
+    background: linear-gradient(135deg, #d97706, #fbbf24);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.35);
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding: 0.875rem 1.25rem;
+}
+
+/* Default / Info */
+.alertify-notifier .ajs-message {
+    background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding: 0.875rem 1.25rem;
+}
+
+/* Dismiss button */
+.alertify-notifier .ajs-message .ajs-close {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.alertify-notifier .ajs-message .ajs-close:hover {
+    color: #fff;
+}
+
+/* Position tweak — top right looks clean */
+.alertify-notifier.ajs-right {
+    right: 1.5rem;
+}
+
+.alertify-notifier.ajs-top {
+    top: 2rem;
+}
+
+
     /* ═══════════════════════════════════════════════════════
        TOASTR OVERRIDES
     ═══════════════════════════════════════════════════════ */

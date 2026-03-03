@@ -56,7 +56,7 @@ from apps.student.models import StudentDocument,EnrollmentAgreement,StudentIDCar
 from apps.bdm.constants import REQUIRED_DOCUMENT_TYPES
 
 
-from .utils import role_required
+from .utils import role_required,counselor_or_admin_required
 
 
 
@@ -188,7 +188,6 @@ def lead_detail(request, lead_id):
 
 
 
-
 User = get_user_model()
 
 
@@ -198,6 +197,7 @@ from django.contrib import messages
 from django.contrib.auth.models import Group
 from .form import CreateUserForm
 
+@role_required('admin')
 def create_user(request):
     if request.method == "POST":
         form = CreateUserForm(request.POST)
@@ -225,6 +225,7 @@ def create_user(request):
 
 
 @login_required
+@role_required('admin')
 def user_list(request):
     users = User.objects.all().order_by("-date_joined")
 
@@ -232,7 +233,7 @@ def user_list(request):
         "users": users
     })
     
-    
+@role_required('admin')    
 def create_admin_profile(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
@@ -540,15 +541,24 @@ def download_enrollment_letter(request):
     
 
 # Leads management aleena
-
+@login_required
+@counselor_or_admin_required
 def leads(request):
-    # 1️⃣ Base queryset (ALWAYS all leads)
+    
+    is_counselor = request.user.role == "counselor"
+    counselor_profile = getattr(request.user, 'counselor', None)
+
+    # ── Base queryset ──
     all_leads = Lead.objects.select_related(
         'preferred_course',
         'assigned_to'
     ).order_by('-enquiry_date')
 
-    # 2️⃣ Filtered queryset (start from all_leads)
+    # ── Counselor sees ONLY their assigned leads ──
+    if is_counselor:
+        all_leads = all_leads.filter(assigned_to=request.user)
+
+    # ── Filtered queryset (starts from all_leads) ──
     filtered_leads = all_leads
 
     # Get filter parameters
@@ -592,40 +602,74 @@ def leads(request):
             Q(phone__icontains=search)
         )
 
-    # 3️⃣ Stats (ALWAYS from all_leads)
-    total_leads = all_leads.count()
-    new_leads = all_leads.filter(status=Lead.LeadStatus.NEW).count()
-    followup_leads = all_leads.filter(
-        status__in=[Lead.LeadStatus.ASSIGNED, Lead.LeadStatus.IDLE]
-    ).count()
-    converted_leads = all_leads.filter(
-        status=Lead.LeadStatus.CONVERTED
-    ).count()
+    # ── Stats (always computed from role-scoped all_leads) ──
+    total_leads         = all_leads.count()
+    new_leads_count     = all_leads.filter(status=Lead.LeadStatus.NEW).count()
+    converted_leads_count = all_leads.filter(status=Lead.LeadStatus.CONVERTED).count()
+
+    if is_counselor:
+        # Counselor-specific stats
+        assigned_leads_count = all_leads.filter(
+            status=Lead.LeadStatus.ASSIGNED
+        ).count()
+        conversion_rate = round(
+            (converted_leads_count / total_leads * 100) if total_leads else 0, 1
+        )
+        followup_leads_count = 0  # not used in counselor view
+    else:
+        # Admin stats
+        assigned_leads_count = all_leads.filter(
+            status=Lead.LeadStatus.ASSIGNED
+        ).count()
+        followup_leads_count = all_leads.filter(
+            status__in=[Lead.LeadStatus.ASSIGNED, Lead.LeadStatus.IDLE]
+        ).count()
+        conversion_rate = round(
+            (converted_leads_count / total_leads * 100) if total_leads else 0, 1
+        )
 
     context = {
         # Tables
-        "leads": all_leads,                  # All Leads table
-        "filtered_leads": filtered_leads,    # Filtered section
+        "leads": all_leads,
+        "filtered_leads": filtered_leads,
         "filtered_count": filtered_leads.count(),
 
         # Dropdowns
         "courses": Course.objects.all().order_by('name'),
         "status_choices": Lead.LeadStatus.choices,
         "mode_choices": Lead.ModeChoice.choices,
+        "counselors": User.objects.filter(
+            role="counselor",
+            counselor__is_active=True
+        ).select_related('counselor'),
 
         # Stats
         "total_leads": total_leads,
-        "new_leads_count": new_leads,
-        "followup_leads_count": followup_leads,
-        "converted_leads_count": converted_leads,
+        "new_leads_count": new_leads_count,
+        "followup_leads_count": followup_leads_count,
+        "converted_leads_count": converted_leads_count,
+        "assigned_leads_count": assigned_leads_count,
+        "conversion_rate": conversion_rate,
+
+        # Role flags
+        "is_counselor": is_counselor,
+        "counselor_profile": counselor_profile,
     }
 
     return render(request, 'bdm/leads/leads.html', context)
 
 
-def lead_details(request, lead_id):
-    lead = get_object_or_404(Lead, id=lead_id)
-    counsellors = User.objects.filter(is_staff=True)
+@counselor_or_admin_required
+def lead_details(request, pk):
+    lead = get_object_or_404(Lead, pk=pk)
+    counsellors = User.objects.filter(role="counselor")
+    
+    new_student_data = request.session.pop("new_student_data", None)
+
+    is_admin = request.user.groups.filter(name="Admin").exists()
+    
+    courses=Course.objects.all()         # changes
+    batches=Batch.objects.all()
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -651,8 +695,166 @@ def lead_details(request, lead_id):
 
     return render(request, "bdm/leads/lead_details.html", {
         "lead": lead,
-        "counsellors": counsellors
+        "counsellors": counsellors,
+        "batches":batches,
+        "courses":courses,
+         "new_student_data": new_student_data,
+        "is_admin": is_admin,
     })
+
+#lead follow up Ramees.
+@counselor_or_admin_required
+def update_lead_followup(request, pk):
+    lead = get_object_or_404(Lead, pk=pk)
+
+    if request.method == "POST":
+        lead.educational_qualification = request.POST.get("educational_qualification")
+        lead.confirmed_course_id = request.POST.get("confirmed_course") or None
+        lead.interested_batch_id = request.POST.get("interested_batch") or None
+        lead.discussed_fee = request.POST.get("discussed_fee") or None
+        lead.payment_plan = request.POST.get("payment_plan") or None
+        lead.telecaller_notes = request.POST.get("telecaller_notes")
+        lead.admission_fee_paid = request.POST.get("admission_fee_paid") == "on"
+        lead.admission_fee_amount=request.POST.get("admission_fee")
+
+        # lead.status = Lead.LeadStatus.FOLLOWED  # optional
+        lead.save()
+
+        messages.success(request, "Follow-up details updated successfully!")
+
+    return redirect("bdm:leads")
+
+
+
+from .models import Admission
+
+User = get_user_model()
+
+from django.db import transaction
+from django.contrib import messages
+from django.utils import timezone
+from decimal import Decimal
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+@role_required('admin')
+def convert_lead_to_admission(request, pk):
+
+    # 🔒 Admin Only
+    if not request.user.groups.filter(name="Admin").exists():
+        messages.error(request, "You are not authorized.")
+        return redirect("bdm:leads")
+
+    lead = get_object_or_404(Lead, pk=pk)
+
+    # ❌ Prevent double conversion
+    if lead.status == Lead.LeadStatus.CONVERTED:
+        messages.error(request, "This lead is already converted.")
+        return redirect("bdm:lead_details", pk=pk)
+
+    if request.method == "POST":
+
+        # 🔎 Check if user already exists
+        existing_user = User.objects.filter(email=lead.email).first()
+
+        if existing_user:
+            messages.error(request, "A user with this email already exists.")
+            return redirect("bdm:lead_details", pk=pk)
+
+        with transaction.atomic():
+
+            # 1️⃣ Create User (safe username)
+            username = f"{lead.phone}"
+            password = f"{lead.name}@1234"
+
+            user = User.objects.create_user(
+                username=username,
+                email=lead.email,
+                password=password,
+                first_name=lead.name,
+                role="student"
+            )
+
+            student_group, _ = Group.objects.get_or_create(name="Student")
+            user.groups.add(student_group)
+
+            # 2️⃣ Create Student
+            student = Student.objects.create(
+                user=user,
+                full_name=lead.name,
+                email=lead.email,
+                phone=lead.phone
+            )
+
+            if lead.interested_batch:
+                student.batches.add(lead.interested_batch)
+
+            # 🔎 Prevent duplicate admission
+            if Admission.objects.filter(student=student, status="active").exists():
+                messages.error(request, "Active admission already exists.")
+                return redirect("bdm:lead_details", pk=pk)
+
+            # 3️⃣ Create Admission
+            admission = Admission.objects.create(
+                user=user,
+                student=student,
+                course=lead.confirmed_course or lead.preferred_course,
+                batch=lead.interested_batch,
+                educational_qualification=lead.educational_qualification,
+                payment_plan=lead.payment_plan,
+                total_fee=lead.discussed_fee or Decimal("0.00"),
+                admitted_by=request.user,
+                admission_fee_paid=lead.admission_fee_paid,
+                admission_fee_amount=lead.admission_fee_amount or Decimal("0.00"),
+                status="active"
+            )
+
+            # 4️⃣ Create Admission Fee Payment
+            feepayment = FeePayment.objects.create(
+                student=student,
+                payment_type=FeePayment.PaymentType.ADMISSION,
+                amount=lead.discussed_fee or Decimal("0.00"),
+                payment_method=FeePayment.PaymentMethod.UPI,
+                payment_status=FeePayment.PaymentStatus.COMPLETED,
+                transaction_id=f"TRN-{student.id}-{int(timezone.now().timestamp())}",
+                receipt_number=f"REC-{student.id}",
+                payment_date=timezone.now(),
+                remarks="Admission fee collected during conversion",
+                received_by=request.user
+            )
+
+            # 5️⃣ Update Lead
+            lead.status = Lead.LeadStatus.CONVERTED
+            lead.save(update_fields=["status"])
+
+        messages.success(
+            request,
+            f"Admission created! Username: {username} | Password: {password}"
+        )
+        
+        
+        request.session["new_student_data"] = {
+                "username": username,
+                "password": password,
+                "name": lead.name,
+                "course": str(admission.course),
+                "batch": str(admission.batch) if admission.batch else "",
+                "payment_plan": admission.payment_plan,
+                "fee": str(admission.total_fee),
+                "admission_date": admission.admission_date.strftime("%d-%m-%Y"),
+                "admission fee receipt no":feepayment.receipt_number
+            }
+
+        return redirect("bdm:student_dashboard", pk=student.pk)
+
+    return redirect("bdm:lead_detail", pk=pk)
+
+
+
+
 
 
 def bulk_leads(request):
@@ -712,19 +914,38 @@ def create_lead(request):
 
     return redirect('bdm:leads')
 
-
+@role_required('admin')
 def assign_lead(request):
     if request.method == "POST":
         lead = get_object_or_404(Lead, id=request.POST.get('lead_id'))
-        lead.assigned_to_id = request.POST.get('assigned_to')
+        assigned_user_id = request.POST.get('assigned_to')
+        
+        if not assigned_user_id:
+            messages.error(request, "Please select a counselor.")
+            return redirect('bdm:leads')
+        
+        assigned_user = get_object_or_404(User, id=assigned_user_id)
+        
+        # Update lead
+        lead.assigned_to = assigned_user
         lead.status = Lead.LeadStatus.ASSIGNED
         lead.save()
-        messages.success(request, "Lead assigned successfully 👤")
+        
+        # Update Counselor metrics if profile exists
+        counselor = getattr(assigned_user, 'counselor', None)
+        if counselor:
+            counselor.total_leads_assigned += 1
+            counselor.active_leads += 1
+            counselor.save()
+        
+        messages.success(request, f"Lead assigned to {assigned_user.get_full_name() or assigned_user.username} 👤")
+    
     return redirect('bdm:leads')
 
 
 
 # user profile view
+@role_required('admin')
 def user_detail(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
@@ -742,6 +963,7 @@ def user_detail(request, user_id):
     )
 
 @login_required
+@role_required('admin')
 def student_admin_profile_form(request, user_id):
     student = get_object_or_404(Student, user__id=user_id)
 
@@ -785,6 +1007,7 @@ def student_admin_profile_form(request, user_id):
         }
     )
 @login_required
+@role_required('admin')
 def trainer_admin_profile_form(request, user_id):
     trainer = get_object_or_404(Trainer, user__id=user_id)
 
@@ -823,7 +1046,7 @@ def trainer_admin_profile_form(request, user_id):
 
 
 #batch
-
+@role_required('admin')
 def batch_list(request):
     batch_qs = Batch.objects.select_related('course').order_by('-id')
 
@@ -888,6 +1111,7 @@ def toggle_batch_extension(request, pk):
     return redirect("bdm:batch_detail", pk=pk)
 
 @login_required
+@role_required('admin')
 def batch_create(request):
 
     if request.method == "POST":
@@ -969,6 +1193,7 @@ def add_batch_schedule(request, pk):
 # ================================
 
 @login_required
+@role_required('admin')
 def payments_dashboard(request):
     payments = FeePayment.objects.select_related("student")
 
@@ -1043,6 +1268,7 @@ def payments_dashboard(request):
 
 
 @login_required
+@role_required('admin')
 def payment_detail(request, pk):
     payment = get_object_or_404(
         FeePayment.objects
@@ -1123,6 +1349,7 @@ def payment_detail(request, pk):
 
     return render(request, "bdm/payments/payment_detail.html", context)
 
+@role_required('admin')
 def course_fee(request):
 
     # ✅ Only students who have at least one payment
@@ -1244,7 +1471,7 @@ def course_fee(request):
         "students": student_data
     })
     
- 
+@role_required('admin')
 def payment_history(request, student_id):
     # ================= GET STUDENT =================
     student = get_object_or_404(Student, id=student_id)
@@ -1363,7 +1590,7 @@ def payment_history(request, student_id):
     return render(request, "bdm/payments/payment_history.html", context)
 
 #leave section-aleena
-
+@role_required('admin')
 def leave_view(request):
     status_filter = request.GET.get('status', 'all')
     student_name = request.GET.get('student')
@@ -1409,6 +1636,7 @@ def leave_view(request):
     return render(request, 'bdm/leave/leave.html', context)
 
 @login_required
+@role_required('admin')
 def leave_detail(request, pk):
     leave = get_object_or_404(
         LeaveApplication.objects.select_related(
@@ -1602,7 +1830,7 @@ def student_feedback(request):
 
 #course section-aleena
 
-
+@role_required('admin')
 def course_list_view(request):
     courses = Course.objects.filter(is_active=True).order_by('-created_at')
 
@@ -1611,7 +1839,7 @@ def course_list_view(request):
     }
     return render(request, 'bdm/course/course_list.html', context)
 
-
+@role_required('admin')
 def course_detail_view(request, pk):
     course = get_object_or_404(Course, pk=pk)
     modules = course.modules.all().order_by('module_number')
@@ -1638,7 +1866,7 @@ def course_detail_view(request, pk):
 
     return render(request, 'bdm/course/course_detail.html', context)
 
-
+@role_required('admin')
 def module_detail_view(request, pk):
     module = get_object_or_404(Module, pk=pk)
     lessons = module.lessons.all().order_by('session_number')
@@ -1666,6 +1894,7 @@ def module_detail_view(request, pk):
 
 
 @login_required
+@role_required('admin')
 def course_create(request):
     if request.method == "POST":
         try:
@@ -1693,6 +1922,7 @@ def course_create(request):
 
 
 #trainer-page-aleena
+@role_required('admin')
 def trainer_list_view(request):
     trainers = Trainer.objects.all().select_related(
         "user", "admin_profile"
@@ -1971,7 +2201,7 @@ from apps.student.models import FeePayment, StudentDocument, EnrollmentAgreement
 
 # New dashboard -ramees
 
-@login_required
+
 @login_required
 @role_required('admin')
 def dashboard(request):

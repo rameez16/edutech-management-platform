@@ -1,689 +1,560 @@
 {% extends "bdm/layout/base.html" %}
 {% load static %}
 
-{% block title %}Lead Details - {{ lead.name }}{% endblock %}
+{% block title %}Lead · {{ lead.name }}{% endblock %}
 
-{% block page_title %}
-Lead Details
-{% endblock %}
-
-{% block page_subtitle %}
-View and manage lead information
-{% endblock %}
+{% block page_title %}Lead Details{% endblock %}
+{% block page_subtitle %}View and manage lead information{% endblock %}
 
 {% block extra_css %}
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        /* Scoped styles - only affect content within .lead-details-wrapper */
-        .lead-details-wrapper {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --blue-50:  #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --slate-50:  #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-700: #334155;
+    --slate-900: #0f172a;
+    --green-100: #dcfce7;
+    --green-600: #16a34a;
+    --amber-100: #fef3c7;
+    --amber-600: #d97706;
+    --red-100:   #fee2e2;
+    --red-600:   #dc2626;
+    --purple-100:#f3e8ff;
+    --purple-600:#9333ea;
+    --cyan-100:  #cffafe;
+    --cyan-600:  #0891b2;
+    --radius-sm: 6px;
+    --radius:    10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow:    0 4px 16px rgba(0,0,0,.08);
+    --shadow-md: 0 8px 24px rgba(0,0,0,.10);
+  }
 
-        .lead-details-wrapper * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  .ld { font-family: 'DM Sans', -apple-system, sans-serif; color: var(--slate-900); }
+  .ld *, .ld *::before, .ld *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .lead-details-wrapper {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --accent: #0ea5e9;
-            --accent-dark: #0284c7;
-            --success: #10b981;
-            --success-light: #34d399;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --danger-dark: #dc2626;
-            --info: #06b6d4;
-            --purple: #8b5cf6;
-            --bg: #f0f9ff;
-            --card-bg: #ffffff;
-            --text: #0f172a;
-            --text-light: #64748b;
-            --border: #cbd5e1;
-        }
+  /* ── Layout ── */
+  .ld-wrap   { max-width: 1080px; margin: 0 auto; padding: 1.25rem 1.5rem 3rem; display: flex; flex-direction: column; gap: 1.25rem; }
 
-        .lead-details-wrapper .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem 1.5rem;
-        }
+  /* ── Hero Header ── */
+  .ld-hero {
+    background: linear-gradient(120deg, var(--blue-600) 0%, #0ea5e9 100%);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem 2rem;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .ld-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .ld-hero-inner { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+  .ld-hero-name  { font-size: 1.625rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .625rem; }
+  .ld-hero-meta  { display: flex; flex-wrap: wrap; gap: .625rem; }
+  .ld-meta-chip  { display: inline-flex; align-items: center; gap: .375rem; font-size: .75rem; font-weight: 500; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.25); border-radius: 6px; padding: .3rem .625rem; white-space: nowrap; }
+  .ld-meta-chip i { opacity: .85; font-size: .7rem; }
+  .ld-status-badge { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem 1rem; background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.35); border-radius: 8px; font-weight: 700; font-size: .8125rem; backdrop-filter: blur(6px); white-space: nowrap; }
+  .ld-dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-        /* Back Button */
-        .lead-details-wrapper .back-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.8125rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
+  /* ── Section Grid ── */
+  .ld-grid-2  { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .ld-span-2  { grid-column: 1 / -1; }
 
-        .lead-details-wrapper .back-button:hover {
-            gap: 0.75rem;
-            color: var(--primary-dark);
-        }
+  /* ── Card ── */
+  .ld-card {
+    background: #fff;
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  .ld-card-header {
+    display: flex; align-items: center; gap: .75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--slate-100);
+  }
+  .ld-card-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--blue-600), #0ea5e9);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: .875rem; flex-shrink: 0;
+  }
+  .ld-card-icon.green   { background: linear-gradient(135deg, var(--green-600), #22c55e); }
+  .ld-card-icon.purple  { background: linear-gradient(135deg, var(--purple-600), #a855f7); }
+  .ld-card-title { font-size: .9375rem; font-weight: 700; color: var(--slate-900); }
+  .ld-card-body  { padding: 1rem 1.25rem; }
 
-        /* Enhanced Header Card */
-        .lead-details-wrapper .header-card {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
+  /* ── Info Table ── */
+  .ld-info { display: flex; flex-direction: column; }
+  .ld-info-row { display: flex; align-items: baseline; gap: .75rem; padding: .5625rem 0; border-bottom: 1px solid var(--slate-100); }
+  .ld-info-row:last-child { border-bottom: none; }
+  .ld-info-label { font-size: .6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--slate-400); min-width: 130px; flex-shrink: 0; }
+  .ld-info-val   { font-size: .8125rem; font-weight: 500; color: var(--slate-700); }
 
-        .lead-details-wrapper .header-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
-            border-radius: 50%;
-        }
+  /* ── Status Pills ── */
+  .ld-pill { display: inline-flex; padding: .25rem .625rem; border-radius: 5px; font-size: .6875rem; font-weight: 700; text-transform: capitalize; }
+  .ld-pill.new       { background: var(--cyan-100);   color: var(--cyan-600); }
+  .ld-pill.assigned  { background: var(--purple-100); color: var(--purple-600); }
+  .ld-pill.converted { background: var(--green-100);  color: var(--green-600); }
+  .ld-pill.dropped,
+  .ld-pill.lost      { background: var(--red-100);    color: var(--red-600); }
+  .ld-pill.followup  { background: var(--amber-100);  color: var(--amber-600); }
 
-        .lead-details-wrapper .header-content {
-            position: relative;
-            z-index: 1;
-        }
+  /* ── Forms ── */
+  .ld-form-group { margin-bottom: .875rem; }
+  .ld-form-group:last-child { margin-bottom: 0; }
+  .ld-label { display: block; font-size: .75rem; font-weight: 600; color: var(--slate-500); margin-bottom: .3rem; }
+  .ld-control {
+    width: 100%; padding: .5rem .75rem;
+    border: 1.5px solid var(--slate-200); border-radius: var(--radius-sm);
+    font-family: inherit; font-size: .8125rem; color: var(--slate-900);
+    background: var(--slate-50); transition: border-color .2s, box-shadow .2s;
+  }
+  .ld-control:focus { outline: none; border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(59,130,246,.12); background: #fff; }
+  textarea.ld-control { resize: vertical; min-height: 80px; }
 
-        .lead-details-wrapper .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-        }
+  /* Inline action row (assign / status) */
+  .ld-action-row  { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+  .ld-action-row .ld-control { flex: 1; min-width: 160px; }
 
-        .lead-details-wrapper .header-left h1 {
-            font-family: 'Instrument Serif', serif;
-            font-size: 1.75rem;
-            color: white;
-            margin-bottom: 0.75rem;
-            letter-spacing: -0.02em;
-        }
+  /* ── Buttons ── */
+  .ld-btn { display: inline-flex; align-items: center; gap: .35rem; padding: .5rem 1rem; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: .8125rem; font-weight: 600; cursor: pointer; transition: filter .15s, transform .15s; white-space: nowrap; }
+  .ld-btn:hover  { filter: brightness(1.08); transform: translateY(-1px); }
+  .ld-btn:active { transform: translateY(0); }
+  .ld-btn-primary  { background: var(--blue-600);  color: #fff; }
+  .ld-btn-success  { background: var(--green-600); color: #fff; }
+  .ld-btn-danger   { background: var(--red-600);   color: #fff; }
+  .ld-btn-ghost    { background: var(--slate-100); color: var(--slate-700); border: 1px solid var(--slate-200); }
+  .ld-btn-outline  { background: transparent; color: var(--blue-600); border: 1.5px solid var(--blue-600); }
 
-        .lead-details-wrapper .header-meta {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
-        }
+  /* ── Section divider ── */
+  .ld-divider { border: none; border-top: 1px solid var(--slate-200); margin: 0; }
 
-        .lead-details-wrapper .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: rgba(255, 255, 255, 0.95);
-            font-size: 0.8125rem;
-        }
+  /* ── Convert banner ── */
+  .ld-convert-banner {
+    border: 1.5px solid #bbf7d0;
+    border-radius: var(--radius-lg);
+    background: #f0fdf4;
+    overflow: hidden;
+  }
+  .ld-convert-banner .ld-card-header { background: var(--green-600); border-bottom: none; }
+  .ld-convert-banner .ld-card-title  { color: #fff; }
+  .ld-convert-banner .ld-card-icon   { background: rgba(255,255,255,.25); }
 
-        .lead-details-wrapper .meta-item i {
-            width: 28px;
-            height: 28px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem;
-        }
+  .ld-summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .5rem .75rem; margin-bottom: 1.25rem; }
+  .ld-summary-item { display: flex; flex-direction: column; gap: .125rem; }
+  .ld-summary-label { font-size: .6875rem; text-transform: uppercase; letter-spacing: .06em; color: var(--slate-400); font-weight: 600; }
+  .ld-summary-val   { font-size: .8125rem; font-weight: 600; color: var(--slate-700); }
 
-        .lead-details-wrapper .header-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.625rem 1.25rem;
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            color: white;
-            font-weight: 700;
-            font-size: 0.875rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+  /* ── Success card ── */
+  .ld-success-card { border: 1.5px solid #bbf7d0; border-radius: var(--radius-lg); background: #f0fdf4; overflow: hidden; }
+  .ld-success-card .ld-card-header { background: #15803d; border-bottom: none; }
+  .ld-success-card .ld-card-title  { color: #fff; }
 
-        .lead-details-wrapper .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: white;
-            animation: pulse 2s ease-in-out infinite;
-        }
+  /* ── Responsive ── */
+  @media (max-width: 740px) {
+    .ld-grid-2  { grid-template-columns: 1fr; }
+    .ld-span-2  { grid-column: 1; }
+    .ld-hero-name { font-size: 1.25rem; }
+    .ld-action-row { flex-direction: column; align-items: stretch; }
+    .ld-info-label { min-width: 110px; }
+  }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Grid Layout */
-        .lead-details-wrapper .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Cards */
-        .lead-details-wrapper .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .lead-details-wrapper .card:hover {
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
-            transform: translateY(-2px);
-        }
-
-        .lead-details-wrapper .card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.875rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .lead-details-wrapper .card-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .lead-details-wrapper .card-header h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Info Rows */
-        .lead-details-wrapper .info-row {
-            display: flex;
-            padding: 0.625rem 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .lead-details-wrapper .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .lead-details-wrapper .info-label {
-            font-weight: 600;
-            color: var(--text-light);
-            min-width: 120px;
-            font-size: 0.75rem;
-        }
-
-        .lead-details-wrapper .info-value {
-            color: var(--text);
-            font-weight: 500;
-            font-size: 0.8125rem;
-        }
-
-        /* Status Badge in Info */
-        .lead-details-wrapper .status-badge {
-            display: inline-flex;
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: capitalize;
-        }
-
-        .lead-details-wrapper .status-badge.new {
-            background: rgba(6, 182, 212, 0.1);
-            color: var(--info);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-        }
-
-        .lead-details-wrapper .status-badge.assigned {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--purple);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-
-        .lead-details-wrapper .status-badge.converted {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .lead-details-wrapper .status-badge.dropped,
-        .lead-details-wrapper .status-badge.lost {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        /* Action Forms */
-        .lead-details-wrapper .action-form {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.02), rgba(14, 165, 233, 0.02));
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .lead-details-wrapper .action-form:last-child {
-            margin-bottom: 0;
-        }
-
-        .lead-details-wrapper .form-row {
-            display: flex;
-            align-items: center;
-            gap: 0.875rem;
-            flex-wrap: wrap;
-        }
-
-        .lead-details-wrapper .form-label {
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: var(--text);
-            min-width: 140px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .lead-details-wrapper .form-select {
-            flex: 1;
-            min-width: 180px;
-            padding: 0.625rem 0.875rem;
-            border-radius: 8px;
-            border: 2px solid var(--border);
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.8125rem;
-            color: var(--text);
-            background: white;
-            transition: all 0.3s ease;
-        }
-
-        .lead-details-wrapper .form-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        /* Buttons */
-        .lead-details-wrapper .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.8125rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        .lead-details-wrapper .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-        }
-
-        .lead-details-wrapper .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
-        }
-
-        .lead-details-wrapper .btn-secondary {
-            background: linear-gradient(135deg, #6b7280, #4b5563);
-            color: white;
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.25);
-        }
-
-        .lead-details-wrapper .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(107, 114, 128, 0.35);
-        }
-
-        .lead-details-wrapper .btn-success {
-            background: linear-gradient(135deg, var(--success), var(--success-light));
-            color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-        }
-
-        .lead-details-wrapper .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
-        }
-
-        .lead-details-wrapper .btn-danger {
-            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
-            color: white;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-        }
-
-        .lead-details-wrapper .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
-        }
-
-        /* Full Width Card */
-        .lead-details-wrapper .card-full {
-            grid-column: 1 / -1;
-        }
-
-        /* Actions Grid */
-        .lead-details-wrapper .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        /* Quick Action Buttons */
-        .lead-details-wrapper .quick-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        /* Bottom Actions Border */
-        .lead-details-wrapper .bottom-actions {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
-        }
-
-        /* Responsive */
-        @media (max-width: 968px) {
-            .lead-details-wrapper .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .lead-details-wrapper .header-top {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .lead-details-wrapper .header-left h1 {
-                font-size: 1.5rem;
-            }
-
-            .lead-details-wrapper .form-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .lead-details-wrapper .form-label {
-                min-width: auto;
-            }
-
-            .lead-details-wrapper .actions-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .lead-details-wrapper .meta-item {
-                font-size: 0.75rem;
-            }
-        }
-
-        /* Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+  /* ── Fade-in ── */
+  .ld-fade { opacity: 0; transform: translateY(14px); animation: fadeUp .45s ease forwards; }
+  @keyframes fadeUp { to { opacity:1; transform: translateY(0); } }
+  .ld-fade:nth-child(1) { animation-delay: .05s; }
+  .ld-fade:nth-child(2) { animation-delay: .12s; }
+  .ld-fade:nth-child(3) { animation-delay: .19s; }
+  .ld-fade:nth-child(4) { animation-delay: .26s; }
+  .ld-fade:nth-child(5) { animation-delay: .33s; }
+  .ld-fade:nth-child(6) { animation-delay: .40s; }
+  .ld-fade:nth-child(7) { animation-delay: .47s; }
+</style>
 {% endblock %}
 
 {% block page_actions %}
-    <a href="{% url 'bdm:leads' %}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i>
-        Back to Leads
-    </a>
+  <a href="{% url 'bdm:leads' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Back to Leads
+  </a>
 {% endblock %}
 
 {% block breadcrumbs %}
-{% comment %} <span>/</span> {% endcomment %}
-<a href="{% url 'bdm:leads' %}">Leads</a>
-
-<span>{{ lead.name }}</span>
+  <a href="{% url 'bdm:leads' %}">Leads</a>
+  <span>{{ lead.name }}</span>
 {% endblock %}
 
 {% block content %}
-<div class="lead-details-wrapper">
-    <div class="container">
-        <!-- Enhanced Header with Lead Summary -->
-        <div class="header-card">
-            <div class="header-content">
-                <div class="header-top">
-                    <div class="header-left">
-                        <h1>{{ lead.name }}</h1>
-                        <div class="header-meta">
-                            <div class="meta-item">
-                                <i class="fas fa-graduation-cap"></i>
-                                <span>{{ lead.preferred_course }}</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-envelope"></i>
-                                <span>{{ lead.email }}</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-phone"></i>
-                                <span>{{ lead.phone }}</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>{{ lead.enquiry_date|date:"M d, Y" }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="header-right">
-                        <div class="header-badge">
-                            <span class="status-dot"></span>
-                            {{ lead.get_status_display }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="ld">
+<div class="ld-wrap">
+
+  <!-- ① Hero -->
+  <div class="ld-hero ld-fade">
+    <div class="ld-hero-inner">
+      <div>
+        <div class="ld-hero-name">{{ lead.name }}</div>
+        <div class="ld-hero-meta">
+          <span class="ld-meta-chip"><i class="fas fa-graduation-cap"></i> {{ lead.preferred_course }}</span>
+          <span class="ld-meta-chip"><i class="fas fa-envelope"></i> {{ lead.email }}</span>
+          <span class="ld-meta-chip"><i class="fas fa-phone"></i> {{ lead.phone }}</span>
+          <span class="ld-meta-chip"><i class="fas fa-calendar-alt"></i> {{ lead.enquiry_date|date:"M d, Y" }}</span>
         </div>
-
-        <!-- Content Grid -->
-        <div class="content-grid">
-            <!-- Personal Information -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <h3>Personal Information</h3>
-                </div>
-                
-                <div class="info-row">
-                    <div class="info-label">Full Name</div>
-                    <div class="info-value">{{ lead.name }}</div>
-                </div>
-                
-                <div class="info-row">
-                    <div class="info-label">Email Address</div>
-                    <div class="info-value">{{ lead.email }}</div>
-                </div>
-                
-                <div class="info-row">
-                    <div class="info-label">Phone Number</div>
-                    <div class="info-value">{{ lead.phone }}</div>
-                </div>
-                
-                <div class="info-row">
-                    <div class="info-label">Enquiry Date</div>
-                    <div class="info-value">{{ lead.enquiry_date|date:"M d, Y" }}</div>
-                </div>
-            </div>
-
-            <!-- Course & Mode Details -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <h3>Course Details</h3>
-                </div>
-                
-                <div class="info-row">
-                    <div class="info-label">Preferred Course</div>
-                    <div class="info-value">{{ lead.preferred_course }}</div>
-                </div>
-                
-                <div class="info-row">
-                    <div class="info-label">Learning Mode</div>
-                    <div class="info-value">{{ lead.get_mode_display }}</div>
-                </div>
-                
-                <div class="info-row">
-                    <div class="info-label">Current Status</div>
-                    <div class="info-value">
-                        <span class="status-badge {{ lead.status }}">
-                            {{ lead.get_status_display }}
-                        </span>
-                    </div>
-                </div>
-
-                {% if lead.assigned_to %}
-                <div class="info-row">
-                    <div class="info-label">Assigned To</div>
-                    <div class="info-value">{{ lead.assigned_to.username }}</div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Actions Section -->
-        <div class="card card-full">
-            <div class="card-header">
-                <div class="card-icon">
-                    <i class="fas fa-tasks"></i>
-                </div>
-                <h3>Lead Actions</h3>
-            </div>
-
-            <div class="actions-grid">
-                <!-- Assign Counsellor -->
-                <div class="action-form">
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="assign">
-                        <div class="form-row">
-                            <label class="form-label">
-                                <i class="fas fa-user-tie"></i> Assign Counsellor
-                            </label>
-                            <select name="assigned_to" class="form-select" required>
-                <option value="">Select</option>
-                {% for user in telecallers %}
-                    <option value="{{ user.id }}">{{ user.username }}</option>
-                {% endfor %}
-            </select>
-                        </div>
-                        <div class="quick-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check"></i>
-                                Assign
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Change Status -->
-                <div class="action-form">
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="status">
-                        <div class="form-row">
-                            <label class="form-label">
-                                <i class="fas fa-sync-alt"></i> Update Status
-                            </label>
-                            <select name="status" class="form-select">
-                                {% for key, val in lead.LeadStatus.choices %}
-                                <option value="{{ key }}"
-                                    {% if lead.status == key %}selected{% endif %}>
-                                    {{ val }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="quick-actions">
-                            <button type="submit" class="btn btn-secondary">
-                                <i class="fas fa-save"></i>
-                                Update Status
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Quick Actions at Bottom -->
-            <div class="bottom-actions">
-                <div class="quick-actions">
-                    <form method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="convert">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-check-circle"></i>
-                            Convert to Admission
-                        </button>
-                    </form>
-
-                    <form method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="lost">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to mark this lead as lost?');">
-                            <i class="fas fa-times-circle"></i>
-                            Mark as Lost
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
+      </div>
+      <div class="ld-status-badge">
+        <span class="ld-dot"></span>
+        {{ lead.get_status_display }}
+      </div>
     </div>
-</div>
+  </div>
 
-<script>
-    // Add smooth animations on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        const cards = document.querySelectorAll('.lead-details-wrapper .card, .lead-details-wrapper .header-card');
-        cards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                card.style.transition = 'all 0.6s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, index * 100);
-        });
-    });
-</script>
+  <!-- ② Info Cards -->
+  <div class="ld-grid-2">
+
+    <!-- Personal -->
+    <div class="ld-card ld-fade">
+      <div class="ld-card-header">
+        <div class="ld-card-icon"><i class="fas fa-user"></i></div>
+        <span class="ld-card-title">Personal Information</span>
+      </div>
+      <div class="ld-card-body">
+        <div class="ld-info">
+          <div class="ld-info-row">
+            <span class="ld-info-label">Full Name</span>
+            <span class="ld-info-val">{{ lead.name }}</span>
+          </div>
+          <div class="ld-info-row">
+            <span class="ld-info-label">Email</span>
+            <span class="ld-info-val">{{ lead.email }}</span>
+          </div>
+          <div class="ld-info-row">
+            <span class="ld-info-label">Phone</span>
+            <span class="ld-info-val">{{ lead.phone }}</span>
+          </div>
+          <div class="ld-info-row">
+            <span class="ld-info-label">Enquiry Date</span>
+            <span class="ld-info-val">{{ lead.enquiry_date|date:"M d, Y" }}</span>
+          </div>
+          {% if lead.educational_qualification %}
+          <div class="ld-info-row">
+            <span class="ld-info-label">Qualification</span>
+            <span class="ld-info-val">{{ lead.educational_qualification }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Course -->
+    <div class="ld-card ld-fade">
+      <div class="ld-card-header">
+        <div class="ld-card-icon"><i class="fas fa-book-open"></i></div>
+        <span class="ld-card-title">Course & Status</span>
+      </div>
+      <div class="ld-card-body">
+        <div class="ld-info">
+          <div class="ld-info-row">
+            <span class="ld-info-label">Preferred Course</span>
+            <span class="ld-info-val">{{ lead.preferred_course }}</span>
+          </div>
+          <div class="ld-info-row">
+            <span class="ld-info-label">Learning Mode</span>
+            <span class="ld-info-val">{{ lead.get_mode_display }}</span>
+          </div>
+          <div class="ld-info-row">
+            <span class="ld-info-label">Status</span>
+            <span class="ld-info-val"><span class="ld-pill {{ lead.status }}">{{ lead.get_status_display }}</span></span>
+          </div>
+          {% if lead.assigned_to %}
+          <div class="ld-info-row">
+            <span class="ld-info-label">Assigned To</span>
+            <span class="ld-info-val">{{ lead.assigned_to.username }}</span>
+          </div>
+          {% endif %}
+          {% if lead.confirmed_course %}
+          <div class="ld-info-row">
+            <span class="ld-info-label">Confirmed Course</span>
+            <span class="ld-info-val">{{ lead.confirmed_course }}</span>
+          </div>
+          {% endif %}
+          {% if lead.interested_batch %}
+          <div class="ld-info-row">
+            <span class="ld-info-label">Batch</span>
+            <span class="ld-info-val">{{ lead.interested_batch }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ Quick Actions (Assign + Status) -->
+  <div class="ld-card ld-fade">
+    <div class="ld-card-header">
+      <div class="ld-card-icon purple"><i class="fas fa-sliders-h"></i></div>
+      <span class="ld-card-title">Quick Actions</span>
+    </div>
+    <div class="ld-card-body" style="display:flex; flex-direction:column; gap:1rem;">
+
+      <!-- Assign Counsellor -->
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="assign">
+        <div class="ld-action-row">
+          <label class="ld-label" style="min-width:130px; margin-bottom:0; flex-shrink:0;">
+            <i class="fas fa-user-tie" style="color:var(--blue-500); margin-right:.25rem;"></i> Assign Counsellor
+          </label>
+          <select name="assigned_to" class="ld-control" required>
+            <option value="">Select counsellor…</option>
+            {% for user in telecallers %}
+              <option value="{{ user.id }}">{{ user.username }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="ld-btn ld-btn-primary">
+            <i class="fas fa-check"></i> Assign
+          </button>
+        </div>
+      </form>
+
+      <hr class="ld-divider">
+
+      <!-- Update Status -->
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="status">
+        <div class="ld-action-row">
+          <label class="ld-label" style="min-width:130px; margin-bottom:0; flex-shrink:0;">
+            <i class="fas fa-sync-alt" style="color:var(--blue-500); margin-right:.25rem;"></i> Update Status
+          </label>
+          <select name="status" class="ld-control">
+            {% for key, val in lead.LeadStatus.choices %}
+              <option value="{{ key }}" {% if lead.status == key %}selected{% endif %}>{{ val }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="ld-btn ld-btn-ghost">
+            <i class="fas fa-save"></i> Save
+          </button>
+        </div>
+      </form>
+
+      <hr class="ld-divider">
+
+      <!-- Mark Lost -->
+      <div class="ld-action-row" style="justify-content:flex-end;">
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="lost">
+          <button type="submit" class="ld-btn ld-btn-danger"
+                  onclick="return confirm('Mark this lead as lost?');">
+            <i class="fas fa-times-circle"></i> Mark as Lost
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ④ Follow-up Information -->
+  <div class="ld-card ld-fade">
+    <div class="ld-card-header">
+      <div class="ld-card-icon"><i class="fas fa-clipboard-list"></i></div>
+      <span class="ld-card-title">Telecaller Follow-up</span>
+    </div>
+    <div class="ld-card-body">
+      <form method="POST" action="{% url 'bdm:update_lead_followup' lead.id %}">
+        {% csrf_token %}
+        <div class="ld-grid-2">
+
+          <div class="ld-form-group">
+            <label class="ld-label">Educational Qualification</label>
+            <input type="text" name="educational_qualification" class="ld-control"
+                   value="{{ lead.educational_qualification|default:'' }}">
+          </div>
+
+          <div class="ld-form-group">
+            <label class="ld-label">Confirmed Course</label>
+            <select name="confirmed_course" class="ld-control">
+              <option value="">Select course…</option>
+              {% for course in courses %}
+                <option value="{{ course.id }}"
+                  {% if lead.confirmed_course and lead.confirmed_course.id == course.id %}selected{% endif %}>
+                  {{ course.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="ld-form-group">
+            <label class="ld-label">Interested Batch</label>
+            <select name="interested_batch" class="ld-control">
+              <option value="">Select batch…</option>
+              {% for batch in batches %}
+                <option value="{{ batch.id }}"
+                  {% if lead.interested_batch and lead.interested_batch.id == batch.id %}selected{% endif %}>
+                  {{ batch.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="ld-form-group">
+            <label class="ld-label">Payment Plan</label>
+            <select name="payment_plan" class="ld-control">
+              <option value="">Select plan…</option>
+              <option value="full"        {% if lead.payment_plan == "full"        %}selected{% endif %}>Full</option>
+              <option value="installment" {% if lead.payment_plan == "installment" %}selected{% endif %}>Installment</option>
+              <option value="emi"         {% if lead.payment_plan == "emi"         %}selected{% endif %}>EMI</option>
+              <option value="pdc"         {% if lead.payment_plan == "pdc"         %}selected{% endif %}>PDC</option>
+            </select>
+          </div>
+
+          <div class="ld-form-group">
+            <label class="ld-label">Discussed Fee (₹)</label>
+            <input type="number" name="discussed_fee" class="ld-control"
+                   value="{{ lead.discussed_fee|default:'' }}">
+          </div>
+
+          <div class="ld-form-group">
+            <label class="ld-label">Admission Fee Amount (₹)</label>
+            <input type="number" name="admission_fee" class="ld-control"
+                   value="{{ lead.admission_fee_amount|default:'' }}">
+          </div>
+
+          <div class="ld-form-group ld-span-2" style="display:flex; align-items:center; gap:.625rem; padding:.5rem .75rem; background:var(--slate-50); border:1.5px solid var(--slate-200); border-radius:var(--radius-sm);">
+            <input type="checkbox" name="admission_fee_paid" id="feeCheck"
+                   value="on" {% if admission.admission_fee_paid %}checked{% endif %}
+                   style="width:15px; height:15px; accent-color:var(--blue-600); cursor:pointer;">
+            <label for="feeCheck" class="ld-label" style="margin-bottom:0; cursor:pointer;">Admission Fee Paid</label>
+          </div>
+
+          <div class="ld-form-group ld-span-2">
+            <label class="ld-label">Telecaller Notes</label>
+            <textarea name="telecaller_notes" class="ld-control">{{ lead.telecaller_notes }}</textarea>
+          </div>
+
+        </div>
+
+        <div style="margin-top:1rem;">
+          <button type="submit" class="ld-btn ld-btn-primary">
+            <i class="fas fa-save"></i> Save Follow-up Info
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ⑤ Convert to Admission (Admin / Superuser only) -->
+  {% if request.user.groups.all.0.name == "Admin" or request.user.is_superuser %}
+  <div class="ld-convert-banner ld-fade">
+    <div class="ld-card-header">
+      <div class="ld-card-icon"><i class="fas fa-user-graduate"></i></div>
+      <span class="ld-card-title">Convert Lead to Admission</span>
+    </div>
+    <div class="ld-card-body">
+      <div class="ld-summary-grid">
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Name</span>
+          <span class="ld-summary-val">{{ lead.name }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Phone</span>
+          <span class="ld-summary-val">{{ lead.phone }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Email</span>
+          <span class="ld-summary-val">{{ lead.email }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Qualification</span>
+          <span class="ld-summary-val">{{ lead.educational_qualification|default:"—" }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Confirmed Course</span>
+          <span class="ld-summary-val">{{ lead.confirmed_course|default:"—" }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Batch</span>
+          <span class="ld-summary-val">{{ lead.interested_batch|default:"—" }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Discussed Fee</span>
+          <span class="ld-summary-val">{% if lead.discussed_fee %}₹{{ lead.discussed_fee }}{% else %}—{% endif %}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Payment Plan</span>
+          <span class="ld-summary-val">{{ lead.payment_plan|title|default:"—" }}</span>
+        </div>
+      </div>
+
+      <form method="POST" action="{% url 'bdm:convert_lead_to_admission' lead.id %}">
+        {% csrf_token %}
+        <button type="submit" class="ld-btn ld-btn-success">
+          <i class="fas fa-check-circle"></i> Convert to Admission
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- New Student Data (post-conversion) -->
+  {% if new_student_data and is_admin %}
+  <div class="ld-success-card ld-fade">
+    <div class="ld-card-header">
+      <div class="ld-card-icon green"><i class="fas fa-user-check"></i></div>
+      <span class="ld-card-title">🎉 Student Account Created</span>
+    </div>
+    <div class="ld-card-body">
+      <div class="ld-summary-grid">
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Name</span>
+          <span class="ld-summary-val">{{ new_student_data.name }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Username</span>
+          <span class="ld-summary-val" style="color:var(--blue-600);">{{ new_student_data.username }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Password</span>
+          <span class="ld-summary-val" style="color:var(--red-600); font-family:monospace;">{{ new_student_data.password }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Course</span>
+          <span class="ld-summary-val">{{ new_student_data.course }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Batch</span>
+          <span class="ld-summary-val">{{ new_student_data.batch }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Payment Plan</span>
+          <span class="ld-summary-val">{{ new_student_data.payment_plan|title }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Total Fee</span>
+          <span class="ld-summary-val">₹{{ new_student_data.fee }}</span>
+        </div>
+        <div class="ld-summary-item">
+          <span class="ld-summary-label">Admission Date</span>
+          <span class="ld-summary-val">{{ new_student_data.admission_date }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+
+</div><!-- /ld-wrap -->
+</div><!-- /ld -->
 {% endblock %}

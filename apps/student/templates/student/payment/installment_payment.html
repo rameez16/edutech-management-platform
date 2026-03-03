@@ -1,0 +1,52 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'student/css/payment_plan.css' %}">
+
+<div class="payment-container glass-card">
+
+    <div class="payment-header">
+        <h2>Installment Plan</h2>
+
+        <div class="student-info">
+            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ student.user.email }}</p>
+        </div>
+    </div>
+
+    <div class="payment-mode-switch">
+        <span>Payment Mode:</span>
+        <div class="mode-tabs">
+            <span class="mode-btn active">
+                {{ admission.get_payment_plan_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="loan-table-box">
+        <table class="loan-table">
+            <thead>
+                <tr>
+                    <th>Installment</th>
+                    <th>Amount</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for ins in installments %}
+                <tr>
+                    <td>Installment {{ ins.number }}</td>
+                    <td>₹{{ ins.amount }}</td>
+                    <td>{{ ins.due_date|date:"M d, Y" }}</td>
+                    <td>{{ ins.display_status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

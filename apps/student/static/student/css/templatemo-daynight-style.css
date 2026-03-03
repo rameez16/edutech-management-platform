@@ -499,7 +499,7 @@ a {
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    gap: 15px;
     margin-bottom: 30px;
 }
 
@@ -608,85 +608,199 @@ a {
 
 
 
- /* Profile Card */
-    .profile-card .stat-value {
-        font-size: 20px; 
-        font-weight: 600;
-        color: #111; 
-    }
+.profile-card .stat-card-inner {
+    width: 100%;
+}
 
-    .profile-card .stat-change {
-        font-size: 14px;
-        font-weight: 500;
-    }
+.profile-card .stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    margin-top: 0;
+    text-align: left;
+}
 
-    .profile-card .stat-change.positive {
-        color: green; 
-    }
+.profile-card-label {
+    font-size: 19px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #3e005f;
+    text-align: center;
+    margin: 0;
+}
 
-    .profile-card .stat-change.inactive {
-        color: red; 
-        background-color: rgba(255, 0, 0, 0.1); 
-    }
 
+.profile-card-body {
+    background: #f5f3ff;
+    border: 1px solid #e9d5ff;
+    border-radius: 12px;
+    padding: 36px 14px;  /* reduced padding */
     
-    .profile-card .stat-card-inner {
-        display: flex;
-        align-items: center;        
-        justify-content: center;    
-        gap: 16px;
-        
-        
-    }
+}
 
+
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;  /* tighter gap */
+    align-items: center;
+    text-align: center;
+}
+
+
+.profile-card .stat-value {
+    font-size: 17px;
+    font-weight: 800;
+    color: #1a1a2e;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    -webkit-text-fill-color: unset;
+    line-height: 1.2;
+}
+
+
+
+
+.profile-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #7c3aed;
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 0;
+}
+
+.profile-card .stat-change {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 99px;
+    align-self: center;
+    margin-top: 2px;
+}
+
+
+.profile-card .stat-change.positive {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.profile-card .stat-change.inactive {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+
+    /* ---- BATCH CARD ---- */
+.batch-info-card .stat-card-inner {
+    width: 100%;
+}
+
+.batch-info-card .stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-top: 0;
+    text-align: left;
+}
+
+.batch-card-label {
+    font-size: 19px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #140036;
+    text-align: center;
+    margin: 0;
+}
+
+.batch-card-body {
+    background: #f5f3ff;
+    border: 1px solid #e9d5ff;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.batch-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    text-align: center;
+}
+
+.batch-info-card .stat-value {
+    font-size: 12px;
+    font-weight: 800;
+    color: #1a1a2e;
+    -webkit-text-fill-color: unset;
+    background: none;
+    padding: 0;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.batch-info-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #7c3aed;
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 0;
+}
+
+.batch-info-card .stat-change {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 99px;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+}
+
+.batch-info-card .stat-change.positive {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.batch-info-card .stat-change.inactive {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.batch-date {
    
-    .profile-card .stat-info {
-        text-align: center;
-        margin-top: 15px;
-    }
+    color: #5b21b6;
+}
 
+.batch-card-link {
+    font-size: 11px;
+    font-weight: 700;
+    background: #debfff;
+    color: #0c0c0c;
+    text-decoration: none;
+    margin-top: 4px;
+    display: inline-block;
+    border-radius: 5px;
+    padding: 10px;
+}
 
+.batch-card-link:hover {
+    opacity: 0.7;
+}
 
-
-
-
-
-    /* Batch Info Card*/
-    .batch-info-card .stat-value {
-        font-size: 14px; 
-        font-weight: 600;
-        color: #111;
-    }
-
-    .batch-info-card .stat-change {
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .batch-info-card .stat-change.positive {
-        color: green;
-    }
-
-    .batch-info-card .stat-change.inactive {
-        color: red; 
-        background-color: rgba(255, 0, 0, 0.1); 
-    }
-
-   
-    .batch-info-card .stat-card-inner {
-        display: flex;
-        align-items: center;       
-        justify-content: center; 
-        gap: 16px;
-    }
-
-   
-    .batch-info-card .stat-info {
-        text-align: center;
-        margin-top: 15px;
-    }
-
-
+.stats-grid .batch-info-card {
+    padding: 16px;
+}
 
 
 
