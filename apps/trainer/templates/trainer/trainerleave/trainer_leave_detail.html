@@ -1,0 +1,59 @@
+{% extends "base/base.html" %}
+{% block content %}
+
+<!-- Header -->
+<div class="trainer-leave-detail-header">
+    <a href="{% url 'trainer:trainer-leave-dashboard' %}" class="trainer-leave-back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+    <h4>Leave Details</h4>
+</div>
+
+<!-- Leave Info Grid -->
+<div class="trainer-leave-detail-grid">
+    <div class="trainer-leave-row">
+        <span class="trainer-leave-label">Type</span>
+        <span class="trainer-leave-value">{{ leave.get_leave_type_display }}</span>
+    </div>
+    <div class="trainer-leave-row">
+        <span class="trainer-leave-label">Start Date</span>
+        <span class="trainer-leave-value">{{ leave.start_date }}</span>
+    </div>
+    <div class="trainer-leave-row">
+        <span class="trainer-leave-label">End Date</span>
+        <span class="trainer-leave-value">{{ leave.end_date }}</span>
+    </div>
+    <div class="trainer-leave-row">
+        <span class="trainer-leave-label">Total Days</span>
+        <span class="trainer-leave-value">{{ leave.total_days }}</span>
+    </div>
+    <div class="trainer-leave-row">
+        <span class="trainer-leave-label">Reason</span>
+        <span class="trainer-leave-value">{{ leave.reason }}</span>
+    </div>
+    {% if leave.attachment %}
+    <div class="trainer-leave-row">
+        <span class="trainer-leave-label">Attachment</span>
+        <span class="trainer-leave-value">
+            <a href="{{ leave.attachment.url }}" target="_blank">View</a>
+        </span>
+    </div>
+    {% endif %}
+    <div class="trainer-leave-row">
+        <span class="trainer-leave-label">Status</span>
+        <span class="trainer-leave-value">{{ leave.get_status_display }}</span>
+    </div>
+    <div class="trainer-leave-row">
+        <span class="trainer-leave-label">Applied At</span>
+        <span class="trainer-leave-value">{{ leave.applied_at }}</span>
+    </div>
+</div>
+
+<!-- Action Button -->
+<div class="trainer-leave-detail-actions">
+    <a href="{% url 'trainer:trainer-leave-dashboard' %}" class="trainer-leave-btn-back">Back to Dashboard</a>
+</div>
+
+{% endblock %}

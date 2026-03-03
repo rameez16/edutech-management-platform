@@ -1,0 +1,86 @@
+{% extends "base/base.html" %}
+{% block content %}
+
+<div class="glass-card">
+
+    <!-- Header -->
+    <div class="exam-eval-result-header">
+        <a href="{% url 'trainer:exam-results-list' result.exam.id %}" 
+           class="exam-eval-result-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </a>
+
+        <h4>Result Detail</h4>
+    </div>
+
+    <div class="exam-eval-result-grid">
+
+        <!-- Score Card -->
+        <div class="exam-eval-result-card">
+
+            <h5>Score Overview</h5>
+
+            <div class="exam-eval-result-big-score">
+                {% if result.marks_obtained is not None %}
+                    {{ result.marks_obtained }}
+                    <span class="exam-eval-result-total">
+                        / {{ result.exam.total_marks }}
+                    </span>
+                {% else %}
+                    <span class="exam-eval-result-pending">
+                        Not Evaluated
+                    </span>
+                {% endif %}
+            </div>
+
+            {% if result.grade %}
+            <div class="exam-eval-result-grade-row">
+
+                <span class="exam-eval-result-grade-badge">
+                    {{ result.grade }}
+                </span>
+
+                {% if result.is_pass %}
+                    <span class="exam-eval-result-badge-pass">
+                        PASS
+                    </span>
+                {% else %}
+                    <span class="exam-eval-result-badge-fail">
+                        FAIL
+                    </span>
+                {% endif %}
+
+            </div>
+            {% endif %}
+
+            <div class="exam-eval-result-row">
+                <span>Passing Marks</span>
+                <strong>{{ result.exam.passing_marks }}</strong>
+            </div>
+
+            <div class="exam-eval-result-row">
+                <span>Evaluated By</span>
+                <strong>
+                    {{ result.evaluator.full_name|default:"—" }}
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    {% if result.remarks %}
+    <div class="exam-eval-result-card exam-eval-result-remarks-card">
+        <h5>Remarks / Feedback</h5>
+        <p class="exam-eval-result-remarks-text">
+            {{ result.remarks }}
+        </p>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

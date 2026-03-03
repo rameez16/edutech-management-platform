@@ -1,0 +1,154 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="exam-submission-list-wrapper glass-card">
+
+    <!-- Header -->
+    <div class="exam-submission-list-header">
+        <div>
+            <h2 class="exam-submission-list-title">
+                Submissions – {{ exam.title }}
+            </h2>
+            <p class="exam-submission-list-meta">
+                Batch: {{ exam.batch.name }} • 
+                Total Marks: {{ exam.total_marks }}
+            </p>
+
+            {# ← add this #}
+            {% if exam.is_completed %}
+                <span class="exam-status-badge exam-status-completed">
+                    Exam Completed – Submissions closed
+                </span>
+            {% elif exam.is_published %}
+                <span class="exam-status-badge exam-status-published">
+                    Exam Active – Late submissions accepted 30 min after end time
+                </span>
+            {% endif %}
+
+        </div>
+
+        <div class="exam-submission-list-actions">
+            <a href="{% url 'trainer:exam-results-list' exam.id %}" 
+               class="exam-submission-btn exam-submission-btn-results">
+                View Results
+            </a>
+
+            <a href="{% url 'trainer:exam-final-view' exam.id %}" 
+               class="exam-submission-btn exam-submission-btn-back">
+                Back to Exam
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="exam-submission-list-stats">
+        <div class="exam-submission-stat-card">
+            <span class="stat-num">{{ total }}</span>
+            <span class="stat-lbl">Total</span>
+        </div>
+
+        <div class="exam-submission-stat-card pending">
+            <span class="stat-num">{{ pending }}</span>
+            <span class="stat-lbl">Pending</span>
+        </div>
+
+        <div class="exam-submission-stat-card late">
+            <span class="stat-num">{{ late }}</span>
+            <span class="stat-lbl">Late</span>
+        </div>
+
+        <div class="exam-submission-stat-card evaluated">
+            <span class="stat-num">{{ evaluated }}</span>
+            <span class="stat-lbl">Evaluated</span>
+        </div>
+
+        <div class="exam-submission-stat-card rejected">
+            <span class="stat-num">{{ rejected }}</span>
+            <span class="stat-lbl">Rejected</span>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="exam-submission-list-table-wrapper">
+        <table class="exam-submission-list-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Submitted At</th>
+                    <th>Status</th>
+                    <th>File</th>
+                    <th>Marks</th>
+                    <th>Evaluated By</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in submissions %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ sub.student.full_name }}</td>
+                    <td>{{ sub.submitted_at|date:"d M Y, H:i" }}</td>
+
+                    <td>
+                        <span class="exam-status-badge exam-status-{{ sub.status }}">
+                            {{ sub.get_status_display }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if sub.answer_file %}
+                            <a href="{{ sub.answer_file.url }}" target="_blank"
+                               class="exam-submission-link">
+                                Download
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No file</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if sub.marks_obtained is not None %}
+                            {{ sub.marks_obtained }} / {{ exam.total_marks }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if sub.evaluated_by %}
+                            {{ sub.evaluated_by.full_name }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if sub.status != "evaluated" and sub.status != "rejected" %}
+                            <a href="{% url 'trainer:exam-evaluate-submission' sub.id %}"
+                               class="exam-submission-btn exam-submission-btn-evaluate">
+                                Evaluate
+                            </a>
+                        {% else %}
+                            <a href="{% url 'trainer:exam-evaluate-submission' sub.id %}"
+                               class="exam-submission-btn exam-submission-btn-view">
+                                View
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="empty-row">
+                        No submissions yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

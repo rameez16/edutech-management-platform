@@ -1,0 +1,110 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="exam-result-list-wrapper glass-card">
+
+    <div class="exam-result-list-header">
+        <div>
+            <h2 class="exam-result-list-title">
+                Results – {{ exam.title }}
+            </h2>
+            <p class="exam-result-list-meta">
+                Batch: {{ exam.batch.name }} • 
+                Passing Marks: {{ exam.passing_marks }} / {{ exam.total_marks }}
+            </p>
+            {% if exam.is_completed %}
+                <span class="exam-status-badge exam-status-completed">Exam Completed</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="exam-result-list-stats">
+        <div class="exam-result-stat total">
+            <span class="stat-num">{{ total }}</span>
+            <span class="stat-lbl">Students</span>
+        </div>
+
+        <div class="exam-result-stat pass">
+            <span class="stat-num">{{ passed }}</span>
+            <span class="stat-lbl">Passed</span>
+        </div>
+
+        <div class="exam-result-stat fail">
+            <span class="stat-num">{{ failed }}</span>
+            <span class="stat-lbl">Failed</span>
+        </div>
+
+        <div class="exam-result-stat pending">
+            <span class="stat-num">{{ pending }}</span>
+            <span class="stat-lbl">Pending</span>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="exam-result-list-table-wrapper">
+        <table class="exam-result-list-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Marks</th>
+                    <th>Grade</th>
+                    <th>Result</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ r.student.full_name }}</td>
+
+                    <td>
+                        {% if r.marks_obtained is not None %}
+                            {{ r.marks_obtained }} / {{ exam.total_marks }}
+                        {% else %}
+                            <span class="text-muted">Pending</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if r.grade %}
+                            <span class="grade-badge">{{ r.grade }}</span>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if r.marks_obtained is None %}
+                            <span class="text-muted">—</span>
+                        {% elif r.is_pass %}
+                            <span class="badge-pass">Pass</span>
+                        {% else %}
+                            <span class="badge-fail">Fail</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'trainer:exam-result-detail' r.id %}"
+                           class="exam-result-btn-detail">
+                            View Detail
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-row">
+                        No results yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

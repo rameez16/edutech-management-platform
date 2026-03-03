@@ -1,0 +1,78 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<h2>Final Exam Details: {{ exam.title }}</h2>
+
+<div class="exam-final-detail-grid">
+
+    <div class="exam-detail-row">
+        <span class="exam-detail-label">Batch</span>
+        <span class="exam-detail-value">{{ exam.batch.name }}</span>
+    </div>
+
+    <div class="exam-detail-row">
+        <span class="exam-detail-label">Description</span>
+        <span class="exam-detail-value">{{ exam.description }}</span>
+    </div>
+
+    <div class="exam-detail-row">
+        <span class="exam-detail-label">Date & Time</span>
+        <span class="exam-detail-value">{{ exam.scheduled_date }} {{ exam.exam_time }}</span>
+    </div>
+
+    <div class="exam-detail-row">
+        <span class="exam-detail-label">Duration</span>
+        <span class="exam-detail-value">{{ exam.duration_minutes }} minutes</span>
+    </div>
+
+    <div class="exam-detail-row">
+        <span class="exam-detail-label">Total Marks</span>
+        <span class="exam-detail-value">{{ exam.total_marks }}</span>
+    </div>
+
+    <div class="exam-detail-row">
+        <span class="exam-detail-label">Passing Marks</span>
+        <span class="exam-detail-value">{{ exam.passing_marks }}</span>
+    </div>
+
+    <div class="exam-detail-row">
+        <span class="exam-detail-label">Instructions</span>
+        <span class="exam-detail-value">{{ exam.instructions }}</span>
+    </div>
+
+    <div class="exam-detail-row">
+        <span class="exam-detail-label">Questions File</span>
+        <span class="exam-detail-value">
+            {% if exam.questions_file %}
+                <a href="{{ exam.questions_file.url }}" target="_blank">Download</a>
+            {% else %}
+                Not uploaded
+            {% endif %}
+        </span>
+    </div>
+
+</div>
+
+<div class="exam-detail-actions">
+    {% if not exam.is_published %}
+        <a href="{% url 'trainer:exam-final-edit' exam.id %}" class="btn btn-primary">
+            Edit
+        </a>
+    {% endif %}
+
+    {% if not exam.is_published %}
+        <form method="post" action="{% url 'trainer:exam-final-publish' exam.id %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="exam-btn-publish">Publish Exam</button>
+        </form>
+    {% elif exam.is_completed %}
+        <span class="exam-view-final-badge badge bg-primary" style="align-self:center;">Completed</span>
+    {% else %}
+        <span class="badge bg-success" style="align-self:center;">Published</span>
+    {% endif %}
+
+    <a href="{% url 'trainer:exam-final-batchlist' %}" class="exam-btn-back">Back to Exams</a>
+</div>
+
+{% endblock %}

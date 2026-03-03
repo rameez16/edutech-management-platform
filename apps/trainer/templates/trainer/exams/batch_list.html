@@ -1,0 +1,107 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="exambatchlist-wrapper">
+
+    <div class="exambatchlist-header">
+        <h2 class="exambatchlist-title">Exam Management</h2>
+        <p class="exambatchlist-subtitle">
+            Select a batch to manage its Final Exam, Submissions, and Results.
+        </p>
+    </div>
+
+    <div class="exambatchlist-table-wrapper">
+        <table class="exambatchlist-table">
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Exam Status</th>
+                    <th>Final Exam</th>
+                    <th>Submissions</th>
+                    <th>Results</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for batch in batches %}
+                <tr>
+
+                    <!-- Batch -->
+                    <td>
+                        <span class="ebl-batch-name">{{ batch.name }}</span>
+                    </td>
+
+                    <!-- Exam Status -->
+                    <td>
+                        {% if batch.final_exam_exists %}
+                            {% if batch.is_completed %}
+                                <span class="ebl-badge-completed">Completed</span>
+                            {% elif batch.is_published %}
+                                <span class="ebl-badge-published">Published</span>
+                            {% else %}
+                                <span class="ebl-badge-draft">Draft</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="ebl-na">Not Created</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Final Exam -->
+                    <td>
+                        {% if batch.final_exam_exists %}
+                            <a href="{% url 'trainer:exam-final-view' batch.final_exam_id %}"
+                               class="ebl-btn ebl-btn-view">
+                                View Exam
+                            </a>
+                        {% else %}
+                            <a href="{% url 'trainer:exam-final-create' batch.id %}"
+                               class="ebl-btn ebl-btn-create">
+                                + Create Exam
+                            </a>
+                        {% endif %}
+                    </td>
+
+                    <!-- Submissions -->
+                    <td>
+                        {% if batch.final_exam_exists and batch.is_published %}
+                            <a href="{% url 'trainer:exam-submissions-list' batch.final_exam_id %}"
+                            class="ebl-btn ebl-btn-submissions">
+                                Submissions
+                            </a>
+
+                            {% if batch.pending_count > 0 %}
+                                <span class="ebl-badge-pending">
+                                    {{ batch.pending_count }} pending
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="ebl-na">—</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Results -->
+                    <td>
+                        {% if batch.final_exam_exists and batch.is_published %}
+                            <a href="{% url 'trainer:exam-results-list' batch.final_exam_id %}"
+                            class="ebl-btn ebl-btn-results">
+                                Results
+                            </a>
+                        {% else %}
+                            <span class="ebl-na">—</span>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="ebl-empty">
+                        No batches found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

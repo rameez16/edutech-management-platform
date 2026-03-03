@@ -1,0 +1,49 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<h2>Edit Final Exam: {{ exam.title }}</h2>
+
+<form method="post" enctype="multipart/form-data" class="exam-form">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="exam-field-error">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    {% for field in form %}
+        {% if field.field.widget.input_type == "checkbox" %}
+            <div class="exam-form-group">
+                <label class="exam-checkbox-label">
+                    {{ field }} {{ field.label }}
+                </label>
+                {% if field.errors %}
+                    <small class="exam-field-error">{{ field.errors|striptags }}</small>
+                {% endif %}
+                {% if field.help_text %}
+                    <small class="exam-help-text">{{ field.help_text }}</small>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="exam-form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <small class="exam-field-error">{{ field.errors|striptags }}</small>
+                {% endif %}
+                {% if field.help_text %}
+                    <small class="exam-help-text">{{ field.help_text }}</small>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <div class="exam-form-actions">
+        <button type="submit" class="exam-btn-update">Update Exam</button>
+        <a href="{% url 'trainer:exam-final-batchlist' %}" class="exam-btn-cancel">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}

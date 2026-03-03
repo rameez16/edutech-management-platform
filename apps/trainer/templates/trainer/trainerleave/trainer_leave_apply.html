@@ -1,0 +1,49 @@
+{% extends "trainer/tasks/base.html" %}
+{% block content %}
+
+<div class="trainer-leave-apply-header">
+    <!-- Back Button -->
+    <a href="{% url 'trainer:trainer-leave-dashboard' %}" class="trainer-leave-back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </a>
+
+    <h4>{% if is_edit %}Edit{% else %}Apply{% endif %} Leave</h4>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="trainer-leave-form">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="trainer-leave-error">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    {% for field in form %}
+        <div class="trainer-leave-form-group">
+            {{ field.label_tag }}
+            {{ field }}
+
+            {% if field.errors %}
+                <small class="trainer-leave-field-error">
+                    {{ field.errors|striptags }}
+                </small>
+            {% endif %}
+
+            {% if field.help_text %}
+                <small class="trainer-leave-help-text">{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <div class="trainer-leave-form-actions">
+        <button type="submit" class="trainer-leave-btn-submit">
+            {% if is_edit %}Update{% else %}Submit{% endif %}
+        </button>
+        <a href="{% url 'trainer:trainer-leave-dashboard' %}" class="trainer-leave-btn-cancel">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}

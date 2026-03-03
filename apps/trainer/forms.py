@@ -1,6 +1,6 @@
 from django import forms
 from apps.bdm.models import Trainer
-from apps.trainer.models import Task, TaskSubmission, LessonSession, SessionMaterial
+from apps.trainer.models import Task, TaskSubmission, LessonSession, SessionMaterial, Exam, TrainerLeave
 from django.utils import timezone 
 from apps.bdm.models import StudentIssue, Announcement
 class TrainerProfileForm(forms.ModelForm):
@@ -193,4 +193,29 @@ class AnnouncementForm(forms.ModelForm):
         help_texts = {
             'is_important': 'Important announcements may be highlighted.',
             'expiry_date': 'Optional. Leave blank if the announcement should not expire.',
+        }
+
+class ExamForm(forms.ModelForm):
+    class Meta:
+        model = Exam
+        fields = [
+            "title", "description",
+            "scheduled_date", "exam_time", "duration_minutes",
+            "total_marks", "passing_marks", "questions_file",
+            "instructions"
+        ]
+        widgets = {
+            "scheduled_date": forms.DateInput(attrs={"type": "date"}),
+            "exam_time": forms.TimeInput(attrs={"type": "time"}),
+        }
+        
+
+class TrainerLeaveForm(forms.ModelForm):
+    class Meta:
+        model = TrainerLeave
+        fields = ['leave_type', 'start_date', 'end_date', 'reason', 'attachment']
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'reason': forms.Textarea(attrs={'rows': 3}),
         }

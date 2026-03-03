@@ -5,11 +5,13 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Max
 from decimal import Decimal
+import datetime
+from zoneinfo import ZoneInfo
 
-from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm,TrainerIssueResolveForm,AnnouncementForm
+from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm,TrainerIssueResolveForm,AnnouncementForm,ExamForm,TrainerLeaveForm
 
 from apps.bdm.models import Trainer, Batch, Student, StudentIssue, Announcement
-from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission, SessionMaterial
+from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission, SessionMaterial,TrainerLeave, Exam, ExamSubmission, ExamResult
 from apps.student.models import StudentFeedback, LeaveApplication
 
 
@@ -312,6 +314,9 @@ def batch_overview_view(request, batch_id):
     total_students = batch.students.count()
     active_students = batch.students.filter(user__is_active=True).count()
     inactive_students = batch.students.filter(user__is_active=False).count()
+    
+    # Batch schedules
+    schedules = batch.schedules.filter(is_active=True)
 
     context = {
         "batch": batch,
@@ -321,6 +326,7 @@ def batch_overview_view(request, batch_id):
         "total_students": total_students,
         "active_students": active_students,
         "inactive_students": inactive_students,
+        "schedules": schedules,
         "active_tab": "overview",
     }
 
@@ -1277,3 +1283,621 @@ def delete_announcement(request, announcement_id):
     announcement.delete()
     messages.success(request, "Announcement deleted successfully.")
     return redirect('trainer:all_announcements')
+
+
+
+# @login_required
+# def final_exam_batchlist(request):
+#     """
+#     List only batches with completed sessions for creating Final Exam
+#     """
+#     trainer = request.user.trainer
+#     batches = Batch.objects.filter(trainers=trainer, is_active=True).prefetch_related("lesson_sessions", "exams")
+
+#     batch_list = []
+#     for batch in batches:
+#         completed_sessions = batch.lesson_sessions.filter(status=LessonSession.SessionStatus.COMPLETED).count()
+#         if completed_sessions > 0:
+#             # Get final exam if exists
+#             final_exam = batch.exams.filter(exam_type=Exam.ExamType.FINAL).first()
+#             batch_list.append({
+#                 "id": batch.id,
+#                 "name": batch.name,
+#                 "completed_sessions": completed_sessions,
+#                 "final_exam_exists": bool(final_exam),
+#                 "final_exam_id": final_exam.id if final_exam else None,
+#             })
+
+#     return render(request, "trainer/exams/batch_list.html", {"batches": batch_list})
+
+# Replace your existing final_exam_batchlist view in apps/trainer/views.py
+
+# trainer leave
+@login_required
+def trainer_leave_dashboard(request):
+    """List all leave applications of the logged-in trainer"""
+    trainer = request.user.trainer
+    leaves = TrainerLeave.objects.filter(trainer=trainer).order_by('-applied_at')
+
+    return render(request, "trainer/trainerleave/trainer_leave_dashboard.html", {
+        "leaves": leaves
+    })
+
+
+@login_required
+def trainer_leave_apply(request):
+    """Trainer applies for leave"""
+    trainer = request.user.trainer
+
+    if request.method == "POST":
+        form = TrainerLeaveForm(request.POST, request.FILES)
+        if form.is_valid():
+            leave = form.save(commit=False)
+            leave.trainer = trainer
+            leave.save()
+            messages.success(request, "Leave application submitted successfully!")
+            return redirect("trainer:trainer-leave-dashboard")
+    else:
+        form = TrainerLeaveForm()
+
+    return render(request, "trainer/trainerleave/trainer_leave_apply.html", {
+        "form": form
+    })
+
+
+@login_required
+def trainer_leave_detail(request, leave_id):
+    """View single leave details"""
+    trainer = request.user.trainer
+    leave = get_object_or_404(TrainerLeave, id=leave_id, trainer=trainer)
+
+    return render(request, "trainer/trainerleave/trainer_leave_detail.html", {
+        "leave": leave
+    })
+
+
+@login_required
+def trainer_leave_edit(request, leave_id):
+    """Edit a leave application"""
+    trainer = request.user.trainer
+    leave = get_object_or_404(TrainerLeave, id=leave_id, trainer=trainer)
+
+    if leave.status != TrainerLeave.LeaveStatus.PENDING:
+        messages.error(request, "Only pending leaves can be edited.")
+        return redirect("trainer:trainer-leave-dashboard")
+
+    if request.method == "POST":
+        form = TrainerLeaveForm(request.POST, request.FILES, instance=leave)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Leave application updated successfully.")
+            return redirect("trainer:trainer-leave-dashboard")
+    else:
+        form = TrainerLeaveForm(instance=leave)
+
+    return render(request, "trainer/trainerleave/trainer_leave_apply.html", {
+        "form": form,
+        "is_edit": True
+    })
+
+
+@login_required
+def trainer_leave_delete(request, leave_id):
+    """Delete a leave application"""
+    trainer = request.user.trainer
+    leave = get_object_or_404(TrainerLeave, id=leave_id, trainer=trainer)
+
+    if leave.status != TrainerLeave.LeaveStatus.PENDING:
+        messages.error(request, "Only pending leaves can be deleted.")
+    else:
+        leave.delete()
+        messages.success(request, "Leave application deleted successfully.")
+
+    return redirect("trainer:trainer-leave-dashboard")
+
+
+
+
+IST = ZoneInfo("Asia/Kolkata")
+
+def auto_publish_exam(exam):
+    if exam.exam_type != Exam.ExamType.FINAL:
+        return
+    if exam.is_published:
+        return
+
+    exam_time = exam.exam_time if exam.exam_time else datetime.time(0, 0)
+    
+    # Treat entered time as IST, make it timezone-aware
+    naive_dt = datetime.datetime.combine(exam.scheduled_date, exam_time)
+    scheduled_ist = naive_dt.replace(tzinfo=IST)  # mark as IST
+
+    if timezone.now() >= scheduled_ist:
+        Exam.objects.filter(pk=exam.pk).update(is_published=True)
+        exam.is_published = True
+        
+LATE_GRACE_MINUTES = 30  # configurable
+
+def auto_complete_exam(exam):
+    """Mark exam completed only after end time + grace period."""
+    if exam.exam_type != Exam.ExamType.FINAL:
+        return
+    if exam.is_completed:
+        return
+
+    exam_time = exam.exam_time if exam.exam_time else datetime.time(0, 0)
+    naive_dt = datetime.datetime.combine(exam.scheduled_date, exam_time)
+    scheduled_ist = naive_dt.replace(tzinfo=IST)
+
+    exam_end_ist = scheduled_ist + datetime.timedelta(minutes=exam.duration_minutes)
+    grace_end_ist = exam_end_ist + datetime.timedelta(minutes=LATE_GRACE_MINUTES)
+
+    if timezone.now() >= grace_end_ist:
+        Exam.objects.filter(pk=exam.pk).update(is_completed=True, is_published=True)
+        exam.is_completed = True
+        exam.is_published = True
+
+
+def auto_mark_late_submissions(exam):
+    """Mark submissions as LATE if submitted after exam end but within grace period."""
+    if not exam.is_published:
+        return
+
+    exam_time = exam.exam_time if exam.exam_time else datetime.time(0, 0)
+    naive_dt = datetime.datetime.combine(exam.scheduled_date, exam_time)
+    scheduled_ist = naive_dt.replace(tzinfo=IST)
+
+    exam_end_ist = scheduled_ist + datetime.timedelta(minutes=exam.duration_minutes)
+
+    # Submitted after exam end time = late
+    late_submissions = ExamSubmission.objects.filter(
+        exam=exam,
+        status=ExamSubmission.SubmissionStatus.SUBMITTED,
+        submitted_at__gt=exam_end_ist,
+    )
+    late_submissions.update(status=ExamSubmission.SubmissionStatus.LATE)
+
+@login_required
+def final_exam_batchlist(request):
+    """
+    List batches with completed sessions.
+    Each row shows quick-access buttons for Submissions and Results
+    if a Final Exam already exists for that batch.
+    """
+    trainer = request.user.trainer
+    batches = (
+        Batch.objects
+        .filter(trainers=trainer, is_active=True)
+        .prefetch_related("lesson_sessions", "exams")
+    )
+
+    batch_list = []
+    for batch in batches:
+        completed_sessions = batch.lesson_sessions.filter(
+            status=LessonSession.SessionStatus.COMPLETED
+        ).count()
+
+        if completed_sessions == 0:
+            continue  # skip batches with no completed sessions
+
+        final_exam = batch.exams.filter(exam_type=Exam.ExamType.FINAL).first()
+        
+
+        # Submission & result counts (only if exam exists)
+        submission_count   = 0
+        pending_count      = 0
+        evaluated_count    = 0
+        result_count       = 0
+        passed_count       = 0
+
+        if final_exam:
+            auto_publish_exam(final_exam)
+            auto_complete_exam(final_exam)
+            auto_mark_late_submissions(final_exam)
+            submission_count  = ExamSubmission.objects.filter(exam=final_exam).count()
+            pending_count     = ExamSubmission.objects.filter(
+                exam=final_exam,
+                status=ExamSubmission.SubmissionStatus.SUBMITTED
+            ).count()
+            evaluated_count   = ExamSubmission.objects.filter(
+                exam=final_exam,
+                status=ExamSubmission.SubmissionStatus.EVALUATED
+            ).count()
+            result_count      = ExamResult.objects.filter(exam=final_exam).count()
+            passed_count      = ExamResult.objects.filter(exam=final_exam, is_pass=True).count()
+
+        batch_list.append({
+            "id":                  batch.id,
+            "name":                batch.name,
+            "completed_sessions":  completed_sessions,
+            "total_students":      batch.students.count(),
+            # exam
+            "final_exam_exists":   bool(final_exam),
+            "final_exam_id":       final_exam.id if final_exam else None,
+            "is_published":        final_exam.is_published if final_exam else False,
+            # submission stats
+            "submission_count":    submission_count,
+            "pending_count":       pending_count,
+            "evaluated_count":     evaluated_count,
+            # result stats
+            "result_count":        result_count,
+            "passed_count":        passed_count,
+            "is_completed":        final_exam.is_completed if final_exam else False,
+        })
+
+    return render(request, "trainer/exams/batch_list.html", {"batches": batch_list})
+
+
+@login_required
+def final_exam_create(request, batch_id):
+    """
+    Create a Final Exam for a batch
+    """
+    trainer = request.user.trainer
+    batch = get_object_or_404(Batch.objects.filter(trainers=trainer, is_active=True), id=batch_id)
+
+    if not batch.lesson_sessions.filter(status=LessonSession.SessionStatus.COMPLETED).exists():
+        messages.error(request, "Cannot create exam: batch has no completed sessions.")
+        return redirect("trainer:exam-final-batchlist")
+
+    # Prevent duplicate final exam
+    if batch.exams.filter(exam_type=Exam.ExamType.FINAL).exists():
+        messages.error(request, "Final Exam already exists for this batch.")
+        return redirect("trainer:exam-final-batchlist")
+
+    if request.method == "POST":
+        form = ExamForm(request.POST, request.FILES)
+        if form.is_valid():
+            exam = form.save(commit=False)
+            exam.batch = batch
+            exam.exam_type = Exam.ExamType.FINAL
+            exam.created_by = trainer
+            exam.save()
+            messages.success(request, f"Final Exam created for batch {batch.name}.")
+            return redirect("trainer:exam-final-view", exam_id=exam.id)
+    else:
+        form = ExamForm()
+
+    return render(request, "trainer/exams/create_final.html", {"form": form, "batch": batch})
+
+
+@login_required
+def final_exam_view(request, exam_id):
+    """
+    View Final Exam details
+    """
+    trainer = request.user.trainer
+    exam = get_object_or_404(Exam, id=exam_id, created_by=trainer)
+    
+    auto_publish_exam(exam)
+    auto_complete_exam(exam)
+    auto_mark_late_submissions(exam)
+    
+    return render(request, "trainer/exams/view_final.html", {"exam": exam})
+
+
+@login_required
+def final_exam_edit(request, exam_id):
+    trainer = request.user.trainer
+    exam = get_object_or_404(Exam, id=exam_id, created_by=trainer)
+    auto_publish_exam(exam)
+    auto_complete_exam(exam)
+    
+    # Prevent editing if published
+    if exam.is_published:
+        messages.error(request, "Cannot edit. Exam is already published.")
+        return redirect("trainer:exam-final-view", exam_id=exam.id)
+
+    if request.method == "POST":
+        form = ExamForm(request.POST, request.FILES, instance=exam)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Final Exam updated successfully.")
+            return redirect("trainer:exam-final-view", exam_id=exam.id)
+    else:
+        form = ExamForm(instance=exam)
+
+    return render(request, "trainer/exams/edit_final.html", {"form": form, "exam": exam})
+
+@login_required
+@require_POST
+def final_exam_publish(request, exam_id):
+    trainer = request.user.trainer
+    exam = get_object_or_404(Exam, id=exam_id, created_by=trainer)
+
+    if exam.is_published:
+        messages.info(request, "Exam is already published.")
+    else:
+        exam.is_published = True
+        exam.save()
+        messages.success(request, f"Exam '{exam.title}' is now published and visible to students.")
+
+    return redirect("trainer:exam-final-view", exam_id=exam.id)
+
+# exam evaluation 
+@login_required
+def exam_submissions_list(request, exam_id):
+    """
+    Show every student submission for a particular exam.
+    Trainer can see status, download files, and jump to evaluate.
+    """
+    trainer = request.user.trainer
+    exam = get_object_or_404(Exam, id=exam_id, created_by=trainer)
+    auto_publish_exam(exam)
+    auto_complete_exam(exam)
+    auto_mark_late_submissions(exam)
+    
+    if not exam.is_published:
+        messages.error(request, "Exam is not published yet.")
+        return redirect("trainer:exam-final-view", exam_id=exam.id)
+
+    submissions = (
+        ExamSubmission.objects
+        .filter(exam=exam)
+        .select_related("student", "student__user", "evaluated_by")
+        .order_by("-submitted_at")
+    )
+
+    # Quick stats
+    total        = submissions.count()
+    evaluated    = submissions.filter(status=ExamSubmission.SubmissionStatus.EVALUATED).count()
+    pending      = submissions.filter(status=ExamSubmission.SubmissionStatus.SUBMITTED).count()
+    late         = submissions.filter(status=ExamSubmission.SubmissionStatus.LATE).count()
+    rejected     = submissions.filter(status=ExamSubmission.SubmissionStatus.REJECTED).count()
+
+    context = {
+        "exam": exam,
+        "submissions": submissions,
+        "total": total,
+        "evaluated": evaluated,
+        "pending": pending,
+        "late": late,
+        "rejected": rejected,
+    }
+    return render(request, "trainer/exams/submissions_list.html", context)
+
+
+# Evaluate a single submission
+@login_required
+def exam_evaluate_submission(request, submission_id):
+    """
+    Trainer evaluates (marks + feedback) a student's exam submission.
+    """
+    trainer = request.user.trainer
+    submission = get_object_or_404(
+        ExamSubmission,
+        id=submission_id,
+        exam__created_by=trainer,
+    )
+    exam = submission.exam
+    
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        # EVALUATE
+        if action == "evaluate":
+            marks_str = request.POST.get("marks", "").strip()
+            feedback  = request.POST.get("feedback", "").strip()
+
+            try:
+                marks = int(marks_str)
+            except (ValueError, TypeError):
+                messages.error(request, "Please enter a valid integer for marks.")
+                return redirect("trainer:exam-evaluate-submission", submission_id=submission.id)
+
+            if marks < 0 or marks > exam.total_marks:
+                messages.error(request, f"Marks must be between 0 and {exam.total_marks}.")
+                return redirect("trainer:exam-evaluate-submission", submission_id=submission.id)
+
+            # Update submission
+            submission.marks_obtained  = marks
+            submission.feedback        = feedback
+            submission.evaluated_by    = trainer
+            submission.evaluated_at    = timezone.now()
+            submission.status          = ExamSubmission.SubmissionStatus.EVALUATED
+            submission.save()
+
+            # Create / update ExamResult (triggers grade calculation via save())
+            result, created = ExamResult.objects.get_or_create(
+                exam=exam,
+                student=submission.student,
+                defaults={"evaluator": trainer},
+            )
+            result.marks_obtained = marks
+            result.evaluator      = trainer
+            result.remarks        = feedback
+            result.save()  # triggers auto-grade in ExamResult.save()
+
+            messages.success(request, f"Submission evaluated. Grade: {result.grade}")
+            return redirect("trainer:exam-submissions-list", exam_id=exam.id)
+
+        # REJECT 
+        elif action == "reject":
+            reason = request.POST.get("feedback", "").strip()
+            submission.status   = ExamSubmission.SubmissionStatus.REJECTED
+            submission.feedback = reason
+            submission.save()
+            messages.warning(request, "Submission rejected.")
+            return redirect("trainer:exam-submissions-list", exam_id=exam.id)
+
+    context = {
+        "submission": submission,
+        "exam": exam,
+    }
+    return render(request, "trainer/exams/exam_evaluation.html", context)
+
+
+#Results list for an exam
+@login_required
+def exam_results_list(request, exam_id):
+    """
+    Show pass/fail grade breakdown for all students in an exam.
+    """
+    trainer = request.user.trainer
+    exam = get_object_or_404(Exam, id=exam_id, created_by=trainer)
+    auto_publish_exam(exam)
+    auto_complete_exam(exam)
+    auto_mark_late_submissions(exam)
+    
+    if not exam.is_published:
+        messages.error(request, "Results unavailable. Exam not published.")
+        return redirect("trainer:exam-final-view", exam_id=exam.id)
+
+    results = (
+        ExamResult.objects
+        .filter(exam=exam)
+        .select_related("student", "evaluator")
+        .order_by("-marks_obtained")
+    )
+
+    total   = results.count()
+    passed  = results.filter(is_pass=True).count()
+    failed  = results.filter(is_pass=False).count()
+    pending = results.filter(marks_obtained__isnull=True).count()
+
+    context = {
+        "exam": exam,
+        "results": results,
+        "total": total,
+        "passed": passed,
+        "failed": failed,
+        "pending": pending,
+    }
+    return render(request, "trainer/exams/results_list.html", context)
+
+
+# Single result detail
+@login_required
+def exam_result_detail(request, result_id):
+    trainer = request.user.trainer
+    result  = get_object_or_404(ExamResult, id=result_id, exam__created_by=trainer)
+    auto_publish_exam(result.exam)
+    auto_complete_exam(result.exam)
+    auto_mark_late_submissions(result.exam)
+    
+    if not result.exam.is_published:
+        messages.error(request, "Result unavailable. Exam not published.")
+        return redirect("trainer:exam-final-view", exam_id=result.exam.id)
+
+    return render(request, "trainer/exams/result_detail.html", {"result": result})
+
+
+@login_required
+def certificate_batch_list(request):
+    """
+    Show only batches where final exam is completed.
+    Eligibility count derived from ExamResult — no Certificate DB touch.
+    """
+    trainer = request.user.trainer
+    batches = (
+        Batch.objects
+        .filter(trainers=trainer, is_active=True)
+        .prefetch_related("exams", "students")
+    )
+
+    batch_list = []
+    for batch in batches:
+        final_exam = batch.exams.filter(exam_type=Exam.ExamType.FINAL).first()
+
+        if not final_exam or not final_exam.is_completed:
+            continue
+
+        total_students = batch.students.count()
+
+        # Count eligible from ExamResult only — no Certificate DB touch
+        eligible_count = ExamResult.objects.filter(
+            exam=final_exam,
+            is_pass=True,
+        ).count()
+
+        batch_list.append({
+            "id":             batch.id,
+            "name":           batch.name,
+            "total_students": total_students,
+            "eligible_count": eligible_count,
+            "not_eligible":   total_students - eligible_count,
+            "exam_title":     final_exam.title,
+        })
+
+    return render(request, "trainer/certificate/batch_list.html", {"batches": batch_list})
+
+
+@login_required
+def certificate_students_list(request, batch_id):
+    """
+    List all students with eligibility status.
+    Derived from ExamResult only — no Certificate DB touch.
+    """
+    trainer = request.user.trainer
+    batch   = get_object_or_404(Batch, id=batch_id, trainers=trainer, is_active=True)
+
+    final_exam = batch.exams.filter(exam_type=Exam.ExamType.FINAL).first()
+    if not final_exam or not final_exam.is_completed:
+        messages.error(request, "Certificate can only be checked after final exam is completed.")
+        return redirect("trainer:certificate-batch-list")
+
+    students = batch.students.all().select_related("user")
+
+    student_list = []
+    for student in students:
+
+        # Only fetch exam result — no Certificate DB lookup
+        exam_result = ExamResult.objects.filter(
+            student=student,
+            exam=final_exam,
+        ).first()
+
+        student_list.append({
+            "student":     student,
+            "exam_result": exam_result,
+            "is_eligible": bool(exam_result and exam_result.is_pass),
+        })
+
+    return render(request, "trainer/certificate/students_list.html", {
+        "batch":        batch,
+        "student_list": student_list,
+        "final_exam":   final_exam,
+    })
+
+
+@login_required
+def certificate_check_eligibility(request, batch_id, student_id):
+    """
+    Trainer checks eligibility on screen only.
+    Nothing saved to DB — admin handles Certificate creation.
+    """
+    trainer = request.user.trainer
+    batch   = get_object_or_404(Batch, id=batch_id, trainers=trainer, is_active=True)
+    student = get_object_or_404(Student, id=student_id)
+
+    final_exam = batch.exams.filter(exam_type=Exam.ExamType.FINAL).first()
+    if not final_exam or not final_exam.is_completed:
+        messages.error(request, "Exam not completed yet.")
+        return redirect("trainer:certificate-batch-list")
+
+    # Check exam result — NO DB touch at all
+    exam_result = ExamResult.objects.filter(
+        student=student,
+        exam=final_exam,
+    ).first()
+
+    if not exam_result:
+        messages.warning(
+            request,
+            f"{student.full_name} — No final exam result found."
+        )
+    elif not exam_result.is_pass:
+        messages.warning(
+            request,
+            f"{student.full_name} — Did not pass "
+            f"(Marks: {exam_result.marks_obtained} / {final_exam.total_marks})"
+        )
+    else:
+        messages.success(
+            request,
+            f"{student.full_name} — Eligible ✓ "
+            f"(Marks: {exam_result.marks_obtained} / {final_exam.total_marks})"
+        )
+
+    return redirect("trainer:certificate-students-list", batch_id=batch.id)

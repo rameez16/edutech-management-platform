@@ -53,10 +53,39 @@ urlpatterns = [
     path('assigned-issues/', views.trainer_issues_list_view, name='trainer_assigned_issues'),
     path('assigned-issues/<int:pk>/', views.trainer_issue_detail_view, name='trainer_issue_detail'),
     
+    # announcements
     path("announcements/", views.all_announcements, name="all_announcements"),
     path("announcements/create/", views.create_announcement, name="create_announcement"),
     path("announcements/<int:announcement_id>/view/", views.view_announcement, name="view_announcement"),
     path("announcements/<int:announcement_id>/edit/", views.edit_announcement, name="edit_announcement"),
     path("announcements/<int:announcement_id>/delete/",views.delete_announcement,name="delete_announcement"),
+    
+    # exam 
+    path("exams/final/", views.final_exam_batchlist, name="exam-final-batchlist"),
+    path("exams/final/<int:batch_id>/create/", views.final_exam_create, name="exam-final-create"),
+    path("exams/final/<int:exam_id>/view/", views.final_exam_view, name="exam-final-view"),
+    path("exams/final/<int:exam_id>/edit/", views.final_exam_edit, name="exam-final-edit"),
+    path("exams/final/<int:exam_id>/publish/", views.final_exam_publish, name="exam-final-publish"),
+    
+    # exam submissions
+    path("exams/final/<int:exam_id>/submissions/", views.exam_submissions_list, name="exam-submissions-list"),
+    path("exams/final/submissions/<int:submission_id>/evaluate/", views.exam_evaluate_submission, name="exam-evaluate-submission"),
+
+    # exam results
+    path("exams/final/<int:exam_id>/results/", views.exam_results_list, name="exam-results-list"),
+    path("exams/final/results/<int:result_id>/", views.exam_result_detail, name="exam-result-detail"),
+    
+    
+    # trainer leave updates 
+    path('trainerleave/', views.trainer_leave_dashboard, name='trainer-leave-dashboard'),
+    path('trainerleave/apply/', views.trainer_leave_apply, name='trainer-leave-apply'),
+    path('trainerleave/<int:leave_id>/', views.trainer_leave_detail, name='trainer-leave-detail'),
+    path('trainerleave/<int:leave_id>/edit/', views.trainer_leave_edit, name='trainer-leave-edit'),
+    path('trainerleave/<int:leave_id>/delete/', views.trainer_leave_delete, name='trainer-leave-delete'),
+    
+    # certificates 
+    path("certificates/", views.certificate_batch_list, name="certificate-batch-list"),
+    path("certificates/<int:batch_id>/students/", views.certificate_students_list, name="certificate-students-list"),
+    path("certificates/<int:batch_id>/check/<int:student_id>/", views.certificate_check_eligibility, name="certificate-check-eligibility")
     
 ]

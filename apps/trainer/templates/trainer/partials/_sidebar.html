@@ -75,7 +75,7 @@
         <!-- Announcements -->
         <li class="nav-item">
             <a href="{% url 'trainer:all_announcements' %}" 
-               class="nav-link {% if request.resolver_match.url_name == 'all_announcements' or request.resolver_match.url_name == 'create_announcement' or request.resolver_match.url_name == 'view_announcement' or request.resolver_match.url_name == 'edit_announcement' %}active{% endif %}">
+               class="nav-link {% if request.resolver_match.url_name == 'all_announcements' or request.resolver_match.url_name == 'create_announcement' or request.resolver_match.url_name == 'view_announcement' or request.resolver_match.url_name == 'edit_announcement' or request.resolver_match.url_name == 'delete_announcement' %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 11l18-5v12l-18-5z"/>
                     <path d="M11 15v4"/>
@@ -84,14 +84,18 @@
             </a>
         </li>
 
-        <!-- Student Evaluation -->
+        <!-- Exam -->
         <li class="nav-item">
-            <a href="#" class="nav-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 3v18h18"/>
-                    <path d="M7 14l4-4 4 2 5-6"/>
+            <a href="{% url 'trainer:exam-final-batchlist' %}" 
+                class="nav-link {% if request.resolver_match.url_name == 'exam-final-batchlist' or request.resolver_match.url_name == 'exam-final-create' or request.resolver_match.url_name == 'exam-final-view' or request.resolver_match.url_name == 'exam-final-edit' or request.resolver_match.url_name == 'exam-final-publish' or request.resolver_match.url_name == 'exam-submissions-list' or request.resolver_match.url_name == 'exam-evaluate-submission' or request.resolver_match.url_name == 'exam-results-list' or request.resolver_match.url_name == 'exam-result-detail'%}active{% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" width="20" height="20">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
                 </svg>
-                <span>Student Evaluation</span>
+                <span>Conduct Exam</span>
             </a>
         </li>
 
@@ -118,25 +122,35 @@
             </a>
         </li>
 
-        <!-- Students Feedback -->
+        <!-- Trainer Leaves -->
         <li class="nav-item">
-            <a href="#" class="nav-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+            <a href="{% url 'trainer:trainer-leave-dashboard' %}" 
+            class="nav-link {% if request.resolver_match.url_name == 'trainer-leave-dashboard' or request.resolver_match.url_name == 'trainer-leave-apply' or request.resolver_match.url_name == 'trainer-leave-detail' or request.resolver_match.url_name == 'trainer-leave-edit' or request.resolver_match.url_name == 'trainer-leave-delete'%}active{% endif %}">
+                <!-- Person + Calendar Icon -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <!-- Person -->
+                    <circle cx="12" cy="7" r="4"></circle>
+                    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"></path>
+                    <!-- Calendar / Leave -->
+                    <rect x="17" y="11" width="6" height="6" rx="1" ry="1"></rect>
+                    <line x1="17" y1="13" x2="23" y2="13"></line>
+                    <line x1="19" y1="11" x2="19" y2="17"></line>
                 </svg>
-                <span>Students Feedback</span>
+                <span>Trainer Leaves</span>
             </a>
         </li>
 
-        <!-- Upload Daily Classes -->
+        <!-- Certificates -->
         <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{% url 'trainer:certificate-batch-list' %}" 
+            class="nav-link {% if request.resolver_match.url_name == 'certificate-batch-list' or request.resolver_match.url_name == 'certificate-students-list' or request.resolver_match.url_name == 'certificate-check-eligibility'%}active{% endif %}">
+                <!-- Award / Certificate Icon -->
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <path d="M7 10l5-5 5 5"/>
-                    <path d="M12 5v14"/>
+                    <circle cx="12" cy="8" r="7"/>
+                    <polyline points="8.21 13.89 7 22 12 19 17 22 15.79 13.88"/>
                 </svg>
-                <span>Upload Daily Classes</span>
+
+                <span>Issue Certificates</span>
             </a>
         </li>
 

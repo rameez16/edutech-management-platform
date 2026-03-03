@@ -1,0 +1,111 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="certificate-student-wrapper glass-card">
+
+    <div class="certificate-student-header">
+        <a href="{% url 'trainer:certificate-batch-list' %}"
+           class="certificate-student-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 width="20" height="20">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </a>
+        <div>
+            <h4>Students – {{ batch.name }}</h4>
+            <p class="certificate-student-subtitle">
+                Final Exam: {{ final_exam.title }} •
+                Total Marks: {{ final_exam.total_marks }} •
+                Passing Marks: {{ final_exam.passing_marks }}
+            </p>
+        </div>
+    </div>
+
+    <div class="certificate-student-table-wrapper">
+        <table class="certificate-student-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Marks</th>
+                    <th>Pass / Fail</th>
+                    <th>Eligibility</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in student_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.student.full_name }}</td>
+
+                    <!-- Marks -->
+                    <td>
+                        {% if item.exam_result %}
+                            {{ item.exam_result.marks_obtained }} / {{ final_exam.total_marks }}
+                        {% else %}
+                            <span class="text-muted">No result</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Pass / Fail -->
+                    <td>
+                        {% if item.exam_result %}
+                            {% if item.exam_result.is_pass %}
+                                <span class="badge-certificate-pass">Pass</span>
+                            {% else %}
+                                <span class="badge-certificate-fail">Fail</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Eligibility -->
+                    <td>
+                        {% if not item.exam_result %}
+                            <span class="badge-certificate-neutral">No Result</span>
+                        {% elif item.is_eligible %}
+                            <span class="badge-certificate-pass">Eligible ✓</span>
+                        {% else %}
+                            <span class="badge-certificate-fail">Not Eligible</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Action -->
+                    <td>
+                        {% if not item.exam_result %}
+                            <span class="text-muted">No Result</span>
+
+                        {% elif item.is_eligible %}
+                            <span class="badge-certificate-neutral">
+                                Admin will issue
+                            </span>
+
+                        {% else %}
+                            <a href="{% url 'trainer:certificate-check-eligibility' batch.id item.student.id %}"
+                               class="btn-certificate-check">
+                                Check
+                            </a>
+
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="certificate-student-empty">
+                        No students found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

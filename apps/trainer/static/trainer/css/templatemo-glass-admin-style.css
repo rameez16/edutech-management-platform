@@ -7163,3 +7163,2002 @@ input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] 
 .trainer-dashboard-scrollable::-webkit-scrollbar-track {
     background-color: transparent;
 }
+
+
+
+/* batch overview schedule */
+.batch-schedule-card{
+    margin-top: 20px;
+}
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.schedule-table th, .schedule-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.schedule-table th {
+    font-weight: 600;
+}
+
+.batch-schedule-card p {
+    margin: 0.5rem 0;
+    color: #ccc;
+}
+
+/* ==========================================
+   TRAINER LEAVE DASHBOARD TABLE
+============================================= */
+
+.trainer-leave-table-wrapper {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+/* Header flex for title and apply button */
+.trainer-leave-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.trainer-leave-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.trainer-leave-table thead {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.trainer-leave-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.trainer-leave-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 500;
+}
+
+.trainer-leave-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: background 0.3s ease;
+}
+
+/* ==========================================
+   BADGES
+============================================= */
+
+.badge-trainer-pending {
+    background-color: #ffc107;
+    color: #000;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-trainer-approved {
+    background-color: #28a745;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-trainer-rejected {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* ==========================================
+   ACTION BUTTONS
+============================================= */
+
+.trainer-leave-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.btn-trainer-view {
+    background-color: #17a2b8;
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.btn-trainer-view:hover {
+    background-color: #138496;
+}
+
+.btn-trainer-edit {
+    background-color: #ffc107;
+    color: #000;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.btn-trainer-edit:hover {
+    background-color: #e0a800;
+}
+
+.btn-trainer-delete {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.btn-trainer-delete:hover {
+    background-color: #c82333;
+}
+
+/* ==========================================
+   APPLY BUTTON
+============================================= */
+
+.btn-trainer-apply {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: #4CAF50;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+}
+
+.btn-trainer-apply:hover {
+    background-color: #45a049;
+}
+
+/* ==========================
+   TRAINER LEAVE APPLY FORM
+=========================== */
+
+.trainer-leave-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.trainer-leave-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.trainer-leave-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.trainer-leave-form input,
+.trainer-leave-form select,
+.trainer-leave-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #000;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.trainer-leave-form input:focus,
+.trainer-leave-form select:focus,
+.trainer-leave-form textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+/* ==========================
+   ERROR & HELP TEXT
+=========================== */
+.trainer-leave-error {
+    background: rgba(255, 99, 71, 0.1);
+    color: #dc3545;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.trainer-leave-field-error {
+    color: #dc3545;
+    font-size: 0.75rem;
+    margin-top: 2px;
+}
+
+.trainer-leave-help-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+/* ==========================
+   FORM ACTION BUTTONS
+=========================== */
+.trainer-leave-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.trainer-leave-btn-submit {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.trainer-leave-btn-submit:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.trainer-leave-btn-cancel {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: #dc3545;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.trainer-leave-btn-cancel:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* ==========================
+   HEADER & BACK BUTTON
+=========================== */
+.trainer-leave-apply-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.trainer-leave-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.trainer-leave-back-btn:hover {
+    background: rgba(0,0,0,0.05);
+    transform: translateX(-2px);
+}
+
+.trainer-leave-apply-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+/* ==========================
+   TRAINER LEAVE DETAIL VIEW
+=========================== */
+
+.trainer-leave-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.trainer-leave-detail-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.trainer-leave-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.trainer-leave-back-btn:hover {
+    background: rgba(0,0,0,0.05);
+    transform: translateX(-2px);
+}
+
+/* ==========================
+   LEAVE INFO GRID
+=========================== */
+
+.trainer-leave-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 1rem;
+}
+
+.trainer-leave-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    word-break: break-word;
+}
+
+[data-theme="light"] .trainer-leave-row {
+    background: #f8fafc;
+}
+
+.trainer-leave-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.trainer-leave-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    max-width: 70%;
+    text-align: right;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* ==========================
+   ACTION BUTTON
+=========================== */
+.trainer-leave-detail-actions {
+    margin-top: 1.5rem;
+}
+
+.trainer-leave-btn-back {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    background-color: #e2e8f0; /* light gray */
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.trainer-leave-btn-back:hover {
+    background-color: #cbd5e1;
+}
+
+/* ==========================================
+   EXAM BATCH LIST
+============================================= */
+
+.exambatchlist-wrapper {
+    padding: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Header */
+.exambatchlist-header {
+    margin-bottom: 24px;
+}
+
+.exambatchlist-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--text-primary);
+}
+
+.exambatchlist-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Table */
+.exambatchlist-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.exambatchlist-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+.exambatchlist-table thead th {
+    background: #f8fafc;
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.exambatchlist-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.exambatchlist-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* Text */
+.ebl-batch-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.ebl-count {
+    font-weight: 600;
+}
+
+.ebl-na {
+    color: #cbd5e1;
+}
+
+/* Action group */
+.ebl-action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.ebl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.ebl-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Button variants */
+.ebl-btn-view {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+}
+
+.ebl-btn-create {
+    background: var(--primary);
+    color: #fff;
+}
+
+.ebl-btn-submissions {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.ebl-btn-results {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+/* Badges */
+.ebl-badge-published {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #dcfce7;
+    color: #166534;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.ebl-badge-draft {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #fef9c3;
+    color: #854d0e;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.ebl-badge-pending {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: block;
+    margin-top: 5px;
+}
+
+/* Empty state */
+.ebl-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 48px !important;
+}
+.ebl-action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ebl-badge-published,
+.ebl-badge-draft {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* =========================
+   EXAM FINAL CREATE FORM
+========================= */
+.exam-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.exam-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.exam-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.exam-form input,
+.exam-form select,
+.exam-form textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.exam-form input:focus,
+.exam-form select:focus,
+.exam-form textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.exam-field-error {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--danger);
+    margin-top: 2px;
+}
+
+.exam-help-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Checkbox Inline */
+.exam-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.exam-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--primary);
+}
+
+/* Form Action Buttons */
+.exam-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.exam-btn-create {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.exam-btn-create:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.exam-btn-cancel {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: var(--danger);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.exam-btn-cancel:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   EXAM FINAL DETAIL VIEW
+========================================= */
+
+.exam-final-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 1rem;
+}
+
+.exam-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    word-break: break-word;
+}
+
+[data-theme="light"] .exam-detail-row {
+    background: #f8fafc;
+}
+
+.exam-detail-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.exam-detail-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    max-width: 70%;
+    text-align: right;
+    white-space: pre-wrap; /* for instructions or long text */
+    line-height: 1.5;
+}
+
+/* Action Buttons */
+.exam-detail-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 10px;
+}
+
+.exam-btn-edit {
+    background-color: var(--primary);
+    color: #FFF;
+}
+
+.exam-btn-edit:hover {
+    background-color: #e0a800;
+}
+
+.exam-btn-publish {
+    background-color: #198754; /* Bootstrap green */
+    color: #FFF;
+}
+
+.exam-btn-publish:hover {
+    background-color: #157347;
+}
+
+.exam-btn-back {
+    background-color: #e2e8f0; /* light gray */
+    color: var(--primary);
+}
+
+.exam-btn-back:hover {
+    background-color: #cbd5e1;
+}
+
+/* Uniform button style */
+.exam-detail-actions a,
+.exam-detail-actions button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.exam-view-final-badge{
+    color: var(--accent);
+}
+
+/* =========================================
+   EXAM FINAL EDIT FORM
+========================================= */
+
+.exam-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.exam-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.exam-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.exam-form input,
+.exam-form select,
+.exam-form textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.exam-form input:focus,
+.exam-form select:focus,
+.exam-form textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.exam-field-error {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--danger);
+    margin-top: 2px;
+}
+
+.exam-help-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Checkbox Inline */
+.exam-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.exam-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--primary);
+}
+
+/* Form Action Buttons */
+.exam-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.exam-btn-update {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.exam-btn-update:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.exam-btn-cancel {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: #e2e8f0;
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.exam-btn-cancel:hover {
+    background-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+/* ==========================================
+   EXAM EVALUATION HEADER
+============================================= */
+
+.exam-evaluation-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.exam-evaluation-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Back Button */
+
+.exam-evaluation-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 8px;
+    background: var(--bg-glass);
+    color: var(--text-primary);
+    transition: all 0.25s ease;
+}
+
+.exam-evaluation-back-btn:hover {
+    background: var(--glass-hover);
+    transform: translateX(-2px);
+}
+
+/* ==========================================
+   GRID
+============================================= */
+
+.exam-evaluation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 20px;
+}
+
+@media(max-width:768px) {
+    .exam-evaluation-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================
+   CARD
+============================================= */
+
+.exam-evaluation-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.exam-evaluation-card h5 {
+    margin: 0 0 12px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* ==========================================
+   ROW
+============================================= */
+
+.exam-evaluation-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.exam-evaluation-row:last-child {
+    border-bottom: none;
+}
+
+/* ==========================================
+   DOWNLOAD BUTTON
+============================================= */
+
+.exam-evaluation-btn-download {
+    display: inline-block;
+    padding: 6px 12px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: 0.2s ease;
+    margin-bottom: 10px;
+}
+
+.exam-evaluation-btn-download:hover {
+    opacity: 0.9;
+}
+
+/* ==========================================
+   FORM
+============================================= */
+
+.exam-evaluation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.exam-evaluation-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.exam-evaluation-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.exam-evaluation-form input,
+.exam-evaluation-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    font-size: 0.85rem;
+}
+
+.exam-evaluation-form input:focus,
+.exam-evaluation-form textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+/* ==========================================
+   ACTION BUTTONS
+============================================= */
+
+.exam-evaluation-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.exam-evaluation-btn-save {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.exam-evaluation-btn-reject {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background-color: var(--danger);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.exam-evaluation-btn-save:hover,
+.exam-evaluation-btn-reject:hover {
+    opacity: 0.9;
+}
+
+/* ==========================================
+   MISC
+============================================= */
+
+.exam-evaluation-muted {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.exam-evaluation-feedback {
+    background: rgba(0,0,0,0.03);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+/* ==========================================
+   EXAM EVAL RESULT HEADER
+============================================= */
+
+.exam-eval-result-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.exam-eval-result-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.exam-eval-result-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 8px;
+    background: var(--bg-glass);
+    color: var(--text-primary);
+    transition: all 0.25s ease;
+}
+
+.exam-eval-result-back-btn:hover {
+    background: var(--glass-hover);
+    transform: translateX(-2px);
+}
+
+/* ==========================================
+   GRID
+============================================= */
+
+.exam-eval-result-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* ==========================================
+   CARD
+============================================= */
+
+.exam-eval-result-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding:20px 22px;
+}
+
+.exam-eval-result-card h5 {
+    margin: 0 0 14px;
+    font-weight: 600;
+}
+
+/* ==========================================
+   SCORE DISPLAY
+============================================= */
+
+.exam-eval-result-big-score {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-align: center;
+    margin: 10px 0;
+    color: var(--text-primary);
+}
+
+.exam-eval-result-total {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.exam-eval-result-pending {
+    font-size: 1.4rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ==========================================
+   GRADE & BADGES
+============================================= */
+
+.exam-eval-result-grade-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.exam-eval-result-grade-badge {
+    background: rgba(79,70,229,0.1);
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding: 5px 16px;
+    border-radius: 20px;
+}
+
+.exam-eval-result-badge-pass {
+    background: #dcfce7;
+    color: #166534;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.exam-eval-result-badge-fail {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+/* ==========================================
+   INFO ROWS
+============================================= */
+
+.exam-eval-result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.exam-eval-result-row:last-child {
+    border-bottom: none;
+}
+
+/* ==========================================
+   REMARKS
+============================================= */
+
+.exam-eval-result-remarks-card {
+    margin-top: 10px;
+}
+
+.exam-eval-result-remarks-text {
+    background: rgba(0,0,0,0.03);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+/* //  */
+
+/* ==========================================
+   Exam reslut list
+============================================= */
+
+.exam-result-list-wrapper {
+    padding: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Header */
+.exam-result-list-header {
+    margin-bottom: 24px;
+}
+
+.exam-result-list-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.exam-result-list-meta {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Stats */
+.exam-result-list-stats {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.exam-result-stat {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 14px 22px;
+    text-align: center;
+    min-width: 90px;
+    border: 1px solid #e9ecef;
+}
+
+.exam-result-stat.pass {
+    background: #e8f5e9;
+    border-color: #28a745;
+}
+
+.exam-result-stat.fail {
+    background: #fde8e8;
+    border-color: #dc3545;
+}
+
+.exam-result-stat.pending {
+    background: #fff8e1;
+    border-color: #ffc107;
+}
+
+.stat-num {
+    display: block;
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+
+.stat-lbl {
+    font-size: 0.78rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+/* Table */
+.exam-result-list-table-wrapper {
+    overflow-x: auto;
+}
+
+.exam-result-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.exam-result-list-table th,
+.exam-result-list-table td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.88rem;
+}
+
+.exam-result-list-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.exam-result-list-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* Badges */
+.badge-pass {
+    background: #dcfce7;
+    color: #166534;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.badge-fail {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.grade-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+/* Button */
+.exam-result-btn-detail {
+    background: #4f46e5;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.exam-result-btn-detail:hover {
+    background: #4338ca;
+}
+
+/* Utilities */
+.text-muted {
+    color: #bbb;
+}
+
+.empty-row {
+    text-align: center;
+    color: #aaa;
+    padding: 32px !important;
+}
+/* ==========================================
+   Exam Submission list
+============================================= */
+
+.exam-submission-list-wrapper {
+    padding: 24px;
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+/* Header */
+.exam-submission-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.exam-submission-list-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.exam-submission-list-meta {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.exam-submission-list-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Buttons */
+.exam-submission-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.exam-submission-btn-evaluate {
+    background: #4f46e5;
+    color: white;
+}
+
+.exam-submission-btn-evaluate:hover {
+    background: #4338ca;
+}
+
+.exam-submission-btn-view {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+.exam-submission-btn-results {
+    background: #059669;
+    color: white;
+}
+
+.exam-submission-btn-results:hover {
+    background: #047857;
+}
+
+.exam-submission-btn-back {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+/* Stats */
+.exam-submission-list-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.exam-submission-stat-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px 24px;
+    text-align: center;
+    border: 1px solid #e9ecef;
+}
+
+.exam-submission-stat-card.pending {
+    background: #fff8e1;
+    border-color: #ffc107;
+}
+
+.exam-submission-stat-card.late {
+    background: #fff3e0;
+    border-color: #fd7e14;
+}
+
+.exam-submission-stat-card.evaluated {
+    background: #e8f5e9;
+    border-color: #28a745;
+}
+
+.exam-submission-stat-card.rejected {
+    background: #fde8e8;
+    border-color: #dc3545;
+}
+
+/* Table */
+.exam-submission-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.exam-submission-list-table th,
+.exam-submission-list-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+}
+
+.exam-submission-list-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.exam-submission-list-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* Status badges */
+.exam-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.exam-status-submitted { background: #dbeafe; color: #1d4ed8; }
+.exam-status-late { background: #ffedd5; color: #c2410c; }
+.exam-status-evaluated { background: #dcfce7; color: #166534; }
+.exam-status-rejected { background: #fee2e2; color: #991b1b; }
+
+.exam-submission-link {
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+.exam-submission-link:hover {
+    text-decoration: underline;
+}
+
+.text-muted { color: #aaa; }
+
+.empty-row {
+    text-align: center;
+    padding: 32px !important;
+    color: #aaa;
+}
+
+.ebl-badge-late {
+    background-color: #f59e0b;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.ebl-badge-rejected {
+    background-color: #ef4444;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.ebl-badge-completed {
+    background-color: #6b7280;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+.exam-status-late {
+    background-color: #f59e0b;
+    color: white;
+}
+.exam-status-completed {
+    background-color: #6b7280;
+    color: white;
+}
+
+/* =====================================================
+   CERTIFICATE MANAGEMENT PAGE
+===================================================== */
+
+.certificate-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.certificate-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Table Wrapper */
+.certificate-table-wrapper {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* Table */
+.certificate-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.certificate-table th {
+    text-align: left;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.certificate-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f1f1;
+    font-size: 14px;
+}
+
+.certificate-table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Badges */
+.badge-certificate-approved {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-certificate-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Button */
+.btn-certificate-manage {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: var(--primary);
+    color: #fff;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-certificate-manage:hover {
+    background-color: #0d6efd;
+    transform: translateY(-1px);
+}
+
+/* Empty Row */
+.certificate-empty {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+/* =====================================================
+   CERTIFICATE STUDENT LIST PAGE
+===================================================== */
+
+/* =====================================================
+   CERTIFICATE STUDENT HEADER (Back Arrow Style)
+===================================================== */
+
+.certificate-student-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+/* Circular Back Button */
+.certificate-student-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.certificate-student-back-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    transform: translateX(-2px);
+}
+
+/* Title */
+.certificate-student-heading {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--primary);
+}
+
+/* Subtitle */
+.certificate-student-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* Table */
+
+.certificate-student-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.certificate-student-table th {
+    text-align: left;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.certificate-student-table td {
+    padding: 12px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.certificate-student-table tr:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+/* Badges */
+
+.badge-certificate-pass {
+    background: rgba(34,197,94,0.15);
+    color: #22c55e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-certificate-fail {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-certificate-neutral {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Buttons */
+
+.btn-certificate-check,
+.btn-certificate-view,
+.btn-certificate-issue {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    text-decoration: none;
+    margin-right: 6px;
+    transition: 0.2s ease;
+}
+
+.btn-certificate-check {
+    background: #fbbf24;
+    color: #fff;
+}
+
+.btn-certificate-view {
+    background: var(--primary);
+    color: #fff;
+}
+
+.btn-certificate-issue {
+    background: #10b981;
+    color: #fff;
+}
+
+.btn-certificate-check:hover,
+.btn-certificate-view:hover,
+.btn-certificate-issue:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+/* Reason Text */
+.certificate-reason-text {
+    color: #ef4444;
+    font-size: 12px;
+}
+
+/* Empty */
+.certificate-student-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+}
+/* ==========================
+   CERTIFICATE DETAIL VIEW
+=========================== */
+
+.certificate-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0.5rem;
+}
+
+.certificate-detail-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.certificate-detail-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.certificate-detail-back-btn:hover {
+    background: rgba(255,255,255,0.08);
+    transform: translateX(-2px);
+}
+
+/* Subtitle */
+.certificate-detail-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+/* Grid */
+.certificate-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 1rem;
+}
+
+.certificate-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    word-break: break-word;
+}
+
+[data-theme="light"] .certificate-detail-row {
+    background: #f8fafc;
+}
+
+.certificate-detail-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.certificate-detail-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    max-width: 70%;
+    text-align: right;
+    line-height: 1.5;
+}
+
+/* Section title */
+.certificate-detail-section-title {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Badges */
+
+.badge-certificate-pass {
+    background: rgba(34,197,94,0.15);
+    color: #22c55e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-certificate-fail {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-certificate-neutral {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Bottom Button */
+
+.certificate-detail-actions {
+    margin-top: 1.5rem;
+}
+
+.certificate-detail-btn-back {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    background-color: #e2e8f0;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.certificate-detail-btn-back:hover {
+    background-color: #cbd5e1;
+}

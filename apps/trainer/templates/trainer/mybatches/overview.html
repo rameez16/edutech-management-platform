@@ -85,6 +85,38 @@
 
     </div>
 
+    <!-- Batch Schedule Card -->
+<div class="glass-card batch-schedule-card">
+    <h4 class="card-title">Batch Schedule</h4>
+
+    {% if schedules %}
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Time</th>
+                    {% comment %} <th>Trainer</th> {% endcomment %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for slot in schedules %}
+                    <tr>
+                        <td>{{ slot.get_day_of_week_display }}</td>
+                        <td>{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</td>
+                        {% comment %} <td>
+                            {% if slot.trainer %}
+                                {{ slot.trainer.user.get_full_name }}
+                            {% else %}
+                                Not Assigned
+                            {% endif %}
+                        </td> {% endcomment %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No schedules available for this batch.</p>
+    {% endif %}
 </div>
 
 {% endblock %}

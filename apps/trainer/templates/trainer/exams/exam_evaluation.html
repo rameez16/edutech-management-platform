@@ -1,0 +1,141 @@
+{% extends "base/base.html" %}
+{% block content %}
+
+<div class="glass-card">
+
+    <!-- Header -->
+    <div class="exam-evaluation-header">
+        <a href="{% url 'trainer:exam-submissions-list' exam.id %}" 
+           class="exam-evaluation-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </a>
+        <h4>Evaluate Submission</h4>
+    </div>
+
+    <div class="exam-evaluation-grid">
+
+        <!-- Student Info -->
+        <div class="exam-evaluation-card">
+            <h5>Student Details</h5>
+
+            <div class="exam-evaluation-row">
+                <span>Name</span>
+                <strong>{{ submission.student.full_name }}</strong>
+            </div>
+
+            <div class="exam-evaluation-row">
+                <span>Submitted</span>
+                <strong>{{ submission.submitted_at|date:"d M Y, H:i" }}</strong>
+            </div>
+
+            <div class="exam-evaluation-row">
+                <span>Status</span>
+                <span class="exam-status-badge exam-status-{{ submission.status }}">
+                    {{ submission.get_status_display }}
+                </span>
+            </div>
+
+            {% if submission.status == "late" %}
+                <div class="exam-evaluation-row">
+                    <span></span>
+                    <small style="color:#f59e0b;">⚠ This submission was submitted after exam end time.</small>
+                </div>
+            {% endif %}
+
+            <hr>
+
+            <h5>Answer File</h5>
+
+            {% if submission.answer_file %}
+                <a href="{{ submission.answer_file.url }}" 
+                   target="_blank"
+                   class="exam-evaluation-btn-download">
+                    📄 Download File
+                </a>
+            {% else %}
+                <p class="exam-evaluation-muted">No file uploaded.</p>
+            {% endif %}
+
+            {% if submission.feedback %}
+                <hr>
+                <h5>Previous Feedback</h5>
+                <p class="exam-evaluation-feedback">
+                    {{ submission.feedback }}
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Evaluation Form -->
+        <div class="exam-evaluation-card">
+
+            <h5>Exam Info</h5>
+
+            <div class="exam-evaluation-row">
+                <span>Exam</span>
+                <strong>{{ exam.title }}</strong>
+            </div>
+
+            <div class="exam-evaluation-row">
+                <span>Total Marks</span>
+                <strong>{{ exam.total_marks }}</strong>
+            </div>
+
+            <div class="exam-evaluation-row">
+                <span>Passing Marks</span>
+                <strong>{{ exam.passing_marks }}</strong>
+            </div>
+
+            {% if exam.is_completed %}
+                <div class="exam-evaluation-row">
+                    <span></span>
+                    <span class="exam-status-badge exam-status-completed">Exam Completed</span>
+                </div>
+            {% endif %}
+
+            <hr>
+
+            <form method="POST" class="exam-evaluation-form">
+                {% csrf_token %}
+
+                <div class="exam-evaluation-form-group">
+                    <label>Marks Obtained *</label>
+                    <input type="number"
+                           name="marks"
+                           min="0"
+                           max="{{ exam.total_marks }}"
+                           value="{{ submission.marks_obtained }}"
+                           required>
+                </div>
+
+                <div class="exam-evaluation-form-group">
+                    <label>Feedback / Remarks</label>
+                    <textarea name="feedback" rows="4">{{ submission.feedback }}</textarea>
+                </div>
+
+                <div class="exam-evaluation-actions">
+                    <button type="submit"
+                            name="action"
+                            value="evaluate"
+                            class="exam-evaluation-btn-save">
+                        Save Evaluation
+                    </button>
+
+                    <button type="submit"
+                            name="action"
+                            value="reject"
+                            class="exam-evaluation-btn-reject"
+                            onclick="return confirm('Reject this submission?')">
+                        Reject
+                    </button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
