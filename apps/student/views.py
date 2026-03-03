@@ -1098,12 +1098,42 @@ def notification_view(request):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @login_required
 def payment_portal(request):
 
     student = request.user.student
 
-    # Get ACTIVE admission
     admission = Admission.objects.filter(
         student=student,
         status=Admission.AdmissionStatus.ACTIVE
@@ -1117,20 +1147,106 @@ def payment_portal(request):
         messages.error(request, "Payment plan not assigned.")
         return redirect("student:stud_dashboard")
 
-    # Check existing completed payment
-    completed_payment = FeePayment.objects.filter(
-        student=student,
-        payment_status=FeePayment.PaymentStatus.COMPLETED
-    ).first()
+    plan = admission.payment_plan.lower()
 
-    # 👉 If payment approved → show summary
-    if completed_payment:
-        return render(request, "student/payment/payment_summary.html", {
+    # ==================================================
+    # COMMON PAYMENT SUMMARY
+    # ==================================================
+
+    total_fee = admission.total_fee or Decimal("0.00")
+
+    admission_fee_paid_amount = Decimal("0.00")
+    if admission.admission_fee_paid and admission.admission_fee_amount:
+        admission_fee_paid_amount = admission.admission_fee_amount
+
+    other_paid_amount = (
+        FeePayment.objects.filter(
+            student=student,
+            payment_status=FeePayment.PaymentStatus.COMPLETED
+        ).aggregate(total=Sum("amount"))["total"]
+        or Decimal("0.00")
+    )
+
+    paid_amount = admission_fee_paid_amount + other_paid_amount
+    pending_amount = total_fee - paid_amount
+
+    if pending_amount < 0:
+        pending_amount = Decimal("0.00")
+
+    # ==================================================
+    # INSTALLMENT / EMI / PDC
+    # ==================================================
+
+    if plan in ["installment", "emi", "pdc"]:
+
+        batch = admission.batch
+        if not batch:
+            messages.error(request, "No batch assigned.")
+            return redirect("student:stud_dashboard")
+
+        today = timezone.now().date()
+        start_date = today
+
+        if plan == "installment":
+            count = 4
+        elif plan == "emi":
+            count = 6
+        elif plan == "pdc":
+            count = 5
+        else:
+            count = 4
+
+        installment_amount = (total_fee / Decimal(str(count))).quantize(Decimal("0.01"))
+
+        installments = []
+
+        for i in range(1, count + 1):
+
+            payment = FeePayment.objects.filter(
+                student=student,
+                payment_type=plan,
+                installment_number=i
+            ).first()
+
+            due_date = start_date + relativedelta(months=i - 1, day=21)
+
+            if payment:
+                if payment.payment_status == FeePayment.PaymentStatus.COMPLETED:
+                    display_status = "Paid"
+                elif payment.payment_status == FeePayment.PaymentStatus.PENDING:
+                    display_status = "Pending Verification"
+                else:
+                    display_status = "Rejected"
+            else:
+                display_status = "Upcoming" if today < due_date else "Not Started"
+
+            installments.append({
+                "number": i,
+                "amount": installment_amount,
+                "due_date": due_date,
+                "display_status": display_status
+            })
+
+        return render(request, "student/payment/installment_payment.html", {
+            "student": student,
             "admission": admission,
-            "payment": completed_payment
+            "total_fee": total_fee,
+            "paid_amount": paid_amount,
+            "pending_amount": pending_amount,
+            "installments": installments,
+            "plan": plan
         })
 
-    # 👉 Handle payment submission
+    # ==================================================
+    # FULL PAYMENT SECTION
+    # ==================================================
+
+    existing_payment = FeePayment.objects.filter(
+        student=student,
+        payment_type=FeePayment.PaymentType.FULL_PAYMENT
+    ).order_by("-created_at").first()
+
+    # Handle Submission
     if request.method == "POST":
 
         receipt = request.FILES.get("receipt")
@@ -1139,158 +1255,59 @@ def payment_portal(request):
             messages.error(request, "Please upload receipt.")
             return redirect("student:payment_portal")
 
-        payment = FeePayment.objects.create(
+        # Prevent duplicate pending
+        if existing_payment and existing_payment.payment_status == FeePayment.PaymentStatus.PENDING:
+            messages.warning(request, "Payment already submitted and under verification.")
+            return redirect("student:payment_portal")
+
+        # If rejected → update same record + new document
+        if existing_payment and existing_payment.payment_status == FeePayment.PaymentStatus.FAILED:
+            existing_payment.payment_status = FeePayment.PaymentStatus.PENDING
+            existing_payment.payment_date = timezone.now()
+            existing_payment.amount = pending_amount
+            existing_payment.transaction_id = f"TXN-{uuid.uuid4().hex[:8].upper()}"
+            existing_payment.save()
+
+            PaymentDocument.objects.create(
+                fee_payment=existing_payment,
+                document_type=PaymentDocument.DocumentType.RECEIPT,
+                document_file=receipt,
+                uploaded_by=request.user,
+            )
+
+            messages.success(request, "Payment re-submitted successfully.")
+            return redirect("student:payment_portal")
+
+        # Fresh payment → create FeePayment + document
+        fee_payment = FeePayment.objects.create(
             student=student,
-            admission=admission,
-            payment_type=admission.payment_plan.upper(),
-            amount=admission.total_fee,
+            payment_type=FeePayment.PaymentType.FULL_PAYMENT,
+            amount=pending_amount,
             payment_method=FeePayment.PaymentMethod.UPI,
             payment_status=FeePayment.PaymentStatus.PENDING,
-            transaction_id=f"TXN-{uuid.uuid4().hex[:8]}",
+            transaction_id=f"TXN-{uuid.uuid4().hex[:8].upper()}",
+            payment_date=timezone.now(),
+            received_by=request.user,
         )
 
         PaymentDocument.objects.create(
-            fee_payment=payment,
+            fee_payment=fee_payment,
+            document_type=PaymentDocument.DocumentType.RECEIPT,
             document_file=receipt,
             uploaded_by=request.user,
-            description="Payment receipt uploaded"
         )
 
         messages.success(request, "Payment submitted successfully.")
         return redirect("student:payment_portal")
 
-    # 👉 If not approved → show plan-based template
-    template = f"student/payment/{admission.payment_plan}_payment.html"
-
-    return render(request, template, {
-        "admission": admission
+    return render(request, "student/payment/full_payment.html", {
+        "admission": admission,
+        "student": student,
+        "total_fee": total_fee,
+        "paid_amount": paid_amount,
+        "pending_amount": pending_amount,
+        "existing_payment": existing_payment,
     })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

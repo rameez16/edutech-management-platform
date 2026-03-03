@@ -8,13 +8,13 @@
 {% block content %}
 
 <div class="page-center">
-    <div class="payment-container glass-card">
+    <div class="payment-container">
 
         <!-- HEADER -->
         <div class="payment-header">
             <h2>Student Admission & Fee Management</h2>
 
-            <div class="student-info">
+            <div class="student-info-card">
                 <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
                 <p><strong>Email:</strong> {{ student.user.email }}</p>
                 <p><strong>Student ID:</strong> {{ student.id }}</p>
@@ -40,32 +40,59 @@
         </div>
 
         <!-- PAYMENT MODE -->
-        <div class="payment-mode-switch">
+        <div class="payment-mode">
             <span>Payment Mode:</span>
-            <div class="mode-tabs">
-                <span class="mode-btn active">
-                    {{ admission.get_payment_plan_display }}
-                </span>
-            </div>
+            <span class="mode-badge">
+                {{ admission.get_payment_plan_display }}
+            </span>
         </div>
 
-        <!-- PAYMENT FORM -->
-        <div class="right-column">
-            <form method="POST" enctype="multipart/form-data" class="qr-payment-box">
+        <!-- CENTERED PAYMENT CARD -->
+        <div class="payment-center">
+            <form method="POST" enctype="multipart/form-data" class="payment-card">
                 {% csrf_token %}
 
                 <img src="{% static 'student/images/image.png' %}" class="qr-image" alt="QR Code">
-                <p>Scan QR & Complete Full Payment</p>
+                <p class="qr-text">Scan QR & Complete Full Payment</p>
 
                 {% if not existing_payment %}
-                    <label class="upload-btn">Upload Payment Receipt</label>
+                    <!-- FIRST TIME SUBMIT -->
                     <input type="file" name="receipt" required>
-                    <button type="submit" class="submit-btn">Submit Payment</button>
-                {% else %}
-                    {% if existing_payment.payment_status == existing_payment.PaymentStatus.PENDING %}
-                        <p class="payment-status warning">⏳ Under Verification</p>
-                    {% endif %}
+                    <button type="submit" class="submit-btn">
+                        Submit Payment
+                    </button>
+
+                {% elif existing_payment.payment_status == "pending" %}
+                    <!-- PENDING -->
+                    <div class="payment-status warning">
+                        ⏳ Payment Under Verification
+                    </div>
+
+                {% elif existing_payment.payment_status == "failed" %}
+                    <!-- REJECTED -->
+                    <div class="payment-status error">
+                        ❌ Payment Rejected. Please Re-upload Receipt.
+                    </div>
+
+                    <input type="file" name="receipt" required>
+                    <button type="submit" class="submit-btn">
+                        Re-Submit Payment
+                    </button>
+
+                {% elif existing_payment.payment_status == "completed" %}
+                    <!-- COMPLETED -->
+                    <div class="payment-status success">
+                        ✅ Payment Completed Successfully
+                    </div>
+
+                    <div class="no-payment">
+                        🎉 No Payment Remaining
+                    </div>
+                     <a href="#" class="submit-btn" style="text-decoration:none; text-align:center; display:block; margin-top:12px;">
+                         Download Payment Receipt
+                    </a>
                 {% endif %}
+
             </form>
         </div>
 
