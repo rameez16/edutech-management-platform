@@ -1,0 +1,557 @@
+/* ═══════════════════════════════════════════════
+   exam.css  —  Final Exam Page
+   Matches existing purple gradient site style
+═══════════════════════════════════════════════ */
+
+/* ── Layout ── */
+.exam-container {
+    padding: 24px;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+/* ── Outer gradient wrapper — matches task/syllabus pages ── */
+.exam-wrapper-card {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ════════════════════════════════
+   HEADER
+════════════════════════════════ */
+.exam-header {
+    background: #fff;
+    border-radius: 12px;
+    padding: 22px 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.exam-header h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e1b4b;
+    margin: 0 0 4px;
+}
+.exam-header p {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* ════════════════════════════════
+   INNER AREA
+════════════════════════════════ */
+.exam-inner {
+    background: #eef0fb;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+/* ════════════════════════════════
+   EXAM CARD
+════════════════════════════════ */
+.exam-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* — Top colour strip — */
+.card-strip {
+    height: 4px;
+    width: 100%;
+}
+.strip-locked   { background: linear-gradient(90deg, #f87171, #fca5a5); }
+.strip-eligible { background: linear-gradient(90deg, #6366f1, #a78bfa); }
+.strip-done     { background: linear-gradient(90deg, #10b981, #34d399); }
+
+/* ════════════════════════════════
+   CARD HEADER
+════════════════════════════════ */
+.exam-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    background: #fafbff;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.exam-card-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.exam-type-badge {
+    display: inline-block;
+    background: #ede9fe;
+    color: #5b21b6;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.exam-title-block {
+    min-width: 0;
+}
+
+.exam-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.exam-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.exam-meta span {
+    font-size: 0.8rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.exam-card-right {
+    flex-shrink: 0;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.badge-locked   { background: #fff1f2; color: #dc2626; border: 1px solid #fca5a5; }
+.badge-eligible { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+.badge-done     { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+
+/* ════════════════════════════════
+   CARD BODY
+════════════════════════════════ */
+.exam-card-body {
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* ── Description ── */
+.exam-description {
+    font-size: 0.875rem;
+    color: #475569;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* ════════════════════════════════
+   STATS ROW
+   — Now supports 6 boxes, so min-width
+     reduced from 110px → 90px so they
+     fit comfortably without wrapping
+════════════════════════════════ */
+.exam-stats-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stat-box {
+    flex: 1;
+    min-width: 90px;       /* ← was 110px; reduced for 6 boxes */
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+/* ── Task completion stat box gets a subtle teal tint ── */
+.stat-box.stat-tasks {
+    background: #f0fdfa;
+    border-color: #99f6e4;
+}
+
+.stat-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #94a3b8;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1e293b;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stat-your {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.val-success { color: #16a34a; }
+.val-danger  { color: #dc2626; }
+
+/* ── Inline mini-bar inside stat box (task completion) ── */
+.stat-mini-bar-wrap {
+    width: 100%;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+.stat-mini-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.7s ease;
+}
+.stat-mini-bar.bar-pass { background: #10b981; }
+.stat-mini-bar.bar-fail { background: #f87171; }
+
+/* ════════════════════════════════
+   CRITERIA BOX  (locked / eligible)
+════════════════════════════════ */
+.criteria-box {
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid;
+}
+.criteria-box.locked   { background: #fff5f5; border-color: #fca5a5; }
+.criteria-box.eligible { background: #f0fdf4; border-color: #86efac; }
+
+.criteria-box-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.cb-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.cb-icon.locked   { background: #fee2e2; }
+.cb-icon.eligible { background: #dcfce7; }
+
+.cb-title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+.cb-title.locked   { color: #dc2626; }
+.cb-title.eligible { color: #16a34a; }
+
+.cb-sub {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* — Individual criteria row — */
+.criteria-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border-radius: 7px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    border: 1px solid #f1f5f9;
+}
+.criteria-row:last-child { margin-bottom: 0; }
+.criteria-row.ok      { border-left: 3px solid #10b981; }
+.criteria-row.blocked { border-left: 3px solid #f87171; }
+
+.c-ico { font-size: 0.88rem; flex-shrink: 0; }
+
+.c-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.c-name {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+.c-detail {
+    font-size: 0.76rem;
+    color: #64748b;
+}
+
+/* Mini progress bar (inside criteria rows) */
+.mini-bar-wrap {
+    width: 64px;
+    height: 5px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.mini-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+.bar-pass { background: #10b981; }
+.bar-fail { background: #f87171; }
+
+/* Tags */
+.c-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.tag-pass { background: #dcfce7; color: #16a34a; }
+.tag-fail { background: #fee2e2; color: #dc2626; }
+
+/* ════════════════════════════════
+   RESULT BLOCK
+════════════════════════════════ */
+.result-block {
+    border-radius: 10px;
+    padding: 18px 20px;
+    border: 1px solid;
+}
+.result-block.result-pass { background: #f0fdf4; border-color: #86efac; }
+.result-block.result-fail { background: #fff5f5; border-color: #fca5a5; }
+
+.result-heading {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 16px;
+}
+
+.result-grid {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.r-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.r-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #94a3b8;
+}
+
+.r-val {
+    font-size: 1.3rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.r-pass    { color: #16a34a; }
+.r-fail    { color: #dc2626; }
+.r-neutral { color: #1e293b; }
+.r-grade   { color: #6366f1; }
+
+.result-remark {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 0.84rem;
+    color: #475569;
+    line-height: 1.6;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* ════════════════════════════════
+   RESULT PENDING
+════════════════════════════════ */
+.result-pending {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 16px 18px;
+}
+.pending-icon { font-size: 1.6rem; flex-shrink: 0; }
+.pending-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 2px;
+}
+.pending-sub {
+    font-size: 0.78rem;
+    color: #94a3b8;
+}
+
+/* ════════════════════════════════
+   MODULES
+════════════════════════════════ */
+.exam-modules {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.modules-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+}
+.modules-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.module-tag {
+    background: #ede9fe;
+    color: #5b21b6;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+/* ════════════════════════════════
+   INSTRUCTIONS
+════════════════════════════════ */
+.exam-instructions {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+.instructions-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #92400e;
+    margin-bottom: 6px;
+}
+.exam-instructions p {
+    font-size: 0.875rem;
+    color: #78350f;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* ════════════════════════════════
+   ACTION ROW
+════════════════════════════════ */
+.exam-action-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-top: 4px;
+}
+
+.lock-hint {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.btn {
+    padding: 10px 26px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s;
+}
+.btn-primary {
+    background: #6366f1;
+    color: #fff;
+}
+.btn-primary:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+}
+.btn-disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+    border: 1px solid #e2e8f0;
+}
+
+/* ════════════════════════════════
+   NO EXAM STATE
+════════════════════════════════ */
+.no-exam {
+    background: #fff;
+    border-radius: 10px;
+    padding: 48px 24px;
+    text-align: center;
+    border: 1px dashed #c4b5fd;
+}
+.no-exam-icon  { font-size: 2.4rem; margin-bottom: 10px; }
+.no-exam-title { font-size: 1rem; font-weight: 700; color: #334155; margin-bottom: 4px; }
+.no-exam-sub   { font-size: 0.84rem; color: #94a3b8; }
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+@media (max-width: 640px) {
+    .exam-container      { padding: 14px; }
+    .exam-card-header    { flex-direction: column; }
+    .exam-card-left      { flex-direction: column; gap: 8px; }
+    .exam-stats-row      { gap: 8px; }
+    .exam-stats-row .stat-box { min-width: 42%; } /* 2-column grid on mobile */
+    .result-grid         { gap: 16px; }
+    .exam-action-row     { flex-direction: column; align-items: stretch; }
+    .btn                 { justify-content: center; }
+}
+
+@media (max-width: 400px) {
+    .exam-stats-row .stat-box { min-width: 100%; } /* single column on very small screens */
+}

@@ -111,102 +111,53 @@
             <!-- BUTTONS / UPLOAD / PAYMENT -->
             <div class="btn-group-vertical step2-buttons">
 
-                <!-- DOWNLOAD ENROLLMENT LETTER -->
-                {% if checklist.enrollment_letter_generated %}
-                    <a href="{% url 'bdm:download_enrollment_letter' %}"
-                       class="btn btn-enroll-download"
-                       download style="height:35px; padding-top:5px;">
-                        Download Enrollment Letter
-                    </a>
-                {% else %}
-                    <a class="btn btn-enroll-download disabled"
-                       aria-disabled="true" style="height:35px; padding-top:5px; margin-bottom:70px;">
-                        Download Enrollment Letter
-                    </a>
-                {% endif %}
+    <!-- DOWNLOAD ENROLLMENT LETTER -->
+    {% if checklist.enrollment_letter_generated %}
+        <a href="{% url 'bdm:download_enrollment_letter' %}"
+           class="btn btn-enroll-download"
+           download style="height:35px; padding-top:5px; margin-bottom:10px;">
+            Download Enrollment Letter
+        </a>
+    {% else %}
+        <a class="btn btn-enroll-download disabled"
+           aria-disabled="true"
+           style="height:35px; padding-top:5px; margin-bottom:10px;">
+            Download Enrollment Letter
+        </a>
+    {% endif %}
 
-                <!-- COURSE FEE INPUT + PAYMENT PLAN -->
-                {% if enrollment_generated and not enrollment_signed %}
-                    <div style="margin-top: 2px; text-align:center;">
-                        
-                        <!-- COURSE FEE -->
-                        <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:5px;">
-                            <input type="number"
-                                id="courseFeeInput"
-                                name="course_fee_agreed"
-                                min="0"
-                                step="0.01"
-                                placeholder="Enter agreed course fee"
-                                {% if agreement.course_fee_agreed %}value="{{ agreement.course_fee_agreed }}"{% endif %}
-                                data-url="{% url 'student:upload_signed_enrollment_letter' %}" 
-                                style="width:80%; height:30px; display:inline-block; border-radius:8px; padding-left:5px;">
+    <!-- UPLOAD SIGNED LETTER -->
+    {% if enrollment_generated and not enrollment_signed %}
+        <form id="uploadSignedForm"
+              data-url="{% url 'student:upload_signed_enrollment_letter' %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file"
+                   id="signedLetterInput"
+                   name="signed_letter"
+                   accept=".pdf,.jpg,.png"
+                   hidden>
 
-                            <button id="saveCourseFeeBtn"
-                                    type="button"
-                                    style="width:18%; height:30px;">
-                                Save
-                            </button>
-                        </div>
-                        <small id="courseFeeStatus" style="display:block; font-size:12px;"></small>
+            <button type="button"
+                    class="btn btn-enroll-upload"
+                    id="uploadSignedBtn"
+                    style="height:40px;">
+                Upload Signed Enrollment Letter
+            </button>
 
-                        <!-- PAYMENT PLAN -->
-                        <div style="display:flex; justify-content:center; align-items:center; gap:10px;">
-                            <select id="paymentPlanSelect"
-                                    name="payment_plan"
-                                    class="form-select"
-                                    style="width:80%; height:30px; display:inline-block; border-radius:8px; padding-left:5px;">
-                                <option value="" {% if not agreement.payment_plan %}selected{% endif %}>
-                                    --Choose a payment plan--
-                                </option>
-                                {% for key, label in payment_plan_choices %}
-                                    {% if key %}
-                                        <option value="{{ key }}" {% if agreement.payment_plan == key %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                            <button id="savePaymentPlanBtn"
-                                    type="button"
-                                    style="width:18%; height:30px;">
-                                Save
-                            </button>
-                        </div>
-                        <small id="paymentStatus" style="display:block; margin-top:5px; font-size:12px;"></small>
+            <small id="uploadStatus"
+                   style="display:block; margin-top:6px; font-size:12px;"></small>
+        </form>
 
-                    </div>
-                {% endif %}
+    {% elif enrollment_signed %}
+        <button class="btn btn-enroll-upload"
+                disabled
+                style="margin-bottom:50px; height:40px;">
+            Uploaded Successfully ✔
+        </button>
+    {% endif %}
 
-                <!-- UPLOAD SIGNED LETTER -->
-                {% if enrollment_generated and not enrollment_signed %}
-                    <form id="uploadSignedForm"
-                          data-url="{% url 'student:upload_signed_enrollment_letter' %}"
-                          enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="file"
-                               id="signedLetterInput"
-                               name="signed_letter"
-                               accept=".pdf,.jpg,.png"
-                               hidden>
-
-                        <button type="button"
-                                class="btn btn-enroll-upload"
-                                id="uploadSignedBtn"
-                                style="height:40px;"
-                                {% if not agreement.payment_plan %}disabled{% endif %}>
-                            Upload Signed Enrollment Letter
-                        </button>
-
-                        <small id="uploadStatus"
-                               style="display:block; margin-top:6px; font-size:12px;"></small>
-                    </form>
-                {% elif enrollment_signed %}
-                    <button class="btn btn-enroll-upload" disabled style="margin-bottom:30px; height:40px;">
-                        Uploaded Successfully ✔
-                    </button>
-                {% endif %}
-
-            </div>
+</div>
         </div>
 
         <!-- STEP 3: Student ID Card -->

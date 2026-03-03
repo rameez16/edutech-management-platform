@@ -62,7 +62,7 @@
         <!-- BATCH DETAILS CARD -->
         <div class="batch-card">
             <div class="batch-card-header">
-                <h4>Batch schedule Details</h4>
+                <h4>Session schedule Details</h4>
                 <span class="arrow-icon">&#9662;</span>
             </div>
 
@@ -228,6 +228,46 @@
 
             </div><!-- /batch-content -->
         </div><!-- /batch-card -->
+
+        <!-- BATCH SCHEDULE CARD (NEW) -->
+    <div class="batch-card">
+        <div class="batch-card-header">
+            <h4>Batch Schedule</h4>
+            <span class="arrow-icon">&#9662;</span>
+        </div>
+        <div class="batch-content">
+            <div class="batch-dates">
+                <div class="date-row">
+                    <span class="date-label">Start Date</span>
+                    <span class="date-value">📅 {{ batch.start_date|date:"d M Y" }}</span>
+                </div>
+
+                <div class="date-row">
+                    <span class="date-label">Expected End Date</span>
+                    <span class="date-value">📅 {{ batch.expected_finish_date|date:"d M Y" }}</span>
+                </div>
+            </div>
+            {% if schedules %}
+                <div class="schedule-grid">
+                {% for slot in schedules %}
+                    <div class="schedule-row">
+                        <div class="schedule-day">
+                            {{ slot.get_day_of_week_display }}
+                        </div>
+                        <div class="schedule-time">
+                            {{ slot.start_time|time:"g:i A" }} – {{ slot.end_time|time:"g:i A" }}
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+            <p class="no-trainers">No schedule set for this batch.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    
+
 
     </div><!-- /batch-wrapper-card -->
 

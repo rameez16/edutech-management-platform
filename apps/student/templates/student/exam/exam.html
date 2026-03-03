@@ -1,0 +1,283 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block title %}Exam{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/exam.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="exam-container">
+<div class="exam-wrapper-card">
+
+    {# ══════════════════════════════════════════ #}
+    {#  HEADER                                    #}
+    {# ══════════════════════════════════════════ #}
+    <div class="exam-header">
+        {% if batch %}
+            <h2>Exam — {{ batch.name }}</h2>
+            <p>Your final exam details and eligibility status.</p>
+        {% else %}
+            <h2>No Active Batch</h2>
+            <p>You are not assigned to any active batch.</p>
+        {% endif %}
+    </div>
+
+    {# ══════════════════════════════════════════ #}
+    {#  EXAM CARD                                 #}
+    {# ══════════════════════════════════════════ #}
+    {% if exam_data %}
+        {% for ed in exam_data %}
+        {% with exam=ed.exam result=ed.result %}
+
+        <div class="exam-inner">
+        <div class="exam-card {% if exam.is_completed %}state-done{% elif ed.is_eligible %}state-eligible{% else %}state-locked{% endif %}">
+
+            {# colour strip #}
+            <div class="card-strip {% if exam.is_completed %}strip-done{% elif ed.is_eligible %}strip-eligible{% else %}strip-locked{% endif %}"></div>
+
+            {# ─── CARD HEADER ─── #}
+            <div class="exam-card-header">
+                <div class="exam-card-left">
+                    <span class="exam-type-badge">🎓 {{ exam.get_exam_type_display }}</span>
+                    <div class="exam-title-block">
+                        <div class="exam-title">{{ exam.title }}</div>
+                        <div class="exam-meta">
+                            <span>📅 {{ exam.scheduled_date|date:"M d, Y" }}</span>
+                            <span>⏱ {{ exam.duration_minutes }} min</span>
+                            <span>📝 {{ exam.total_marks }} marks</span>
+                            <span>✅ Pass: {{ exam.passing_marks }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="exam-card-right">
+                    {% if exam.is_completed %}
+                        <span class="status-badge badge-done">🏆 Result Published</span>
+                    {% elif ed.is_eligible %}
+                        <span class="status-badge badge-eligible">✅ You're Eligible</span>
+                    {% else %}
+                        <span class="status-badge badge-locked">🔒 Locked</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# ─── CARD BODY ─── #}
+            <div class="exam-card-body">
+
+                {# — STATS ROW — #}
+                <div class="exam-stats-row">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Marks</div>
+                        <div class="stat-value">{{ exam.total_marks }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Passing Marks</div>
+                        <div class="stat-value">{{ exam.passing_marks }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Duration</div>
+                        <div class="stat-value">{{ exam.duration_minutes }} min</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Min. Attendance</div>
+                        {% for c in ed.criteria %}{% if c.label == "Attendance" %}
+                        <div class="stat-value {% if c.ok %}val-success{% else %}val-danger{% endif %}">
+                            {{ exam.minimum_attendance_required }}%
+                            <span class="stat-your">You: {{ c.value }}</span>
+                        </div>
+                        {% endif %}{% endfor %}
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Course Fees</div>
+                        {% for c in ed.criteria %}{% if c.label == "Course Fees" %}
+                        <div class="stat-value {% if c.ok %}val-success{% else %}val-danger{% endif %}">
+                            {{ c.value }}
+                        </div>
+                        {% endif %}{% endfor %}
+                    </div>
+                    {# ── NEW: Task Completion stat box ── #}
+                    <div class="stat-box">
+                        <div class="stat-label">Task Completion</div>
+                        {% for c in ed.criteria %}{% if c.label == "Task Completion" %}
+                        <div class="stat-value {% if c.ok %}val-success{% else %}val-danger{% endif %}">
+                            {{ c.value }}
+                            <span class="stat-your">Min: 80%</span>
+                        </div>
+                        {% endif %}{% endfor %}
+                    </div>
+                </div>
+
+                {# ══════════════════════════════════════════ #}
+                {#  STATE 1 — RESULT (exam is_completed)      #}
+                {# ══════════════════════════════════════════ #}
+                {% if exam.is_completed %}
+
+                    {% if result %}
+                        {% if not result.is_eligible %}
+                        <div class="criteria-box locked">
+                            <div class="criteria-box-head">
+                                <div class="cb-icon locked">⚠️</div>
+                                <div>
+                                    <div class="cb-title locked">Not Eligible for Exam</div>
+                                    <div class="cb-sub">{{ result.ineligibility_reason }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <div class="result-block {% if result.is_pass %}result-pass{% else %}result-fail{% endif %}">
+                            <div class="result-heading">
+                                {% if result.is_pass %}🏆 Congratulations — You Passed!
+                                {% else %}📋 Exam Result{% endif %}
+                            </div>
+                            <div class="result-grid">
+                                <div class="r-cell">
+                                    <span class="r-label">Marks Obtained</span>
+                                    <span class="r-val {% if result.is_pass %}r-pass{% else %}r-fail{% endif %}">
+                                        {{ result.marks_obtained }} / {{ exam.total_marks }}
+                                    </span>
+                                </div>
+                                <div class="r-cell">
+                                    <span class="r-label">Percentage</span>
+                                    <span class="r-val r-neutral">
+                                        {% widthratio result.marks_obtained exam.total_marks 100 %}%
+                                    </span>
+                                </div>
+                                <div class="r-cell">
+                                    <span class="r-label">Grade</span>
+                                    <span class="r-val r-grade">{{ result.grade }}</span>
+                                </div>
+                                <div class="r-cell">
+                                    <span class="r-label">Status</span>
+                                    <span class="r-val {% if result.is_pass %}r-pass{% else %}r-fail{% endif %}">
+                                        {% if result.is_pass %}✅ Pass{% else %}❌ Fail{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            {% if result.remarks %}
+                            <div class="result-remark">
+                                <span>💬</span> {{ result.remarks }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                    {% else %}
+                    <div class="result-pending">
+                        <span class="pending-icon">🕐</span>
+                        <div>
+                            <div class="pending-title">Result Not Yet Published</div>
+                            <div class="pending-sub">Your trainer will publish the result soon.</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                {# ══════════════════════════════════════════ #}
+                {#  STATE 2 — LOCKED (criteria not met)       #}
+                {# ══════════════════════════════════════════ #}
+                {% elif not ed.is_eligible %}
+
+                <div class="criteria-box locked">
+                    <div class="criteria-box-head">
+                        <div class="cb-icon locked">🔒</div>
+                        <div>
+                            <div class="cb-title locked">Exam Access Locked</div>
+                            <div class="cb-sub">
+                                Resolve {{ ed.failed_count }} issue{{ ed.failed_count|pluralize }} below to unlock your final exam
+                            </div>
+                        </div>
+                    </div>
+                    {% for c in ed.criteria %}
+                    <div class="criteria-row {% if c.ok %}ok{% else %}blocked{% endif %}">
+                        <span class="c-ico">{% if c.ok %}✅{% else %}❌{% endif %}</span>
+                        <div class="c-content">
+                            <span class="c-name">{{ c.label }}</span>
+                            <span class="c-detail">{{ c.detail }}</span>
+                        </div>
+                        {% if c.bar is not None %}
+                        <div class="mini-bar-wrap">
+                            <div class="mini-bar {% if c.ok %}bar-pass{% else %}bar-fail{% endif %}"
+                                 style="width:{{ c.bar }}%"></div>
+                        </div>
+                        {% endif %}
+                        <span class="c-tag {% if c.ok %}tag-pass{% else %}tag-fail{% endif %}">{{ c.value }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {# ══════════════════════════════════════════ #}
+                {#  STATE 3 — ELIGIBLE (ready to start)       #}
+                {# ══════════════════════════════════════════ #}
+                {% else %}
+
+                <div class="criteria-box eligible">
+                    <div class="criteria-box-head">
+                        <div class="cb-icon eligible">✅</div>
+                        <div>
+                            <div class="cb-title eligible">All Criteria Met — You're Good to Go!</div>
+                            <div class="cb-sub">You meet all prerequisites for the final exam</div>
+                        </div>
+                    </div>
+                    {% for c in ed.criteria %}
+                    <div class="criteria-row ok">
+                        <span class="c-ico">✅</span>
+                        <div class="c-content">
+                            <span class="c-name">{{ c.label }}</span>
+                            <span class="c-detail">{{ c.detail }}</span>
+                        </div>
+                        {% if c.bar is not None %}
+                        <div class="mini-bar-wrap">
+                            <div class="mini-bar bar-pass" style="width:{{ c.bar }}%"></div>
+                        </div>
+                        {% endif %}
+                        <span class="c-tag tag-pass">{{ c.value }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% endif %}{# end state blocks #}
+
+                {# — MODULES COVERED — #}
+                {% if exam.syllabus_modules.all %}
+                <div class="exam-modules">
+                    <div class="modules-label">📚 Modules Covered</div>
+                    <div class="modules-tags">
+                        {% for mod in exam.syllabus_modules.all %}
+                        <span class="module-tag">M{{ mod.module_number }} — {{ mod.title }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {# — ACTION ROW — #}
+                
+                {% if not exam.is_completed %}
+                <div class="exam-action-row">
+                    {% if ed.is_eligible %}
+                        <a href="{% url 'student:attend_exam' exam.id %}" class="btn btn-primary">🚀 Start Exam</a>
+                    {% else %}
+                        <span class="lock-hint">🔒 Resolve {{ ed.failed_count }} issue{{ ed.failed_count|pluralize }} to unlock</span>
+                        <button class="btn btn-disabled" disabled>Start Exam</button>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>{# /exam-card-body #}
+        </div>{# /exam-card #}
+        </div>{# /exam-inner #}
+
+        {% endwith %}
+        {% endfor %}
+
+    {% elif batch %}
+        <div class="no-exam">
+            <div class="no-exam-icon">📭</div>
+            <div class="no-exam-title">No Exam Scheduled Yet</div>
+            <div class="no-exam-sub">Your trainer will publish the final exam once ready.</div>
+        </div>
+    {% endif %}
+
+</div>{# /exam-wrapper-card #}
+</div>{# /exam-container #}
+{% endblock %}

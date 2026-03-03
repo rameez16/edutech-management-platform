@@ -187,6 +187,154 @@
         </div>
     </div>
 
+    <!-- ── Scheduled Timings Card ── -->
+    <div class="info-card schedule-full-card">
+        <div class="card-header">
+            <span class="card-icon" data-icon="clock"></span>
+            <h2 class="card-title">Scheduled Timings</h2>
+            <span class="count-badge">{{ batch.schedules.count }}</span>
+            {% if batch.is_active %}
+            <button type="button" class="btn-add-schedule" id="openScheduleModalBtn">
+                <i class="fa-solid fa-plus"></i> Add Schedule
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="card-body schedule-card-body">
+            {% if batch.schedules.all %}
+            <div class="schedule-list">
+                {% for schedule in schedules %}
+                <div class="schedule-row">
+                    <!-- Day pill -->
+                    <div class="schedule-day-pill">
+                        <i class="fa-solid fa-calendar-week"></i>
+                        {{ schedule.get_day_of_week_display }}
+                    </div>
+
+                    <!-- Time block -->
+                    <div class="schedule-time-block">
+                        <span class="schedule-time-icon"><i class="fa-regular fa-clock"></i></span>
+                        <span class="schedule-time-text">{{ schedule.start_time }} – {{ schedule.end_time }}</span>
+                    </div>
+
+                    {% comment %} <!-- Trainer block -->
+                    <div class="schedule-trainer-block">
+                        {% if schedule.trainer %}
+                            <div class="schedule-trainer-avatar">
+                                {{ schedule.trainer.user.get_full_name|first|upper }}
+                            </div>
+                            <span class="schedule-trainer-name">
+                                {{ schedule.trainer.user.get_full_name }}
+                            </span>
+                        {% else %}
+                            <span class="schedule-unassigned">
+                                <i class="fa-solid fa-user-slash"></i>
+                                Not Assigned
+                            </span>
+                        {% endif %}
+                    </div> {% endcomment %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+                <div class="empty-message">
+                    <span class="empty-icon" data-icon="calendar-xmark"></span>
+                    <p>No schedule added yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="modal-overlay" id="scheduleModal">
+        <div class="modal-container">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="modal-header-icon">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                </div>
+                <div class="modal-header-text">
+                    <h2 class="modal-title">Add Schedule</h2>
+                    <p class="modal-subtitle">{{ batch.name }}</p>
+                </div>
+                <button class="modal-close" id="closeScheduleModal" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="post" action="{% url 'bdm:add_batch_schedule' batch.id %}">
+                    {% csrf_token %}
+
+                    <!-- Row: Day -->
+                    <div class="mform-group">
+                        <label class="mform-label">
+                            <span class="mform-label-icon"><i class="fa-solid fa-calendar-week"></i></span>
+                            Day of Week
+                        </label>
+                        <select name="day_of_week" class="mform-select" required>
+                            <option value="">Select a day…</option>
+                            <option value="monday">Monday</option>
+                            <option value="tuesday">Tuesday</option>
+                            <option value="wednesday">Wednesday</option>
+                            <option value="thursday">Thursday</option>
+                            <option value="friday">Friday</option>
+                            <option value="saturday">Saturday</option>
+                            <option value="sunday">Sunday</option>
+                        </select>
+                    </div>
+
+                    <!-- Row: Start & End Time side by side -->
+                    <div class="mform-row">
+                        <div class="mform-group">
+                            <label class="mform-label">
+                                <span class="mform-label-icon"><i class="fa-solid fa-play"></i></span>
+                                Start Time
+                            </label>
+                            <input type="time" name="start_time" class="mform-input" required>
+                        </div>
+                        <div class="mform-group">
+                            <label class="mform-label">
+                                <span class="mform-label-icon"><i class="fa-solid fa-stop"></i></span>
+                                End Time
+                            </label>
+                            <input type="time" name="end_time" class="mform-input" required>
+                        </div>
+                    </div>
+
+                    <!-- Row: Trainer -->
+                    <div class="mform-group">
+                        <label class="mform-label">
+                            <span class="mform-label-icon"><i class="fa-solid fa-chalkboard-user"></i></span>
+                            Trainer <span class="mform-optional">(optional)</span>
+                        </label>
+                        <select name="trainer" class="mform-select">
+                            <option value="">No trainer assigned</option>
+                            {% for trainer in trainers %}
+                                <option value="{{ trainer.id }}">
+                                    {{ trainer.user.get_full_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="mform-actions">
+                        <button type="button" class="mform-btn-cancel" id="cancelScheduleModal">
+                            <i class="fa-solid fa-xmark"></i> Cancel
+                        </button>
+                        <button type="submit" class="mform-btn-submit">
+                            <i class="fa-solid fa-check"></i> Save Schedule
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
     <!-- Back Button -->
     <div class="actions-footer">
         <a href="{% url 'bdm:batch_list' %}" class="btn-back">
@@ -219,7 +367,6 @@
     }
 
     .batch-detail-container {
-        max-width: 1000px;
         margin: 40px auto;
         padding: 30px;
         background: var(--white);
@@ -228,6 +375,7 @@
         border: 1px solid var(--border-color);
     }
 
+    /* ── Header ── */
     .batch-header {
         display: flex;
         justify-content: space-between;
@@ -236,82 +384,40 @@
         margin-bottom: 32px;
         border-bottom: 2px solid var(--light-blue);
     }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
+    .header-left { display: flex; align-items: center; gap: 16px; }
     .batch-icon {
         width: 56px; height: 56px;
         border-radius: 14px;
         background: linear-gradient(135deg, #0077cc, #00b4d8);
         display: flex; align-items: center; justify-content: center;
-        font-size: 22px;
-        color: #fff;
+        font-size: 22px; color: #fff;
         box-shadow: 0 4px 14px rgba(0,119,204,0.28);
         flex-shrink: 0;
     }
+    .batch-title { font-size: 26px; font-weight: 700; color: var(--text-dark); margin: 0 0 4px 0; }
+    .batch-course { font-size: 15px; color: var(--text-light); margin: 0; }
 
-    .batch-title {
-        font-size: 26px;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin: 0 0 4px 0;
-    }
-
-    .batch-course {
-        font-size: 15px;
-        color: var(--text-light);
-        margin: 0;
-    }
-
+    /* ── Status badges ── */
     .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 18px;
-        border-radius: 24px;
-        font-size: 14px;
-        font-weight: 600;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 18px; border-radius: 24px;
+        font-size: 14px; font-weight: 600;
     }
+    .status-active  { background: var(--success-light);  color: #234e52; border: 1px solid var(--success-border); }
+    .status-inactive{ background: #fed7d7; color: #742a2a; border: 1px solid #fc8181; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .status-active  .status-dot { background: var(--success); box-shadow: 0 0 0 3px rgba(56,161,105,0.2); }
+    .status-inactive .status-dot { background: var(--danger);  box-shadow: 0 0 0 3px rgba(229,62,62,0.2); }
 
-    .status-active {
-        background: var(--success-light);
-        color: #234e52;
-        border: 1px solid var(--success-border);
-    }
-
-    .status-inactive {
-        background: #fed7d7;
-        color: #742a2a;
-        border: 1px solid #fc8181;
-    }
-
-    .status-dot {
-        width: 10px; height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .status-active .status-dot {
-        background: var(--success);
-        box-shadow: 0 0 0 3px rgba(56,161,105,0.2);
-    }
-
-    .status-inactive .status-dot {
-        background: var(--danger);
-        box-shadow: 0 0 0 3px rgba(229,62,62,0.2);
-    }
-
+    /* ── Content Grid ── */
     .content-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 24px;
-        margin-bottom: 32px;
+        margin-bottom: 24px;
     }
 
+    /* ── Info Cards (shared) ── */
     .info-card {
         background: var(--lighter-blue);
         border: 1px solid var(--border-color);
@@ -319,285 +425,395 @@
         overflow: hidden;
         transition: all 0.3s ease;
     }
-
-    .info-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow);
-    }
+    .info-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 
     .card-header {
         background: var(--white);
         padding: 14px 20px;
         border-bottom: 1px solid var(--border-color);
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        display: flex; align-items: center; gap: 10px;
     }
-
     .card-icon {
-        width: 32px; height: 32px;
-        border-radius: 8px;
-        background: var(--light-blue);
-        border: 1px solid var(--border-color);
+        width: 32px; height: 32px; border-radius: 8px;
+        background: var(--light-blue); border: 1px solid var(--border-color);
         display: inline-flex; align-items: center; justify-content: center;
-        font-size: 13px;
-        color: var(--primary-blue);
-        flex-shrink: 0;
+        font-size: 13px; color: var(--primary-blue); flex-shrink: 0;
     }
-
-    .card-title {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--text-dark);
-        margin: 0;
-        flex: 1;
-    }
-
+    .card-title { font-size: 15px; font-weight: 600; color: var(--text-dark); margin: 0; flex: 1; }
     .count-badge {
-        background: var(--primary-blue);
-        color: white;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 3px 10px;
-        border-radius: 12px;
+        background: var(--primary-blue); color: white;
+        font-size: 11px; font-weight: 700;
+        padding: 3px 10px; border-radius: 12px;
     }
-
     .card-body { padding: 20px; }
 
+    /* ── Info Rows ── */
     .info-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 11px 0;
-        border-bottom: 1px solid var(--border-color);
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 11px 0; border-bottom: 1px solid var(--border-color);
     }
-
     .info-row:last-child { border-bottom: none; padding-bottom: 0; }
     .info-row:first-child { padding-top: 0; }
-
     .info-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13.5px;
-        font-weight: 500;
-        color: var(--text-light);
+        display: flex; align-items: center; gap: 8px;
+        font-size: 13.5px; font-weight: 500; color: var(--text-light);
     }
-
     .label-icon {
-        width: 26px; height: 26px;
-        border-radius: 6px;
+        width: 26px; height: 26px; border-radius: 6px;
         background: var(--light-blue);
         display: inline-flex; align-items: center; justify-content: center;
-        font-size: 11px;
-        color: var(--primary-blue);
-        flex-shrink: 0;
+        font-size: 11px; color: var(--primary-blue); flex-shrink: 0;
     }
+    .info-value { font-size: 13.5px; font-weight: 600; color: var(--text-dark); text-align: right; }
 
-    .info-value {
-        font-size: 13.5px;
-        font-weight: 600;
-        color: var(--text-dark);
-        text-align: right;
-    }
-
+    /* small status badges */
     .status-badge-small {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 11px;
-        border-radius: 16px;
-        font-size: 12px;
-        font-weight: 600;
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 11px; border-radius: 16px; font-size: 12px; font-weight: 600;
     }
-
-    .status-badge-small.status-active {
-        background: var(--success-light);
-        color: #234e52;
-        border: 1px solid var(--success-border);
-    }
-
-    .status-badge-small.status-inactive {
-        background: #fed7d7;
-        color: #742a2a;
-        border: 1px solid #fc8181;
-    }
-
-    .status-dot-small {
-        width: 7px; height: 7px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .status-badge-small.status-active .status-dot-small { background: var(--success); }
+    .status-badge-small.status-active  { background: var(--success-light);  color: #234e52; border: 1px solid var(--success-border); }
+    .status-badge-small.status-inactive{ background: #fed7d7; color: #742a2a; border: 1px solid #fc8181; }
+    .status-dot-small { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .status-badge-small.status-active  .status-dot-small { background: var(--success); }
     .status-badge-small.status-inactive .status-dot-small { background: var(--danger); }
 
+    /* badges */
     .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 5px 11px;
-        border-radius: 14px;
-        font-size: 12px;
-        font-weight: 600;
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 5px 11px; border-radius: 14px; font-size: 12px; font-weight: 600;
     }
-
-    .badge-success {
-        background: var(--success-light);
-        color: #234e52;
-        border: 1px solid var(--success-border);
-    }
-
-    .badge-warning {
-        background: var(--warning-light);
-        color: #744210;
-        border: 1px solid var(--warning-border);
-    }
-
-    .badge-icon {
-        font-size: 11px;
-        display: inline-flex; align-items: center; justify-content: center;
-    }
+    .badge-success { background: var(--success-light); color: #234e52; border: 1px solid var(--success-border); }
+    .badge-warning  { background: var(--warning-light); color: #744210; border: 1px solid var(--warning-border); }
+    .badge-icon { font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
 
     .edit-btn {
-        background: var(--light-blue);
-        border: 1px solid var(--border-color);
-        border-radius: 7px;
+        background: var(--light-blue); border: 1px solid var(--border-color); border-radius: 7px;
         width: 28px; height: 28px;
         display: inline-flex; align-items: center; justify-content: center;
-        font-size: 11px;
-        color: var(--primary-blue);
-        cursor: pointer;
+        font-size: 11px; color: var(--primary-blue); cursor: pointer;
         transition: background 0.18s, color 0.18s;
     }
+    .edit-btn:hover { background: var(--primary-blue); color: #fff; }
 
-    .edit-btn:hover {
-        background: var(--primary-blue);
-        color: #fff;
-    }
-
-    .members-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
+    /* members */
+    .members-list { display: flex; flex-direction: column; gap: 10px; }
     .member-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px;
-        background: var(--white);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px; background: var(--white);
+        border: 1px solid var(--border-color); border-radius: 8px;
         transition: all 0.2s ease;
     }
-
-    .member-item:hover {
-        background: var(--light-blue);
-        transform: translateX(4px);
-    }
-
+    .member-item:hover { background: var(--light-blue); transform: translateX(4px); }
     .member-avatar {
         width: 34px; height: 34px;
         background: linear-gradient(135deg, #0077cc, #00b4d8);
-        color: white;
-        border-radius: 50%;
+        color: white; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        font-weight: 700;
-        font-size: 13px;
-        flex-shrink: 0;
+        font-weight: 700; font-size: 13px; flex-shrink: 0;
     }
-
-    .member-name {
-        font-size: 13.5px;
-        font-weight: 500;
-        color: var(--text-dark);
-    }
+    .member-name { font-size: 13.5px; font-weight: 500; color: var(--text-dark); }
 
     .empty-message {
-        text-align: center;
-        padding: 32px 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
+        text-align: center; padding: 32px 20px;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .empty-icon {
+        width: 52px; height: 52px; border-radius: 12px;
+        background: var(--light-blue); border: 1px solid var(--border-color);
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 20px; color: #93c5fd;
+    }
+    .empty-message p { font-size: 13px; color: var(--text-lighter); margin: 0; font-style: italic; }
+
+    /* ── Scheduled Timings Card (full-width) ── */
+    .schedule-full-card {
+        margin-bottom: 24px;
     }
 
-    .empty-icon {
-        width: 52px; height: 52px;
-        border-radius: 12px;
+    /* "Add Schedule" button inside card header */
+    .btn-add-schedule {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 7px 16px;
+        background: var(--primary-blue); color: #fff;
+        border: none; border-radius: 8px;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+        margin-left: auto;           /* push to the right inside flex header */
+        white-space: nowrap;
+    }
+    .btn-add-schedule:hover {
+        background: var(--blue-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,119,204,0.25);
+    }
+
+    .schedule-card-body { padding: 20px; }
+
+    /* List of schedule rows */
+    .schedule-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .schedule-row {
+        display: flex; align-items: center; gap: 16px;
+        padding: 12px 16px;
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+    .schedule-row:hover { background: var(--light-blue); transform: translateX(4px); }
+
+    /* Day pill */
+    .schedule-day-pill {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 6px 14px;
         background: var(--light-blue);
         border: 1px solid var(--border-color);
+        border-radius: 20px;
+        font-size: 13px; font-weight: 600; color: var(--primary-blue);
+        min-width: 130px; flex-shrink: 0;
+    }
+
+    /* Time block */
+    .schedule-time-block {
+        display: inline-flex; align-items: center; gap: 8px;
+        flex: 1;
+    }
+    .schedule-time-icon {
+        width: 28px; height: 28px; border-radius: 7px;
+        background: var(--lighter-blue); border: 1px solid var(--border-color);
         display: inline-flex; align-items: center; justify-content: center;
-        font-size: 20px;
-        color: #93c5fd;
+        font-size: 12px; color: var(--primary-blue); flex-shrink: 0;
+    }
+    .schedule-time-text {
+        font-size: 13.5px; font-weight: 600; color: var(--text-dark);
     }
 
-    .empty-message p {
-        font-size: 13px;
-        color: var(--text-lighter);
-        margin: 0;
-        font-style: italic;
+    /* Trainer block */
+    .schedule-trainer-block {
+        display: inline-flex; align-items: center; gap: 10px;
+        flex-shrink: 0;
+    }
+    .schedule-trainer-avatar {
+        width: 30px; height: 30px;
+        background: linear-gradient(135deg, #0077cc, #00b4d8);
+        color: white; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 12px; flex-shrink: 0;
+    }
+    .schedule-trainer-name {
+        font-size: 13.5px; font-weight: 500; color: var(--text-dark);
+    }
+    .schedule-unassigned {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 13px; font-style: italic; color: var(--text-lighter);
     }
 
+    /* ── Footer ── */
     .actions-footer {
         padding-top: 24px;
         border-top: 1px solid var(--border-color);
-        display: flex;
-        justify-content: flex-start;
+        display: flex; justify-content: flex-start;
     }
-
     .btn-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
+        display: inline-flex; align-items: center; gap: 8px;
         padding: 10px 20px;
-        background: var(--light-blue);
-        color: var(--primary-blue);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 13.5px;
+        background: var(--light-blue); color: var(--primary-blue);
+        border: 1px solid var(--border-color); border-radius: 8px;
+        text-decoration: none; font-weight: 500; font-size: 13.5px;
         transition: all 0.2s ease;
     }
+    .btn-back:hover { background: var(--primary-blue); color: white; transform: translateY(-2px); box-shadow: var(--shadow-hover); }
 
-    .btn-back:hover {
-        background: var(--primary-blue);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-hover);
+    /* ── Modal overlay ── */
+    .modal-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(15,23,42,0.45); backdrop-filter: blur(5px);
+        z-index: 9999; align-items: center; justify-content: center;
+        padding: 20px;
+    }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ── Modal container ── */
+    .modal-container {
+        background: var(--white);
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 20px 60px rgba(0, 119, 204, 0.18);
+        width: 100%; max-width: 480px;
+        animation: slideUp 0.25s ease;
+        overflow: hidden;
+    }
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
     }
 
+    /* ── Modal header ── */
+    .modal-header {
+        display: flex; align-items: center; gap: 14px;
+        padding: 20px 24px;
+        background: var(--lighter-blue);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .modal-header-icon {
+        width: 42px; height: 42px; border-radius: 11px;
+        background: linear-gradient(135deg, #0077cc, #00b4d8);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 16px; color: #fff;
+        box-shadow: 0 4px 12px rgba(0,119,204,0.28);
+        flex-shrink: 0;
+    }
+    .modal-header-text { flex: 1; }
+    .modal-title {
+        font-size: 16px; font-weight: 700;
+        color: var(--text-dark); margin: 0 0 2px 0;
+    }
+    .modal-subtitle {
+        font-size: 12.5px; color: var(--text-lighter); margin: 0;
+    }
+    .modal-close {
+        width: 32px; height: 32px; border-radius: 8px;
+        background: var(--light-blue); border: 1px solid var(--border-color);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; color: var(--text-light); cursor: pointer;
+        transition: background 0.18s, color 0.18s;
+        flex-shrink: 0;
+    }
+    .modal-close:hover { background: #fed7d7; color: var(--danger); border-color: #fc8181; }
+
+    /* ── Modal body ── */
+    .modal-body { padding: 24px; }
+
+    /* ── Form groups ── */
+    .mform-group {
+        display: flex; flex-direction: column; gap: 7px;
+        margin-bottom: 18px;
+    }
+    .mform-row {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .mform-label {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 13px; font-weight: 600; color: var(--text-light);
+    }
+    .mform-label-icon {
+        width: 24px; height: 24px; border-radius: 6px;
+        background: var(--light-blue); border: 1px solid var(--border-color);
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 10px; color: var(--primary-blue); flex-shrink: 0;
+    }
+    .mform-optional {
+        font-size: 11px; font-weight: 400; color: var(--text-lighter);
+        margin-left: 2px;
+    }
+
+    /* ── Inputs & selects ── */
+    .mform-input,
+    .mform-select {
+        width: 100%; padding: 10px 14px;
+        background: var(--lighter-blue);
+        border: 1.5px solid var(--border-color);
+        border-radius: 9px;
+        font-size: 13.5px; color: var(--text-dark);
+        transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+        outline: none;
+        appearance: none; -webkit-appearance: none;
+        box-sizing: border-box;
+    }
+    .mform-select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230077cc' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 36px;
+    }
+    .mform-input:focus,
+    .mform-select:focus {
+        border-color: var(--primary-blue);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(0,119,204,0.12);
+    }
+    .mform-input:hover,
+    .mform-select:hover {
+        border-color: #93c5fd;
+    }
+
+    /* time input tweak */
+    .mform-input[type="time"]::-webkit-calendar-picker-indicator {
+        opacity: 0.5; cursor: pointer;
+        filter: invert(29%) sepia(93%) saturate(1000%) hue-rotate(185deg);
+    }
+
+    /* ── Form action buttons ── */
+    .mform-actions {
+        display: flex; justify-content: flex-end; gap: 10px;
+        margin-top: 6px; padding-top: 18px;
+        border-top: 1px solid var(--border-color);
+    }
+    .mform-btn-cancel {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 10px 18px;
+        background: var(--light-blue); color: var(--text-light);
+        border: 1px solid var(--border-color); border-radius: 8px;
+        font-size: 13px; font-weight: 500; cursor: pointer;
+        transition: all 0.18s ease;
+    }
+    .mform-btn-cancel:hover {
+        background: #fed7d7; color: var(--danger); border-color: #fc8181;
+    }
+    .mform-btn-submit {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 10px 22px;
+        background: var(--primary-blue); color: #fff;
+        border: none; border-radius: 8px;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+    }
+    .mform-btn-submit:hover {
+        background: var(--blue-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(0,119,204,0.3);
+    }
+
+    @media (max-width: 480px) {
+        .mform-row { grid-template-columns: 1fr; }
+        .mform-actions { flex-direction: column-reverse; }
+        .mform-btn-cancel, .mform-btn-submit { width: 100%; justify-content: center; }
+    }
+
+    /* ── Responsive ── */
     @media (max-width: 768px) {
         .batch-detail-container { margin: 20px; padding: 20px; }
         .batch-header { flex-direction: column; align-items: flex-start; gap: 16px; }
         .content-grid { grid-template-columns: 1fr; gap: 16px; }
         .info-row { flex-direction: column; align-items: flex-start; gap: 8px; }
         .info-value { text-align: left; }
+        .schedule-row { flex-wrap: wrap; gap: 10px; }
+        .schedule-day-pill { min-width: unset; }
+        .btn-add-schedule { padding: 6px 12px; font-size: 12px; }
     }
 </style>
 
 <script>
-  // Map of data-icon names to Font Awesome class names
   const ICON_MAP = {
-    'book-open':              'fa-solid fa-book-open',
-    'circle-info':            'fa-solid fa-circle-info',
-    'pen-to-square':          'fa-solid fa-pen-to-square',
-    'book':                   'fa-solid fa-book',
-    'chart-bar':              'fa-solid fa-chart-bar',
-    'calendar-days':          'fa-solid fa-calendar-days',
-    'rocket':                 'fa-solid fa-rocket',
-    'flag-checkered':         'fa-solid fa-flag-checkered',
-    'stopwatch':              'fa-solid fa-stopwatch',
-    'arrow-trend-up':         'fa-solid fa-arrow-trend-up',
-    'triangle-exclamation':   'fa-solid fa-triangle-exclamation',
-    'check':                  'fa-solid fa-check',
-    'pen':                    'fa-solid fa-pen',
-    'chalkboard-user':        'fa-solid fa-chalkboard-user',
-    'users':                  'fa-solid fa-users',
-    'arrow-left':             'fa-solid fa-arrow-left',
+    'book-open':            'fa-solid fa-book-open',
+    'circle-info':          'fa-solid fa-circle-info',
+    'pen-to-square':        'fa-solid fa-pen-to-square',
+    'book':                 'fa-solid fa-book',
+    'chart-bar':            'fa-solid fa-chart-bar',
+    'calendar-days':        'fa-solid fa-calendar-days',
+    'clock':                'fa-solid fa-clock',
+    'rocket':               'fa-solid fa-rocket',
+    'flag-checkered':       'fa-solid fa-flag-checkered',
+    'stopwatch':            'fa-solid fa-stopwatch',
+    'arrow-trend-up':       'fa-solid fa-arrow-trend-up',
+    'triangle-exclamation': 'fa-solid fa-triangle-exclamation',
+    'check':                'fa-solid fa-check',
+    'pen':                  'fa-solid fa-pen',
+    'chalkboard-user':      'fa-solid fa-chalkboard-user',
+    'users':                'fa-solid fa-users',
+    'arrow-left':           'fa-solid fa-arrow-left',
+    'calendar-xmark':       'fa-solid fa-calendar-xmark',
   };
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -605,12 +821,22 @@
       const name = el.getAttribute('data-icon');
       const classes = ICON_MAP[name];
       if (!classes) return;
-
       const i = document.createElement('i');
       i.className = classes;
       el.appendChild(i);
       el.removeAttribute('data-icon');
     });
+
+    const modal   = document.getElementById("scheduleModal");
+    const openBtn = document.getElementById("openScheduleModalBtn");
+    const closeBtn= document.getElementById("closeScheduleModal");
+
+    const cancelBtn = document.getElementById("cancelScheduleModal");
+    const closeModal = () => modal.classList.remove("active");
+    if (openBtn)    openBtn.addEventListener("click",  () => modal.classList.add("active"));
+    closeBtn.addEventListener("click",  closeModal);
+    if (cancelBtn)  cancelBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
   });
 </script>
 

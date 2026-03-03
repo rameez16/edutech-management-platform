@@ -127,7 +127,7 @@
 
     <div class="courses-grid-refined">
       {% for course in courses %}
-      <a href="{% url 'course_detail' course.id %}" class="course-card-refined">
+      <a href="{% url 'landing_page:course_detail' course.id %}" class="course-card-refined">
         <div class="course-card-content">
           <div class="course-card-header">
             <div class="course-icon-wrapper">

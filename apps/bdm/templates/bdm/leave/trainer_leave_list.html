@@ -1,0 +1,591 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+  :root {
+    --sky-50: #f0f9ff;
+    --sky-100: #e0f2fe;
+    --sky-200: #bae6fd;
+    --sky-300: #7dd3fc;
+    --sky-400: #38bdf8;
+    --sky-500: #0ea5e9;
+    --sky-600: #0284c7;
+    --sky-700: #0369a1;
+    --white: #ffffff;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --green-100: #dcfce7;
+    --green-600: #16a34a;
+    --amber-100: #fef3c7;
+    --amber-600: #d97706;
+    --red-100: #fee2e2;
+    --red-600: #dc2626;
+    --violet-100: #ede9fe;
+    --violet-600: #7c3aed;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--sky-50);
+    color: var(--slate-700);
+  }
+
+  .leave-page {
+    padding: 2.5rem 2rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Header ── */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .page-title-group { line-height: 1; }
+
+  .page-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sky-500);
+    margin-bottom: 0.4rem;
+  }
+
+  .page-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--slate-800);
+    line-height: 1.1;
+  }
+
+  .page-title span {
+    font-style: italic;
+    color: var(--sky-600);
+  }
+
+  .header-stat {
+    background: var(--white);
+    border: 1.5px solid var(--sky-200);
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .header-stat .stat-num {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--sky-600);
+    line-height: 1;
+  }
+
+  .header-stat .stat-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--slate-400);
+    margin-top: 0.25rem;
+  }
+
+  /* ── Filters ── */
+  .filter-bar {
+    background: var(--white);
+    border: 1.5px solid var(--sky-100);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    box-shadow: 0 2px 12px rgba(14,165,233,0.06);
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .filter-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--slate-400);
+  }
+
+  .filter-group input,
+  .filter-group select {
+    border: 1.5px solid var(--sky-200);
+    border-radius: 10px;
+    padding: 0.55rem 0.9rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.88rem;
+    background: var(--sky-50);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .filter-group input:focus,
+  .filter-group select:focus {
+    border-color: var(--sky-400);
+    box-shadow: 0 0 0 3px rgba(14,165,233,0.12);
+    background: var(--white);
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-end;
+  }
+
+  .btn-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-apply {
+    background: var(--sky-500);
+    color: var(--white);
+  }
+  .btn-apply:hover { background: var(--sky-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(14,165,233,0.3); }
+
+  .btn-clear {
+    background: var(--sky-50);
+    color: var(--slate-500);
+    border: 1.5px solid var(--sky-200);
+  }
+  .btn-clear:hover { background: var(--sky-100); color: var(--slate-700); }
+
+  /* ── Status Tabs ── */
+  .status-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    animation: fadeUp 0.5s 0.15s ease both;
+  }
+
+  .status-tab {
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.2s;
+    background: var(--white);
+    border-color: var(--sky-200);
+    color: var(--slate-500);
+  }
+
+  .status-tab:hover { border-color: var(--sky-400); color: var(--sky-600); }
+  .status-tab.active { background: var(--sky-500); color: var(--white); border-color: var(--sky-500); }
+
+  /* ── Table Card ── */
+  .table-card {
+    background: var(--white);
+    border: 1.5px solid var(--sky-100);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(14,165,233,0.07);
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .table-wrapper { overflow-x: auto; }
+
+  table.leave-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .leave-table thead {
+    background: linear-gradient(135deg, var(--sky-50) 0%, var(--sky-100) 100%);
+  }
+
+  .leave-table th {
+    padding: 1rem 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sky-700);
+    text-align: left;
+    border-bottom: 2px solid var(--sky-200);
+    white-space: nowrap;
+  }
+
+  .leave-table td {
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    color: var(--slate-600);
+    border-bottom: 1px solid var(--sky-50);
+    vertical-align: middle;
+  }
+
+  .leave-table tbody tr {
+    transition: background 0.18s;
+  }
+
+  .leave-table tbody tr:hover { background: var(--sky-50); }
+  .leave-table tbody tr:last-child td { border-bottom: none; }
+
+  /* Trainer cell */
+  .trainer-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .trainer-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sky-300), var(--sky-500));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+
+  .trainer-name {
+    font-weight: 500;
+    color: var(--slate-700);
+  }
+
+  /* Leave type pill */
+  .type-pill {
+    display: inline-block;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--sky-100);
+    color: var(--sky-700);
+    letter-spacing: 0.02em;
+  }
+
+  /* Days badge */
+  .days-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 600;
+    color: var(--slate-600);
+    font-size: 0.85rem;
+  }
+
+  /* Status badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .status-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+  }
+
+  .status-badge.approved,
+  .status-badge.APPROVED { background: var(--green-100); color: var(--green-600); }
+
+  .status-badge.pending,
+  .status-badge.PENDING { background: var(--amber-100); color: var(--amber-600); }
+
+  .status-badge.rejected,
+  .status-badge.REJECTED { background: var(--red-100); color: var(--red-600); }
+
+  .status-badge.cancelled,
+  .status-badge.CANCELLED { background: var(--slate-100); color: var(--slate-500); }
+
+  /* View btn */
+  .btn-view {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--sky-50);
+    border: 1.5px solid var(--sky-200);
+    color: var(--sky-600);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-view:hover {
+    background: var(--sky-500);
+    border-color: var(--sky-500);
+    color: var(--white);
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(14,165,233,0.25);
+  }
+
+  /* Empty state */
+  .empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+    color: var(--sky-200);
+    margin-bottom: 1rem;
+  }
+
+  .empty-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.2rem;
+    color: var(--slate-500);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-sub {
+    font-size: 0.85rem;
+    color: var(--slate-400);
+  }
+
+  /* Table footer */
+  .table-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1.5px solid var(--sky-100);
+    background: var(--sky-50);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .result-count {
+    font-size: 0.8rem;
+    color: var(--slate-400);
+    font-weight: 500;
+  }
+
+  .result-count strong { color: var(--sky-600); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .leave-page { padding: 1.25rem 1rem; }
+    .page-title { font-size: 1.5rem; }
+    .filter-bar { flex-direction: column; }
+    .filter-group { min-width: 100%; }
+    .filter-actions { width: 100%; justify-content: flex-end; }
+  }
+</style>
+
+<div class="leave-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <p class="page-eyebrow"><i class="fas fa-calendar-check"></i> &nbsp;HR Dashboard</p>
+      <h1 class="page-title">Leave <span>Applications</span></h1>
+    </div>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+      <div class="header-stat">
+        <div class="stat-num">{{ leaves|length }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="header-stat">
+        <div class="stat-num" style="color:var(--amber-600);">
+          {{ pending_count }}
+        </div>
+        <div class="stat-label">Pending</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <form method="get" class="filter-bar" id="filterForm">
+    <div class="filter-group">
+      <label class="filter-label" for="q"><i class="fas fa-search" style="font-size:0.65rem;"></i> Search Trainer</label>
+      <input type="text" id="q" name="q" placeholder="e.g. John Doe…" value="{{ request.GET.q }}">
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label" for="leave_type">Leave Type</label>
+      <select id="leave_type" name="leave_type">
+  <option value="">All Types</option>
+  {% for value, label in leave_type_choices %}
+      <option value="{{ value }}"
+          {% if request.GET.leave_type == value %}selected{% endif %}>
+          {{ label }}
+      </option>
+  {% endfor %}
+</select>
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label" for="status">Status</label>
+      <select id="status" name="status">
+  <option value="">All Statuses</option>
+  {% for value, label in status_choices %}
+      <option value="{{ value }}"
+          {% if request.GET.status == value %}selected{% endif %}>
+          {{ label }}
+      </option>
+  {% endfor %}
+</select>
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label" for="date_from">From Date</label>
+      <input type="date" id="date_from" name="date_from" value="{{ request.GET.date_from }}">
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label" for="date_to">To Date</label>
+      <input type="date" id="date_to" name="date_to" value="{{ request.GET.date_to }}">
+    </div>
+
+    <div class="filter-actions">
+      <button type="submit" class="btn-filter btn-apply">
+        <i class="fas fa-filter"></i> Apply
+      </button>
+      <a href="{% url 'bdm:trainer_leave_list' %}" class="btn-filter btn-clear">
+        <i class="fas fa-times"></i> Clear
+      </a>
+    </div>
+  </form>
+
+  {% comment %} <!-- Quick status tabs -->
+  <div class="status-tabs">
+    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}" 
+       class="status-tab {% if not request.GET.status %}active{% endif %}">All</a>
+    <a href="?status=PENDING{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+       class="status-tab {% if request.GET.status == 'PENDING' %}active{% endif %}">⏳ Pending</a>
+    <a href="?status=APPROVED{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+       class="status-tab {% if request.GET.status == 'APPROVED' %}active{% endif %}">✓ Approved</a>
+    <a href="?status=REJECTED{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+       class="status-tab {% if request.GET.status == 'REJECTED' %}active{% endif %}">✗ Rejected</a>
+    <a href="?status=CANCELLED{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+       class="status-tab {% if request.GET.status == 'CANCELLED' %}active{% endif %}">◌ Cancelled</a>
+  </div> {% endcomment %}
+
+  <!-- Table -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table class="leave-table">
+        <thead>
+          <tr>
+            <th>Trainer</th>
+            <th>Type</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Days</th>
+            <th>Status</th>
+            <th>View</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for leave in leaves %}
+          <tr>
+            <td>
+              <div class="trainer-cell">
+                <div class="trainer-avatar">
+                  {{ leave.trainer.user.username|slice:":2"|upper }}
+                </div>
+                <span class="trainer-name">{{ leave.trainer.user.username }}</span>
+              </div>
+            </td>
+
+            <td><span class="type-pill">{{ leave.get_leave_type_display }}</span></td>
+
+            <td>{{ leave.start_date|date:"d M Y" }}</td>
+            <td>{{ leave.end_date|date:"d M Y" }}</td>
+
+            <td>
+              <span class="days-badge">
+                <i class="fas fa-moon" style="font-size:0.7rem;color:var(--sky-400);"></i>
+                {{ leave.total_days }}d
+              </span>
+            </td>
+
+            <td>
+              <span class="status-badge {{ leave.status }}">
+                {{ leave.get_status_display }}
+              </span>
+            </td>
+
+            <td>
+              <a href="{% url 'bdm:trainer_leave_detail' leave.id %}" class="btn-view" title="View details">
+                <i class="fas fa-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-calendar-times"></i></div>
+                <p class="empty-title">No leave applications found</p>
+                <p class="empty-sub">Try adjusting your filters or check back later.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if leaves %}
+    <div class="table-footer">
+      <span class="result-count">Showing <strong>{{ leaves|length }}</strong> application{% if leaves|length != 1 %}s{% endif %}</span>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}

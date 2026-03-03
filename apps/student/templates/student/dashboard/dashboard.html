@@ -103,61 +103,76 @@
     <!-- TOP STATS GRID (ALL CARDS IN ONE ROW) -->
     <section class="stats-grid">
 
-        <!-- Student Profile Card -->
+
+        <!--profile card -->
         <div class="glass-card glass-card-3d stat-card profile-card">
-            <div class="stat-card-inner">
-                <div class="stat-info">
+    <div class="stat-card-inner">
+        <div class="stat-info">
+
+            <p class="profile-card-label">Profile</p>
+
+            <div class="profile-card-body">
+                <div class="profile-details">
                     <div class="stat-value">{{ student.full_name }}</div>
-
-                    <h3>
-                        Student ID:
-                        {% if admin_profile %}
-                            {{ admin_profile.student_code }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </h3>
-
+                    <h3>ID: {% if admin_profile %}{{ admin_profile.student_code }}{% else %}N/A{% endif %}</h3>
                     <span class="stat-change {% if user.is_active %}positive{% else %}inactive{% endif %}">
-                        {% if user.is_active %}
-                            Active Student
-                        {% else %}
-                            Inactive
-                        {% endif %}
+                        {% if user.is_active %}Active Student{% else %}Inactive{% endif %}
                     </span>
                 </div>
             </div>
+
         </div>
+    </div>
+</div>
+
+        
+
 
         <!-- Batch Info Card -->
-        <div class="glass-card glass-card-3d stat-card batch-info-card">
-            <div class="stat-card-inner">
-                <div class="stat-info">
-                    {% if batch %}
+<div class="glass-card glass-card-3d stat-card batch-info-card">
+    <div class="stat-card-inner">
+        <div class="stat-info">
+
+            <p class="batch-card-label">Batch Info</p>
+
+            {% if batch %}
+                <div class="batch-card-body">
+                    <div class="batch-details">
                         <div class="stat-value">{{ batch.name }}</div>
                         <h3>{{ batch.course.name }}</h3>
 
                         {% if batch.trainers.exists %}
                             {% for trainer in batch.trainers.all %}
                                 <span class="stat-change positive">
-                                    👤 Trainer: {{ trainer.full_name|default:trainer.user.get_full_name|default:trainer.user.username }}
+                                    Trainer :  {{ trainer.full_name|default:trainer.user.get_full_name|default:trainer.user.username }}
                                 </span>
                             {% endfor %}
                         {% else %}
-                            <span class="stat-change inactive">
-                                👤 Trainer: Not assigned
-                            </span>
+                            <span class="stat-change inactive">👤 No Trainer</span>
                         {% endif %}
-                    {% else %}
+
+                        <span class="stat-change batch-date">
+                            📅 {{ batch.start_date|date:"d M Y" }}
+                        </span>
+
+                        <a href="{% url 'student:batch_details' %}" class="batch-card-link">
+                            View Batch Details →
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="batch-card-body">
+                    <div class="batch-details">
                         <div class="stat-value">No Active Batch</div>
                         <h3>Not Enrolled</h3>
-                        <span class="stat-change inactive">
-                            You are not enrolled in any batch
-                        </span>
-                    {% endif %}
+                        <span class="stat-change inactive">Not enrolled in any batch</span>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
+
         </div>
+    </div>
+</div>
 
         <!-- PAYMENT STATUS CARD -->
 <div class="glass-card stat-card payment-smart-card">

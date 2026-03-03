@@ -1,0 +1,32 @@
+{% extends 'student/layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'student/css/payment_plan.css' %}">
+
+<div class="payment-container glass-card">
+
+    <div class="payment-header">
+        <h2>Post Dated Cheque (PDC)</h2>
+
+        <div class="student-info">
+            <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ student.user.email }}</p>
+        </div>
+    </div>
+
+    <div class="payment-mode-switch">
+        <span>Payment Mode:</span>
+        <div class="mode-tabs">
+            <span class="mode-btn active">
+                {{ admission.get_payment_plan_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="note">
+        <p>Please submit post-dated cheques to the admin office.</p>
+    </div>
+
+</div>
+{% endblock %}
