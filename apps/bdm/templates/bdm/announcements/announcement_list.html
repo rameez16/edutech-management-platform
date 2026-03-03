@@ -1,0 +1,350 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* Reusing your exact theme variables */
+:root {
+  --bg: #f0f5fc;
+  --surface: #ffffff;
+  --border: #d1e0f5;
+  --text-primary: #1a2333;
+  --text-secondary: #5a6a84;
+  --accent: #4a90d9;
+  --accent-light: #dbeafe;
+  --accent-mid: #93c5fd;
+  --accent-dark: #2563eb;
+  --danger: #dc2626;
+  --warning: #f59e0b;
+  --success: #16a34a;
+  --radius: 14px;
+  --shadow: 0 2px 12px rgba(74,144,217,0.08);
+}
+
+.announcement-wrapper {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  padding: 40px 24px 80px;
+}
+
+/* HEADER */
+.page-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+  margin-bottom:30px;
+}
+
+.header-left {
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.header-icon {
+  width:48px;height:48px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#f59e0b,#fbbf24);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:20px;
+  box-shadow:0 4px 14px rgba(245,158,11,0.3);
+}
+
+.header-text h1 {
+  font-family:'Sora',sans-serif;
+  font-size:21px;
+  font-weight:700;
+}
+
+.header-text p {
+  font-size:13px;
+  color:var(--text-secondary);
+}
+
+.header-count {
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:7px 16px;
+  border-radius:999px;
+  font-size:13px;
+  box-shadow:var(--shadow);
+}
+
+.btn-create {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 18px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#2563eb,#4a90d9);
+  border:none;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(37,99,235,0.35);
+}
+
+/* GRID */
+.announcement-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* CARD */
+.announcement-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  box-shadow:var(--shadow);
+  transition:0.25s;
+}
+
+.announcement-card:hover {
+  transform:translateY(-4px);
+  box-shadow:0 10px 30px rgba(74,144,217,0.15);
+}
+
+.card-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.badge-important {
+  background:#fee2e2;
+  color:var(--danger);
+  font-size:11px;
+  font-weight:700;
+  padding:4px 10px;
+  border-radius:999px;
+}
+
+.badge-audience {
+  background:var(--accent-light);
+  color:var(--accent-dark);
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:600;
+}
+
+.card-title {
+  font-family:'Sora',sans-serif;
+  font-size:15px;
+  font-weight:600;
+}
+
+.card-message {
+  font-size:13px;
+  color:var(--text-secondary);
+  line-height:1.6;
+}
+
+.card-meta {
+  font-size:12px;
+  color:var(--text-secondary);
+  border-top:1px solid var(--border);
+  padding-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+/* MODAL SAME STYLE AS COURSE */
+.modal-overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  opacity:0;
+  visibility:hidden;
+  transition:0.25s;
+}
+
+.modal-overlay.active {
+  opacity:1;
+  visibility:visible;
+}
+
+.modal-container {
+  background:#fff;
+  width:100%;
+  max-width:520px;
+  border-radius:16px;
+  padding:22px;
+}
+
+.form-group { margin-bottom:14px; }
+
+.form-label {
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:6px;
+  display:block;
+}
+
+.form-input {
+  width:100%;
+  padding:8px 11px;
+  border-radius:8px;
+  border:1.5px solid var(--border);
+  font-size:13px;
+}
+
+.modal-footer {
+  margin-top:16px;
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+}
+
+.btn-cancel {
+  padding:8px 16px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:#fff;
+}
+
+.btn-submit {
+  padding:8px 18px;
+  border:none;
+  border-radius:8px;
+  background:linear-gradient(135deg,#2563eb,#4a90d9);
+  color:#fff;
+  font-weight:600;
+}
+</style>
+
+<div class="announcement-wrapper">
+
+<div class="page-header">
+  <div class="header-left">
+    <div class="header-icon">
+      <i class="fas fa-bullhorn"></i>
+    </div>
+    <div class="header-text">
+      <h1>Announcement Management</h1>
+      <p>Manage and publish announcements</p>
+    </div>
+  </div>
+
+  {% if announcements %}
+  <div class="header-count">
+    {{ announcements|length }} announcement{{ announcements|length|pluralize }}
+  </div>
+  {% endif %}
+
+  <button class="btn-create" id="openModal">
+    <i class="fas fa-plus"></i> Create Announcement
+  </button>
+</div>
+
+<div class="announcement-grid">
+{% for announcement in announcements %}
+  <div class="announcement-card">
+
+    <div class="card-top">
+      {% if announcement.is_important %}
+        <span class="badge-important">
+          <i class="fas fa-exclamation-circle"></i> Important
+        </span>
+      {% endif %}
+
+      <span class="badge-audience">
+        {{ announcement.get_audience_display }}
+      </span>
+    </div>
+
+    <div class="card-title">
+      {{ announcement.title }}
+    </div>
+
+    <div class="card-message">
+      {{ announcement.message|truncatechars:150 }}
+    </div>
+
+    <div class="card-meta">
+      <div><i class="fas fa-calendar"></i> Published: {{ announcement.publish_date|date:"M d, Y" }}</div>
+      {% if announcement.expiry_date %}
+      <div><i class="fas fa-clock"></i> Expires: {{ announcement.expiry_date|date:"M d, Y" }}</div>
+      {% endif %}
+    </div>
+
+  </div>
+{% empty %}
+  <p>No announcements yet.</p>
+{% endfor %}
+</div>
+
+</div>
+
+<!-- CREATE MODAL -->
+<div class="modal-overlay" id="announcementModal">
+  <div class="modal-container">
+    <form method="post" action="{% url 'bdm:announcement_create' %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" name="title" class="form-input" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea name="message" class="form-input" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Audience</label>
+        <select name="audience" class="form-input">
+          <option value="students">Students</option>
+          <option value="trainers">Trainers</option>
+          <option value="both">Both</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="is_important">
+          Mark as Important
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Expiry Date</label>
+        <input type="datetime-local" name="expiry_date" class="form-input">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" id="closeModal">Cancel</button>
+        <button type="submit" class="btn-submit">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const openBtn = document.getElementById('openModal');
+const closeBtn = document.getElementById('closeModal');
+const modal = document.getElementById('announcementModal');
+
+openBtn.onclick = () => modal.classList.add('active');
+closeBtn.onclick = () => modal.classList.remove('active');
+modal.onclick = e => { if(e.target === modal) modal.classList.remove('active'); };
+</script>
+
+{% endblock %}

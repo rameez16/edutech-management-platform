@@ -1,0 +1,75 @@
+{% extends "student/layout/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'student/css/certificate.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="certificate-wrapper">
+
+    <div class="certificate-card">
+
+        <h2 class="certificate-title">🎓 Certificate</h2>
+
+        {% if certificate %}
+
+            <div class="certificate-details">
+
+                <div class="detail-row">
+                    <span class="label">Student Name:</span>
+                    <span class="value">{{ student.full_name }}</span>
+                </div>
+
+                
+
+                <div class="detail-row">
+                    <span class="label">Certificate No:</span>
+                    <span class="value">{{ certificate.certificate_number }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Course:</span>
+                    <span class="value">{{ certificate.batch.course.name }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Issued Date:</span>
+                    <span class="value">{{ certificate.issue_date }}</span>
+                </div>
+
+            </div>
+
+            {% if certificate.certificate_file %}
+                <div class="button-group">
+
+                    <a href="{{ certificate.certificate_file.url }}"
+                       target="_blank"
+                       class="btn btn-view">
+                        👁 View Certificate
+                    </a>
+
+                    <a href="?download=1"
+                       class="btn btn-download">
+                        ⬇ Download Certificate
+                    </a>
+
+                </div>
+            {% else %}
+                <div class="alert warning">
+                    Certificate file not uploaded yet.
+                </div>
+            {% endif %}
+
+        {% else %}
+            <div class="alert info">
+                Certificate not available or not eligible yet.
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -11,16 +11,12 @@ Leads Management
 View, assign, and manage all leads
 {% endblock %}
 
-   
-   
-{% block extra_css %} 
-    <!-- Font Awesome for icons -->
+{% block extra_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        /* Scoped styles - only affect content within .leads-page-wrapper */
         .leads-page-wrapper {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;        }
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
 
         .leads-page-wrapper * {
             margin: 0;
@@ -54,19 +50,89 @@ View, assign, and manage all leads
             --shadow-colored: 0 8px 32px rgba(14, 165, 233, 0.15);
         }
 
-        /* Remove custom navbar - use base template's navbar */
-        .leads-page-wrapper .navbar {
-            display: none;
-        }
+        .leads-page-wrapper .navbar { display: none; }
 
-        /* Main Container */
         .leads-page-wrapper .container {
-           
             margin: 0 auto;
-            /* padding: 1rem 1.5rem; */
         }
 
-        /* Header */
+        /* ── Counselor Welcome Banner ── */
+        .counselor-banner {
+            background: linear-gradient(120deg, var(--primary-dark) 0%, var(--accent) 100%);
+            border-radius: 14px;
+            padding: 1.5rem 2rem;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .counselor-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .counselor-banner-left { position: relative; z-index: 1; }
+        .counselor-banner-left h2 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+        }
+        .counselor-banner-left p {
+            font-size: 0.8125rem;
+            opacity: 0.85;
+        }
+
+        .counselor-banner-right {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .counselor-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .counselor-meta { text-align: right; }
+        .counselor-meta .role-tag {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            padding: 0.2rem 0.5rem;
+        }
+        .counselor-meta .dept {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        /* ── Page Header ── */
         .leads-page-wrapper .page-header {
             margin-bottom: 1.5rem;
             animation: fadeInUp 0.6s ease;
@@ -88,7 +154,7 @@ View, assign, and manage all leads
             font-size: 0.875rem;
         }
 
-        /* Stats Cards */
+        /* ── Stats Grid ── */
         .leads-page-wrapper .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -110,9 +176,7 @@ View, assign, and manage all leads
         .leads-page-wrapper .stat-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 4px;
             background: linear-gradient(90deg, var(--primary), var(--accent));
             transform: scaleX(0);
@@ -122,10 +186,8 @@ View, assign, and manage all leads
         .leads-page-wrapper .stat-card::after {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
+            top: -50%; right: -50%;
+            width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
             opacity: 0;
             transition: opacity 0.4s ease;
@@ -137,49 +199,24 @@ View, assign, and manage all leads
             border-color: var(--primary-light);
         }
 
-        .leads-page-wrapper .stat-card:hover::before {
-            transform: scaleX(1);
-        }
+        .leads-page-wrapper .stat-card:hover::before { transform: scaleX(1); }
+        .leads-page-wrapper .stat-card:hover::after  { opacity: 1; }
 
-        .leads-page-wrapper .stat-card:hover::after {
-            opacity: 1;
-        }
+        .leads-page-wrapper .stat-card.new          { border-color: rgba(6,182,212,0.3); }
+        .leads-page-wrapper .stat-card.new::before  { background: linear-gradient(90deg, var(--info), var(--info-light)); }
+        .leads-page-wrapper .stat-card.new:hover    { box-shadow: 0 12px 40px rgba(6,182,212,0.2); }
 
-        .leads-page-wrapper .stat-card.new {
-            border-color: rgba(6, 182, 212, 0.3);
-        }
+        .leads-page-wrapper .stat-card.follow-up         { border-color: rgba(245,158,11,0.3); }
+        .leads-page-wrapper .stat-card.follow-up::before { background: linear-gradient(90deg, var(--warning), var(--warning-light)); }
+        .leads-page-wrapper .stat-card.follow-up:hover   { box-shadow: 0 12px 40px rgba(245,158,11,0.2); }
 
-        .leads-page-wrapper .stat-card.new:hover {
-            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.2);
-        }
+        .leads-page-wrapper .stat-card.converted         { border-color: rgba(16,185,129,0.3); }
+        .leads-page-wrapper .stat-card.converted::before { background: linear-gradient(90deg, var(--success), var(--success-light)); }
+        .leads-page-wrapper .stat-card.converted:hover   { box-shadow: 0 12px 40px rgba(16,185,129,0.2); }
 
-        .leads-page-wrapper .stat-card.new::before { 
-            background: linear-gradient(90deg, var(--info), var(--info-light)); 
-        }
-        
-        .leads-page-wrapper .stat-card.follow-up {
-            border-color: rgba(245, 158, 11, 0.3);
-        }
-
-        .leads-page-wrapper .stat-card.follow-up:hover {
-            box-shadow: 0 12px 40px rgba(245, 158, 11, 0.2);
-        }
-
-        .leads-page-wrapper .stat-card.follow-up::before { 
-            background: linear-gradient(90deg, var(--warning), var(--warning-light)); 
-        }
-        
-        .leads-page-wrapper .stat-card.converted {
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        .leads-page-wrapper .stat-card.converted:hover {
-            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.2);
-        }
-
-        .leads-page-wrapper .stat-card.converted::before { 
-            background: linear-gradient(90deg, var(--success), var(--success-light)); 
-        }
+        .leads-page-wrapper .stat-card.rate         { border-color: rgba(139,92,246,0.3); }
+        .leads-page-wrapper .stat-card.rate::before { background: linear-gradient(90deg, var(--purple), #a855f7); }
+        .leads-page-wrapper .stat-card.rate:hover   { box-shadow: 0 12px 40px rgba(139,92,246,0.2); }
 
         .leads-page-wrapper .stat-header {
             display: flex;
@@ -189,33 +226,35 @@ View, assign, and manage all leads
         }
 
         .leads-page-wrapper .stat-icon {
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 1.35rem;
-            position: relative;
-            z-index: 1;
+            position: relative; z-index: 1;
         }
 
         .leads-page-wrapper .stat-card.new .stat-icon {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(34, 211, 238, 0.1));
+            background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(34,211,238,0.1));
             color: var(--info);
-            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.2);
+            box-shadow: 0 4px 16px rgba(6,182,212,0.2);
         }
 
         .leads-page-wrapper .stat-card.follow-up .stat-icon {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.1));
             color: var(--warning);
-            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+            box-shadow: 0 4px 16px rgba(245,158,11,0.2);
         }
 
         .leads-page-wrapper .stat-card.converted .stat-icon {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(52,211,153,0.1));
             color: var(--success);
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 16px rgba(16,185,129,0.2);
+        }
+
+        .leads-page-wrapper .stat-card.rate .stat-icon {
+            background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(168,85,247,0.1));
+            color: var(--purple);
+            box-shadow: 0 4px 16px rgba(139,92,246,0.2);
         }
 
         .leads-page-wrapper .stat-count {
@@ -227,8 +266,7 @@ View, assign, and manage all leads
             -webkit-text-fill-color: transparent;
             background-clip: text;
             line-height: 1;
-            position: relative;
-            z-index: 1;
+            position: relative; z-index: 1;
         }
 
         .leads-page-wrapper .stat-label {
@@ -247,15 +285,11 @@ View, assign, and manage all leads
             margin-top: 0.5rem;
         }
 
-        .leads-page-wrapper .stat-change.positive {
-            color: var(--success);
-        }
+        .leads-page-wrapper .stat-change.positive { color: var(--success); }
+        .leads-page-wrapper .stat-change.neutral   { color: var(--text-light); }
+        .leads-page-wrapper .stat-change.purple    { color: var(--purple); }
 
-        .leads-page-wrapper .stat-change.neutral {
-            color: var(--text-light);
-        }
-
-        /* Filter Section */
+        /* ── Filter Section ── */
         .leads-page-wrapper .filter-section {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -263,7 +297,7 @@ View, assign, and manage all leads
             padding: 1.25rem;
             margin-bottom: 1.5rem;
             animation: fadeInUp 0.6s ease 0.2s backwards;
-            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+            box-shadow: 0 4px 16px rgba(59,130,246,0.08);
             position: relative;
             overflow: hidden;
         }
@@ -271,9 +305,7 @@ View, assign, and manage all leads
         .leads-page-wrapper .filter-section::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 3px;
             background: linear-gradient(90deg, var(--primary), var(--accent), var(--info));
             background-size: 200% 100%;
@@ -281,8 +313,8 @@ View, assign, and manage all leads
         }
 
         @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
@@ -347,7 +379,7 @@ View, assign, and manage all leads
         .leads-page-wrapper .search-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
         }
 
         .leads-page-wrapper .search-wrapper {
@@ -395,13 +427,13 @@ View, assign, and manage all leads
         .leads-page-wrapper .btn-primary {
             background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }
 
         .leads-page-wrapper .btn-primary:hover {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 6px 20px rgba(59,130,246,0.4);
         }
 
         .leads-page-wrapper .btn-secondary {
@@ -413,13 +445,10 @@ View, assign, and manage all leads
         .leads-page-wrapper .btn-secondary:hover {
             background: var(--bg-secondary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.15);
         }
 
-        .leads-page-wrapper .btn-filter {
-            padding: 0.5rem 1rem;
-            font-size: 0.8125rem;
-        }
+        .leads-page-wrapper .btn-filter { padding: 0.5rem 1rem; font-size: 0.8125rem; }
 
         .leads-page-wrapper .clear-filters {
             color: var(--text-light);
@@ -433,16 +462,13 @@ View, assign, and manage all leads
             gap: 0.35rem;
         }
 
-        .leads-page-wrapper .clear-filters:hover {
-            color: var(--primary);
-        }
+        .leads-page-wrapper .clear-filters:hover { color: var(--primary); }
 
-        /* Filter info display */
         .leads-page-wrapper .filter-result-info {
             margin-bottom: 1rem;
             padding: 0.625rem 1rem;
             border-radius: 8px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.08));
+            background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(14,165,233,0.08));
             color: var(--text);
             font-size: 0.8125rem;
             font-weight: 600;
@@ -452,11 +478,9 @@ View, assign, and manage all leads
             border-left: 3px solid var(--primary);
         }
 
-        .leads-page-wrapper .filter-result-info i {
-            color: var(--primary);
-        }
+        .leads-page-wrapper .filter-result-info i { color: var(--primary); }
 
-        /* Leads Table */
+        /* ── Leads Table ── */
         .leads-page-wrapper .leads-section {
             animation: fadeInUp 0.6s ease 0.3s backwards;
         }
@@ -489,17 +513,14 @@ View, assign, and manage all leads
             border: 1px solid var(--border);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+            box-shadow: 0 4px 16px rgba(59,130,246,0.08);
         }
 
-        .leads-page-wrapper table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .leads-page-wrapper table { width: 100%; border-collapse: collapse; }
 
         .leads-page-wrapper thead {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.08));
-            border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+            background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(14,165,233,0.08));
+            border-bottom: 2px solid rgba(59,130,246,0.2);
         }
 
         .leads-page-wrapper th {
@@ -518,25 +539,10 @@ View, assign, and manage all leads
             font-size: 0.8125rem;
         }
 
-        .leads-page-wrapper tbody tr {
-            transition: all 0.3s ease;
-            position: relative;
-        }
+        .leads-page-wrapper tbody tr { transition: all 0.3s ease; }
+        .leads-page-wrapper tbody tr:hover { background: rgba(59,130,246,0.03); }
 
-        .leads-page-wrapper tbody tr:hover {
-            background: rgba(59, 130, 246, 0.03);
-        }
-
-        .leads-page-wrapper .lead-name {
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .leads-page-wrapper .lead-company {
-            color: var(--text-light);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
+        .leads-page-wrapper .lead-name { font-weight: 700; color: var(--text); }
 
         .leads-page-wrapper .status-badge {
             display: inline-flex;
@@ -548,40 +554,13 @@ View, assign, and manage all leads
             transition: all 0.3s ease;
         }
 
-        .leads-page-wrapper .status-badge:hover {
-            transform: translateY(-1px);
-        }
-        
-        .status-badge.new {
-    background: rgba(6, 182, 212, 0.1);
-    color: var(--info);
-    border: 1px solid rgba(6, 182, 212, 0.3);
-}
+        .leads-page-wrapper .status-badge:hover { transform: translateY(-1px); }
 
-.status-badge.assigned {
-    background: rgba(249, 115, 22, 0.1); /* light orange background */
-    color: var(--orange); /* orange text */
-    border: 1px solid rgba(249, 115, 22, 0.3);
-}
-
-
-        .leads-page-wrapper .status-badge.follow-up {
-            background: rgba(245, 158, 11, 0.1);
-            color: #d97706;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
-        .leads-page-wrapper .status-badge.converted {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .leads-page-wrapper .status-badge.lost {
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
+        .status-badge.new       { background: rgba(6,182,212,0.1);   color: var(--info);    border: 1px solid rgba(6,182,212,0.3); }
+        .status-badge.assigned  { background: rgba(249,115,22,0.1);  color: var(--orange);  border: 1px solid rgba(249,115,22,0.3); }
+        .status-badge.follow-up { background: rgba(245,158,11,0.1);  color: #d97706;        border: 1px solid rgba(245,158,11,0.3); }
+        .status-badge.converted { background: rgba(16,185,129,0.1);  color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+        .status-badge.lost      { background: rgba(239,68,68,0.1);   color: #dc2626;        border: 1px solid rgba(239,68,68,0.3); }
 
         .leads-page-wrapper .btn-view {
             padding: 0.5rem 0.875rem;
@@ -603,16 +582,11 @@ View, assign, and manage all leads
             background: var(--primary);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }
 
-        .leads-page-wrapper .btn-view:hover i {
-            transform: scale(1.1);
-        }
-
-        .leads-page-wrapper .btn-view i {
-            transition: transform 0.3s ease;
-        }
+        .leads-page-wrapper .btn-view i { transition: transform 0.3s ease; }
+        .leads-page-wrapper .btn-view:hover i { transform: scale(1.1); }
 
         .leads-page-wrapper .btn-assign {
             padding: 0.5rem 0.875rem;
@@ -623,7 +597,7 @@ View, assign, and manage all leads
             border: none;
             color: white;
             background: linear-gradient(135deg, var(--success), var(--success-light));
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
@@ -632,130 +606,65 @@ View, assign, and manage all leads
 
         .leads-page-wrapper .btn-assign:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 6px 20px rgba(16,185,129,0.4);
         }
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .leads-page-wrapper .container {
-                padding: 1rem 0.75rem;
-            }
-
-            .leads-page-wrapper .page-title {
-                font-size: 1.5rem;
-            }
-
-            .leads-page-wrapper .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .leads-page-wrapper .filter-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .leads-page-wrapper .leads-table {
-                overflow-x: auto;
-            }
-
-            .leads-page-wrapper table {
-                min-width: 700px;
-            }
-
-            .leads-page-wrapper .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-
-
-        /* Mobile fix for Create Lead modal */
-@media (max-width: 640px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-group.full-width {
-        grid-column: span 1;
-    }
-}
-
+        /* ── Modals ── */
         .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
 
-.modal-card {
-    background: #fff;
-    width: 100%;
-    max-width: 600px;   /* slightly wider */
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-}
+        .modal-card {
+            background: #fff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
 
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .close-btn {
+            font-size: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
 
-.close-btn {
-    font-size: 22px;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-top: 15px;
-}
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: span 2; }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
+        .form-group label { font-weight: 600; margin-bottom: 5px; }
 
-.form-group.full-width {
-    grid-column: span 2;
-}
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
 
-.form-group label {
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.form-select {
+        .form-select {
             flex: 1;
             min-width: 180px;
             padding: 0.625rem 0.875rem;
@@ -768,42 +677,153 @@ View, assign, and manage all leads
             transition: all 0.3s ease;
         }
 
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 15px;
-}
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
 
+        /* ── Animations ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .leads-page-wrapper .container { padding: 1rem 0.75rem; }
+            .leads-page-wrapper .page-title { font-size: 1.5rem; }
+            .leads-page-wrapper .stats-grid { grid-template-columns: 1fr; }
+            .leads-page-wrapper .filter-grid { grid-template-columns: 1fr; }
+            .leads-page-wrapper .leads-table { overflow-x: auto; }
+            .leads-page-wrapper table { min-width: 700px; }
+            .leads-page-wrapper .section-header { flex-direction: column; align-items: flex-start; }
+            .counselor-banner { flex-direction: column; }
+            .counselor-meta { text-align: left; }
+        }
+
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: span 1; }
+        }
     </style>
 {% endblock %}
 
+
+{# ── Page Action Buttons (top right) ── #}
 {% block page_actions %}
     <a href="#all-leads" class="btn btn-secondary">
-        <i class="fas fa-list"></i>
-        View All Leads
+        <i class="fas fa-list"></i> View All Leads
     </a>
+    {% if not is_counselor %}
     <button class="btn btn-primary" onclick="openLeadModal()">
-    <i class="fas fa-plus"></i> Create New Lead
-</button>
+        <i class="fas fa-plus"></i> Create New Lead
+    </button>
+    {% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
 <a href="{% url 'bdm:leads' %}">Leads</a>
 {% endblock %}
 
+
 {% block content %}
 <div class="leads-page-wrapper">
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Track, manage, and convert your leads effectively</h1>
-           
-        </div>
+<div class="container">
 
-        <!-- Stats Cards -->
-        <div class="stats-grid">
+    {# ── Counselor Welcome Banner ── #}
+    {% if is_counselor %}
+    <div class="counselor-banner">
+        <div class="counselor-banner-left">
+            <h2>Welcome back, {{ request.user.get_full_name|default:request.user.username }} 👋</h2>
+            <p>
+                Here are all the leads assigned to you.
+                {% if counselor_profile %}
+                    · {{ counselor_profile.department }}
+                {% endif %}
+            </p>
+        </div>
+        <div class="counselor-banner-right">
+            <div class="counselor-meta">
+                <div class="role-tag">Counselor</div>
+                {% if counselor_profile %}
+                <div class="dept">{{ counselor_profile.department }}</div>
+                {% endif %}
+            </div>
+            <div class="counselor-avatar">
+                {{ request.user.get_full_name|default:request.user.username|first|upper }}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    {# ── Admin Page Header ── #}
+    <div class="page-header">
+        <h1 class="page-title">Track, manage, and convert your leads effectively</h1>
+    </div>
+    {% endif %}
+
+
+    {# ── Stats Cards ── #}
+    <div class="stats-grid">
+
+        {% if is_counselor %}
+            {# ── Counselor Stats ── #}
+
+            {# My Assigned Leads #}
+            <div class="stat-card new">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-count">{{ assigned_leads_count }}</div>
+                        <div class="stat-label">My Assigned Leads</div>
+                        <div class="stat-change neutral">
+                            <i class="fas fa-user-check"></i>
+                            <span>Active pipeline</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-user-tag"></i>
+                    </div>
+                </div>
+            </div>
+
+            {# My Conversions #}
+            <div class="stat-card converted">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-count">{{ converted_leads_count }}</div>
+                        <div class="stat-label">My Conversions</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Keep it up!</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            {# Conversion Rate #}
+            <div class="stat-card rate">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-count">{{ conversion_rate }}%</div>
+                        <div class="stat-label">My Conversion Rate</div>
+                        <div class="stat-change purple">
+                            <i class="fas fa-chart-line"></i>
+                            <span>{{ total_leads }} total leads</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                </div>
+            </div>
+
+        {% else %}
+            {# ── Admin Stats ── #}
+
             <div class="stat-card new">
                 <div class="stat-header">
                     <div>
@@ -814,9 +834,7 @@ View, assign, and manage all leads
                             <span>12% this week</span>
                         </div>
                     </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
                 </div>
             </div>
 
@@ -830,9 +848,7 @@ View, assign, and manage all leads
                             <span>No change</span>
                         </div>
                     </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
                 </div>
             </div>
 
@@ -846,210 +862,226 @@ View, assign, and manage all leads
                             <span>8% this month</span>
                         </div>
                     </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 </div>
+            </div>
+
+        {% endif %}
+    </div>{# /stats-grid #}
+
+
+    {# ── Filter Section ── #}
+    <div class="filter-section">
+        <div class="filter-header">
+            <div class="filter-title">
+                <i class="fas fa-filter"></i>
+                Filter Leads
             </div>
         </div>
 
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="filter-header">
-                <div class="filter-title">
-                    <i class="fas fa-filter"></i>
-                    Filter Leads
-                </div>
-            </div>
-
-            <form method="GET" action="{% url 'bdm:leads' %}" id="filterForm">
-                <div class="filter-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Status</label>
-                        <select class="filter-select" name="status" id="statusFilter">
-                            <option value="">All Status</option>
-                            {% for key, value in status_choices %}
-                            <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>
-                                {{ value }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">Course</label>
-                        <select class="filter-select" name="course" id="courseFilter">
-                            <option value="">All Courses</option>
-                            {% for course in courses %}
-                            <option value="{{ course.id }}" {% if request.GET.course == course.id|stringformat:"s" %}selected{% endif %}>
-                                {{ course.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">Mode</label>
-                        <select class="filter-select" name="mode" id="modeFilter">
-                            <option value="">All Modes</option>
-                            {% for key, value in mode_choices %}
-                            <option value="{{ key }}" {% if request.GET.mode == key %}selected{% endif %}>
-                                {{ value }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">Date From</label>
-                        <input type="date" class="filter-select" name="date_from" id="dateFrom" 
-                            value="{{ request.GET.date_from }}">
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">Date To</label>
-                        <input type="date" class="filter-select" name="date_to" id="dateTo" 
-                            value="{{ request.GET.date_to }}">
-                    </div>
-
-                    <div class="search-wrapper">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" name="search" id="searchInput"
-                            placeholder="Search leads by name, email, or phone..." 
-                            value="{{ request.GET.search }}">
-                    </div>
-                </div>
-
-                <div class="filter-actions">
-                    <a href="{% url 'bdm:leads' %}" class="clear-filters">
-                        <i class="fas fa-times"></i> Clear Filters
-                    </a>
-                    <button type="submit" class="btn btn-primary btn-filter">
-                        <i class="fas fa-search"></i>
-                        Search & Filter
-                    </button>
-                </div>
-            </form>
-        
-            {% if request.GET.search or request.GET.status or request.GET.course or request.GET.mode or request.GET.date_from or request.GET.date_to %}
-            <div class="filter-result-info">
-                <i class="fas fa-info-circle"></i>
-                <span>
-                    {{ filtered_count }} result{{ leads.count|pluralize }} found
-                    {% if request.GET.search %}
-                        for "<strong>{{ request.GET.search }}</strong>"
-                    {% endif %}
-                </span> 
-            </div>
-                
-            <div class="leads-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Course</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Mode</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lead in filtered_leads %}
-                        <tr>
-                            <td>{{ lead.name }}</td>
-                            <td>{{ lead.preferred_course.name|default:"—" }}</td>
-                            <td>{{ lead.email }}</td>
-                            <td>
-                                <span class="status-badge {{ lead.status }}">
-                                    {{ lead.get_status_display }}
-                                </span>
-                            </td>
-                            <td>{{ lead.get_mode_display }}</td>
-                            <td>{{ lead.enquiry_date|date:"M d, Y" }}</td>
-                            <td style="display:flex; gap:0.5rem; flex-wrap:nowrap; align-items:center;">
-
-                                <a href="{% url 'bdm:lead_details' lead.id %}" class="btn-view">
-                                    <i class="fas fa-eye"></i>
-                                    View
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" style="text-align:center; padding:1.5rem;">
-                                No matching leads found
-                            </td>
-                        </tr>
+        <form method="GET" action="{% url 'bdm:leads' %}" id="filterForm">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select" name="status">
+                        <option value="">All Status</option>
+                        {% for key, value in status_choices %}
+                        <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>
+                            {{ value }}
+                        </option>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% endif %}
-        </div>
+                    </select>
+                </div>
 
-        <!-- Leads Table -->
-        <div class="leads-section" id="all-leads">
-            <div class="section-header">
-                <h2 class="section-title">All Leads</h2>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <span class="results-count">Total Leads: {{ total_leads }}</span>
-                    <a href="{% url 'bdm:bulk_leads' %}" class="btn btn-secondary">
-                        <i class="fas fa-tasks"></i> Bulk Actions
-                    </a>
+                <div class="filter-group">
+                    <label class="filter-label">Course</label>
+                    <select class="filter-select" name="course">
+                        <option value="">All Courses</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}" {% if request.GET.course == course.id|stringformat:"s" %}selected{% endif %}>
+                            {{ course.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Mode</label>
+                    <select class="filter-select" name="mode">
+                        <option value="">All Modes</option>
+                        {% for key, value in mode_choices %}
+                        <option value="{{ key }}" {% if request.GET.mode == key %}selected{% endif %}>
+                            {{ value }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Date From</label>
+                    <input type="date" class="filter-select" name="date_from" value="{{ request.GET.date_from }}">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Date To</label>
+                    <input type="date" class="filter-select" name="date_to" value="{{ request.GET.date_to }}">
+                </div>
+
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" name="search"
+                        placeholder="Search by name, email, or phone..."
+                        value="{{ request.GET.search }}">
                 </div>
             </div>
 
-            <div class="leads-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Course</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Mode</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lead in leads %}
-                        <tr id="lead-row-{{ lead.id }}">
-                            <td>
-                                <div class="lead-name">{{ lead.name }}</div>
-                            </td>
-                            <td>{{ lead.preferred_course.name|default:"—" }}</td>
-                            <td>{{ lead.email }}</td>
-                            <td>
-                                <span class="status-badge {{ lead.status }}">
-                                    {{ lead.get_status_display }}
-                                </span>
-                            </td>
-                            <td>{{ lead.get_mode_display }}</td>
-                            <td>{{ lead.enquiry_date|date:"M d, Y" }}</td>
-                            <td style="display:flex; gap:0.5rem; flex-wrap:nowrap; align-items:center;">
+            <div class="filter-actions">
+                <a href="{% url 'bdm:leads' %}" class="clear-filters">
+                    <i class="fas fa-times"></i> Clear Filters
+                </a>
+                <button type="submit" class="btn btn-primary btn-filter">
+                    <i class="fas fa-search"></i> Search & Filter
+                </button>
+            </div>
+        </form>
 
-                                <a href="{% url 'bdm:lead_details' lead.id %}" class="btn-view">
-                                    <i class="fas fa-eye"></i>
-                                    View
-                                </a>
-                                <button type="button"
-                                class="btn-assign" onclick="openAssignModal({{ lead.id }})">
+        {# ── Filtered Results ── #}
+        {% if request.GET.search or request.GET.status or request.GET.course or request.GET.mode or request.GET.date_from or request.GET.date_to %}
+        <div class="filter-result-info">
+            <i class="fas fa-info-circle"></i>
+            <span>
+                {{ filtered_count }} result{{ filtered_count|pluralize }} found
+                {% if request.GET.search %}for "<strong>{{ request.GET.search }}</strong>"{% endif %}
+            </span>
+        </div>
+
+        <div class="leads-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Mode</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lead in filtered_leads %}
+                    <tr>
+                        <td><div class="lead-name">{{ lead.name }}</div></td>
+                        <td>{{ lead.preferred_course.name|default:"—" }}</td>
+                        <td>{{ lead.email }}</td>
+                        <td>
+                            <span class="status-badge {{ lead.status }}">
+                                {{ lead.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ lead.get_mode_display }}</td>
+                        <td>{{ lead.enquiry_date|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'bdm:lead_details' lead.id %}" class="btn-view">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding:1.5rem; color:var(--text-light);">
+                            No matching leads found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+    </div>{# /filter-section #}
+
+
+    {# ── All Leads Table ── #}
+    <div class="leads-section" id="all-leads">
+
+        <div class="section-header">
+            <h2 class="section-title">
+                {% if is_counselor %}My Leads{% else %}All Leads{% endif %}
+            </h2>
+            <div style="display:flex; gap:1rem; align-items:center;">
+                <span class="results-count">Total: {{ total_leads }}</span>
+                {% if not is_counselor %}
+                <a href="{% url 'bdm:bulk_leads' %}" class="btn btn-secondary">
+                    <i class="fas fa-tasks"></i> Bulk Actions
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="leads-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Mode</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lead in leads %}
+                    <tr id="lead-row-{{ lead.id }}">
+                        <td><div class="lead-name">{{ lead.name }}</div></td>
+                        <td>{{ lead.preferred_course.name|default:"—" }}</td>
+                        <td>{{ lead.email }}</td>
+                        <td>
+                            <span class="status-badge {{ lead.status }}">
+                                {{ lead.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ lead.get_mode_display }}</td>
+                        <td>{{ lead.enquiry_date|date:"M d, Y" }}</td>
+                        <td style="display:flex; gap:0.5rem; flex-wrap:nowrap; align-items:center;">
+                            <a href="{% url 'bdm:lead_details' lead.id %}" class="btn-view">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            {# Assign button — admin only #}
+                            {% if not is_counselor %}
+                            <button type="button" class="btn-assign" onclick="openAssignModal({{ lead.id }})">
                                 <i class="fas fa-user-plus"></i> Assign
-                                </button>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" style="text-align:center; padding: 3rem; color: var(--text-light);">
-                                No leads found
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding:3rem; color:var(--text-light);">
+                            {% if is_counselor %}
+                                No leads have been assigned to you yet.
+                            {% else %}
+                                No leads found.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>{# /leads-section #}
+
+</div>{# /container #}
+</div>{# /leads-page-wrapper #}
+
+
+
+{% if not is_counselor %}
+
+{# ── Assign Lead Modal ── #}
 <div class="modal-overlay" id="assignModal">
     <div class="modal-card">
         <div class="modal-header">
@@ -1061,13 +1093,18 @@ View, assign, and manage all leads
             {% csrf_token %}
             <input type="hidden" name="lead_id" id="assignLeadId">
 
-            <label>Assign to Telecaller</label>
-            <select name="assigned_to" class="form-select" required>
-                <option value="">Select</option>
-                {% for user in telecallers %}
-                    <option value="{{ user.id }}">{{ user.username }}</option>
-                {% endfor %}
-            </select>
+            <div class="form-group" style="margin-top:1rem;">
+                <label>Assign to Counselor</label>
+                <select name="assigned_to" class="form-select" required>
+                    <option value="">Select counselor…</option>
+                    {% for user in counselors %}
+                        <option value="{{ user.id }}">
+                            {{ user.get_full_name|default:user.username }}
+                            {% if user.counselor.department %} — {{ user.counselor.department }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeAssignModal()">Cancel</button>
@@ -1077,13 +1114,7 @@ View, assign, and manage all leads
     </div>
 </div>
 
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Create Lead Modal -->
+{# ── Create Lead Modal ── #}
 <div class="modal-overlay" id="leadModal">
     <div class="modal-card">
         <div class="modal-header">
@@ -1093,28 +1124,23 @@ View, assign, and manage all leads
 
         <form method="post" action="{% url 'bdm:create_lead' %}">
             {% csrf_token %}
-
             <div class="form-grid">
 
-                <!-- Name -->
                 <div class="form-group">
                     <label>Full Name *</label>
                     <input type="text" name="name" required>
                 </div>
 
-                <!-- Phone -->
                 <div class="form-group">
                     <label>Phone *</label>
                     <input type="text" name="phone" required>
                 </div>
 
-                <!-- Email -->
                 <div class="form-group">
                     <label>Email *</label>
                     <input type="email" name="email" required>
                 </div>
 
-                <!-- Course -->
                 <div class="form-group">
                     <label>Preferred Course</label>
                     <select name="preferred_course">
@@ -1125,7 +1151,6 @@ View, assign, and manage all leads
                     </select>
                 </div>
 
-                <!-- Mode -->
                 <div class="form-group">
                     <label>Mode</label>
                     <select name="mode">
@@ -1135,7 +1160,6 @@ View, assign, and manage all leads
                     </select>
                 </div>
 
-                <!-- Notes -->
                 <div class="form-group full-width">
                     <label>Notes</label>
                     <textarea name="notes" rows="3"></textarea>
@@ -1147,59 +1171,54 @@ View, assign, and manage all leads
                 <button type="button" class="btn btn-secondary" onclick="closeLeadModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary">Save Lead</button>
             </div>
-
         </form>
     </div>
 </div>
 
-
+{% endif %}{# /not is_counselor #}
 {% endblock %}
+
 
 {% block extra_js %}
 <script>
-    // Smooth scroll for anchor links
+    // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+        anchor.addEventListener('click', function(e) {
             e.preventDefault();
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            
-            const target = document.querySelector(targetId);
+            const target = document.querySelector(this.getAttribute('href'));
             if (target) {
-                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - 100;
                 window.scrollTo({
-                    top: targetPosition,
+                    top: target.getBoundingClientRect().top + window.pageYOffset - 100,
                     behavior: 'smooth'
                 });
             }
         });
     });
 
-    // Placeholder for openAssignModal function
-    function openAssignModal(leadId) {
-        console.log('Open assign modal for lead:', leadId);
-        // Implement your modal logic here
+    {% if not is_counselor %}
+    // Lead Modal
+    function openLeadModal() {
+        document.getElementById("leadModal").style.display = "flex";
+    }
+    function closeLeadModal() {
+        document.getElementById("leadModal").style.display = "none";
     }
 
-   
-function openLeadModal() {
-    document.getElementById("leadModal").style.display = "flex";
-}
+    // Assign Modal
+    function openAssignModal(leadId) {
+        document.getElementById("assignLeadId").value = leadId;
+        document.getElementById("assignModal").style.display = "flex";
+    }
+    function closeAssignModal() {
+        document.getElementById("assignModal").style.display = "none";
+    }
 
-function closeLeadModal() {
-    document.getElementById("leadModal").style.display = "none";
-}
-
-
-//assign lead
-function openAssignModal(leadId) {
-    document.getElementById("assignLeadId").value = leadId;
-    document.getElementById("assignModal").style.display = "flex";
-}
-
-function closeAssignModal() {
-    document.getElementById("assignModal").style.display = "none";
-}
-
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) this.style.display = 'none';
+        });
+    });
+    {% endif %}
 </script>
 {% endblock %}

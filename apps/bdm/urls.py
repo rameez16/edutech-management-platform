@@ -10,12 +10,23 @@ app_name='bdm'
 urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                
                 path('leads/', views.leads, name='leads'),
-                path('leads/<int:lead_id>/', views.lead_details, name='lead_details'),
+                path('leads/<int:pk>/', views.lead_details, name='lead_details'),
                 path('leads/bulk-actions/', views.bulk_leads, name='bulk_leads'),
                 path('leads/create/', views.create_lead, name='create_lead'),
                 path('leads/assign/', views.assign_lead, name='assign_lead'),
                 path('leads/bulk-action/', views.bulk_action, name='bulk_action'),
+                
+                path(
+    "lead/<int:pk>/update-followup/",
+    views.update_lead_followup,
+    name="update_lead_followup"
+),
               
+              path(
+    "lead/<int:pk>/convert/",
+    views.convert_lead_to_admission,
+    name="convert_lead_to_admission"
+),
                
                
                
@@ -38,6 +49,7 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path('batches/<int:pk>/', views.batch_detail, name='batch_detail'),
                 path("batches/<int:pk>/toggle-extension/",views.toggle_batch_extension,name="toggle_batch_extension"),
                 path('batches/create/', views.batch_create, name='batch_create'),
+                path('batch/<int:pk>/add_schedule/',views.add_batch_schedule,name='add_batch_schedule'),
                 
                 
                 
@@ -93,6 +105,13 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("students/", views.StudentListView.as_view(), name="student_list"),
                 path("students/<int:pk>/", views.StudentDashboardView.as_view(), name="student_dashboard"),
                 
+                
+                path("announcements/", views.announcement_list, name="announcement_list"),
+                path("announcements/create/", views.announcement_create, name="announcement_create"),
+                
+                 path("trainer-leave/", views.trainer_leave_list, name="trainer_leave_list"),
+                 path("trainer-leave/<int:pk>/", views.trainer_leave_detail, name="trainer_leave_detail"),
+                 path("trainer-leave/<int:pk>/update/", views.update_trainer_leave_status, name="update_trainer_leave_status"),
                 ]
 
 

@@ -16,6 +16,7 @@ admin.site.register(ExamResult)
 admin.site.register(ExtensionRequest)
 admin.site.register(Attendance)
 admin.site.register(SessionMaterial)
+admin.site.register(ExamSubmission)
 
 admin.site.register(TrainerLeave)
 admin.site.register(ExamSubmission)

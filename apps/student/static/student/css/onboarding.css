@@ -90,7 +90,7 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     justify-content: space-between;
     height: auto;        /* remove fixed 320px */
-    min-height: 320px;   /* keep minimum height */
+    min-height: 300px;   /* keep minimum height */
 
 }
 
@@ -207,6 +207,14 @@ button.btn-enroll-upload:disabled {
     cursor: default !important;
     pointer-events: none !important;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+}
+
+.step2-card {
+    justify-content: flex-start !important;
+}
+
+.step2-card .step2-buttons {
+    margin-top: 15px;
 }
 
 .step3-buttons { display: flex; flex-direction: column; gap: 10px; width: 100%; }
