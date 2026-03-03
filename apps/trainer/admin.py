@@ -19,4 +19,3 @@ admin.site.register(SessionMaterial)
 admin.site.register(ExamSubmission)
 
 admin.site.register(TrainerLeave)
-admin.site.register(ExamSubmission)
