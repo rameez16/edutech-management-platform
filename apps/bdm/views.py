@@ -7,6 +7,8 @@ from decimal import Decimal
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
 from django.db.models import Max
+from django.db.models import Case, When, IntegerField
+
 
 from django.db.models import Prefetch
 
@@ -25,7 +27,7 @@ from django.db.models import Sum, Avg
 from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
 from apps.bdm.models import Student ,PaymentDocument ,StudentIssue ,Announcement ,BatchSchedule
 
-from apps.trainer.models import Module
+from apps.trainer.models import Module,TrainerLeave
 from apps.trainer.models import Module
 
 
@@ -846,21 +848,35 @@ def batch_list(request):
         'inactive_batches_count': inactive_batches_count,
     }
     return render(request, 'bdm/batch/batch_list.html', context)
-
 def batch_detail(request, pk):
     batch = get_object_or_404(
         Batch.objects.select_related('course')
-        .prefetch_related('trainers', 'students'),
+        .prefetch_related(
+            'trainers__user',
+            'students__user',
+        ),
         pk=pk
     )
 
-    trainers = Trainer.objects.all()   # 👈 ADD THIS
+    # ✅ Custom weekday ordering
+    schedules = batch.schedules.annotate(
+        day_order=Case(
+            When(day_of_week='monday', then=1),
+            When(day_of_week='tuesday', then=2),
+            When(day_of_week='wednesday', then=3),
+            When(day_of_week='thursday', then=4),
+            When(day_of_week='friday', then=5),
+            When(day_of_week='saturday', then=6),
+            When(day_of_week='sunday', then=7),
+            output_field=IntegerField(),
+        )
+    ).order_by('day_order', 'start_time')
 
     return render(request, 'bdm/batch/batch_detail.html', {
         'batch': batch,
-        'trainers': trainers,          # 👈 ADD THIS
+        'trainers': batch.trainers.all(),
+        'schedules': schedules,  # ✅ pass ordered schedules
     })
- 
      
     
 def toggle_batch_extension(request, pk):
@@ -2293,3 +2309,71 @@ def announcement_create(request):
 
         messages.success(request, "Announcement created successfully 🎉")
         return redirect("bdm:announcement_list")
+    
+    
+    #trainer leave-aleena
+
+def trainer_leave_list(request):
+    leaves = TrainerLeave.objects.select_related(
+        "trainer", "trainer__user"
+    ).order_by("-applied_at")
+
+    leave_type = request.GET.get("leave_type")
+    status = request.GET.get("status")
+    q = request.GET.get("q")
+    date_from = request.GET.get("date_from")
+    date_to = request.GET.get("date_to")
+
+    if q:
+        leaves = leaves.filter(trainer__user__username__icontains=q)
+
+    if leave_type:
+        leaves = leaves.filter(leave_type=leave_type)
+
+    if status:
+        leaves = leaves.filter(status=status)
+
+    if date_from and date_to:
+        leaves = leaves.filter(
+            start_date__lte=date_to,
+            end_date__gte=date_from
+        )
+
+    context = {
+        "leaves": leaves,
+        "pending_count": TrainerLeave.objects.filter(status="PENDING").count(),
+        "leave_type_choices": TrainerLeave._meta.get_field("leave_type").choices,
+        "status_choices": TrainerLeave._meta.get_field("status").choices,
+    }
+
+    return render(request, "bdm/leave/trainer_leave_list.html", context)
+
+def trainer_leave_detail(request, pk):
+    leave = get_object_or_404(TrainerLeave, pk=pk)
+    return render(request, "bdm/leave/trainer_leave_detail.html", {
+        "leave": leave
+    })
+    
+@require_POST
+def update_trainer_leave_status(request, pk):
+    leave = get_object_or_404(TrainerLeave, pk=pk)
+
+    if leave.status != TrainerLeave.LeaveStatus.PENDING:
+        messages.warning(request, "This leave has already been processed.")
+        return redirect("bdm:trainer_leave_detail", pk=pk)
+
+    action = request.POST.get("action")  # 'approve' or 'reject'
+    remarks = request.POST.get("remarks")
+
+    if action == "approve":
+        leave.status = TrainerLeave.LeaveStatus.APPROVED
+        messages.success(request, "Leave approved successfully.")
+    elif action == "reject":
+        leave.status = TrainerLeave.LeaveStatus.REJECTED
+        messages.success(request, "Leave rejected.")
+
+    leave.bdm_remarks = remarks
+    leave.decision_at = timezone.now()
+    leave.save()
+
+    return redirect("bdm:trainer_leave_detail", pk=pk)

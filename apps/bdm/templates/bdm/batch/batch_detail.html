@@ -203,7 +203,7 @@
         <div class="card-body schedule-card-body">
             {% if batch.schedules.all %}
             <div class="schedule-list">
-                {% for schedule in batch.schedules.all %}
+                {% for schedule in schedules %}
                 <div class="schedule-row">
                     <!-- Day pill -->
                     <div class="schedule-day-pill">
@@ -217,7 +217,7 @@
                         <span class="schedule-time-text">{{ schedule.start_time }} – {{ schedule.end_time }}</span>
                     </div>
 
-                    <!-- Trainer block -->
+                    {% comment %} <!-- Trainer block -->
                     <div class="schedule-trainer-block">
                         {% if schedule.trainer %}
                             <div class="schedule-trainer-avatar">
@@ -232,7 +232,7 @@
                                 Not Assigned
                             </span>
                         {% endif %}
-                    </div>
+                    </div> {% endcomment %}
                 </div>
                 {% endfor %}
             </div>

@@ -97,6 +97,10 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 
                 path("announcements/", views.announcement_list, name="announcement_list"),
                 path("announcements/create/", views.announcement_create, name="announcement_create"),
+                
+                 path("trainer-leave/", views.trainer_leave_list, name="trainer_leave_list"),
+                 path("trainer-leave/<int:pk>/", views.trainer_leave_detail, name="trainer_leave_detail"),
+                 path("trainer-leave/<int:pk>/update/", views.update_trainer_leave_status, name="update_trainer_leave_status"),
                 ]
 
 
