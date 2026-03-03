@@ -18,12 +18,28 @@
                 <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
                 <p><strong>Email:</strong> {{ student.user.email }}</p>
                 <p><strong>Student ID:</strong> {{ student.id }}</p>
+                <p><strong>Course:</strong> {{ course.name }}</p>
+                <p><strong>Batch:</strong> {{ batch.name }}</p>
             </div>
+        </div>
+
+        <!-- ADMISSION STATUS -->
+        <div class="admission-status">
+            <h4>Admission Fee Status</h4>
+
+            {% if admission_paid %}
+                <p class="status-verified">
+                    ✅ Admission Fee Paid & Verified by BDM
+                </p>
+            {% else %}
+                <p class="status-pending">
+                    ❌ Admission Fee Not Paid
+                </p>
+            {% endif %}
         </div>
 
         <!-- SUMMARY -->
         <div class="fee-summary">
-
             <div class="fee-box">
                 <p>Total Fee</p>
                 <h3>₹{{ total_fee|floatformat:2 }}</h3>
@@ -38,13 +54,10 @@
                 <p>Pending Amount</p>
                 <h3>₹{{ pending_amount|floatformat:2 }}</h3>
             </div>
-
         </div>
 
-        <!-- TITLE -->
-        <h3 class="section-title">
-            One-Time Payment
-        </h3>
+        <!-- PAYMENT DETAILS -->
+        <h3 class="section-title">Payment Details</h3>
 
         <!-- PAYMENT MODES -->
         <div class="payment-mode-switch">
@@ -79,11 +92,17 @@
             <!-- LEFT -->
             <div class="left-column">
                 <div class="fee-summary-box">
-                    <h4>Fee Details</h4>
+                    <h4>Fee Breakdown</h4>
 
                     <div class="fee-row">
-                        <span>Admission Fee (10%)</span>
-                        <strong>₹{{ admission_fee|floatformat:2 }}</strong>
+                        <span>Admission Fee</span>
+                        <strong>
+                            {% if admission_paid %}
+                                ₹{{ admission_amount|floatformat:2 }}
+                            {% else %}
+                                ₹0.00
+                            {% endif %}
+                        </strong>
                     </div>
 
                     <div class="fee-row">
@@ -96,83 +115,62 @@
                         <strong>₹{{ total_fee|floatformat:2 }}</strong>
                     </div>
                 </div>
-
-                <a href="{% url 'student:onetime_view' %}" class="status-btn">
-                    View Your Status
-                </a>
             </div>
 
             <!-- RIGHT -->
             <div class="right-column">
+                <center><h3>Full Payment</h3></center>
 
-                <form method="POST"
-                      enctype="multipart/form-data"
-                      class="qr-payment-box">
+                {% if pending_amount > 0 %}
+
+                <form method="POST" enctype="multipart/form-data" class="qr-payment-box">
                     {% csrf_token %}
 
                     <img src="{% static 'student/images/image.png' %}"
                          class="qr-image"
                          alt="QR Code">
 
-                    <p>Scan the QR code to pay</p>
+                    <p>Scan the QR code to pay ₹{{ pending_amount|floatformat:2 }}</p>
 
-                    {% if not existing_payment %}
+                    <label for="receipt" class="upload-btn">
+                        Upload Payment Receipt
+                    </label>
 
-                        <label for="receipt" class="upload-btn">
-                            Upload Payment Receipt
-                        </label>
+                    <input type="file"
+                           id="receipt"
+                           name="receipt"
+                           accept="image/*,application/pdf"
+                           required>
 
-                        <input type="file"
-                               id="receipt"
-                               name="receipt"
-                               accept="image/*,application/pdf"
-                               required>
+                    <span id="file-name" class="file-name"></span>
 
-                        <span id="file-name" class="file-name"></span>
-
-                        <button type="submit" class="submit-btn">
-                            Submit Payment
-                        </button>
-
-                    {% else %}
-
-                        <!-- ✅ FIXED PAYMENT STATUS LOGIC -->
-                        {% if existing_payment.payment_status == existing_payment.PaymentStatus.COMPLETED %}
-
-                            <p class="payment-status success">
-                                ✅ Payment Completed
-                            </p>
-
-                        {% elif existing_payment.payment_status == existing_payment.PaymentStatus.PENDING %}
-
-                            <p class="payment-status warning">
-                                ⏳ Payment Under Verification
-                            </p>
-
-                        {% else %}
-
-                            <p class="payment-status done">
-                                ✅ Payment Submitted
-                            </p>
-
-                        {% endif %}
-
-                    {% endif %}
+                    <button type="submit" class="submit-btn">
+                        Submit Payment
+                    </button>
                 </form>
+
+                {% else %}
+
+                <div class="info-box">
+                    🎉 All payments completed successfully.
+                </div>
+
+                {% endif %}
 
                 <div class="reminder-box">
                     <h4>Reminders</h4>
-                    <label><input type="checkbox" checked> Email reminder</label>
-                    <br>
+                    <label><input type="checkbox" checked> Email reminder</label><br>
                     <label><input type="checkbox" checked> SMS reminder</label>
                 </div>
-
             </div>
         </div>
 
         <!-- NOTE -->
         <div class="note">
-            <p><strong>Note:</strong> One-time payment only. Non-refundable.</p>
+            <p>
+                <strong>Note:</strong> Payment once submitted will be verified by BDM.
+                Payment plan cannot be modified.
+            </p>
         </div>
 
     </div>

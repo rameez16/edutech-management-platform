@@ -1,0 +1,130 @@
+/* Background */
+body {
+    background:rgb(148, 125, 187);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Wrapper */
+.certificate-wrapper {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
+}
+
+/* Card */
+.certificate-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 950px;        /* Increased width */
+    min-height: 550px;       /* Increased height */
+    padding: 70px;           /* More spacing */
+    border-radius: 20px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+    transition: 0.3s ease;
+}
+
+.certificate-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Title */
+.certificate-title {
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 32px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Details */
+.certificate-details {
+    margin-bottom: 50px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    border-bottom: 1px solid #eaeaea;
+    font-size: 17px;
+}
+
+.label {
+    color: #555;
+    font-weight: 500;
+}
+
+.value {
+    font-weight: 600;
+    color: #222;
+}
+
+/* Buttons */
+.button-group {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.btn {
+    padding: 12px 30px;
+    margin: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+/* View Button */
+.btn-view {
+    background: #007bff;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #0056b3;
+}
+
+/* Download Button */
+.btn-download {
+    background: #28a745;
+    color: white;
+}
+
+.btn-download:hover {
+    background: #1e7e34;
+}
+
+/* Alerts */
+.alert {
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.alert.info {
+    background: #e8f4ff;
+    color: #3178c6;
+}
+
+.alert.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .certificate-card {
+        padding: 40px;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+}

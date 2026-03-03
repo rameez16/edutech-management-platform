@@ -51,7 +51,7 @@
 
     .table-container {
         background: white;
-        border-radius: 28px;
+        border-radius: 5px;
         padding: 1.5rem;
         box-shadow: 0 20px 40px rgba(33, 150, 243, 0.12);
         border: 1px solid rgba(33, 150, 243, 0.15);
@@ -66,24 +66,18 @@
     }
 
     .table thead th {
-        background: #e8f4fe;
-        color: #0a4b7a;
+        background: #0071aa;
+        color: #e5eef5;
         font-weight: 600;
         font-size: 0.95rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         padding: 1rem 1.2rem;
         border: none;
-        border-radius: 16px;
+
     }
 
-    .table thead th:first-child {
-        border-radius: 20px 0 0 20px;
-    }
-
-    .table thead th:last-child {
-        border-radius: 0 20px 20px 0;
-    }
+ 
 
     .table tbody tr {
         background: #f8fcff;
@@ -256,11 +250,11 @@
                         <span class="avatar-placeholder">
                             {{ student.full_name|first|upper }}
                         </span>
-                        <span class="student-name">{{ student.full_name }}</span>
+                        <span class="student-name">{{ student.user.username }}</span>
                     </div>
                 </td>
                 <td>
-                    <span class="student-email">{{ student.email }}</span>
+                    <span class="student-email">{{ student.user.email }}</span>
                 </td>
                 <td>
                     {% for batch in student.batches.all %}
@@ -270,10 +264,10 @@
                     {% endfor %}
                 </td>
                 <td>
-                    {% if student.is_active %}
-                        <span class="status-badge status-active">● Active</span>
+                    {% if student.user.is_active %}
+                        <span class="status-badge status-active">Active</span>
                     {% else %}
-                        <span class="status-badge status-inactive">○ Inactive</span>
+                        <span class="status-badge status-inactive">Inactive</span>
                     {% endif %}
                 </td>
                 <td>
