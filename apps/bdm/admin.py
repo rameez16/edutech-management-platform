@@ -26,8 +26,5 @@ admin.site.register(Notification)
 admin.site.register(StudentIssue)
 admin.site.register(Announcement)
 admin.site.register(Admission)
-<<<<<<< HEAD
-=======
 
 
->>>>>>> 82e73366d11bc7ae1f59bb22f762453491f071be
