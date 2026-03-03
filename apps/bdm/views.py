@@ -637,9 +637,8 @@ def leads(request):
         "status_choices": Lead.LeadStatus.choices,
         "mode_choices": Lead.ModeChoice.choices,
         "counselors": User.objects.filter(
-            role="counselor",
-            counselor__is_active=True
-        ).select_related('counselor'),
+            role="counselor"
+        ),
 
         # Stats
         "total_leads": total_leads,
