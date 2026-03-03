@@ -319,9 +319,11 @@
                 <span>🎓</span>
                 <span class="student-id">Student Dashboard</span>
                 <span>•</span>
-                <span class="status-badge {% if student.is_active %}status-active{% else %}status-inactive{% endif %}">
-                    {% if student.is_active %}● Active{% else %}○ Inactive{% endif %}
-                </span>
+                {% if student.user.is_active %}
+                <span class="status-badge status-active">Active</span>
+            {% else %}
+                <span class="status-badge status-inactive">Inactive</span>
+            {% endif %}
             </div>
         </div>
         <div style="display: flex; gap: 1rem;">
@@ -350,6 +352,7 @@
             <span class="info-label">📱 Phone</span>
             <span class="info-value">{{ student.phone }}</span>
         </div>
+       
     </div>
 
     <!-- Batch Card -->
