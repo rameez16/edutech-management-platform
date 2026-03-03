@@ -16,6 +16,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('QR_pay/', views.QR_pay, name='QR_pay'),
                path('installment/qr/<int:installment_number>/',views.install_qr,name='install_qr'),
                
+               
                path('stud_feedback/', views.stud_feedback, name='stud_feedback'),
                path("fees/", views.payment_gateway, name="payment_gateway"),
                path("student_attendance/", views.student_attendance, name="student_attendance"),
@@ -24,6 +25,7 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('student_issues/', views.student_issues, name='student_issues'),
                path('announcement_view/', views.announcement_view, name='announcement_view'),
                path('notification_view/', views.notification_view, name='notification_view'),
+               path('certificate_view/', views.certificate_view, name='certificate_view'),
               
                
                

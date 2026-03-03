@@ -26,3 +26,4 @@ admin.site.register(Notification)
 admin.site.register(StudentIssue)
 admin.site.register(Announcement)
 
+
