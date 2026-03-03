@@ -3,7 +3,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
 from django.shortcuts import get_object_or_404,render,redirect
-
+from django.contrib import messages
 
 def render_to_pdf(template_src, context, filename="document.pdf"):
     
@@ -65,12 +65,33 @@ print(auto_crop_url)
 from django.http import HttpResponseForbidden
 from functools import wraps
 
+
 def role_required(role):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
             if request.user.role != role:
+                messages.error(request, "You are not authorised to access this page.")
                 return redirect("accounts:login")
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
+
+
+
+from django.core.exceptions import PermissionDenied
+from functools import wraps
+
+def counselor_or_admin_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("login")
+        if request.user.role in ("admin", "counselor") or request.user.is_superuser:
+            return view_func(request, *args, **kwargs)
+        
+        # ← friendly message + redirect instead of hard 403
+        messages.error(request, "You are not authorised to access this page.")
+        return redirect("bdm:leads")  # or wherever makes sense
+    
+    return wrapper

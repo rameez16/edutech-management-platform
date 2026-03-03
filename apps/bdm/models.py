@@ -77,6 +77,17 @@ class Lead(models.Model):
         blank=True,
         null=True
     )
+    admission_fee_paid = models.BooleanField(
+        default=False
+    )
+
+    admission_fee_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
+
    
     telecaller_notes = models.TextField(blank=True)
     
@@ -976,11 +987,7 @@ class Announcement(models.Model):
     def __str__(self):
         return self.title    
     
-    
-    
-    
-    
-
+       
 
 
 class Admission(models.Model):
