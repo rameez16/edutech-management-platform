@@ -446,9 +446,8 @@ class ExamSubmission(models.Model):
     # -----------------------------
 
     answer_file = models.FileField(
-        upload_to="exam_submissions/%Y/%m/",
-        null=True,
-        blank=True
+       upload_to='ans_file/%Y/%m/', null=True, blank=True,
+                           help_text="Upload files like PDF, PPTX, ZIP, etc.",storage=RawMediaCloudinaryStorage()
     )
 
     # -----------------------------
@@ -954,9 +953,8 @@ class TrainerLeave(models.Model):
     reason = models.TextField()
 
     attachment = models.FileField(
-        upload_to="leave_documents/%Y/%m/",
-        null=True,
-        blank=True
+        upload_to='trainer_leave_docs/%Y/%m/', null=True, blank=True,
+                           help_text="Upload files like PDF, PPTX, ZIP, etc.",storage=RawMediaCloudinaryStorage()
     )
 
     # ----------------------------
