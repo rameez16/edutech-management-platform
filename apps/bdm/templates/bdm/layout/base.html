@@ -641,12 +641,7 @@
 
                     <div class="sidebar-section">
                         <h4 class="sidebar-section-title">Management</h4>
-                        <a href="{% url 'bdm:user_list' %}"    class="sidebar-link {% if 'user'    in request.resolver_match.url_name %}active{% endif %}"><div class="sidebar-link-icon"><i class="bi bi-people-fill"></i></div><span class="sidebar-link-text">Users</span></a>
-                        <a href="{% url 'bdm:course_list' %}"  class="sidebar-link {% if 'course'  in request.resolver_match.url_name %}active{% endif %}"><div class="sidebar-link-icon"><i class="bi bi-journal-bookmark-fill"></i></div><span class="sidebar-link-text">Courses</span></a>
-                        <a href="{% url 'bdm:trainer_list' %}" class="sidebar-link {% if 'trainer' in request.resolver_match.url_name %}active{% endif %}"><div class="sidebar-link-icon"><i class="bi bi-person-badge-fill"></i></div><span class="sidebar-link-text">Trainers</span></a>
-                        <a href="{% url 'bdm:student_list' %}" class="sidebar-link {% if 'student' in request.resolver_match.url_name %}active{% endif %}"><div class="sidebar-link-icon"><i class="bi bi-mortarboard-fill"></i></div><span class="sidebar-link-text">Students</span></a>
-                        <a href="{% url 'bdm:batch_list' %}"   class="sidebar-link {% if request.resolver_match.url_name == 'batch_list' %}active{% endif %}"><div class="sidebar-link-icon"><i class="bi bi-collection-fill"></i></div><span class="sidebar-link-text">Batches</span></a>
-                        <a href="{% url 'bdm:batch_list_manage' %}" class="sidebar-link {% if request.resolver_match.url_name == 'batch_list_manage' %}active{% endif %}"><div class="sidebar-link-icon"><i class="bi bi-calendar2-week-fill"></i></div><span class="sidebar-link-text">Academic Schedule</span></a>
+                        
                         <a href="{% url 'bdm:announcement_list' %}"
                            class="sidebar-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
                             <div class="sidebar-link-icon"><i class="bi bi-megaphone-fill"></i></div>
@@ -692,11 +687,7 @@
 
                     <div class="sidebar-section">
                         <h4 class="sidebar-section-title">Operations</h4>
-                        <a href="#" class="sidebar-link"><div class="sidebar-link-icon"><i class="bi bi-person-check-fill"></i></div><span class="sidebar-link-text">Attendance</span></a>
-                        <a href="{% url 'bdm:student_onboarding' %}" class="sidebar-link {% if 'onboarding' in request.resolver_match.url_name %}active{% endif %}"><div class="sidebar-link-icon"><i class="bi bi-clipboard2-pulse-fill"></i></div><span class="sidebar-link-text">Student Onboarding</span></a>
-                        <a href="{% url 'bdm:leave' %}"              class="sidebar-link {% if 'leave'      in request.resolver_match.url_name %}active{% endif %}"><div class="sidebar-link-icon"><i class="bi bi-calendar-x-fill"></i></div><span class="sidebar-link-text">Leave</span></a>
-                        <a href="{% url 'bdm:payments_dashboard' %}" class="sidebar-link {% if 'payment'    in request.resolver_match.url_name %}active{% endif %}">
-
+                        
                         <a href="#"
                            class="sidebar-link {% if 'attendance' in request.resolver_match.url_name %}active{% endif %}">
                             <div class="sidebar-link-icon"><i class="bi bi-person-check-fill"></i></div>
@@ -728,7 +719,7 @@
                             <span class="sidebar-link-text">Payments</span>
                             {% if pending_payments > 0 %}<span class="sidebar-link-badge warning">{{ pending_payments }}</span>{% endif %}
                         </a>
-                        <a href="#" class="sidebar-link"><div class="sidebar-link-icon"><i class="bi bi-clipboard2-check-fill"></i></div><span class="sidebar-link-text">Exams</span></a>
+                        <a href="{% url 'bdm:exam_list' %}" class="sidebar-link"><div class="sidebar-link-icon"><i class="bi bi-clipboard2-check-fill"></i></div><span class="sidebar-link-text">Exams</span></a>
                     </div>
 
                     <div class="sidebar-section">
