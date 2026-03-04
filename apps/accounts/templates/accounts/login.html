@@ -7,12 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
             --primary: #0F172A;
             --primary-light: #1E293B;
-            --accent: #F59E0B;
-            --accent-dark: #D97706;
+            --accent: #11a7ec;
+            --accent-dark: #0696d9;
             --surface: #FFFFFF;
             --text: #0F172A;
             --text-muted: #64748B;
@@ -496,13 +497,22 @@
         <div class="login-card">
             <div class="logo-section">
                 <div class="logo">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V7.89l7-3.11v8.2z"/>
-                    </svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <defs>
+                          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8b5cf6"/>
+                            <stop offset="100%" style="stop-color:#6d28d9"/>
+                          </linearGradient>
+                        </defs>
+                      
+                        <circle cx="12" cy="12" r="10" fill="url(#grad1)"/>
+                        <circle cx="12" cy="12" r="6" fill="#ffffff"/>
+                        <circle cx="12" cy="12" r="3" fill="url(#grad1)"/>
+                      </svg>
                 </div>
                 <div class="login-header">
-                    <h2>Welcome Back</h2>
-                    <p>Sign in to continue </p>
+                    <h2>Victus Tech Lab</h2>
+                    <p>Sign in to user portal </p>
                 </div>
             </div>
 <!-- 

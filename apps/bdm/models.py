@@ -19,6 +19,7 @@ class Lead(models.Model):
         CONVERTED = 'converted', 'Converted'
         IDLE = 'idle', 'Idle'
         DROPPED = 'dropped', 'Dropped'
+        FOLLOWED='followed','Followed'
     
     class ModeChoice(models.TextChoices):
         REMOTE = 'remote', 'Remote'

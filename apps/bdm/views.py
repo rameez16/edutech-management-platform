@@ -716,7 +716,7 @@ def update_lead_followup(request, pk):
         lead.admission_fee_paid = request.POST.get("admission_fee_paid") == "on"
         lead.admission_fee_amount=request.POST.get("admission_fee")
 
-        # lead.status = Lead.LeadStatus.FOLLOWED  # optional
+        lead.status = Lead.LeadStatus.FOLLOWED  # optional
         lead.save()
 
         messages.success(request, "Follow-up details updated successfully!")
