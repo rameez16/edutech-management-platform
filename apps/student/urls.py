@@ -4,16 +4,10 @@ from .views import stud_feedback
 app_name='student'
 
 #rinta
-urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
-               
-               path('stud_profile/', views.stud_profile, name='stud_profile'),
+urlpatterns = [path('stud_profile/', views.stud_profile, name='stud_profile'),
                path('overview/', views.overview, name='overview'),
                path('password/', views.password, name='password'),
-               
-               
-               
                path('stud_feedback/', views.stud_feedback, name='stud_feedback'),
-              
                path("student_attendance/", views.student_attendance, name="student_attendance"),
                path("student_leave/", views.student_leave, name="student_leave"),
                path("student_evaluation/",views.student_evaluation, name="student_evaluation"),
@@ -23,14 +17,16 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                path('certificate_view/', views.certificate_view, name='certificate_view'),
               
                
+               
+               
+#Niranjana & Rinta
                path('payment_portal/',views.payment_portal,name='payment_portal'),
                
                
                
                
-               
-               
-                #niranjana
+#niranjana
+                path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path('stud_onboard/',views.onboard,name='stud_onboard'),
                 path('stud_upload/',views.upload,name='stud_upload'),
                 path('stud_lessonplan/',views.lessonplan,name='stud_lessonplan'),
@@ -38,7 +34,6 @@ urlpatterns = [path('stud_dashboard/',views.dashboard,name='stud_dashboard'),
                 path("download-id-card/",views.download_id_card,name="id_card_download"),
                 path('onboarding/id-card/',views.view_id_card, name='view_id_card'),
                 path('stud_syllabus/',views.syllabus,name='stud_syllabus'),
-                #only for checking logic delete later for merge
                 path("download-enrollment-letter/",views.download_enrollment_letter,name="download_enrollment_letter"),
                 path('batch_details/', views.batch_details, name='batch_details'),
                 path('stud_tasks/', views.student_tasks, name='student_tasks'),
