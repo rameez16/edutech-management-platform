@@ -1,28 +1,45 @@
 {% extends 'student/layout/base.html' %}
 {% load static %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'student/css/payment_plan.css' %}">
+{% endblock %}
 
-<div class="payment-container glass-card">
+{% block content %}
 
+<div class="page-center">
+<div class="payment-container">
+
+    <!-- HEADER -->
     <div class="payment-header">
         <h2>Installment Plan</h2>
-
-        <div class="student-info">
+        <div class="student-info-card">
             <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
             <p><strong>Email:</strong> {{ student.user.email }}</p>
         </div>
     </div>
 
-    <div class="payment-mode-switch">
-        <span>Payment Mode:</span>
-        <div class="mode-tabs">
-            <span class="mode-btn active">
-                {{ admission.get_payment_plan_display }}
-            </span>
+    <!-- FEE SUMMARY -->
+    <div class="fee-summary">
+        <div class="fee-box">
+            <p>Total Fee</p>
+            <h3>₹{{ total_fee|floatformat:2 }}</h3>
+        </div>
+        <div class="fee-box">
+            <p>Paid Amount</p>
+            <h3>₹{{ paid_amount|floatformat:2 }}</h3>
+        </div>
+        <div class="fee-box highlight">
+            <p>Pending Amount</p>
+            <h3>₹{{ pending_amount|floatformat:2 }}</h3>
         </div>
     </div>
+
+
+    <!-- ============================================================ -->
+    <!-- INSTALLMENT TABLE — hidden when pay form or summary is shown -->
+    <!-- ============================================================ -->
+    {% if not selected_installment and not selected_summary %}
 
     <div class="loan-table-box">
         <table class="loan-table">
@@ -34,19 +51,160 @@
                     <th>Status</th>
                 </tr>
             </thead>
-
             <tbody>
                 {% for ins in installments %}
                 <tr>
                     <td>Installment {{ ins.number }}</td>
                     <td>₹{{ ins.amount }}</td>
                     <td>{{ ins.due_date|date:"M d, Y" }}</td>
-                    <td>{{ ins.display_status }}</td>
+                    <td>
+
+                        {% if ins.display_status == "Paid" %}
+                            <span class="status paid">Paid</span>
+                          
+                            <a href="?summary={{ ins.number }}" class="summary-btn">View Summary</a>
+
+                        {% elif ins.display_status == "Pending Verification" %}
+                            <span class="status pending">Pending Verification</span>
+                            
+
+                        {% elif ins.display_status == "Rejected" %}
+                            <span class="status rejected">Rejected</span>
+                            <br>
+                            <a href="?summary={{ ins.number }}" class="summary-btn">View Summary</a>
+                            <br>
+                            <a href="?pay={{ ins.number }}" class="pay-btn">Re-Pay</a>
+
+                        {% elif ins.display_status == "Due Today" %}
+                            <span class="status due">Due Today</span>
+                            <br>
+                            <a href="?pay={{ ins.number }}" class="pay-btn">Pay Now</a>
+
+                        {% elif ins.display_status == "Overdue" %}
+                            <span class="status overdue">Overdue</span>
+                            <br>
+                            <a href="?pay={{ ins.number }}" class="pay-btn">Pay Now</a>
+
+                        {% else %}
+                            <span class="status upcoming">Upcoming</span>
+                        {% endif %}
+
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
+    {% endif %}
+
+
+    <!-- ============================================================ -->
+    <!-- INLINE SUMMARY PANEL — shown when ?summary=N                -->
+    <!-- ============================================================ -->
+    {% if selected_summary and summary_detail %}
+
+    <div class="summary-card">
+
+        <div class="summary-card-header">
+            <span class="summary-card-icon">🧾</span>
+            <div>
+                <h3>Payment Summary</h3>
+                <p>Installment {{ summary_detail.number }}</p>
+            </div>
+            {% if summary_detail.display_status == "Paid" %}
+                <span class="status paid" style="margin-left:auto;">Paid</span>
+            {% elif summary_detail.display_status == "Pending Verification" %}
+                <span class="status pending" style="margin-left:auto;">Pending Verification</span>
+            {% elif summary_detail.display_status == "Rejected" %}
+                <span class="status rejected" style="margin-left:auto;">Rejected</span>
+            {% endif %}
+        </div>
+
+        <div class="summary-card-divider"></div>
+
+        <div class="summary-card-body">
+
+            <div class="summary-card-row">
+                <span class="summary-label">Installment</span>
+                <span class="summary-value">Installment {{ summary_detail.number }}</span>
+            </div>
+
+            <div class="summary-card-row">
+                <span class="summary-label">Amount Paid</span>
+                <span class="summary-value strong">₹{{ summary_detail.amount }}</span>
+            </div>
+
+            <div class="summary-card-row">
+                <span class="summary-label">Payment Date</span>
+                <span class="summary-value">
+                    {% if summary_detail.payment_date %}
+                        {{ summary_detail.payment_date|date:"M d, Y" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="summary-card-row">
+                <span class="summary-label">Payment Method</span>
+                <span class="summary-value">{{ summary_detail.payment_method_display|default:"—" }}</span>
+            </div>
+
+            <div class="summary-card-row">
+                <span class="summary-label">Due Date</span>
+                <span class="summary-value">{{ summary_detail.due_date|date:"M d, Y" }}</span>
+            </div>
+
+        </div>
+
+        <div class="summary-card-divider"></div>
+
+        <div class="summary-card-footer">
+            <a href="{% url 'student:payment_portal' %}" class="pay-btn" style="background:#888;">
+                ← Back to Installments
+            </a>
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ============================================================ -->
+    <!-- PAY FORM — shown when ?pay=N                                 -->
+    <!-- ============================================================ -->
+    {% if selected_installment %}
+
+    <div class="payment-card" style="margin-top:30px;">
+        <h3>Pay Installment {{ selected_installment }}</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="installment_number" value="{{ selected_installment }}">
+
+            <img src="{% static 'student/images/image.png' %}"
+                 style="width:180px; margin:15px 0;"
+                 alt="QR Code">
+
+            <div>
+                <input type="file" name="receipt" required>
+            </div>
+
+            <button type="submit" class="pay-btn" style="margin-top:15px;">
+                Submit Payment
+            </button>
+        </form>
+
+        <br>
+        <a href="{% url 'student:payment_portal' %}" class="pay-btn" style="background:#888;">
+            ← Back to Installments
+        </a>
+    </div>
+
+    {% endif %}
+
 </div>
+</div>
+
 {% endblock %}
