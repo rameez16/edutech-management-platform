@@ -24,8 +24,10 @@ class FeePayment(models.Model):
     class PaymentType(models.TextChoices):
         BOOKING = 'booking', 'Booking Fee'
         ADMISSION = 'admission', 'Admission Fee'
-        INSTALLMENT = 'installment', 'EMI/Installment'
+        INSTALLMENT = 'installment', 'Installment'
         FULL_PAYMENT = 'full', 'Full Payment'
+        EMI = 'emi', 'Emi'
+        PDC = 'pdc', 'Pdc'
         LATE_FEE = 'late_fee', 'Late Fee'
         OTHER = 'other', 'Other'
     

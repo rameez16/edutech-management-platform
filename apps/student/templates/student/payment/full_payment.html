@@ -27,12 +27,10 @@
                 <p>Total Fee</p>
                 <h3>₹{{ total_fee|floatformat:2 }}</h3>
             </div>
-
             <div class="fee-box">
                 <p>Paid Amount</p>
                 <h3>₹{{ paid_amount|floatformat:2 }}</h3>
             </div>
-
             <div class="fee-box highlight">
                 <p>Pending Amount</p>
                 <h3>₹{{ pending_amount|floatformat:2 }}</h3>
@@ -42,12 +40,14 @@
         <!-- PAYMENT MODE -->
         <div class="payment-mode">
             <span>Payment Mode:</span>
-            <span class="mode-badge">
-                {{ admission.get_payment_plan_display }}
-            </span>
+            <span class="mode-badge">{{ admission.get_payment_plan_display }}</span>
         </div>
 
-        <!-- CENTERED PAYMENT CARD -->
+        <!-- ============================================================ -->
+        <!-- PAYMENT CARD — hidden when viewing summary                   -->
+        <!-- ============================================================ -->
+        {% if not view_summary %}
+
         <div class="payment-center">
             <form method="POST" enctype="multipart/form-data" class="payment-card">
                 {% csrf_token %}
@@ -56,40 +56,31 @@
                 <p class="qr-text">Scan QR & Complete Full Payment</p>
 
                 {% if not existing_payment %}
-                    <!-- FIRST TIME SUBMIT -->
                     <input type="file" name="receipt" required>
-                    <button type="submit" class="submit-btn">
-                        Submit Payment
-                    </button>
+                    <button type="submit" class="submit-btn">Submit Payment</button>
 
                 {% elif existing_payment.payment_status == "pending" %}
-                    <!-- PENDING -->
-                    <div class="payment-status warning">
-                        ⏳ Payment Under Verification
-                    </div>
+                    <div class="payment-status warning">⏳ Payment Under Verification</div>
+                    <a href="?summary=1" class="submit-btn"
+                       style="text-decoration:none; text-align:center; display:block; margin-top:12px;">
+                        View Payment Summary
+                    </a>
 
                 {% elif existing_payment.payment_status == "failed" %}
-                    <!-- REJECTED -->
-                    <div class="payment-status error">
-                        ❌ Payment Rejected. Please Re-upload Receipt.
-                    </div>
-
-                    <input type="file" name="receipt" required>
-                    <button type="submit" class="submit-btn">
-                        Re-Submit Payment
-                    </button>
+                    <div class="payment-status error">❌ Payment Rejected. Please Re-upload Receipt.</div>
+                    <a href="?summary=1" class="submit-btn"
+                       style="text-decoration:none; text-align:center; display:block; margin-top:12px; background:#888;">
+                        View Payment Summary
+                    </a>
+                    <input type="file" name="receipt" required style="margin-top:12px;">
+                    <button type="submit" class="submit-btn" style="margin-top:8px;">Re-Submit Payment</button>
 
                 {% elif existing_payment.payment_status == "completed" %}
-                    <!-- COMPLETED -->
-                    <div class="payment-status success">
-                        ✅ Payment Completed Successfully
-                    </div>
-
-                    <div class="no-payment">
-                        🎉 No Payment Remaining
-                    </div>
-                     <a href="#" class="submit-btn" style="text-decoration:none; text-align:center; display:block; margin-top:12px;">
-                         Download Payment Receipt
+                    <div class="payment-status success">✅ Payment Completed Successfully</div>
+                    <div class="no-payment">🎉 No Payment Remaining</div>
+                    <a href="?summary=1" class="submit-btn"
+                       style="text-decoration:none; text-align:center; display:block; margin-top:12px;">
+                        View Payment Summary
                     </a>
                 {% endif %}
 
@@ -99,6 +90,82 @@
         <div class="note">
             <p><strong>Note:</strong> Full payment is non-refundable.</p>
         </div>
+
+        {% endif %}
+
+
+        <!-- ============================================================ -->
+        <!-- PAYMENT SUMMARY CARD — shown when ?summary=1                -->
+        <!-- ============================================================ -->
+        {% if view_summary and existing_payment %}
+
+        <div class="summary-card">
+
+            <div class="summary-card-header">
+                <span class="summary-card-icon">🧾</span>
+                <div>
+                    <h3>Payment Summary</h3>
+                    <p>Full Payment</p>
+                </div>
+                {% if existing_payment.payment_status == "completed" %}
+                    <span class="status paid" style="margin-left:auto;">Paid</span>
+                {% elif existing_payment.payment_status == "pending" %}
+                    <span class="status pending" style="margin-left:auto;">Pending Verification</span>
+                {% elif existing_payment.payment_status == "failed" %}
+                    <span class="status rejected" style="margin-left:auto;">Rejected</span>
+                {% endif %}
+            </div>
+
+            <div class="summary-card-divider"></div>
+
+            <div class="summary-card-body">
+
+                <div class="summary-card-row">
+                    <span class="summary-label">Payment Type</span>
+                    <span class="summary-value">Full Payment</span>
+                </div>
+
+                <div class="summary-card-row">
+                    <span class="summary-label">Amount Paid</span>
+                    <span class="summary-value strong">₹{{ existing_payment.amount|floatformat:2 }}</span>
+                </div>
+
+                <div class="summary-card-row">
+                    <span class="summary-label">Payment Date</span>
+                    <span class="summary-value">
+                        {% if existing_payment.payment_date %}
+                            {{ existing_payment.payment_date|date:"M d, Y" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="summary-card-row">
+                    <span class="summary-label">Payment Method</span>
+                    <span class="summary-value">{{ existing_payment.get_payment_method_display|default:"—" }}</span>
+                </div>
+
+                <div class="summary-card-row">
+                    <span class="summary-label">Transaction ID</span>
+                    <span class="summary-value" style="font-size:12px; color:#888;">
+                        {{ existing_payment.transaction_id|default:"—" }}
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="summary-card-divider"></div>
+
+            <div class="summary-card-footer">
+                <a href="{% url 'student:payment_portal' %}" class="pay-btn" style="background:#888;">
+                    ← Back to Payment
+                </a>
+            </div>
+
+        </div>
+
+        {% endif %}
 
     </div>
 </div>
