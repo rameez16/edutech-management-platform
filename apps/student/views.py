@@ -16,11 +16,8 @@ import os
 import calendar
 from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement,Notification, Admission
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial,Exam,ExamResult,ExamSubmission
-from apps.bdm.models import Student, Trainer, Course, Batch,StudentAdminProfile, OnboardingChecklist,StudentIssue, PaymentDocument,Announcement,Notification
-
+from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial,Exam,ExamResult,ExamSubmission,Certificate
 from apps.accounts.decorators import role_required
-from apps.trainer.models import Module, LessonPlan, TaskSubmission, Task, LessonSession, Attendance, SessionMaterial,Certificate
 from apps.student.models import LeaveApplication
 from .models import FeePayment, StudentDocument,EnrollmentAgreement, StudentIDCard,StudentFeedback
 from .forms import EnrollmentAgreementForm,TaskSubmissionForm
@@ -33,6 +30,7 @@ from datetime import date
 from datetime import timedelta
 import re
 #rinta
+
 
 #Edit Profile
 
@@ -527,6 +525,35 @@ def certificate_view(request):
     }
 
     return render(request, "student/dashboard/certificate.html", context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
