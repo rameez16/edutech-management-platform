@@ -109,9 +109,15 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("announcements/", views.announcement_list, name="announcement_list"),
                 path("announcements/create/", views.announcement_create, name="announcement_create"),
                 
-                 path("trainer-leave/", views.trainer_leave_list, name="trainer_leave_list"),
-                 path("trainer-leave/<int:pk>/", views.trainer_leave_detail, name="trainer_leave_detail"),
-                 path("trainer-leave/<int:pk>/update/", views.update_trainer_leave_status, name="update_trainer_leave_status"),
+                path("trainer-leave/", views.trainer_leave_list, name="trainer_leave_list"),
+                path("trainer-leave/<int:pk>/", views.trainer_leave_detail, name="trainer_leave_detail"),
+                path("trainer-leave/<int:pk>/update/", views.update_trainer_leave_status, name="update_trainer_leave_status"),
+                 
+                path("exams/", views.exam_list, name="exam_list"),
+                path("exams/<int:pk>/results/", views.exam_results, name="exam_results"),
+                path("certificate/issue/<int:result_id>/",views.issue_certificate_single,name="issue_certificate_single"),
+                path("exams/results/published/",views.published_exam_results,name="published_exam_results"),
+               path("eligible-certificates/", views.eligible_certificate_list, name="eligible_certificate_list"),
                 ]
 
 
