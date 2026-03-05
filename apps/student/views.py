@@ -3826,3 +3826,38 @@ def submit_exam(request, exam_id):
         pass
 
     return redirect('student:attend_exam', exam_id=exam_id)
+
+
+
+
+@login_required
+def get_notifications(request):
+    notifications = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False
+    ).order_by('-created_at')[:20]
+
+    data = [
+        {
+            "id": n.id,
+            "title": n.title,
+            "message": n.message,
+            "type": n.notification_type,
+            "link_url": n.link_url,
+            "created_at": n.created_at.strftime("%b %d, %I:%M %p"),
+        }
+        for n in notifications
+    ]
+    return JsonResponse({"notifications": data, "count": len(data)})
+
+
+@login_required
+def mark_notification_read(request, notif_id):
+    if request.method == "POST":
+        try:
+            notif = Notification.objects.get(id=notif_id, recipient=request.user)
+            notif.mark_as_read()
+            return JsonResponse({"success": True})
+        except Notification.DoesNotExist:
+            return JsonResponse({"success": False}, status=404)
+    return JsonResponse({"success": False}, status=405)
