@@ -1,0 +1,308 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap');
+
+  :root {
+    --blue-50: #f0f7ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --white: #ffffff;
+    --gray-100: #f3f4f6;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --radius: 14px;
+    --radius-pill: 999px;
+    --shadow: 0 4px 20px rgba(37,99,235,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  body {
+    background: var(--blue-50);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .pr-wrapper {
+    /*max-width: 1200px;*/
+    margin: 0 auto;
+    padding: 36px 24px 64px;
+  }
+
+  /* ── Back button ── */
+  .er-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--blue-600);
+    text-decoration: none;
+    margin-bottom: 22px;
+    padding: 6px 14px 6px 10px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--blue-200);
+    background: var(--white);
+    transition: all .18s ease;
+  }
+  .er-back svg { width: 15px; height: 15px; }
+  .er-back:hover {
+    background: var(--blue-600);
+    color: var(--white);
+    border-color: var(--blue-600);
+    text-decoration: none;
+    transform: translateX(-2px);
+  }
+
+  /* ── Page header ── */
+  .pr-header { margin-bottom: 28px; }
+
+  .pr-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 6px;
+  }
+
+  .pr-subtitle {
+    font-size: 15px;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  /* ── Grid ── */
+  .pr-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) { .pr-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .pr-grid { grid-template-columns: 1fr; } }
+
+  /* ── Card ── */
+  .pr-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--blue-100);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+    animation: fadeUp .35s ease both;
+  }
+
+  .pr-card:nth-child(1) { animation-delay:.05s }
+  .pr-card:nth-child(2) { animation-delay:.10s }
+  .pr-card:nth-child(3) { animation-delay:.15s }
+  .pr-card:nth-child(4) { animation-delay:.20s }
+  .pr-card:nth-child(n+5) { animation-delay:.25s }
+
+  .pr-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 32px rgba(37,99,235,0.14), 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  /* top accent line */
+  .pr-card::before {
+    content: '';
+    display: block;
+    height: 3px;
+    background: linear-gradient(90deg, var(--blue-400, #60a5fa), var(--blue-600));
+  }
+
+  .pr-card-body {
+    padding: 20px 22px;
+    flex: 1;
+  }
+
+  .pr-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 14px;
+    line-height: 1.3;
+  }
+
+  .pr-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 12px;
+  }
+
+  .pr-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 14.5px;
+    color: var(--gray-700);
+  }
+
+  .pr-meta-row svg {
+    width: 15px; height: 15px;
+    color: var(--blue-600);
+    flex-shrink: 0;
+  }
+
+  .pr-meta-row strong {
+    font-weight: 600;
+    color: var(--gray-500);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    min-width: 42px;
+  }
+
+  .pr-desc {
+    font-size: 13.5px;
+    color: var(--gray-400);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── Card footer ── */
+  .pr-card-footer {
+    padding: 14px 22px;
+    border-top: 1px solid var(--gray-100);
+    background: var(--white);
+  }
+
+  .pr-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    background: var(--blue-600);
+    color: var(--white);
+    border: none;
+    transition: all .18s ease;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.22);
+  }
+
+  .pr-btn svg { width: 14px; height: 14px; }
+
+  .pr-btn:hover {
+    background: var(--blue-700);
+    color: var(--white);
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.32);
+  }
+
+  /* ── Empty state ── */
+  .pr-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 64px 24px;
+    color: var(--gray-400);
+  }
+
+  .pr-empty-icon {
+    width: 52px; height: 52px;
+    background: var(--blue-50);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    border: 1.5px solid var(--blue-100);
+  }
+
+  .pr-empty-icon svg { width: 24px; height: 24px; color: var(--blue-200); }
+  .pr-empty h5 { font-size: 15px; font-weight: 600; color: var(--gray-500); margin: 0 0 6px; }
+  .pr-empty p  { font-size: 13px; margin: 0; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+</style>
+
+<div class="pr-wrapper">
+
+  <!-- Back Button -->
+  <a href="{% url 'bdm:exam_list' %}" class="er-back">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Back
+  </a>
+
+  <!-- Header -->
+  <div class="pr-header">
+    <h2 class="pr-title">Published Exam Results</h2>
+    <p class="pr-subtitle">Click a batch to view detailed results</p>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="pr-grid">
+
+    {% for exam in exams %}
+    <div class="pr-card">
+
+      <div class="pr-card-body">
+        <h5 class="pr-card-title">{{ exam.title }}</h5>
+
+        <div class="pr-meta">
+          <div class="pr-meta-row">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <strong>Batch</strong>
+            {{ exam.batch.name }}
+          </div>
+
+          <div class="pr-meta-row">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <strong>Date</strong>
+            {{ exam.scheduled_date }}
+          </div>
+        </div>
+
+        <p class="pr-desc">{{ exam.description|truncatewords:12 }}</p>
+      </div>
+
+      <div class="pr-card-footer">
+        <a href="{% url 'bdm:exam_results' exam.id %}" class="pr-btn">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          View Detailed Results
+        </a>
+      </div>
+
+    </div>
+
+    {% empty %}
+    <div class="pr-empty">
+      <div class="pr-empty-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </div>
+      <h5>No published results</h5>
+      <p>No published results available.</p>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+{% endblock %}

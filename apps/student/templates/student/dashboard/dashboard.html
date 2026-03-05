@@ -114,7 +114,7 @@
             <div class="profile-card-body">
                 <div class="profile-details">
                     <div class="stat-value">{{ student.full_name }}</div>
-                    <h3>ID: {% if admin_profile %}{{ admin_profile.student_code }}{% else %}N/A{% endif %}</h3>
+                    <h3>ID: {{ admin_profile.student_id|default:"N/A" }}</h3>
                     <span class="stat-change {% if user.is_active %}positive{% else %}inactive{% endif %}">
                         {% if user.is_active %}Active Student{% else %}Inactive{% endif %}
                     </span>
@@ -174,6 +174,8 @@
     </div>
 </div>
 
+
+
         <!-- PAYMENT STATUS CARD -->
 <div class="glass-card stat-card payment-smart-card">
 
@@ -181,7 +183,6 @@
         <span class="payment-smart-label">PAYMENT STATUS</span>
         <div class="payment-smart-icon
             {% if payment_card_state == 'locked' %}psi-grey
-            {% elif payment_card_state == 'admission_due' %}psi-red
             {% elif payment_card_state == 'full_paid' %}psi-green
             {% elif payment_card_state == 'installment' and overdue_installment %}psi-red
             {% elif payment_card_state == 'installment' %}psi-amber
@@ -189,6 +190,7 @@
             ₹
         </div>
     </div>
+    
 
     {% if payment_card_state == 'locked' %}
         <!-- STATE 1: Portal not unlocked -->
@@ -196,47 +198,45 @@
             <div class="psb-icon">🔒</div>
             <div class="psb-content">
                 <strong>Payment Portal Locked</strong>
-                
             </div>
         </div>
 
-    {% elif payment_card_state == 'admission_due' %}
-        <!-- STATE 2: Admission fee not paid -->
-        <div class="psb psb-danger">
-            <div class="psb-icon">⚠️</div>
-            <div class="psb-content">
-                <strong>Admission Fee Pending</strong>
-                <span>Please complete your admission fee payment</span>
-            </div>
-        </div>
-        <a href=" {% url 'student:payment_gateway' %}" class="psb-action-btn psb-btn-red">
-            Pay Now →
-        </a>
 
     {% elif payment_card_state == 'full_paid' %}
         <!-- STATE 3: Fully paid -->
         <div class="psb psb-success">
             <div class="psb-icon">✅</div>
             <div class="psb-content">
+
                 <strong>All Payments Cleared</strong>
                 <span>Total Paid: ₹{{ paid_amount }}</span>
             </div>
         </div>
-
+        
+        
     {% elif payment_card_state == 'installment' %}
-    <!-- STATE 4: Installment plan -->
+        <!-- STATE 4: Installment / EMI / PDC -->
+
         {% if overdue_installment %}
-        <!-- Overdue -->
             <div class="psb psb-danger">
                 <div class="psb-icon">🔴</div>
                 <div class="psb-content">
-                    <strong>EMI Overdue — ₹{{ overdue_installment.amount }}</strong>
+                    {% if plan == "emi" %}
+                        <strong>EMI Overdue — ₹{{ overdue_installment.amount }}</strong>
+                    {% elif plan == "pdc" %}
+                        <strong>Cheque Overdue — ₹{{ overdue_installment.amount }}</strong>
+                    {% else %}
+                        <strong>Installment Overdue — ₹{{ overdue_installment.amount }}</strong>
+                    {% endif %}
                     <span>Due date was {{ overdue_installment.due_date|date:"d M Y" }}</span>
                 </div>
             </div>
             <div class="psb-installment-progress">
                 <div class="psb-ip-labels">
-                    <span>EMI {{ completed_installments }}/{{ total_installments }} paid</span>
+                    {% if plan == "emi" %}<span>EMI
+                    {% elif plan == "pdc" %}<span>Cheque
+                    {% else %}<span>Installment{% endif %}
+                    {{ completed_installments }}/{{ total_installments }} paid</span>
                     <span>Balance: ₹{{ fee_balance }}</span>
                 </div>
                 <div class="psb-ip-bar">
@@ -245,22 +245,30 @@
                     </div>
                 </div>
             </div>
-            <a href="{% url 'student:payment_gateway' %}" class="psb-action-btn psb-btn-purple">
+            <a href="{% url 'student:payment_portal' %}" class="psb-action-btn psb-btn-purple">
                 View Payment Portal →
             </a>
 
         {% elif next_installment %}
-            <!-- Next EMI is due -->
             <div class="psb psb-warning">
                 <div class="psb-icon">📅</div>
                 <div class="psb-content">
-                    <strong>Next EMI — ₹{{ next_installment.amount }}</strong>
+                    {% if plan == "emi" %}
+                        <strong>Next EMI — ₹{{ next_installment.amount }}</strong>
+                    {% elif plan == "pdc" %}
+                        <strong>Next Cheque — ₹{{ next_installment.amount }}</strong>
+                    {% else %}
+                        <strong>Next Installment — ₹{{ next_installment.amount }}</strong>
+                    {% endif %}
                     <span>Due: {{ next_installment.due_date|date:"d M Y"|default:"—" }}</span>
                 </div>
             </div>
             <div class="psb-installment-progress">
                 <div class="psb-ip-labels">
-                    <span>EMI {{ completed_installments }}/{{ total_installments }} paid</span>
+                    {% if plan == "emi" %}<span>EMI
+                    {% elif plan == "pdc" %}<span>Cheque
+                    {% else %}<span>Installment{% endif %}
+                    {{ completed_installments }}/{{ total_installments }} paid</span>
                     <span>Balance: ₹{{ fee_balance }}</span>
                 </div>
                 <div class="psb-ip-bar">
@@ -269,40 +277,46 @@
                     </div>
                 </div>
             </div>
-            <a href="{% url 'student:payment_gateway' %}" class="psb-action-btn psb-btn-purple">
+            <a href="{% url 'student:payment_portal' %}" class="psb-action-btn psb-btn-purple">
                 View Payment Portal →
             </a>
 
         {% else %}
-        <!-- No overdue, no pending due yet — next installment not due -->
             <div class="psb psb-success">
                 <div class="psb-icon">✅</div>
                 <div class="psb-content">
-                    <strong>EMI {{ completed_installments }}/{{ total_installments }} Paid</strong>
-                    <span>Next installment not due yet</span>
+                    {% if plan == "emi" %}
+                        <strong>EMI {{ completed_installments }}/{{ total_installments }} Paid</strong>
+                        <span>Next EMI not due yet</span>
+                    {% elif plan == "pdc" %}
+                        <strong>Cheque {{ completed_installments }}/{{ total_installments }} Paid</strong>
+                        <span>Next cheque not due yet</span>
+                    {% else %}
+                        <strong>Installment {{ completed_installments }}/{{ total_installments }} Paid</strong>
+                        <span>Next installment not due yet</span>
+                    {% endif %}
                 </div>
             </div>
 
         {% endif %}
 
     {% else %}
-        <!-- STATE 5: Balance due (no installment plan) -->
+        <!-- STATE 5: Balance due (full payment plan, not yet paid) -->
         <div class="psb psb-warning">
             <div class="psb-icon">⏳</div>
             <div class="psb-content">
+                
                 <strong>Balance Due — ₹{{ fee_balance }}</strong>
                 <span>Paid: ₹{{ paid_amount }} of ₹{{ total_fee }}</span>
             </div>
         </div>
-        <a href="{% url 'student:payment_gateway' %}" class="psb-action-btn psb-btn-amber">
+        <a href="{% url 'student:payment_portal' %}" class="psb-action-btn psb-btn-amber">
             Complete Payment →
         </a>
 
     {% endif %}
 
 </div>
-
-
 
         <!-- Announcements Card -->
         <div class="glass-card glass-card-3d stat-card">
@@ -435,7 +449,7 @@
         <a href="{% url 'student:student_tasks' %}" class="quick-link-btn green">
             ✅ Submit Task
         </a>
-        <a href="{% url 'student:payment' %}" class="quick-link-btn orange">
+        <a href="{% url 'student:payment_portal' %}" class="quick-link-btn orange">
             💳 Pay Now
         </a>
     </div>

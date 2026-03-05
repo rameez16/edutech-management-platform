@@ -1,118 +1,782 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EDUTECH | Online Learning Platform</title>
+  <title>{% block title %}EDUTECH | Online Learning Platform{% endblock %}</title>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'landing_page/css/templatemo-606-string-master.css' %}">
-  <link rel="stylesheet" href="{% static 'landing_page/css/style.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  
+  <style>
+    /* ─── RESET & VARIABLES ─── */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Dark theme (default) */
+      --primary: #8B5CF6;
+      --primary-dark: #7C3AED;
+      --primary-light: #A78BFA;
+      --primary-soft: rgba(139, 92, 246, 0.1);
+      
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #12121A;
+      --bg-tertiary: #1A1A24;
+      --bg-card: rgba(26, 26, 36, 0.5);
+      
+      --text-primary: #FFFFFF;
+      --text-secondary: #A0A0B0;
+      --text-tertiary: #6B6B7B;
+      --text-inverse: #0A0A0F;
+      
+      --border-light: rgba(255, 255, 255, 0.06);
+      --border-medium: rgba(255, 255, 255, 0.12);
+      
+      --success: #10B981;
+      --error: #EF4444;
+      --info: #3B82F6;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+      
+      --nav-height: 72px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Light theme variables */
+    [data-theme="light"] {
+      --bg-primary: #F9FAFB;
+      --bg-secondary: #FFFFFF;
+      --bg-tertiary: #F3F4F6;
+      --bg-card: rgba(255, 255, 255, 0.8);
+      
+      --text-primary: #111827;
+      --text-secondary: #4B5563;
+      --text-tertiary: #9CA3AF;
+      --text-inverse: #FFFFFF;
+      
+      --border-light: rgba(0, 0, 0, 0.05);
+      --border-medium: rgba(0, 0, 0, 0.1);
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Subtle noise texture */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── NAVBAR ─── */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--nav-height);
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-light);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .navbar-container {
+      max-width: 1400px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover .logo-mark {
+      transform: rotate(-5deg) scale(1.05);
+    }
+
+    .logo-mark i {
+      width: 20px;
+      height: 20px;
+      color: white;
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-text span {
+      color: var(--primary);
+    }
+
+    /* Desktop Navigation */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      list-style: none;
+      margin-left: auto;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-full);
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a i {
+      width: 18px;
+      height: 18px;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .nav-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border-medium);
+      margin: 0 0.5rem;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 38px;
+      height: 38px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-secondary);
+    }
+
+    .theme-toggle:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .theme-toggle i {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Login Button */
+    .btn-login {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border: none;
+      border-radius: var(--radius-full);
+      color: white;
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+    }
+
+    .btn-login i {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+    }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-btn.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .mobile-menu-btn.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-btn.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      position: fixed;
+      top: var(--nav-height);
+      left: 0;
+      right: 0;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-light);
+      backdrop-filter: blur(12px);
+      padding: 1rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.25rem;
+      z-index: 999;
+      animation: slideDown 0.3s ease;
+    }
+
+    .mobile-menu.open {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+
+    .mobile-menu a i {
+      width: 18px;
+      height: 18px;
+    }
+
+    .mobile-menu a:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .mobile-divider {
+      height: 1px;
+      background: var(--border-light);
+      margin: 0.5rem 0;
+    }
+
+    .mobile-login {
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: var(--radius-md);
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .mobile-login i {
+      width: 18px;
+      height: 18px;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Main Content */
+    .main-content {
+      padding-top: var(--nav-height);
+      min-height: calc(100vh - var(--nav-height));
+    }
+
+    /* Flash Messages */
+    .messages-container {
+      position: fixed;
+      top: calc(var(--nav-height) + 1rem);
+      right: 1.5rem;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 360px;
+    }
+
+    .message {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-lg);
+      animation: messageIn 0.3s ease;
+    }
+
+    .message i {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .message.success i { color: var(--success); }
+    .message.error i { color: var(--error); }
+    .message.info i { color: var(--info); }
+
+    .message-content {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-light);
+      padding: 4rem 0 2rem;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand p {
+      color: var(--text-tertiary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-top: 1rem;
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .footer-col ul a {
+      color: var(--text-tertiary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .footer-col ul a:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-col ul a i {
+      width: 16px;
+      height: 16px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .footer-col ul a:hover i {
+      opacity: 1;
+    }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-light);
+      color: var(--text-tertiary);
+      font-size: 0.9rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .social-links a {
+      color: var(--text-tertiary);
+      transition: all 0.2s ease;
+    }
+
+    .social-links a:hover {
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .social-links i {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-container {
+        padding: 0 1.5rem;
+      }
+
+      .nav-links,
+      .nav-divider,
+      .theme-toggle,
+      .btn-login {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+        margin-left: auto;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
 
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-container">
 
-<!-- Navigation -->
-  <nav>
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <div class="logo-icon">##</div>
-        EDUTECH
+      <!-- Logo -->
+      <a href="{% url 'landing_page:landing' %}" class="logo">
+       
+          <i data-feather="target"></i>
+   
+        <span class="logo-text">Victus Tech Lab</span>
       </a>
-      <ul class="nav-links">
-        <li><a href="{% url 'landing_page:landing' %}#courses">Courses</a></li>
-  <li><a href="{% url 'landing_page:landing' %}#aboutus">About Us</a></li>
-  <li><a href="{% url 'landing_page:landing' %}#contactpage">Contact</a></li>
-  <li><a href="{% url 'landing_page:landing' %}#testimonials">Reviews</a></li>
 
-<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-        <div class="theme-toggle-slider">
-          <svg id="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-          <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-        </div>
+      <!-- Desktop Navigation -->
+      <ul class="nav-links">
+        <li><a href="{% url 'landing_page:landing' %}#courses"><i data-feather="book-open"></i> Courses</a></li>
+        <li><a href="{% url 'landing_page:landing' %}#aboutus"><i data-feather="info"></i> About</a></li>
+        <li><a href="{% url 'landing_page:landing' %}#testimonials"><i data-feather="star"></i> Reviews</a></li>
+        <li><a href="{% url 'landing_page:landing' %}#contactpage"><i data-feather="mail"></i> Contact</a></li>
+      </ul>
+
+      <div class="nav-divider"></div>
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle">
+        <i data-feather="moon" id="moonIcon"></i>
+        <i data-feather="sun" id="sunIcon" style="display: none;"></i>
       </button>
 
-      </ul>
-      <a href="#contact" class="nav-cta"><span>Login</span></a>
-      <button class="mobile-menu-btn">☰</button>
+      <!-- Simple Login Button with Icon -->
+      <a href="{% url 'accounts:login' %}" class="btn-login">
+        <i data-feather="log-in"></i>
+        User Login
+      </a>
+
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
     </div>
   </nav>
 
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="{% url 'landing_page:landing' %}#courses">
+      <i data-feather="book-open"></i> Courses
+    </a>
+    <a href="{% url 'landing_page:landing' %}#aboutus">
+      <i data-feather="info"></i> About
+    </a>
+    <a href="{% url 'landing_page:landing' %}#testimonials">
+      <i data-feather="star"></i> Reviews
+    </a>
+    <a href="{% url 'landing_page:landing' %}#contactpage">
+      <i data-feather="mail"></i> Contact
+    </a>
+    <div class="mobile-divider"></div>
+    <a href="{% url 'accounts:login' %}" class="mobile-login">
+      <i data-feather="log-in"></i>
+      Login
+    </a>
+  </div>
 
-  {% block content %}
+  <!-- Main Content -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
 
-  {% endblock %}
+  <!-- Flash Messages -->
+  {% if messages %}
+  <div class="messages-container" id="messages">
+    {% for message in messages %}
+    <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+      <i data-feather="{% if 'success' in message.tags %}check-circle{% elif 'error' in message.tags %}alert-circle{% else %}info{% endif %}"></i>
+      <span class="message-content">{{ message }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
-<!-- Footer -->
-  <footer>
+  <!-- Footer -->
+  <footer class="footer">
     <div class="footer-container">
       <div class="footer-grid">
+
         <div class="footer-brand">
-          <a href="#" class="logo">
-            <div class="logo-icon">##</div>
-            EDUTECH
+          <a href="{% url 'landing_page:landing' %}" class="logo">
+            <div class="logo-mark">
+              <i data-feather="layers"></i>
+            </div>
+            <span class="logo-text">EDU<span>TECH</span></span>
           </a>
-          <p>Transforming lives through world-class software development education. Building tomorrow's tech leaders today.</p>
+          <p>Empowering learners worldwide with industry-focused tech education.</p>
         </div>
-        <div>
-          <h4 class="footer-title">Product</h4>
-          <ul class="footer-links">
-            <li><a href="#courses">Courses</a></li>
-            <li><a href="#aboutus">About Us</a></li>
-            <li><a href="#testimonials">Reviews</a></li>
-            <li><a href="#contact">Contact</a></li>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="#"><i data-feather="arrow-right"></i> All Courses</a></li>
+            <li><a href="#"><i data-feather="arrow-right"></i> Learning Paths</a></li>
+            <li><a href="#"><i data-feather="arrow-right"></i> For Teams</a></li>
           </ul>
         </div>
-        <div>
-          <h4 class="footer-title">Company</h4>
-          <ul class="footer-links">
-            <li><a href="#aboutus">About Us</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#contact">Contact</a></li>
+
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#aboutus"><i data-feather="arrow-right"></i> About Us</a></li>
+            <li><a href="#"><i data-feather="arrow-right"></i> Careers</a></li>
+            <li><a href="#"><i data-feather="arrow-right"></i> Blog</a></li>
           </ul>
         </div>
-        <div>
-          <h4 class="footer-title">Support</h4>
-          <ul class="footer-links">
-            <li><a href="#">Help Center</a></li>
-            <li><a href="#">Community</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Privacy Policy</a></li>
+
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#"><i data-feather="arrow-right"></i> Help Center</a></li>
+            <li><a href="#"><i data-feather="arrow-right"></i> Contact</a></li>
+            <li><a href="#"><i data-feather="arrow-right"></i> Privacy</a></li>
           </ul>
         </div>
+
       </div>
+
       <div class="footer-bottom">
-        <span>© 2026 EDUTECH. All rights reserved.</span>
-        <span>Empowering learners worldwide</span>
+        <span>© {% now "Y" %} EDUTECH. All rights reserved.</span>
+        <div class="social-links">
+          <a href="#" aria-label="Twitter"><i data-feather="twitter"></i></a>
+          <a href="#" aria-label="LinkedIn"><i data-feather="linkedin"></i></a>
+          <a href="#" aria-label="GitHub"><i data-feather="github"></i></a>
+        </div>
       </div>
     </div>
   </footer>
 
-   <script src="{% static 'landing_page/js/templatemo-606-string-scripts.js' %}"></script>
+  <script>
+    feather.replace();
 
-  {% if messages %}
-  <div id="popup-message" class="popup">
-    {% for message in messages %}
-      <p>{{ message }}</p>
-    {% endfor %}
-  </div>
-{% endif %}
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    });
 
+    // Mobile menu
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    mobileBtn.addEventListener('click', () => {
+      mobileBtn.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+
+    // Close mobile menu on link click
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileBtn.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIcon = document.getElementById('sunIcon');
+    
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      moonIcon.style.display = 'none';
+      sunIcon.style.display = 'block';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      
+      if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'light');
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        moonIcon.style.display = 'block';
+        sunIcon.style.display = 'none';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    // Auto-dismiss messages
+    const messages = document.getElementById('messages');
+    if (messages) {
+      setTimeout(() => {
+        messages.style.transition = 'opacity 0.3s, transform 0.3s';
+        messages.style.opacity = '0';
+        messages.style.transform = 'translateX(20px)';
+        setTimeout(() => messages.remove(), 300);
+      }, 4000);
+    }
+  </script>
 </body>
 </html>

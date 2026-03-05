@@ -8,7 +8,7 @@ from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
 from django.db.models import Max
 from django.db.models import Case, When, IntegerField
-
+from django.utils.timezone import now
 
 from django.db.models import Prefetch
 
@@ -25,11 +25,29 @@ from .form import StudentAdminProfileForm, TrainerAdminProfileForm
 from django.db.models import Sum, Avg
 
 from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
-from apps.bdm.models import Student ,PaymentDocument ,StudentIssue ,Announcement ,BatchSchedule
+from apps.bdm.models import Student ,PaymentDocument ,StudentIssue ,Announcement ,BatchSchedule 
 
-from apps.trainer.models import Module,TrainerLeave
+from apps.trainer.models import Module,TrainerLeave,Exam ,ExamResult,Certificate
 from apps.trainer.models import Module
 
+from django.db.models import Exists, OuterRef
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import Image
+from reportlab.platypus import PageBreak
+from reportlab.platypus import Table
+from reportlab.platypus import TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from django.core.files.base import ContentFile
+from reportlab.lib.pagesizes import A4,landscape
+from django.template.loader import render_to_string
+from PIL import Image, ImageDraw, ImageFont
+import io
+from reportlab.pdfgen import canvas
+from io import BytesIO
+from django.core.files.base import File
 
 # Create your views here.
 
@@ -716,7 +734,7 @@ def update_lead_followup(request, pk):
         lead.admission_fee_paid = request.POST.get("admission_fee_paid") == "on"
         lead.admission_fee_amount=request.POST.get("admission_fee")
 
-        # lead.status = Lead.LeadStatus.FOLLOWED  # optional
+        lead.status = Lead.LeadStatus.FOLLOWED  # optional
         lead.save()
 
         messages.success(request, "Follow-up details updated successfully!")
@@ -1469,7 +1487,7 @@ def course_fee(request):
     return render(request, "bdm/payments/course_fee.html", {
         "students": student_data
     })
-    
+
 @role_required('admin')
 def payment_history(request, student_id):
     # ================= GET STUDENT =================
@@ -2606,3 +2624,150 @@ def update_trainer_leave_status(request, pk):
     leave.save()
 
     return redirect("bdm:trainer_leave_detail", pk=pk)
+
+#exam -aleena
+
+def exam_list(request):
+    exams = Exam.objects.filter(
+        scheduled_date__gte=now().date()
+    ).select_related("batch", "created_by")
+
+    return render(request, "bdm/exam/exam_list.html", {
+        "exams": exams
+    })
+    
+#result published exam list
+
+def published_exam_results(request):
+    exams = Exam.objects.filter(
+        is_published=True
+    ).select_related("batch", "created_by").order_by("-scheduled_date")
+
+    return render(request, "bdm/exam/published_exam_results.html", {
+        "exams": exams
+    })
+
+#certificate eligibility list
+
+def eligible_certificate_list(request):
+    # Subquery: check if a certificate exists for this student & batch
+    certificate_exists = Certificate.objects.filter(
+        student=OuterRef('student'),
+        batch=OuterRef('exam__batch')
+    )
+
+    # All eligible + passed results without certificate yet
+    results = ExamResult.objects.filter(
+        is_pass=True,
+        is_eligible=True
+    ).select_related("student", "exam", "exam__batch").annotate(
+        certificate_exists=Exists(certificate_exists)
+    ).filter(
+        certificate_exists=False
+    ).order_by('exam__scheduled_date', 'exam__batch__name', 'student__full_name')
+
+    return render(request, "bdm/exam/eligible_certificates.html", {
+        "results": results
+    })
+#exam result detail-view page
+
+def exam_results(request, pk):
+    exam = get_object_or_404(
+        Exam.objects.select_related("batch", "created_by"),
+        pk=pk
+    )
+
+    # Subquery to check if certificate already exists
+    certificate_subquery = Certificate.objects.filter(
+        student=OuterRef("student"),
+        batch=exam.batch
+    )
+
+    results = ExamResult.objects.filter(
+        exam=exam
+    ).select_related("student").annotate(
+        certificate_exists=Exists(certificate_subquery)
+    )
+
+    participated_count = results.filter(
+        marks_obtained__isnull=False
+    ).count()
+
+    context = {
+        "exam": exam,
+        "results": results,
+        "participated_count": participated_count,
+    }
+
+    return render(request, "bdm/exam/exam_results_detail.html", context)
+
+#certificate issue
+@require_POST
+def issue_certificate_single(request, result_id):
+    result = get_object_or_404(ExamResult, id=result_id)
+    student = result.student
+    exam = result.exam
+    batch = exam.batch
+    grade = getattr(result, "grade", None)  # get grade safely
+
+    # Prevent duplicate certificate
+    if Certificate.objects.filter(student=student, batch=batch).exists():
+        messages.warning(request, "Certificate already issued.")
+        return redirect("bdm:exam_results", pk=exam.id)
+
+    # Create certificate record
+    certificate = Certificate.objects.create(
+        student=student,
+        batch=batch,
+        certificate_type=Certificate.CertificateType.COMPLETION,
+        certificate_number=f"EDU-{batch.id}-{student.id}-{timezone.now().strftime('%Y%m%d%H%M%S')}",
+        issue_date=timezone.now().date(),
+        issued_by=exam.created_by,
+        approved_by=request.user,
+        is_eligible=True,
+        eligibility_checked_at=timezone.now()
+    )
+
+    # ==============================
+    # Create certificate image
+    # ==============================
+    width, height = 1200, 900
+    image = Image.new("RGB", (width, height), color="white")
+    draw = ImageDraw.Draw(image)
+
+    # Fonts (adjust path as needed)
+    font_large = ImageFont.truetype("arial.ttf", 50)
+    font_medium = ImageFont.truetype("arial.ttf", 30)
+    font_small = ImageFont.truetype("arial.ttf", 24)
+
+    # Centered text
+    student_name = student.user.get_full_name() or student.user.username
+    draw.text((width/2, 100), "CERTIFICATE OF COMPLETION", fill="black", anchor="mm", font=font_large)
+    draw.text((width/2, 250), "This is to certify that", fill="black", anchor="mm", font=font_medium)
+    draw.text((width/2, 320), student_name, fill="black", anchor="mm", font=font_large)
+    draw.text((width/2, 400), "has successfully completed the course", fill="black", anchor="mm", font=font_medium)
+    draw.text((width/2, 470), batch.name, fill="black", anchor="mm", font=font_large)
+
+    # Add grade
+    if grade:
+        draw.text((width/2, 540), f"Grade: {grade}", fill="black", anchor="mm", font=font_medium)
+
+    # Issue date and certificate number
+    draw.text((width/2, 650), f"Issue Date: {certificate.issue_date}", fill="black", anchor="mm", font=font_small)
+    draw.text((width/2, 700), f"Certificate No: {certificate.certificate_number}", fill="black", anchor="mm", font=font_small)
+
+    # Save image to memory
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    # Save to DB (FileField)
+    certificate.certificate_file.save(
+        f"{certificate.certificate_number}.png",
+        File(buffer),
+        save=True
+    )
+
+    buffer.close()
+    messages.success(request, "Certificate issued successfully!")
+    return redirect("bdm:exam_results", pk=exam.id)

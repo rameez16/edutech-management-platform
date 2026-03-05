@@ -19,6 +19,7 @@ class Lead(models.Model):
         CONVERTED = 'converted', 'Converted'
         IDLE = 'idle', 'Idle'
         DROPPED = 'dropped', 'Dropped'
+        FOLLOWED='followed','Followed'
     
     class ModeChoice(models.TextChoices):
         REMOTE = 'remote', 'Remote'
@@ -784,7 +785,7 @@ class OnboardingChecklist(models.Model):
         completed_steps = sum([
             self.documents_uploaded,
             self.documents_verified,
-            self.booking_fee_paid,
+            # self.booking_fee_paid,
             self.admission_fee_paid,
             self.payment_plan_created,
             self.enrollment_letter_generated,
@@ -792,9 +793,9 @@ class OnboardingChecklist(models.Model):
             self.id_card_generated,
             self.id_card_issued,
             self.lms_access_created,
-            self.pdc_collected if has_pdc_or_emi else True,
+            # self.pdc_collected if has_pdc_or_emi else True,
             self.batch_assigned,
-            self.orientation_completed
+            # self.orientation_completed
         ])
 
         return round((completed_steps / total_steps) * 100, 1)

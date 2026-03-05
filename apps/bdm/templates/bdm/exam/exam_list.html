@@ -1,0 +1,334 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap');
+
+  :root {
+    --blue-50: #f0f7ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-400: #60a5fa;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --white: #ffffff;
+    --gray-100: #f3f4f6;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --radius: 14px;
+    --radius-pill: 999px;
+  }
+
+  body {
+    background: var(--blue-50);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .ep-wrapper {
+    /*max-width: 1200px;*/
+    margin: 0 auto;
+    padding: 40px 24px 64px;
+  }
+
+  /* Header */
+  .ep-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .ep-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 6px;
+  }
+
+  .ep-subtitle {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  .ep-nav-btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* Buttons */
+  .ep-btn {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 18px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    transition: all .2s ease;
+    white-space: nowrap;
+  }
+
+  .ep-btn-success {
+    background: var(--white);
+    color: #166534;
+    border: 1.5px solid #bbf7d0;
+  }
+  .ep-btn-success:hover {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  .ep-btn-primary {
+    background: var(--blue-600);
+    color: var(--white);
+    border: 1.5px solid var(--blue-600);
+    box-shadow: 0 2px 8px rgba(37,99,235,0.22);
+  }
+  .ep-btn-primary:hover {
+    background: var(--blue-700);
+    border-color: var(--blue-700);
+    color: var(--white);
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(37,99,235,0.32);
+  }
+
+  /* Card */
+  .ep-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(37,99,235,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    border: 1px solid var(--blue-100);
+    overflow: hidden;
+  }
+
+  /* Table */
+  .ep-table-wrap { overflow-x: auto; }
+
+  .ep-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ep-table thead tr {
+    background: var(--blue-50);
+    border-bottom: 1.5px solid var(--blue-100);
+  }
+
+  .ep-table thead th {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--blue-600);
+    padding: 14px 20px;
+    white-space: nowrap;
+  }
+
+  .ep-table tbody tr {
+    border-bottom: 1px solid var(--gray-100);
+    transition: background .15s;
+    animation: fadeUp .3s ease both;
+  }
+  .ep-table tbody tr:nth-child(1) { animation-delay:.05s }
+  .ep-table tbody tr:nth-child(2) { animation-delay:.10s }
+  .ep-table tbody tr:nth-child(3) { animation-delay:.15s }
+  .ep-table tbody tr:nth-child(4) { animation-delay:.20s }
+  .ep-table tbody tr:nth-child(n+5) { animation-delay:.25s }
+  .ep-table tbody tr:last-child { border-bottom: none; }
+  .ep-table tbody tr:hover { background: var(--blue-50); }
+
+  .ep-table tbody td {
+    padding: 16px 20px;
+    font-size: 13.5px;
+    color: var(--gray-700);
+    vertical-align: middle;
+  }
+
+  .ep-table td strong {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 14px;
+  }
+
+  .ep-table td small.text-muted {
+    font-size: 12px;
+    color: var(--gray-400) !important;
+  }
+
+  /* Badges */
+  .ep-table .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: var(--radius-pill);
+  }
+  .ep-table .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ep-table .bg-success {
+    background: #dcfce7 !important;
+    color: #166534;
+  }
+  .ep-table .bg-success::before { background: #22c55e; }
+
+  .ep-table .bg-warning {
+    background: #fef9c3 !important;
+    color: #854d0e;
+  }
+  .ep-table .bg-warning::before { background: #eab308; }
+
+  /* Action button */
+  .ep-table .btn.btn-sm.btn-outline-success {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    transition: all .18s ease;
+    background: var(--white);
+    color: #166534;
+    border: 1.5px solid #bbf7d0;
+  }
+  .ep-table .btn.btn-sm.btn-outline-success:hover {
+    background: #166534;
+    color: var(--white);
+    border-color: #166534;
+    text-decoration: none;
+    box-shadow: 0 3px 10px rgba(22,101,52,0.2);
+  }
+
+  /* Empty row */
+  .ep-table td.text-center.text-muted {
+    padding: 52px 24px !important;
+    color: var(--gray-400) !important;
+    font-size: 14px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  @media (max-width: 640px) {
+    .ep-header { flex-direction: column; }
+    .ep-nav-btns { width: 100%; }
+    .ep-btn { flex: 1; justify-content: center; }
+  }
+</style>
+
+<div class="ep-wrapper">
+
+    <!-- Page Header -->
+    <div class="ep-header">
+        <div>
+            <h2 class="ep-title">Exam Schedules</h2>
+            <p class="ep-subtitle">
+                Exams created by trainers that are scheduled for future dates
+            </p>
+        </div>
+
+        <!-- Quick Navigation Buttons -->
+        <div class="ep-nav-btns">
+            {% comment %} {% for exam in exams %} {% endcomment %}
+            <a href="{% url 'bdm:published_exam_results' %}"
+               class="ep-btn ep-btn-success">
+               View Exam Results
+            </a>
+
+            <a href="{% url 'bdm:eligible_certificate_list' %}"
+               class="ep-btn ep-btn-primary">
+               Issue Certificates
+            </a>
+            {% comment %} {%endfor%} {% endcomment %}
+        </div>
+    </div>
+
+    <!-- Exam Table -->
+    <div class="ep-card">
+        <div class="ep-table-wrap">
+            <table class="ep-table">
+                <thead>
+                    <tr>
+                        <th>Exam</th>
+                        <th>Batch</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Duration</th>
+                        <th>Result</th>
+                        <th>Trainer</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in exams %}
+                    <tr>
+                        <td>
+                            <strong>{{ exam.title }}</strong><br>
+                            <small class="text-muted">
+                                {{ exam.description|truncatewords:10 }}
+                            </small>
+                        </td>
+
+                        <td>{{ exam.batch.name }}</td>
+                        <td>{{ exam.get_exam_type_display }}</td>
+                        <td>{{ exam.scheduled_date }}</td>
+                        <td>{{ exam.exam_time }}</td>
+                        <td>{{ exam.duration_minutes }} mins</td>
+
+                        <td>
+                            {% if exam.is_published %}
+                                <span class="badge bg-success">Published</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Not Published</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ exam.created_by }}</td>
+
+                        <td>
+                            <!-- Result Page -->
+                            <a href="{% url 'bdm:exam_results' exam.id %}"
+                               class="btn btn-sm btn-outline-success">
+                               Results
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            No scheduled exams available
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

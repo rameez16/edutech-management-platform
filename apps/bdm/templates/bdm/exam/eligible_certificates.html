@@ -1,0 +1,365 @@
+{% extends "bdm/layout/base.html" %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap');
+
+  :root {
+    --blue-50: #f0f7ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --white: #ffffff;
+    --gray-100: #f3f4f6;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --radius: 14px;
+    --radius-pill: 999px;
+    --shadow: 0 4px 20px rgba(37,99,235,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  body {
+    background: var(--blue-50);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .ec-wrapper {
+   /* max-width: 1000px;*/
+    margin: 0 auto;
+    padding: 36px 24px 64px;
+  }
+
+  /* ── Back button ── */
+  .er-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--blue-600);
+    text-decoration: none;
+    margin-bottom: 22px;
+    padding: 6px 14px 6px 10px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--blue-200);
+    background: var(--white);
+    transition: all .18s ease;
+  }
+  .er-back svg { width: 15px; height: 15px; }
+  .er-back:hover {
+    background: var(--blue-600);
+    color: var(--white);
+    border-color: var(--blue-600);
+    text-decoration: none;
+    transform: translateX(-2px);
+  }
+
+  /* ── Header ── */
+  .ec-header {
+    margin-bottom: 28px;
+  }
+
+  .ec-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 3vw, 27px);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 10px;
+  }
+
+  .ec-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .ec-meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--blue-700);
+    background: var(--blue-100);
+    border: 1px solid var(--blue-200);
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+  }
+
+  .ec-meta-chip svg { width: 13px; height: 13px; }
+
+  /* ── Card ── */
+  .ec-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--blue-100);
+    overflow: hidden;
+    animation: fadeUp .35s ease both;
+  }
+
+  .ec-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 24px;
+    background: var(--blue-50);
+    border-bottom: 1.5px solid var(--blue-100);
+  }
+
+  .ec-card-header h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+  }
+
+  .ec-card-header svg {
+    width: 18px; height: 18px;
+    color: var(--blue-600);
+    flex-shrink: 0;
+  }
+
+  /* ── Table ── */
+  .ec-table-wrap { overflow-x: auto; }
+
+  .ec-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ec-table thead tr {
+    background: var(--blue-50);
+    border-bottom: 1.5px solid var(--blue-100);
+  }
+
+  .ec-table thead th {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--blue-600);
+    padding: 14px 20px;
+    white-space: nowrap;
+  }
+
+  .ec-table tbody tr {
+    border-bottom: 1px solid var(--gray-100);
+    transition: background .15s;
+    animation: fadeUp .3s ease both;
+  }
+  .ec-table tbody tr:nth-child(1) { animation-delay:.06s }
+  .ec-table tbody tr:nth-child(2) { animation-delay:.12s }
+  .ec-table tbody tr:nth-child(3) { animation-delay:.18s }
+  .ec-table tbody tr:nth-child(4) { animation-delay:.22s }
+  .ec-table tbody tr:nth-child(n+5) { animation-delay:.26s }
+  .ec-table tbody tr:last-child { border-bottom: none; }
+  .ec-table tbody tr:hover { background: var(--blue-50); }
+
+  .ec-table tbody td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--gray-700);
+    vertical-align: middle;
+  }
+
+  /* student name */
+  .ec-table tbody td:first-child {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 14.5px;
+  }
+
+  /* marks */
+  .ec-marks {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    color: var(--gray-700);
+    font-size: 14px;
+  }
+
+  /* badge */
+  .ec-table .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+  }
+  .ec-table .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ec-table .bg-success {
+    background: #dcfce7 !important;
+    color: #166534;
+  }
+  .ec-table .bg-success::before { background: #22c55e; }
+
+  /* issue button */
+  .ec-issue-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 15px;
+    border-radius: var(--radius-pill);
+    background: var(--white);
+    color: #166534;
+    border: 1.5px solid #bbf7d0;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+  .ec-issue-btn svg { width: 14px; height: 14px; }
+  .ec-issue-btn:hover {
+    background: #166534;
+    color: var(--white);
+    border-color: #166534;
+    box-shadow: 0 3px 10px rgba(22,101,52,0.2);
+  }
+
+  /* empty */
+  .ec-empty {
+    padding: 56px 24px;
+    text-align: center;
+    color: var(--gray-400);
+  }
+  .ec-empty-icon {
+    width: 52px; height: 52px;
+    background: var(--blue-50);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    border: 1.5px solid var(--blue-100);
+  }
+  .ec-empty-icon svg { width: 24px; height: 24px; color: var(--blue-200); }
+  .ec-empty h5 { font-size: 15px; font-weight: 600; color: var(--gray-500); margin: 0 0 5px; }
+  .ec-empty p  { font-size: 13.5px; margin: 0; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+</style>
+
+<div class="ec-wrapper">
+
+  <!-- Back Button -->
+  <a href="{% url 'bdm:exam_list' %}" class="er-back">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Back 
+  </a>
+
+  <!-- Header -->
+  <div class="ec-header">
+    <h2 class="ec-title">Eligible Students for Certificate</h2>
+    <div class="ec-meta">
+      <span class="ec-meta-chip">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        {{ exam.title }}
+      </span>
+      <span class="ec-meta-chip">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        {{ exam.batch.name }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="ec-card">
+    <div class="ec-card-header">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 12l2 2 4-4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+      </svg>
+      <h4>Eligible Students</h4>
+    </div>
+
+    <div class="ec-table-wrap">
+      <table class="ec-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+             <th>Exam</th>
+            <th>Batch</th>
+            <th>Marks</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for result in results %}
+          <tr>
+            <td>{{ result.student.full_name }}</td>
+            <td>{{ result.exam.title }}</td>
+            <td>{{ result.exam.batch.name }}</td>
+            <td>
+              <span class="ec-marks">{{ result.marks_obtained }}</span>
+            </td>
+
+            <td>
+              <span class="badge bg-success">Eligible</span>
+            </td>
+
+            <td>
+              <form method="post"
+                    action="{% url 'bdm:issue_certificate_single' result.id %}"
+                    style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="ec-issue-btn">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12l2 2 4-4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                  </svg>
+                  Issue Certificate
+                </button>
+              </form>
+            </td>
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="4">
+              <div class="ec-empty">
+                <div class="ec-empty-icon">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                  </svg>
+                </div>
+                <h5>No eligible students</h5>
+                <p>No eligible students found for this exam.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
