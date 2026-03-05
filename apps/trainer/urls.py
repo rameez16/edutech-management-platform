@@ -54,11 +54,11 @@ urlpatterns = [
     path('assigned-issues/<int:pk>/', views.trainer_issue_detail_view, name='trainer_issue_detail'),
     
     # announcements
-    path("announcements/", views.all_announcements, name="all_announcements"),
-    path("announcements/create/", views.create_announcement, name="create_announcement"),
-    path("announcements/<int:announcement_id>/view/", views.view_announcement, name="view_announcement"),
-    path("announcements/<int:announcement_id>/edit/", views.edit_announcement, name="edit_announcement"),
-    path("announcements/<int:announcement_id>/delete/",views.delete_announcement,name="delete_announcement"),
+    path("trainerannouncements/", views.all_announcements, name="all_announcements"),
+    path("trainerannouncements/create/", views.create_announcement, name="create_announcement"),
+    path("trainerannouncements/<int:announcement_id>/view/", views.view_announcement, name="view_announcement"),
+    path("trainerannouncements/<int:announcement_id>/edit/", views.edit_announcement, name="edit_announcement"),
+    path("trainerannouncements/<int:announcement_id>/delete/",views.delete_announcement,name="delete_announcement"),
     
     # exam 
     path("exams/final/", views.final_exam_batchlist, name="exam-final-batchlist"),
