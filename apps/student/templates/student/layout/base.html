@@ -14,6 +14,7 @@
 
     <!-- FONT AWESOME ICONS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- GlassAdmin CSS -->
     <link rel="stylesheet" href="{% static 'student/css/templatemo-daynight-style.css' %}">
@@ -30,7 +31,13 @@
     {% block extra_css %}{% endblock %}
     <style>
 
-        <style>
+:root {
+   
+    --grad: linear-gradient(135deg, #0EA5E9, #0369A1);
+
+}
+
+
 
 /* Success */
 .alertify-notifier .ajs-message.ajs-success {
@@ -102,7 +109,27 @@
     top: 2rem !important;
 }
 
-</style>
+
+    .logo { display: flex; align-items: center; gap: 11px; text-decoration: none; flex-shrink: 0; }
+    .logo:hover { text-decoration: none; }
+
+    .logo-icon {
+        width: 40px; height: 40px;
+        background: var(--grad);
+        border-radius: 11px;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 19px;
+        box-shadow: 0 3px 14px rgba(14,165,233,.30);
+        transition: transform .2s, box-shadow .2s;
+        flex-shrink: 0;
+    }
+    .logo:hover .logo-icon { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14,165,233,.38); }
+
+    .logo-text {
+        font-family: var(--fd); font-size: 21px; font-weight: 700;
+        color: var(--sky-700); letter-spacing: -.3px; line-height: 1;
+    }
+    .carbon .logo-text { color: var(--sky-400); }
 
     </style>
 </head>
@@ -118,14 +145,18 @@
     <div class="dashboard">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                
-                <div class="logo-icon"><i class="bi bi-mortarboard-fill"></i></div>
-                <span class="logo-text">Student portal</span>
-                
-                
-            </div>
+           <div class="sidebar-header">
 
+    <div class="logo-icon">
+        <i class="bi bi-mortarboard-fill"></i>
+    </div>
+
+    <div class="logo-text-group">
+        <span class="logo-text">Student Portal</span>
+        <span class="student-name">{{ student.full_name }}</span>
+    </div>
+
+</div>
 
             <ul class="nav-menu">
                 <li class="nav-section">

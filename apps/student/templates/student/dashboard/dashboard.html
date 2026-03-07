@@ -72,32 +72,33 @@
                 </svg>
             </button>
 
-            <div style="margin-left:14px; display:flex; align-items:center;">
+            <div class="profile-menu-wrapper" id="profile-wrapper">
 
-    {% if student.profile_photo %}
-        <img src="{{ student.profile_photo.url }}?v={{ student.id }}"
-             alt="Profile"
-             style="width:60px;
-                    height:60px;
-                    border-radius:50%;
-                    object-fit:cover;
-                    cursor:pointer;
-                    border:2px solid rgba(255,255,255,0.3);">
-    {% else %}
-        <div style="width:60px;
-                    height:60px;
-                    border-radius:50%;
-                    background:linear-gradient(135deg,#22c55e,#06b6d4);
-                    color:#fff;
-                    font-weight:600;
-                    font-size:20px;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    cursor:pointer;">
-            {{ student.full_name|first|upper }}
+    <div class="profile-avatar" onclick="toggleProfileMenu(event)">
+        <div class="avatar-placeholder">J</div>
+    </div>
+
+    <div id="profile-dropdown" class="profile-dropdown">
+
+        <div class="profile-dropdown-header">
+            
+            <span>Student Account</span>
         </div>
-    {% endif %}
+
+        <a href="{% url 'student:overview' %}" class="profile-dropdown-item">
+            👤 View Profile
+        </a>
+
+        <div class="profile-divider"></div>
+
+        <form method="POST" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="profile-dropdown-item logout-btn">
+                🚪 Logout
+            </button>
+        </form>
+
+    </div>
 
 </div>
         </div>

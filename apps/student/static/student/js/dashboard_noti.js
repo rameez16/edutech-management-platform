@@ -1,3 +1,5 @@
+
+
 // ── Notification Panel ──────────────────────────────────────────
 
 let notifLoaded = false;
@@ -139,21 +141,34 @@ async function markAllRead() {
     updateBadge(0);
 }
 
-// Close panel when clicking outside
-document.addEventListener('click', function (e) {
-    const wrapper = document.getElementById('notif-wrapper');
-    if (wrapper && !wrapper.contains(e.target)) {
-        const panel = document.getElementById('notif-panel');
-        if (panel) panel.classList.remove('open');
-    }
-});
 
-// Auto-load badge count on page load (no panel open)
-document.addEventListener('DOMContentLoaded', function () {
-    const urlEl = document.getElementById('notif-fetch-url');
-    if (!urlEl) return;
-    fetch(urlEl.value, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(r => r.json())
-        .then(d => updateBadge(d.count))
-        .catch(() => {});
+
+
+
+// ── Profile Dropdown ─────────────────────────────
+
+function toggleProfileMenu(e) {
+    e.stopPropagation();
+    const menu = document.getElementById('profile-dropdown');
+    menu.classList.toggle('open');
+}
+
+// ── Global Click Handler (close panels) ─────────────────
+
+document.addEventListener('click', function (e) {
+
+    const notifWrapper = document.getElementById('notif-wrapper');
+    const notifPanel = document.getElementById('notif-panel');
+
+    if (notifWrapper && !notifWrapper.contains(e.target)) {
+        if (notifPanel) notifPanel.classList.remove('open');
+    }
+
+    const profileWrapper = document.getElementById('profile-wrapper');
+    const profileDropdown = document.getElementById('profile-dropdown');
+
+    if (profileWrapper && !profileWrapper.contains(e.target)) {
+        if (profileDropdown) profileDropdown.classList.remove('open');
+    }
+
 });
