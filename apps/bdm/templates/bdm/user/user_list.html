@@ -159,25 +159,32 @@
 
         {# ---------- DROPDOWN (UNCHANGED) ---------- #}
         <div class="action-dropdown">
-            <button class="action-menu-btn">
-                <i class="menu-icon">⋯</i>
-            </button>
-            <div class="action-menu">
-                <a href="#" class="menu-item">
-                    <i class="menu-icon">✏️</i>
-                    Edit User
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="menu-icon">🔑</i>
-                    Reset Password
-                </a>
-                <div class="menu-divider"></div>
-                <a href="#" class="menu-item text-danger">
-                    <i class="menu-icon">🚫</i>
-                    Deactivate
-                </a>
-            </div>
-        </div>
+    <button class="action-menu-btn toggle-menu">
+        <i class="menu-icon">⋯</i>
+    </button>
+
+    <div class="action-menu">
+        <a href="{% url 'bdm:edit_user' user.id %}" class="menu-item">
+            <i class="menu-icon">✏️</i>
+            Edit User
+        </a>
+
+        <a href="#" class="menu-item">
+            <i class="menu-icon">🔑</i>
+            Reset Password
+        </a>
+
+        <div class="menu-divider"></div>
+
+        {% if user.is_active %}
+        <a href="{% url 'bdm:deactivate_user' user.id %}" class="menu-item text-danger"
+           onclick="return confirm('Are you sure you want to deactivate this user?');">
+            <i class="menu-icon">🚫</i>
+            Deactivate
+        </a>
+        {% endif %}
+    </div>
+</div>
 
     </div>
 </td>
@@ -675,10 +682,10 @@
         border: 1px solid var(--gray-border);
     }
 
-    .action-dropdown:hover .action-menu {
+    /*.action-dropdown:hover .action-menu {
         display: block;
     }
-
+*/
     .menu-item {
         display: flex;
         align-items: center;
@@ -937,6 +944,31 @@
         roleFilter.addEventListener('change', filterUsers);
         statusFilter.addEventListener('change', filterUsers);
     });
+
+    document.querySelectorAll('.toggle-menu').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.stopPropagation();
+
+        const menu = this.nextElementSibling;
+
+        // close other menus
+        document.querySelectorAll('.action-menu').forEach(m => {
+            if (m !== menu) {
+                m.style.display = 'none';
+            }
+        });
+
+        // toggle this menu
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+});
+
+// close when clicking outside
+document.addEventListener('click', function() {
+    document.querySelectorAll('.action-menu').forEach(menu => {
+        menu.style.display = 'none';
+    });
+});
 </script>
 
 {% endblock %}

@@ -1,0 +1,1214 @@
+{% extends "bdm/layout/base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Analytics & Reports{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+/* ════════════════════════════════════════
+   ANALYTICS PAGE — extends DS design system
+   ════════════════════════════════════════ */
+:root {
+  --ds-gray-50: #f9fafb; --ds-gray-100: #f3f4f6; --ds-gray-200: #e5e7eb;
+  --ds-gray-300: #d1d5db; --ds-gray-400: #9ca3af; --ds-gray-500: #6b7280;
+  --ds-gray-600: #4b5563; --ds-gray-700: #374151; --ds-gray-800: #1f2937; --ds-gray-900: #111827;
+  --ds-blue-50: #eff6ff; --ds-blue-100: #dbeafe; --ds-blue-200: #bfdbfe;
+  --ds-blue-400: #60a5fa; --ds-blue-500: #3b82f6; --ds-blue-600: #2563eb; --ds-blue-700: #1d4ed8;
+  --ds-success: #10b981; --ds-success-bg: #d1fae5;
+  --ds-warning: #f59e0b; --ds-warning-bg: #fef3c7;
+  --ds-danger: #ef4444; --ds-danger-bg: #fee2e2;
+  --ds-purple: #8b5cf6; --ds-purple-bg: #ede9fe;
+  --ds-teal: #14b8a6; --ds-teal-bg: #ccfbf1;
+  --font: 'DM Sans', 'Inter', -apple-system, sans-serif;
+  --radius-sm: 0.375rem; --radius-md: 0.5rem; --radius-lg: 0.75rem;
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -1px rgb(0 0 0 / 0.04);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.ar-root {
+  font-family: var(--font);
+  background: var(--ds-gray-50);
+  color: var(--ds-gray-900);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  padding-bottom: 60px;
+}
+
+/* ── Page Header ── */
+.ar-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; flex-wrap: wrap;
+  gap: 16px; margin-bottom: 24px;
+}
+.ar-title {
+  font-size: 1.75rem; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--ds-gray-900);
+}
+.ar-title span { color: var(--ds-blue-600); }
+.ar-sub { font-size: 0.8125rem; color: var(--ds-gray-500); margin-top: 4px; font-weight: 500; }
+.ar-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* ── Buttons ── */
+.ar-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; font-size: 0.8125rem; font-weight: 500;
+  border-radius: var(--radius-md); border: 1px solid var(--ds-gray-200);
+  background: white; color: var(--ds-gray-700); cursor: pointer;
+  transition: all 0.18s; text-decoration: none; font-family: var(--font); line-height: 1;
+}
+.ar-btn:hover { background: var(--ds-gray-50); border-color: var(--ds-gray-300); color: var(--ds-gray-900); }
+.ar-btn-primary { background: var(--ds-blue-600); color: white; border-color: var(--ds-blue-600); }
+.ar-btn-primary:hover { background: var(--ds-blue-700); border-color: var(--ds-blue-700); color: white; }
+.ar-btn i { font-size: 0.875rem; }
+.ar-btn select { font-family: var(--font); font-size: 0.8125rem; }
+
+/* ── Tab Nav ── */
+.ar-tabs {
+  display: flex; gap: 4px; background: white;
+  border: 1px solid var(--ds-gray-200); border-radius: var(--radius-lg);
+  padding: 5px; margin-bottom: 24px; width: fit-content; flex-wrap: wrap;
+}
+.ar-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; font-size: 0.8125rem; font-weight: 500;
+  border-radius: var(--radius-md); border: none; background: transparent;
+  color: var(--ds-gray-500); cursor: pointer; transition: all 0.18s;
+  font-family: var(--font);
+}
+.ar-tab:hover { color: var(--ds-gray-800); background: var(--ds-gray-50); }
+.ar-tab.active { background: var(--ds-blue-600); color: white; }
+.ar-tab i { font-size: 0.875rem; }
+
+/* ── Sections ── */
+.ar-section { display: none; }
+.ar-section.active { display: block; }
+
+/* ── Summary Stats ── */
+.ar-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; margin-bottom: 20px;
+}
+@media (max-width: 1100px) { .ar-stats { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 600px) { .ar-stats { grid-template-columns: 1fr; } }
+
+.ar-stat {
+  background: white; border: 1px solid var(--ds-gray-200);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+  transition: box-shadow 0.2s;
+}
+.ar-stat:hover { box-shadow: var(--shadow-md); }
+.ar-stat-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; margin-bottom: 12px;
+}
+.ar-stat-val {
+  font-size: 1.625rem; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.1; color: var(--ds-gray-900);
+}
+.ar-stat-lbl { font-size: 0.75rem; color: var(--ds-gray-500); font-weight: 500; margin-top: 3px; }
+.ar-stat-note { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 600; margin-top: 6px; }
+.ar-stat-note.up { color: var(--ds-success); }
+.ar-stat-note.down { color: var(--ds-danger); }
+.ar-stat-note.neutral { color: var(--ds-gray-500); }
+
+/* ── Grids ── */
+.ar-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.ar-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 16px; }
+.ar-grid-6-4 { display: grid; grid-template-columns: 6fr 4fr; gap: 16px; margin-bottom: 16px; }
+.ar-grid-4-6 { display: grid; grid-template-columns: 4fr 6fr; gap: 16px; margin-bottom: 16px; }
+@media (max-width: 1000px) { .ar-grid-2,.ar-grid-3,.ar-grid-6-4,.ar-grid-4-6 { grid-template-columns: 1fr; } }
+
+/* ── Cards ── */
+.ar-card {
+  background: white; border: 1px solid var(--ds-gray-200);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.ar-card-hd {
+  padding: 14px 18px; border-bottom: 1px solid var(--ds-gray-200);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+}
+.ar-card-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.875rem; font-weight: 600; color: var(--ds-gray-700);
+}
+.ar-card-title i { color: var(--ds-blue-500); }
+.ar-card-bd { padding: 18px; }
+.ar-card-bd.np { padding: 0; }
+
+/* ── Badge ── */
+.ar-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 999px;
+  font-size: 0.6875rem; font-weight: 600; line-height: 1;
+}
+.ar-badge.blue { background: var(--ds-blue-100); color: var(--ds-blue-700); }
+.ar-badge.green { background: var(--ds-success-bg); color: var(--ds-success); }
+.ar-badge.amber { background: var(--ds-warning-bg); color: var(--ds-warning); }
+.ar-badge.red { background: var(--ds-danger-bg); color: var(--ds-danger); }
+.ar-badge.gray { background: var(--ds-gray-100); color: var(--ds-gray-600); }
+.ar-badge.purple { background: var(--ds-purple-bg); color: var(--ds-purple); }
+.ar-badge.teal { background: var(--ds-teal-bg); color: var(--ds-teal); }
+
+/* ── Table ── */
+.ar-tbl-wrap { overflow-x: auto; }
+.ar-tbl { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.ar-tbl thead th {
+  padding: 10px 14px; text-align: left; font-size: 0.6875rem;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--ds-gray-500); background: var(--ds-gray-50);
+  border-bottom: 1px solid var(--ds-gray-200);
+}
+.ar-tbl tbody td {
+  padding: 11px 14px; border-bottom: 1px solid var(--ds-gray-100);
+  color: var(--ds-gray-700); vertical-align: middle;
+}
+.ar-tbl tbody tr:last-child td { border-bottom: none; }
+.ar-tbl tbody tr:hover td { background: var(--ds-gray-50); }
+.fw6 { font-weight: 600; color: var(--ds-gray-900); }
+
+/* ── Progress ── */
+.ar-prog { height: 7px; background: var(--ds-gray-100); border-radius: 999px; overflow: hidden; }
+.ar-prog-fill { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
+.ar-prog-fill.blue { background: var(--ds-blue-500); }
+.ar-prog-fill.green { background: var(--ds-success); }
+.ar-prog-fill.amber { background: var(--ds-warning); }
+.ar-prog-fill.red { background: var(--ds-danger); }
+.ar-prog-fill.purple { background: var(--ds-purple); }
+.ar-prog-fill.teal { background: var(--ds-teal); }
+
+/* ── Funnel ── */
+.ar-funnel-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.ar-funnel-lbl { font-size: 0.75rem; font-weight: 600; color: var(--ds-gray-700); width: 80px; flex-shrink: 0; }
+.ar-funnel-bar { flex: 1; }
+.ar-funnel-val { font-size: 0.75rem; font-weight: 700; color: var(--ds-gray-900); width: 36px; text-align: right; flex-shrink: 0; }
+.ar-funnel-pct { font-size: 0.6875rem; color: var(--ds-gray-400); font-weight: 500; width: 38px; text-align: right; flex-shrink: 0; }
+
+/* ── Legend ── */
+.ar-legend { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 0.75rem; font-weight: 500; color: var(--ds-gray-500); margin-top: 10px; }
+.ar-legend-item { display: flex; align-items: center; gap: 5px; }
+.ar-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* ── Section label ── */
+.ar-sec-lbl {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.6875rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--ds-gray-400); margin: 16px 0 10px;
+}
+.ar-sec-lbl::after { content: ''; flex: 1; height: 1px; background: var(--ds-gray-200); }
+
+/* ── Metric pills ── */
+.ar-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.ar-pill {
+  flex: 1; min-width: 90px; background: var(--ds-gray-50);
+  border: 1px solid var(--ds-gray-200); border-radius: var(--radius-md); padding: 12px 14px;
+}
+.ar-pill-val { font-size: 1.25rem; font-weight: 700; color: var(--ds-gray-900); line-height: 1.2; }
+.ar-pill-lbl { font-size: 0.6875rem; font-weight: 600; color: var(--ds-gray-400); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
+
+/* ── Performer ── */
+.ar-perf-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ds-gray-100); }
+.ar-perf-item:last-child { border-bottom: none; }
+.ar-perf-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700; flex-shrink: 0; color: white; }
+.ar-perf-info { flex: 1; min-width: 0; }
+.ar-perf-name { font-size: 0.8125rem; font-weight: 600; color: var(--ds-gray-900); }
+.ar-perf-sub { font-size: 0.6875rem; color: var(--ds-gray-400); margin-top: 2px; }
+.ar-perf-score { text-align: right; }
+.ar-perf-score-val { font-size: 0.9375rem; font-weight: 700; color: var(--ds-gray-900); }
+.ar-perf-score-lbl { font-size: 0.625rem; font-weight: 600; color: var(--ds-gray-400); text-transform: uppercase; }
+
+/* ── Rank ── */
+.ar-rank { width: 22px; height: 22px; border-radius: 50%; background: var(--ds-gray-100); display: flex; align-items: center; justify-content: center; font-size: 0.6875rem; font-weight: 700; color: var(--ds-gray-600); flex-shrink: 0; }
+.ar-rank.r1 { background: #fef3c7; color: #d97706; }
+.ar-rank.r2 { background: var(--ds-gray-200); color: var(--ds-gray-700); }
+.ar-rank.r3 { background: #fde8d8; color: #c2410c; }
+
+/* ── Heatmap ── */
+.ar-heatmap { display: grid; grid-template-columns: 72px repeat(6, 1fr); gap: 4px; font-size: 0.6875rem; font-weight: 600; }
+.ar-hmap-lbl { color: var(--ds-gray-500); display: flex; align-items: center; font-size: 0.6875rem; }
+.ar-hmap-col { color: var(--ds-gray-400); text-align: center; padding: 4px 0; }
+.ar-hmap-cell { height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 0.6875rem; font-weight: 600; color: white; cursor: default; transition: transform 0.1s; }
+.ar-hmap-cell:hover { transform: scale(1.08); }
+
+/* ── Empty state ── */
+.ar-empty { text-align: center; padding: 32px; color: var(--ds-gray-400); }
+.ar-empty i { font-size: 36px; margin-bottom: 8px; opacity: 0.5; display: block; }
+.ar-empty p { font-size: 0.8125rem; }
+
+/* ── Chart wrapper ── */
+.ar-chart { position: relative; }
+.ar-chart canvas { width: 100% !important; }
+
+/* ── Source list ── */
+.ar-src-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 0.75rem; }
+.ar-src-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.ar-src-lbl { flex: 1; font-weight: 600; color: var(--ds-gray-700); }
+.ar-src-val { font-weight: 700; color: var(--ds-gray-900); }
+.ar-src-pct { color: var(--ds-gray-400); font-weight: 500; width: 34px; text-align: right; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ar-root">
+
+  <!-- ══ Header ══ -->
+  <div class="ar-header">
+    <div>
+      <h1 class="ar-title">Analytics & <span>Reports</span></h1>
+      <div class="ar-sub">
+        <i class="bi bi-calendar3"></i>&nbsp; {% now "l, j F Y" %} &nbsp;·&nbsp; Batch Operations
+      </div>
+    </div>
+    <div class="ar-controls">
+      <form method="get" style="display:contents;">
+        <select name="range" class="ar-btn" onchange="this.form.submit()">
+          <option value="30" {% if date_range == 30 %}selected{% endif %}>Last 30 days</option>
+          <option value="90" {% if date_range == 90 %}selected{% endif %}>Last 90 days</option>
+          <option value="365" {% if date_range == 365 %}selected{% endif %}>This Year</option>
+        </select>
+      </form>
+      <button class="ar-btn"><i class="bi bi-download"></i> Export</button>
+    </div>
+  </div>
+
+  <!-- ══ Tabs ══ -->
+  <div class="ar-tabs">
+    <button class="ar-tab active" onclick="showTab('leads', this)">
+      <i class="bi bi-funnel-fill"></i> Lead & Admissions
+    </button>
+    <button class="ar-tab" onclick="showTab('payments', this)">
+      <i class="bi bi-credit-card-2-front-fill"></i> Payments
+    </button>
+    <button class="ar-tab" onclick="showTab('academic', this)">
+      <i class="bi bi-mortarboard-fill"></i> Academic & Attendance
+    </button>
+    
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       TAB 1 — LEAD & ADMISSIONS
+       Models: Lead, Admission, Counselor, TeleCallerProfile
+  ════════════════════════════════════════════ -->
+  <div class="ar-section active" id="tab-leads">
+
+    <div class="ar-stats">
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-blue-50);color:var(--ds-blue-600);"><i class="bi bi-funnel-fill"></i></div>
+        <div class="ar-stat-val">{{ total_leads|default:"0" }}</div>
+        <div class="ar-stat-lbl">Total Leads (Period)</div>
+        <div class="ar-stat-note neutral"><i class="bi bi-calendar3"></i> Last {{ date_range|default:"30" }} days</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-success-bg);color:var(--ds-success);"><i class="bi bi-person-check-fill"></i></div>
+        <div class="ar-stat-val">{{ total_admissions|default:"0" }}</div>
+        <div class="ar-stat-lbl">Admissions (Period)</div>
+        <div class="ar-stat-note up"><i class="bi bi-arrow-up-short"></i> {{ admissions_change|default:"0" }}% vs previous</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-warning-bg);color:var(--ds-warning);"><i class="bi bi-percent"></i></div>
+        <div class="ar-stat-val">{{ overall_conversion_rate|default:"0" }}%</div>
+        <div class="ar-stat-lbl">Conversion Rate</div>
+        <div class="ar-stat-note neutral"><i class="bi bi-info-circle"></i> Leads → Admissions</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-danger-bg);color:var(--ds-danger);"><i class="bi bi-clock-history"></i></div>
+        <div class="ar-stat-val">{{ followup_due|default:"0" }}</div>
+        <div class="ar-stat-lbl">Follow-ups Due</div>
+        <div class="ar-stat-note down"><i class="bi bi-exclamation-circle"></i> Need attention today</div>
+      </div>
+    </div>
+
+    <div class="ar-grid-6-4">
+      <!-- Monthly Lead & Admission Trend -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-graph-up-arrow"></i> Lead & Admission Trend</div>
+          <span class="ar-badge blue">Monthly</span>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-chart" style="height:240px;">
+            <canvas id="leadTrendChart"></canvas>
+          </div>
+          <div class="ar-legend">
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#bfdbfe;"></div> Total Leads</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#3b82f6;"></div> Admissions</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#f59e0b;"></div> Converted Leads</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lead Status Breakdown -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-pie-chart-fill"></i> Lead Status</div>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-chart" style="height:170px;">
+            <canvas id="leadStatusChart"></canvas>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#60a5fa;"></div><div class="ar-src-lbl">New</div><div class="ar-src-val">{{ lead_status_new|default:"0" }}</div></div>
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#3b82f6;"></div><div class="ar-src-lbl">Assigned</div><div class="ar-src-val">{{ lead_status_assigned|default:"0" }}</div></div>
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#10b981;"></div><div class="ar-src-lbl">Converted</div><div class="ar-src-val">{{ lead_status_converted|default:"0" }}</div></div>
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#f59e0b;"></div><div class="ar-src-lbl">Idle</div><div class="ar-src-val">{{ lead_status_idle|default:"0" }}</div></div>
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#ef4444;"></div><div class="ar-src-lbl">Dropped</div><div class="ar-src-val">{{ lead_status_dropped|default:"0" }}</div></div>
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#8b5cf6;"></div><div class="ar-src-lbl">Followed</div><div class="ar-src-val">{{ lead_status_followed|default:"0" }}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ar-grid-2">
+      <!-- Conversion Funnel -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-filter-square-fill"></i> Lead Conversion Funnel</div>
+        </div>
+        <div class="ar-card-bd">
+          {% if total_leads %}
+          {% with total_leads as T %}
+          <div class="ar-funnel-row">
+            <div class="ar-funnel-lbl">Total Leads</div>
+            <div class="ar-funnel-bar"><div class="ar-prog"><div class="ar-prog-fill blue" data-w="100"></div></div></div>
+            <div class="ar-funnel-val">{{ total_leads }}</div>
+            <div class="ar-funnel-pct">100%</div>
+          </div>
+          <div class="ar-funnel-row">
+            <div class="ar-funnel-lbl">Assigned</div>
+            <div class="ar-funnel-bar"><div class="ar-prog"><div class="ar-prog-fill purple" data-w="{{ lead_assigned_pct|default:'0' }}"></div></div></div>
+            <div class="ar-funnel-val">{{ lead_status_assigned|default:"0" }}</div>
+            <div class="ar-funnel-pct">{{ lead_assigned_pct|default:"0" }}%</div>
+          </div>
+          <div class="ar-funnel-row">
+            <div class="ar-funnel-lbl">Followed Up</div>
+            <div class="ar-funnel-bar"><div class="ar-prog"><div class="ar-prog-fill teal" data-w="{{ lead_followed_pct|default:'0' }}"></div></div></div>
+            <div class="ar-funnel-val">{{ lead_status_followed|default:"0" }}</div>
+            <div class="ar-funnel-pct">{{ lead_followed_pct|default:"0" }}%</div>
+          </div>
+          <div class="ar-funnel-row">
+            <div class="ar-funnel-lbl">Converted</div>
+            <div class="ar-funnel-bar"><div class="ar-prog"><div class="ar-prog-fill green" data-w="{{ overall_conversion_rate|default:'0' }}"></div></div></div>
+            <div class="ar-funnel-val">{{ lead_status_converted|default:"0" }}</div>
+            <div class="ar-funnel-pct">{{ overall_conversion_rate|default:"0" }}%</div>
+          </div>
+          <div class="ar-funnel-row">
+            <div class="ar-funnel-lbl">Idle</div>
+            <div class="ar-funnel-bar"><div class="ar-prog"><div class="ar-prog-fill amber" data-w="{{ lead_idle_pct|default:'0' }}"></div></div></div>
+            <div class="ar-funnel-val">{{ lead_status_idle|default:"0" }}</div>
+            <div class="ar-funnel-pct">{{ lead_idle_pct|default:"0" }}%</div>
+          </div>
+          <div class="ar-funnel-row">
+            <div class="ar-funnel-lbl">Dropped</div>
+            <div class="ar-funnel-bar"><div class="ar-prog"><div class="ar-prog-fill red" data-w="{{ lead_dropped_pct|default:'0' }}"></div></div></div>
+            <div class="ar-funnel-val">{{ lead_status_dropped|default:"0" }}</div>
+            <div class="ar-funnel-pct">{{ lead_dropped_pct|default:"0" }}%</div>
+          </div>
+          {% endwith %}
+          {% else %}
+          <div class="ar-empty"><i class="bi bi-funnel"></i><p>No lead data available</p></div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Course-wise Admissions -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-journal-bookmark-fill"></i> Admissions by Course</div>
+          <span class="ar-badge green">Period</span>
+        </div>
+        <div class="ar-card-bd">
+          {% if course_admissions %}
+          <div class="ar-chart" style="height:240px;">
+            <canvas id="courseAdmChart"></canvas>
+          </div>
+          {% else %}
+          <div class="ar-empty"><i class="bi bi-journal-bookmark"></i><p>No admission data</p></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-display"></i> Mode Preference (Remote vs Offline)</div>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-chart" style="height:200px;">
+            <canvas id="modeChart"></canvas>
+          </div>
+          <div class="ar-legend" style="margin-top:12px;">
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#3b82f6;"></div> Offline: {{ leads_offline|default:"0" }}</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#14b8a6;"></div> Remote: {{ leads_remote|default:"0" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-leads -->
+
+
+  <!-- ════════════════════════════════════════════
+       TAB 2 — PAYMENTS
+       Models: FeePayment (student app), PaymentReminder, PDCCollection, Admission
+  ════════════════════════════════════════════ -->
+  <div class="ar-section" id="tab-payments">
+
+    <div class="ar-stats">
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-blue-50);color:var(--ds-blue-600);"><i class="bi bi-currency-rupee"></i></div>
+        <div class="ar-stat-val">₹{{ total_collected|default:"0"|floatformat:0|intcomma }}</div>
+        <div class="ar-stat-lbl">Total Collected (Period)</div>
+        <div class="ar-stat-note up"><i class="bi bi-arrow-up-short"></i> {{ revenue_change_pct|default:"0"|floatformat:1 }}% vs previous</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-danger-bg);color:var(--ds-danger);"><i class="bi bi-hourglass-split"></i></div>
+        <div class="ar-stat-val">₹{{ total_pending|default:"0"|floatformat:0|intcomma }}</div>
+        <div class="ar-stat-lbl">Total Pending Dues</div>
+        <div class="ar-stat-note down"><i class="bi bi-exclamation-circle"></i> {{ overdue_students|default:"0" }} students overdue</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-success-bg);color:var(--ds-success);"><i class="bi bi-check-circle-fill"></i></div>
+        <div class="ar-stat-val">{{ fee_collected_pct|default:"0" }}%</div>
+        <div class="ar-stat-lbl">Collection Rate</div>
+        <div class="ar-stat-note neutral"><i class="bi bi-info-circle"></i> Collected / Total expected</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-warning-bg);color:var(--ds-warning);"><i class="bi bi-calendar2-check-fill"></i></div>
+        <div class="ar-stat-val">{{ pdc_active|default:"0" }}</div>
+        <div class="ar-stat-lbl">Active PDC Cheques</div>
+        <div class="ar-stat-note neutral"><i class="bi bi-dash"></i> {{ pdc_due_soon|default:"0" }} due this week</div>
+      </div>
+    </div>
+
+    <div class="ar-grid-6-4">
+      <!-- Monthly Revenue Stacked Bar -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-bar-chart-fill"></i> Monthly Revenue Breakdown</div>
+          <span class="ar-badge blue">12 Months</span>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-chart" style="height:260px;">
+            <canvas id="revenueChart"></canvas>
+          </div>
+          <div class="ar-legend">
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#3b82f6;"></div> Full Payment</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#14b8a6;"></div> Installment / EMI</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#f59e0b;"></div> Booking Fee</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#8b5cf6;"></div> PDC</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Type Donut -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-pie-chart-fill"></i> Payment Plan Distribution</div>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-chart" style="height:200px;">
+            <canvas id="payTypeChart"></canvas>
+          </div>
+          <div style="margin-top:14px;">
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#3b82f6;"></div><div class="ar-src-lbl">Full Payment</div><div class="ar-src-val">{{ pay_full_count|default:"0" }}</div><div class="ar-src-pct">students</div></div>
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#14b8a6;"></div><div class="ar-src-lbl">Installment</div><div class="ar-src-val">{{ pay_install_count|default:"0" }}</div><div class="ar-src-pct">students</div></div>
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#f59e0b;"></div><div class="ar-src-lbl">EMI</div><div class="ar-src-val">{{ pay_emi_count|default:"0" }}</div><div class="ar-src-pct">students</div></div>
+            <div class="ar-src-row"><div class="ar-src-dot" style="background:#8b5cf6;"></div><div class="ar-src-lbl">PDC</div><div class="ar-src-val">{{ pay_pdc_count|default:"0" }}</div><div class="ar-src-pct">students</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Batch-wise Fee Collection -->
+    <div class="ar-card" style="margin-bottom:16px;">
+      <div class="ar-card-hd">
+        <div class="ar-card-title"><i class="bi bi-collection-fill"></i> Batch-wise Fee Collection</div>
+        <span class="ar-badge gray">{{ batch_fee_stats|length }} active batches</span>
+      </div>
+      <div class="ar-card-bd np">
+        <div class="ar-tbl-wrap">
+          <table class="ar-tbl">
+            <thead>
+              <tr>
+                <th>Batch</th>
+                <th>Course</th>
+                <th>Students</th>
+                <th>Total Fee</th>
+                <th>Collected</th>
+                <th>Pending</th>
+                <th>Collection %</th>
+                <th>Booking Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in batch_fee_stats %}
+              <tr>
+                <td class="fw6">{{ b.batch.name }}</td>
+                <td>{{ b.batch.course.name }}</td>
+                <td>{{ b.student_count }}</td>
+                <td>₹{{ b.total_fee|default:"0"|floatformat:0|intcomma }}</td>
+                <td>₹{{ b.collected|default:"0"|floatformat:0|intcomma }}</td>
+                <td style="color:var(--ds-danger);">₹{{ b.pending|default:"0"|floatformat:0|intcomma }}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="ar-prog" style="width:70px;">
+                      <div class="ar-prog-fill {% if b.collection_pct >= 80 %}green{% elif b.collection_pct >= 60 %}amber{% else %}red{% endif %}"
+                           data-w="{{ b.collection_pct|default:'0'|floatformat:0 }}"></div>
+                    </div>
+                    <span style="font-weight:600;color:{% if b.collection_pct >= 80 %}var(--ds-success){% elif b.collection_pct >= 60 %}var(--ds-warning){% else %}var(--ds-danger){% endif %};">
+                      {{ b.collection_pct|default:"0"|floatformat:0 }}%
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <span class="ar-badge {% if b.booking_paid_count == b.student_count %}green{% else %}amber{% endif %}">
+                    {{ b.booking_paid_count }}/{{ b.student_count }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="8"><div class="ar-empty"><i class="bi bi-collection"></i><p>No batch fee data available</p></div></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="ar-grid-2">
+      <!-- PDC Status -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-file-earmark-check-fill"></i> PDC Cheque Status</div>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-chart" style="height:200px;">
+            <canvas id="pdcChart"></canvas>
+          </div>
+          <div class="ar-legend" style="margin-top:10px;">
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#bfdbfe;"></div> Collected</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#3b82f6;"></div> Deposited</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#10b981;"></div> Cleared</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#ef4444;"></div> Bounced</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Reminders -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-bell-fill"></i> Payment Reminders</div>
+          <span class="ar-badge amber">{{ reminders_pending|default:"0" }} pending</span>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-pills">
+            <div class="ar-pill">
+              <div class="ar-pill-val" style="color:var(--ds-warning);">{{ reminders_pending|default:"0" }}</div>
+              <div class="ar-pill-lbl">Pending</div>
+            </div>
+            <div class="ar-pill">
+              <div class="ar-pill-val" style="color:var(--ds-blue-600);">{{ reminders_sent|default:"0" }}</div>
+              <div class="ar-pill-lbl">Sent</div>
+            </div>
+            <div class="ar-pill">
+              <div class="ar-pill-val" style="color:var(--ds-success);">{{ reminders_paid|default:"0" }}</div>
+              <div class="ar-pill-lbl">Paid</div>
+            </div>
+          </div>
+
+          <div class="ar-sec-lbl">Overdue by Reminder Type</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:.75rem;font-weight:600;color:var(--ds-gray-700);">Booking Fee</span>
+                <span style="font-size:.75rem;font-weight:600;">{{ reminder_booking|default:"0" }}</span>
+              </div>
+              <div class="ar-prog"><div class="ar-prog-fill amber" data-w="{{ reminder_booking_pct|default:'0' }}"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:.75rem;font-weight:600;color:var(--ds-gray-700);">Installment Due</span>
+                <span style="font-size:.75rem;font-weight:600;">{{ reminder_installment|default:"0" }}</span>
+              </div>
+              <div class="ar-prog"><div class="ar-prog-fill blue" data-w="{{ reminder_installment_pct|default:'0' }}"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:.75rem;font-weight:600;color:var(--ds-gray-700);">Balance Fee</span>
+                <span style="font-size:.75rem;font-weight:600;">{{ reminder_balance|default:"0" }}</span>
+              </div>
+              <div class="ar-prog"><div class="ar-prog-fill purple" data-w="{{ reminder_balance_pct|default:'0' }}"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:.75rem;font-weight:600;color:var(--ds-gray-700);">Overdue</span>
+                <span style="font-size:.75rem;font-weight:600;color:var(--ds-danger);">{{ reminder_overdue|default:"0" }}</span>
+              </div>
+              <div class="ar-prog"><div class="ar-prog-fill red" data-w="{{ reminder_overdue_pct|default:'0' }}"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-payments -->
+
+
+  <!-- ════════════════════════════════════════════
+       TAB 3 — ACADEMIC & ATTENDANCE
+       Models: Attendance, LessonSession, Batch, ExamResult, TaskSubmission
+  ════════════════════════════════════════════ -->
+  <div class="ar-section" id="tab-academic">
+
+    <div class="ar-stats">
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-blue-50);color:var(--ds-blue-600);"><i class="bi bi-person-check-fill"></i></div>
+        <div class="ar-stat-val">{{ overall_attendance_avg|default:"0" }}%</div>
+        <div class="ar-stat-lbl">Overall Avg. Attendance</div>
+        <div class="ar-stat-note up"><i class="bi bi-arrow-up-short"></i> Across all active batches</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-danger-bg);color:var(--ds-danger);"><i class="bi bi-person-x-fill"></i></div>
+        <div class="ar-stat-val">{{ students_below_75|default:"0" }}</div>
+        <div class="ar-stat-lbl">Students Below 75%</div>
+        <div class="ar-stat-note down"><i class="bi bi-exclamation-circle"></i> Attendance risk</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-success-bg);color:var(--ds-success);"><i class="bi bi-layers-fill"></i></div>
+        <div class="ar-stat-val">{{ avg_batch_progress|default:"0" }}%</div>
+        <div class="ar-stat-lbl">Avg. Curriculum Progress</div>
+        <div class="ar-stat-note neutral"><i class="bi bi-info-circle"></i> Sessions completed / total</div>
+      </div>
+      <div class="ar-stat">
+        <div class="ar-stat-icon" style="background:var(--ds-warning-bg);color:var(--ds-warning);"><i class="bi bi-clipboard2-x-fill"></i></div>
+        <div class="ar-stat-val">{{ overdue_tasks|default:"0" }}</div>
+        <div class="ar-stat-lbl">Overdue Task Submissions</div>
+        <div class="ar-stat-note down"><i class="bi bi-clock"></i> Across all batches</div>
+      </div>
+    </div>
+
+    <!-- Batch-wise Attendance Chart -->
+    <div class="ar-card" style="margin-bottom:16px;">
+      <div class="ar-card-hd">
+        <div class="ar-card-title"><i class="bi bi-bar-chart-steps"></i> Batch-wise Attendance (Weekly Breakdown)</div>
+        <span class="ar-badge blue">Last 4 Weeks</span>
+      </div>
+      <div class="ar-card-bd">
+        {% if batch_attendance_data %}
+        <div class="ar-chart" style="height:260px;">
+          <canvas id="batchAttendChart"></canvas>
+        </div>
+        <div class="ar-legend">
+          <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#bfdbfe;"></div> Week 1</div>
+          <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#3b82f6;"></div> Week 2</div>
+          <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#14b8a6;"></div> Week 3</div>
+          <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#10b981;"></div> Week 4</div>
+        </div>
+        {% else %}
+        <div class="ar-empty"><i class="bi bi-bar-chart"></i><p>No attendance data available</p></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="ar-grid-2">
+      <!-- Batch Academic Progress (LessonSession-based) -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-layers-fill"></i> Batch Academic Progress</div>
+          <span class="ar-badge gray">Sessions completed</span>
+        </div>
+        <div class="ar-card-bd">
+          {% if batch_progress_data %}
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            {% for item in batch_progress_data %}
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                <div>
+                  <span style="font-size:.8125rem;font-weight:600;color:var(--ds-gray-800);">{{ item.batch.name }}</span>
+                  <span style="font-size:.6875rem;color:var(--ds-gray-400);margin-left:6px;">{{ item.batch.course.name|truncatechars:22 }}</span>
+                </div>
+                <span style="font-size:.8125rem;font-weight:700;color:{% if item.progress >= 80 %}var(--ds-success){% elif item.progress >= 50 %}var(--ds-blue-600){% elif item.progress >= 30 %}var(--ds-warning){% else %}var(--ds-danger){% endif %};">
+                  {{ item.progress }}%
+                </span>
+              </div>
+              <div class="ar-prog">
+                <div class="ar-prog-fill {% if item.progress >= 80 %}green{% elif item.progress >= 50 %}blue{% elif item.progress >= 30 %}amber{% else %}red{% endif %}"
+                     data-w="{{ item.progress }}"></div>
+              </div>
+              <div style="font-size:.6875rem;color:var(--ds-gray-400);margin-top:3px;">
+                {{ item.completed_sessions }}/{{ item.total_sessions }} sessions · {{ item.delayed_sessions }} delayed
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="ar-empty"><i class="bi bi-layers"></i><p>No progress data available</p></div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Attendance Heatmap (batch × day) -->
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-grid-3x3-gap-fill"></i> Attendance Heatmap (This Week)</div>
+        </div>
+        <div class="ar-card-bd">
+          {% if heatmap_data %}
+          <div class="ar-heatmap">
+            <div class="ar-hmap-lbl"></div>
+            <div class="ar-hmap-col">Mon</div>
+            <div class="ar-hmap-col">Tue</div>
+            <div class="ar-hmap-col">Wed</div>
+            <div class="ar-hmap-col">Thu</div>
+            <div class="ar-hmap-col">Fri</div>
+            <div class="ar-hmap-col">Sat</div>
+            {% for row in heatmap_data %}
+            <div class="ar-hmap-lbl" title="{{ row.batch_name }}">{{ row.batch_short }}</div>
+            {% for cell in row.days %}
+            <div class="ar-hmap-cell"
+                 style="background:{% if cell.pct >= 90 %}#1d4ed8{% elif cell.pct >= 75 %}#3b82f6{% elif cell.pct >= 60 %}#93c5fd{% else %}#dbeafe{% endif %};"
+                 title="{{ row.batch_name }} · {{ cell.day }}: {{ cell.pct }}%">
+              {{ cell.pct }}%
+            </div>
+            {% endfor %}
+            {% endfor %}
+          </div>
+          <div class="ar-legend" style="margin-top:14px;">
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#dbeafe;"></div> &lt;60%</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#93c5fd;"></div> 60–75%</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#3b82f6;"></div> 75–90%</div>
+            <div class="ar-legend-item"><div class="ar-legend-dot" style="background:#1d4ed8;"></div> &gt;90%</div>
+          </div>
+          {% else %}
+          <div class="ar-empty"><i class="bi bi-grid-3x3-gap"></i><p>No heatmap data available</p></div>
+          {% endif %}
+
+          <div class="ar-sec-lbl">Students Below 75% Attendance</div>
+          {% if at_risk_students %}
+          {% for s in at_risk_students|slice:":5" %}
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:{% if s.pct < 60 %}var(--ds-danger-bg){% else %}var(--ds-warning-bg){% endif %};border-radius:var(--radius-md);margin-bottom:6px;">
+            <div>
+              <span style="font-size:.8125rem;font-weight:600;color:var(--ds-gray-800);">{{ s.student.full_name }}</span>
+              <span style="font-size:.6875rem;color:var(--ds-gray-400);margin-left:6px;">{{ s.batch.name }}</span>
+            </div>
+            <span class="ar-badge {% if s.pct < 60 %}red{% else %}amber{% endif %}">{{ s.pct }}%</span>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div style="font-size:.8125rem;color:var(--ds-success);font-weight:500;padding:8px 0;"><i class="bi bi-check-circle-fill"></i> All students above 75%</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Batch Attendance Detail Table -->
+    <div class="ar-card" style="margin-bottom:16px;">
+      <div class="ar-card-hd">
+        <div class="ar-card-title"><i class="bi bi-table"></i> Batch Attendance Detail</div>
+        <span class="ar-badge gray">This Month</span>
+      </div>
+      <div class="ar-card-bd np">
+        <div class="ar-tbl-wrap">
+          <table class="ar-tbl">
+            <thead>
+              <tr>
+                <th>Batch</th>
+                <th>Course</th>
+                <th>Students</th>
+                <th>Classes Held</th>
+                <th>Avg. Attendance</th>
+                <th>Below 75%</th>
+                <th>Trainer(s)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in batch_attendance_table %}
+              <tr>
+                <td class="fw6">{{ b.batch.name }}</td>
+                <td>{{ b.batch.course.name }}</td>
+                <td>{{ b.student_count }}</td>
+                <td>{{ b.classes_held }}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="ar-prog" style="width:60px;">
+                      <div class="ar-prog-fill {% if b.avg_pct >= 80 %}green{% elif b.avg_pct >= 65 %}amber{% else %}red{% endif %}"
+                           data-w="{{ b.avg_pct|default:'0'|floatformat:0 }}"></div>
+                    </div>
+                    <span style="font-weight:600;color:{% if b.avg_pct >= 80 %}var(--ds-success){% elif b.avg_pct >= 65 %}var(--ds-warning){% else %}var(--ds-danger){% endif %};">
+                      {{ b.avg_pct|default:"0"|floatformat:1 }}%
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <span class="ar-badge {% if b.below_75_count == 0 %}green{% elif b.below_75_count <= 3 %}amber{% else %}red{% endif %}">
+                    {{ b.below_75_count }}
+                  </span>
+                </td>
+                <td style="color:var(--ds-gray-600);">
+                  {% for trainer in b.batch.trainers.all|slice:":2" %}{{ trainer.full_name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
+                </td>
+                <td>
+                  <span class="ar-badge {% if b.avg_pct >= 85 %}green{% elif b.avg_pct >= 70 %}blue{% elif b.avg_pct >= 60 %}amber{% else %}red{% endif %}">
+                    {% if b.avg_pct >= 85 %}Excellent{% elif b.avg_pct >= 70 %}Good{% elif b.avg_pct >= 60 %}Fair{% else %}Poor{% endif %}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="8"><div class="ar-empty"><i class="bi bi-collection"></i><p>No batch data available</p></div></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exam Results Overview -->
+    {% if exam_results_data %}
+    <div class="ar-grid-2">
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-clipboard2-data-fill"></i> Exam Results — Grade Distribution</div>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-chart" style="height:220px;">
+            <canvas id="gradeChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="ar-card">
+        <div class="ar-card-hd">
+          <div class="ar-card-title"><i class="bi bi-check2-square"></i> Task Submission Overview</div>
+        </div>
+        <div class="ar-card-bd">
+          <div class="ar-pills">
+            <div class="ar-pill">
+              <div class="ar-pill-val" style="color:var(--ds-success);">{{ task_submitted|default:"0" }}</div>
+              <div class="ar-pill-lbl">Submitted</div>
+            </div>
+            <div class="ar-pill">
+              <div class="ar-pill-val" style="color:var(--ds-danger);">{{ task_overdue|default:"0" }}</div>
+              <div class="ar-pill-lbl">Overdue</div>
+            </div>
+            <div class="ar-pill">
+              <div class="ar-pill-val" style="color:var(--ds-warning);">{{ task_pending|default:"0" }}</div>
+              <div class="ar-pill-lbl">Pending</div>
+            </div>
+          </div>
+          <div class="ar-chart" style="height:160px;">
+            <canvas id="taskChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div><!-- /tab-academic -->
+
+
+</div><!-- /ar-root -->
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ════════════════════════════════════════
+   Tab switching
+════════════════════════════════════════ */
+function showTab(id, btn) {
+  document.querySelectorAll('.ar-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.ar-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
+}
+
+/* ════════════════════════════════════════
+   Animate progress bars on load
+════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.ar-prog-fill[data-w]').forEach(el => {
+    const w = parseFloat(el.getAttribute('data-w')) || 0;
+    setTimeout(() => { el.style.width = Math.min(w, 100) + '%'; }, 250);
+  });
+});
+
+/* ════════════════════════════════════════
+   Chart.js Defaults
+════════════════════════════════════════ */
+Chart.defaults.font.family = "'DM Sans', 'Inter', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#6b7280';
+Chart.defaults.plugins.legend.display = false;
+
+const C = {
+  blue: '#3b82f6', blueL: '#93c5fd', blueXL: '#dbeafe',
+  green: '#10b981', amber: '#f59e0b', red: '#ef4444',
+  purple: '#8b5cf6', teal: '#14b8a6',
+  grid: '#f3f4f6'
+};
+
+/* ════════════════════════════════════════
+   Django → JS data (JSON from view context)
+   Replace these with Django template tags
+   injecting your actual querysets.
+════════════════════════════════════════ */
+
+// Monthly trend data — from view context
+const monthLabels = {{ monthly_labels|safe|default:'["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"]' }};
+const monthLeads  = {{ monthly_leads|safe|default:'[0,0,0,0,0,0,0,0,0,0,0,0]' }};
+const monthAdm    = {{ monthly_admissions|safe|default:'[0,0,0,0,0,0,0,0,0,0,0,0]' }};
+const monthConv   = {{ monthly_converted|safe|default:'[0,0,0,0,0,0,0,0,0,0,0,0]' }};
+
+// Lead status counts
+const leadStatusData = [
+  {{ lead_status_new|default:0 }},
+  {{ lead_status_assigned|default:0 }},
+  {{ lead_status_converted|default:0 }},
+  {{ lead_status_idle|default:0 }},
+  {{ lead_status_dropped|default:0 }},
+  {{ lead_status_followed|default:0 }}
+];
+
+// Course admissions
+const courseLabels = {{ course_labels|safe|default:'[]' }};
+const courseAdmData = {{ course_adm_data|safe|default:'[]' }};
+
+// Payment plan
+const payPlanLabels = {{ pay_plan_labels|safe|default:'["Full","Installment","EMI","PDC"]' }};
+const payPlanData   = {{ pay_plan_data|safe|default:'[0,0,0,0]' }};
+
+// Mode
+const modeData = [{{ leads_offline|default:0 }}, {{ leads_remote|default:0 }}];
+
+// Revenue monthly stacked
+const revMonths     = {{ rev_month_labels|safe|default:'["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"]' }};
+const revFull       = {{ rev_full_data|safe|default:'[0,0,0,0,0,0,0,0,0,0,0,0]' }};
+const revInstall    = {{ rev_install_data|safe|default:'[0,0,0,0,0,0,0,0,0,0,0,0]' }};
+const revBooking    = {{ rev_booking_data|safe|default:'[0,0,0,0,0,0,0,0,0,0,0,0]' }};
+const revPdc        = {{ rev_pdc_data|safe|default:'[0,0,0,0,0,0,0,0,0,0,0,0]' }};
+
+// Payment type donut
+const payTypeData = [{{ pay_full_count|default:0 }}, {{ pay_install_count|default:0 }}, {{ pay_emi_count|default:0 }}, {{ pay_pdc_count|default:0 }}];
+
+// PDC status
+const pdcData = [{{ pdc_collected|default:0 }}, {{ pdc_deposited|default:0 }}, {{ pdc_cleared|default:0 }}, {{ pdc_bounced|default:0 }}];
+
+// Batch attendance (weekly grouped)
+const batchLabels = {{ batch_labels|safe|default:'[]' }};
+const attendW1 = {{ attend_week1|safe|default:'[]' }};
+const attendW2 = {{ attend_week2|safe|default:'[]' }};
+const attendW3 = {{ attend_week3|safe|default:'[]' }};
+const attendW4 = {{ attend_week4|safe|default:'[]' }};
+
+// Grades
+const gradeLabels = ['A+','A','B+','B','C','D','F'];
+const gradeData   = {{ grade_distribution|safe|default:'[0,0,0,0,0,0,0]' }};
+
+// Tasks
+const taskData = [{{ task_submitted|default:0 }}, {{ task_overdue|default:0 }}, {{ task_pending|default:0 }}];
+
+// Trainer performance
+const trainerLabels = {{ trainer_labels|safe|default:'[]' }};
+const trainerRatings = {{ trainer_ratings|safe|default:'[]' }};
+const trainerBatches = {{ trainer_batches|safe|default:'[]' }};
+
+// Counselor performance
+const counselorLabels = {{ counselor_labels|safe|default:'[]' }};
+const counselorLeads  = {{ counselor_leads_data|safe|default:'[]' }};
+const counselorConv   = {{ counselor_conv_data|safe|default:'[]' }};
+
+
+/* ════════════════════════════════════════
+   Build charts (only when canvas exists)
+════════════════════════════════════════ */
+function makeChart(id, config) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  return new Chart(el, config);
+}
+
+const scaleOpts = {
+  x: { grid: { display: false } },
+  y: { grid: { color: C.grid }, beginAtZero: true }
+};
+
+// 1. Lead trend
+makeChart('leadTrendChart', {
+  type: 'bar',
+  data: {
+    labels: monthLabels,
+    datasets: [
+      { label: 'Leads', data: monthLeads, backgroundColor: C.blueXL, borderRadius: 4 },
+      { label: 'Admissions', data: monthAdm, backgroundColor: C.blue, borderRadius: 4 },
+      { label: 'Converted', data: monthConv, type: 'line', borderColor: C.amber, backgroundColor: 'transparent', pointBackgroundColor: C.amber, borderWidth: 2, pointRadius: 3, tension: 0.4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: scaleOpts }
+});
+
+// 2. Lead status donut
+makeChart('leadStatusChart', {
+  type: 'doughnut',
+  data: {
+    labels: ['New','Assigned','Converted','Idle','Dropped','Followed'],
+    datasets: [{ data: leadStatusData, backgroundColor: [C.blueL, C.blue, C.green, C.amber, C.red, C.purple], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false } } }
+});
+
+// 3. Course admissions horizontal bar
+if (courseLabels.length > 0) {
+  makeChart('courseAdmChart', {
+    type: 'bar',
+    data: {
+      labels: courseLabels,
+      datasets: [{ data: courseAdmData, backgroundColor: [C.blue, C.blueL, C.teal, C.green, C.purple, C.amber].slice(0, courseLabels.length), borderRadius: 5 }]
+    },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: C.grid }, beginAtZero: true }, y: { grid: { display: false } } } }
+  });
+}
+
+// 4. Payment plan donut
+makeChart('payPlanChart', {
+  type: 'doughnut',
+  data: {
+    labels: payPlanLabels,
+    datasets: [{ data: payPlanData, backgroundColor: [C.blue, C.teal, C.amber, C.purple], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } }
+});
+
+// 5. Mode (Remote vs Offline)
+makeChart('modeChart', {
+  type: 'doughnut',
+  data: {
+    labels: ['Offline', 'Remote'],
+    datasets: [{ data: modeData, backgroundColor: [C.blue, C.teal], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } }
+});
+
+// 6. Revenue stacked bar
+makeChart('revenueChart', {
+  type: 'bar',
+  data: {
+    labels: revMonths,
+    datasets: [
+      { label: 'Full', data: revFull, backgroundColor: C.blue, borderRadius: 4, stack: 'r' },
+      { label: 'Install', data: revInstall, backgroundColor: C.teal, borderRadius: 0, stack: 'r' },
+      { label: 'Booking', data: revBooking, backgroundColor: C.amber, borderRadius: 0, stack: 'r' },
+      { label: 'PDC', data: revPdc, backgroundColor: C.purple, borderRadius: 0, stack: 'r' },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => '₹' + Number(ctx.raw).toLocaleString('en-IN') } } },
+    scales: { x: { grid: { display: false }, stacked: true }, y: { stacked: true, grid: { color: C.grid }, ticks: { callback: v => '₹' + (v >= 100000 ? (v/100000).toFixed(1)+'L' : (v/1000).toFixed(0)+'K') } } }
+  }
+});
+
+// 7. Payment type donut
+makeChart('payTypeChart', {
+  type: 'doughnut',
+  data: {
+    labels: ['Full','Installment','EMI','PDC'],
+    datasets: [{ data: payTypeData, backgroundColor: [C.blue, C.teal, C.amber, C.purple], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } }
+});
+
+// 8. PDC bar
+makeChart('pdcChart', {
+  type: 'bar',
+  data: {
+    labels: ['Collected','Deposited','Cleared','Bounced'],
+    datasets: [{ data: pdcData, backgroundColor: [C.blueXL, C.blue, C.green, C.red], borderRadius: 5 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: scaleOpts }
+});
+
+// 9. Batch attendance grouped bar
+if (batchLabels.length > 0) {
+  makeChart('batchAttendChart', {
+    type: 'bar',
+    data: {
+      labels: batchLabels,
+      datasets: [
+        { label: 'Wk1', data: attendW1, backgroundColor: C.blueXL, borderRadius: 3 },
+        { label: 'Wk2', data: attendW2, backgroundColor: C.blue, borderRadius: 3 },
+        { label: 'Wk3', data: attendW3, backgroundColor: C.teal, borderRadius: 3 },
+        { label: 'Wk4', data: attendW4, backgroundColor: C.green, borderRadius: 3 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false } }, y: { grid: { color: C.grid }, min: 0, max: 100, ticks: { callback: v => v + '%' } } }
+    }
+  });
+}
+
+// 10. Grade distribution
+makeChart('gradeChart', {
+  type: 'bar',
+  data: {
+    labels: gradeLabels,
+    datasets: [{ data: gradeData, backgroundColor: [C.green, C.green, C.blue, C.blue, C.amber, C.amber, C.red], borderRadius: 5 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: scaleOpts }
+});
+
+// 11. Task status doughnut
+makeChart('taskChart', {
+  type: 'doughnut',
+  data: {
+    labels: ['Submitted','Overdue','Pending'],
+    datasets: [{ data: taskData, backgroundColor: [C.green, C.red, C.amber], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { display: false } } }
+});
+
+// 12. Trainer chart
+if (trainerLabels.length > 0) {
+  makeChart('trainerChart', {
+    type: 'bar',
+    data: {
+      labels: trainerLabels,
+      datasets: [
+        { label: 'Rating ×20', data: trainerRatings.map(r => r * 20), backgroundColor: C.blue, borderRadius: 4 },
+        { label: 'Batches', data: trainerBatches, backgroundColor: C.blueXL, borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: scaleOpts }
+  });
+}
+
+// 13. Counselor chart
+if (counselorLabels.length > 0) {
+  makeChart('counselorChart', {
+    type: 'bar',
+    data: {
+      labels: counselorLabels,
+      datasets: [
+        { label: 'Leads', data: counselorLeads, backgroundColor: C.blueXL, borderRadius: 4 },
+        { label: 'Converted', data: counselorConv, backgroundColor: C.green, borderRadius: 4 },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: scaleOpts }
+  });
+}
+</script>
+{% endblock %}

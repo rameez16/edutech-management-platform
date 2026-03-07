@@ -556,22 +556,22 @@
                 <div class="notification-dropdown" id="notifDropdown">
                     <button class="notification-btn" id="notifBtn" type="button">
                         <i class="bi bi-bell-fill"></i>
-                        {% if notification_count and notification_count > 0 %}
-                        <span class="notification-badge">{{ notification_count }}</span>
+                        {% if unread_notif_count and unread_notif_count > 0 %}
+                        <span class="notification-badge">{{ unread_notif_count }}</span>
                         {% endif %}
                     </button>
                     <div class="notification-dropdown-menu" id="notifPanel">
                         <div class="notification-header">
                             <h4>
                                 <i class="bi bi-bell"></i> Notifications
-                                {% if notification_count and notification_count > 0 %}
-                                <span class="notif-unread-pill">{{ notification_count }}</span>
+                                {% if unread_notif_count and unread_notif_count > 0 %}
+                                <span class="notif-unread-pill">{{ unread_notif_count }}</span>
                                 {% endif %}
                             </h4>
                             <a href="#">Mark all read</a>
                         </div>
                         <div class="notification-list">
-                            {% for notification in notifications|slice:":8" %}
+                            {% for notification in recent_notifications|slice:":8" %}
                             <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
                                 <div class="notification-icon {% if 'payment' in notification.notification_type|default:'' %}ni-green{% elif 'issue' in notification.notification_type|default:'' %}ni-rose{% elif 'lead' in notification.notification_type|default:'' %}ni-amber{% else %}ni-sky{% endif %}">
                                     {% if 'payment'  in notification.notification_type|default:'' %}<i class="bi bi-currency-rupee"></i>
@@ -643,7 +643,7 @@
                         <h4 class="sidebar-section-title">Management</h4>
                         
                         <a href="{% url 'bdm:announcement_list' %}"
-                           class="sidebar-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                           class="sidebar-link {% if 'announcements' in request.resolver_match.url_name %}active{% endif %}">
                             <div class="sidebar-link-icon"><i class="bi bi-megaphone-fill"></i></div>
                             <span class="sidebar-link-text">Announcements</span>
                         </a>
@@ -688,11 +688,11 @@
                     <div class="sidebar-section">
                         <h4 class="sidebar-section-title">Operations</h4>
                         
-                        <a href="#"
+                        {% comment %} <a href="#"
                            class="sidebar-link {% if 'attendance' in request.resolver_match.url_name %}active{% endif %}">
                             <div class="sidebar-link-icon"><i class="bi bi-person-check-fill"></i></div>
                             <span class="sidebar-link-text">Attendance</span>
-                        </a>
+                        </a> {% endcomment %}
 
                         <a href="{% url 'bdm:student_onboarding' %}"
                            class="sidebar-link {% if 'onboarding' in request.resolver_match.url_name %}active{% endif %}">
@@ -724,8 +724,8 @@
 
                     <div class="sidebar-section">
                         <h4 class="sidebar-section-title">Analytics</h4>
-                        <a href="#" class="sidebar-link"><div class="sidebar-link-icon"><i class="bi bi-bar-chart-fill"></i></div><span class="sidebar-link-text">Reports</span></a>
-                        <a href="#" class="sidebar-link"><div class="sidebar-link-icon"><i class="bi bi-graph-up-arrow"></i></div><span class="sidebar-link-text">Analytics</span></a>
+                        <a href="{% url 'bdm:analytics_report' %}" class="sidebar-link"><div class="sidebar-link-icon"><i class="bi bi-bar-chart-fill"></i></div><span class="sidebar-link-text">Reports & Analytics</span></a>
+                        
                     </div>
 
                     <div class="sidebar-section">
