@@ -44,6 +44,8 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("users/<int:user_id>/", views.user_detail, name="user_profile"),
                 path("users/<int:user_id>/student-admin-profile/",views.student_admin_profile_form,name="student_admin_profile_form"),
                 path("users/<int:user_id>/trainer-admin-profile/",views.trainer_admin_profile_form,name="trainer_admin_profile_form"),
+                
+
 
                 path('batches/', views.batch_list, name='batch_list'),
                 path('batches/<int:pk>/', views.batch_detail, name='batch_detail'),
@@ -117,7 +119,11 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path("exams/<int:pk>/results/", views.exam_results, name="exam_results"),
                 path("certificate/issue/<int:result_id>/",views.issue_certificate_single,name="issue_certificate_single"),
                 path("exams/results/published/",views.published_exam_results,name="published_exam_results"),
-               path("eligible-certificates/", views.eligible_certificate_list, name="eligible_certificate_list"),
+                path("eligible-certificates/", views.eligible_certificate_list, name="eligible_certificate_list"),
+               
+                path('analytics/', views.analytics_report, name='analytics_report'),
+                path("users/<int:user_id>/edit/",views.edit_user,name="edit_user"),
+                path("users/<int:user_id>/deactivate/",views.deactivate_user,name="deactivate_user"),
                 ]
 
 

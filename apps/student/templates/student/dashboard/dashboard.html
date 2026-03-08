@@ -6,6 +6,11 @@
 
 {% endblock %}
 
+
+{% block extra_js %}
+<script src="{% static 'student/js/dashboard_noti.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
     <!-- Top Navbar -->
@@ -23,13 +28,35 @@
                 <input type="text" class="search-input" placeholder="Search anything...">
             </div>
 
-            <button class="nav-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
-                <span class="notification-dot"></span>
-            </button>
+
+
+
+
+            <input type="hidden" id="notif-fetch-url"      value="{% url 'student:get_notifications' %}">
+            <input type="hidden" id="notif-mark-read-base" value="{% url 'student:mark_notification_read' notif_id=0 %}">
+
+
+            <!-- NOTIFICATION BELL -->
+            <div class="notif-wrapper" id="notif-wrapper">
+                <button class="nav-btn" id="notif-bell-btn" onclick="toggleNotifPanel(event)" title="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    <span class="notif-count-badge" id="notif-count-badge" style="display:none;">0</span>
+                </button>
+
+                <!-- POPUP PANEL -->
+                <div class="notif-panel" id="notif-panel">
+                    <div class="notif-panel-header">
+                        <span>🔔 Notifications</span>
+                        <button class="notif-mark-all-btn" onclick="markAllRead()">Mark all read</button>
+                    </div>
+                    <div class="notif-panel-body" id="notif-panel-body">
+                        <div class="notif-loading">Loading...</div>
+                    </div>
+                </div>
+            </div>
 
             <button class="nav-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
                 <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -45,32 +72,33 @@
                 </svg>
             </button>
 
-            <div style="margin-left:14px; display:flex; align-items:center;">
+            <div class="profile-menu-wrapper" id="profile-wrapper">
 
-    {% if student.profile_photo %}
-        <img src="{{ student.profile_photo.url }}?v={{ student.id }}"
-             alt="Profile"
-             style="width:60px;
-                    height:60px;
-                    border-radius:50%;
-                    object-fit:cover;
-                    cursor:pointer;
-                    border:2px solid rgba(255,255,255,0.3);">
-    {% else %}
-        <div style="width:60px;
-                    height:60px;
-                    border-radius:50%;
-                    background:linear-gradient(135deg,#22c55e,#06b6d4);
-                    color:#fff;
-                    font-weight:600;
-                    font-size:20px;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    cursor:pointer;">
-            {{ student.full_name|first|upper }}
+    <div class="profile-avatar" onclick="toggleProfileMenu(event)">
+        <div class="avatar-placeholder">J</div>
+    </div>
+
+    <div id="profile-dropdown" class="profile-dropdown">
+
+        <div class="profile-dropdown-header">
+            
+            <span>Student Account</span>
         </div>
-    {% endif %}
+
+        <a href="{% url 'student:overview' %}" class="profile-dropdown-item">
+            👤 View Profile
+        </a>
+
+        <div class="profile-divider"></div>
+
+        <form method="POST" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="profile-dropdown-item logout-btn">
+                🚪 Logout
+            </button>
+        </form>
+
+    </div>
 
 </div>
         </div>

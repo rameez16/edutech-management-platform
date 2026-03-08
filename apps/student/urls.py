@@ -45,6 +45,8 @@ urlpatterns = [path('stud_profile/', views.stud_profile, name='stud_profile'),
                 path('stud_exam/', views.exam, name='student_exam'),
                 path('stud_exam/<int:exam_id>/attend/', views.attend_exam, name='attend_exam'),
                 path('exam/<int:exam_id>/submit/', views.submit_exam, name='submit_exam'),
+                path('stud_notifications/', views.get_notifications, name='get_notifications'),
+                path('stud_notifications/mark-read/<int:notif_id>/', views.mark_notification_read, name='mark_notification_read'),
 
 
             

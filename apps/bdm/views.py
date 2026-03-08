@@ -9,6 +9,7 @@ from django.db.models.functions import Coalesce
 from django.db.models import Max
 from django.db.models import Case, When, IntegerField
 from django.utils.timezone import now
+from django.db.models.functions import TruncMonth
 
 from django.db.models import Prefetch
 
@@ -25,10 +26,10 @@ from .form import StudentAdminProfileForm, TrainerAdminProfileForm
 from django.db.models import Sum, Avg
 
 from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
-from apps.bdm.models import Student ,PaymentDocument ,StudentIssue ,Announcement ,BatchSchedule 
+from apps.bdm.models import Student ,PaymentDocument ,StudentIssue ,Announcement ,BatchSchedule ,Counselor
 
-from apps.trainer.models import Module,TrainerLeave,Exam ,ExamResult,Certificate
-from apps.trainer.models import Module
+from apps.trainer.models import Module,TrainerLeave,Exam ,ExamResult,Certificate,Attendance
+from apps.trainer.models import Module,TaskSubmission
 
 from django.db.models import Exists, OuterRef
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
@@ -246,9 +247,11 @@ def create_user(request):
 @role_required('admin')
 def user_list(request):
     users = User.objects.all().order_by("-date_joined")
-
+    active_users_count = users.filter(is_active=True).count()
+    
     return render(request, "bdm/user/user_list.html", {
-        "users": users
+        "users": users,
+        "active_users_count": active_users_count
     })
     
 @role_required('admin')    
@@ -2771,3 +2774,401 @@ def issue_certificate_single(request, result_id):
     buffer.close()
     messages.success(request, "Certificate issued successfully!")
     return redirect("bdm:exam_results", pk=exam.id)
+
+
+#report and analytics dashboard-aleena__________________________
+
+
+import json
+from datetime import date, timedelta
+
+# ── Tiny helpers ──────────────────────────────────────────────
+
+def _pct(part, total):
+    return round((part / total) * 100, 1) if total else 0
+
+def _month_ranges(n=12):
+    today = date.today()
+    return [
+        (date(today.year, today.month, 1) - timedelta(days=i * 28)).replace(day=1)
+        for i in range(n - 1, -1, -1)
+    ]
+
+def _week_starts(n=4):
+    monday = date.today() - timedelta(days=date.today().weekday())
+    return [monday - timedelta(weeks=i) for i in range(n - 1, -1, -1)]
+
+def _att_pct(qs):
+    total = qs.count()
+    present = qs.filter(status__in=['present', 'late']).count()
+    return _pct(present, total)
+
+
+# ── Main view ─────────────────────────────────────────────────
+
+@login_required
+def analytics_report(request):
+    days     = int(request.GET.get('range', 30))
+    since    = timezone.now().date() - timedelta(days=days)
+    prev     = since - timedelta(days=days)
+    today    = timezone.now().date()
+    mo_start = today.replace(day=1)
+
+    ctx = {'date_range': days}
+
+    # ── LEADS ─────────────────────────────────────────────────
+    leads    = Lead.objects.all()
+    p_leads  = leads.filter(enquiry_date__date__gte=since)
+    status_c = {s: leads.filter(status=s).count() for s in Lead.LeadStatus.values}
+    total_l  = p_leads.count()
+    total_adm = p_leads.filter(status=Lead.LeadStatus.CONVERTED).count()
+    prev_adm  = leads.filter(status=Lead.LeadStatus.CONVERTED,
+                              enquiry_date__date__range=(prev, since)).count()
+
+    ctx.update({
+        'total_leads': total_l,
+        'total_admissions': total_adm,
+        'admissions_change': _pct(total_adm - prev_adm, prev_adm or 1),
+        'overall_conversion_rate': _pct(total_adm, total_l),
+        'followup_due': leads.filter(
+            status__in=[Lead.LeadStatus.NEW, Lead.LeadStatus.ASSIGNED],
+            last_followup__date__lt=today - timedelta(days=2)
+        ).count(),
+        **{f'lead_status_{k}': status_c.get(k, 0)
+           for k in ('new', 'assigned', 'converted', 'idle', 'dropped', 'followed')},
+        **{f'lead_{k}_pct': _pct(status_c.get(k, 0), total_l)
+           for k in ('assigned', 'followed', 'idle', 'dropped')},
+        'leads_offline': p_leads.filter(mode=Lead.ModeChoice.OFFLINE).count(),
+        'leads_remote':  p_leads.filter(mode=Lead.ModeChoice.REMOTE).count(),
+    })
+
+    # Monthly trend
+    months = _month_ranges(12)
+    ctx.update({
+        'monthly_labels':     json.dumps([m.strftime('%b') for m in months]),
+        'monthly_leads':      json.dumps([leads.filter(enquiry_date__year=m.year, enquiry_date__month=m.month).count() for m in months]),
+        'monthly_admissions': json.dumps([leads.filter(status='converted', enquiry_date__year=m.year, enquiry_date__month=m.month).count() for m in months]),
+        'monthly_converted':  json.dumps([leads.filter(status='converted', enquiry_date__year=m.year, enquiry_date__month=m.month).count() for m in months]),
+    })
+
+    # Course admissions + counselors
+    course_adm = (Admission.objects.filter(admission_date__date__gte=since)
+                  .exclude(course=None).values('course__name').annotate(cnt=Count('id')).order_by('-cnt')[:8])
+    counselors = list(Counselor.objects.filter(is_active=True).select_related('user')[:8])
+    top_c      = sorted(counselors, key=lambda c: c.conversion_rate, reverse=True)
+
+    ctx.update({
+        'course_admissions':  course_adm,
+        'course_labels':      json.dumps([r['course__name'] for r in course_adm]),
+        'course_adm_data':    json.dumps([r['cnt'] for r in course_adm]),
+        'counselor_stats':    [{'counselor': c} for c in counselors],
+        'top_counselors':     top_c[:5],
+        'top_counselor_rate': round(top_c[0].conversion_rate, 1) if top_c else 0,
+        'top_counselor_name': top_c[0].user.get_full_name() if top_c else '—',
+        'counselor_perf_data':  bool(counselors),
+        'counselor_labels':     json.dumps([c.user.get_full_name() or c.user.username for c in counselors]),
+        'counselor_leads_data': json.dumps([c.total_leads_assigned for c in counselors]),
+        'counselor_conv_data':  json.dumps([c.total_conversions for c in counselors]),
+        'pay_plan_labels':    json.dumps(['Full', 'Installment', 'EMI', 'PDC']),
+        'pay_plan_data_json': json.dumps([p_leads.filter(payment_plan=k).count() for k in ('full', 'installment', 'emi', 'pdc')]),
+        'payment_plan_data':  True,
+    })
+
+    # ── PAYMENTS ──────────────────────────────────────────────
+    # FeePayment fields: amount, payment_type, payment_status, payment_date, due_date
+    COMPLETED = FeePayment.PaymentStatus.COMPLETED
+
+    fp     = FeePayment.objects.filter(payment_status=COMPLETED)
+    fp_all = FeePayment.objects.all()                           # all statuses for pending calc
+    p_fp   = fp.filter(payment_date__date__gte=since)
+    p_prev = fp.filter(payment_date__date__range=(prev, since))
+
+    col      = p_fp.aggregate(s=Sum('amount'))['s'] or 0
+    prev_col = p_prev.aggregate(s=Sum('amount'))['s'] or 0
+    paid_all = fp.aggregate(s=Sum('amount'))['s'] or 0          # total ever collected
+
+    # Total expected = sum of Admission.total_fee (source of truth for what's owed)
+    total_expected = Admission.objects.aggregate(s=Sum('total_fee'))['s'] or 0
+    total_pending  = max(float(total_expected) - float(paid_all), 0)
+
+    # Overdue: payments with a due_date in the past that are still pending
+    overdue_students = (
+        FeePayment.objects
+        .filter(payment_status=FeePayment.PaymentStatus.PENDING, due_date__lt=today)
+        .values('student').distinct().count()
+    )
+
+    # Payment plan distribution — from Admission model
+    adm_plans = {k: Admission.objects.filter(payment_plan=k).count()
+                 for k in ('full', 'installment', 'emi', 'pdc')}
+
+    # Monthly revenue stacked by payment_type (use FeePayment.PaymentType choices)
+    TYPE_MAP = [
+        ('full',    FeePayment.PaymentType.FULL_PAYMENT),
+        ('install', FeePayment.PaymentType.INSTALLMENT),
+        ('booking', FeePayment.PaymentType.BOOKING),
+        ('pdc',     FeePayment.PaymentType.PDC),
+    ]
+
+    def _monthly_rev(ptype):
+        return json.dumps([
+            float(fp.filter(payment_type=ptype,
+                            payment_date__year=m.year,
+                            payment_date__month=m.month)
+                    .aggregate(s=Sum('amount'))['s'] or 0)
+            for m in months
+        ])
+
+    ctx.update({
+        'total_collected':    col,
+        'total_pending':      total_pending,
+        'fee_collected_pct':  _pct(float(paid_all), float(total_expected)),
+        'revenue_change_pct': _pct(col - prev_col, prev_col or 1),
+        'overdue_students':   overdue_students,
+        **{f'pay_{k}_count': v for k, v in adm_plans.items()},
+        'pay_type_data':      json.dumps(list(adm_plans.values())),
+        'rev_month_labels':   json.dumps([m.strftime('%b') for m in months]),
+        **{f'rev_{k}_data': _monthly_rev(t) for k, t in TYPE_MAP},
+    })
+
+    # PDC & reminders
+    pdc = PDCCollection.objects
+    rem = PaymentReminder.objects
+    total_rem = rem.count() or 1
+    ctx.update({
+        **{f'pdc_{k}': pdc.filter(status=v).count()
+           for k, v in [('active','collected'),('collected','collected'),
+                        ('deposited','deposited'),('cleared','cleared'),('bounced','bounced')]},
+        'pdc_due_soon': pdc.filter(status='collected', cheque_date__lte=today + timedelta(days=7)).count(),
+        'reminders_pending': rem.filter(status='pending').count(),
+        'reminders_sent':    rem.filter(status='sent').count(),
+        'reminders_paid':    rem.filter(status='paid').count(),
+        **{f'reminder_{k}': rem.filter(reminder_type=t).count()
+           for k, t in [('booking','booking'),('installment','installment'),
+                        ('balance','balance'),('overdue','overdue')]},
+        **{f'reminder_{k}_pct': _pct(rem.filter(reminder_type=t).count(), total_rem)
+           for k, t in [('booking','booking'),('installment','installment'),
+                        ('balance','balance'),('overdue','overdue')]},
+    })
+
+    # Batch fee stats — total_fee from Admission, collected from FeePayment
+    ctx['batch_fee_stats'] = []
+    for b in Batch.objects.filter(is_active=True).select_related('course')[:10]:
+        total_fee = float(
+            Admission.objects.filter(batch=b).aggregate(s=Sum('total_fee'))['s'] or 0
+        )
+        collected = float(
+            FeePayment.objects
+            .filter(student__batches=b, payment_status=COMPLETED)
+            .aggregate(s=Sum('amount'))['s'] or 0
+        )
+        booking_paid = FeePayment.objects.filter(
+            student__batches=b,
+            payment_type=FeePayment.PaymentType.BOOKING,
+            payment_status=COMPLETED,
+        ).values('student').distinct().count()
+
+        ctx['batch_fee_stats'].append({
+            'batch': b,
+            'student_count':     b.students.count(),
+            'total_fee':         total_fee,
+            'collected':         collected,
+            'pending':           max(total_fee - collected, 0),
+            'collection_pct':    _pct(collected, total_fee),
+            'booking_paid_count': booking_paid,
+        })
+
+    # ── ACADEMIC & ATTENDANCE ─────────────────────────────────
+    active_batches = list(
+        Batch.objects.filter(is_active=True)
+        .prefetch_related('trainers', 'students').select_related('course')
+    )
+
+    # Batch curriculum progress
+    ctx['batch_progress_data'] = []
+    for b in active_batches:
+        p = LessonSession.get_batch_progress(b)
+        ctx['batch_progress_data'].append({
+            'batch': b, 'progress': p['progress_percentage'],
+            'completed_sessions': p['completed'], 'total_sessions': p['total'],
+            'delayed_sessions': p['delayed'],
+        })
+    prog = ctx['batch_progress_data']
+    ctx['avg_batch_progress'] = round(sum(x['progress'] for x in prog) / len(prog), 1) if prog else 0
+
+    # Attendance: weekly bars + table + at-risk list
+    week_starts_list = _week_starts(4)
+    b_labels, weekly_data = [], [[], [], [], []]
+    att_table, at_risk, students_below = [], [], 0
+
+    for b in active_batches:
+        sc = b.students.count()
+        if not sc:
+            continue
+        b_labels.append(b.name[:12])
+
+        for i, ws in enumerate(week_starts_list):
+            weekly_data[i].append(
+                _att_pct(Attendance.objects.filter(batch=b, date__range=(ws, ws + timedelta(days=6))))
+            )
+
+        month_att    = Attendance.objects.filter(batch=b, date__gte=mo_start)
+        classes_held = LessonSession.objects.filter(batch=b, status='completed', actual_date__gte=mo_start).count()
+        below_75     = 0
+
+        for s in b.students.all():
+            pct = Attendance.calculate_attendance_percentage(s, b)
+            if pct < 75:
+                below_75 += 1
+                students_below += 1
+                at_risk.append({'student': s, 'batch': b, 'pct': round(pct, 1)})
+
+        att_table.append({
+            'batch': b, 'student_count': sc, 'classes_held': classes_held,
+            'avg_pct': _att_pct(month_att), 'below_75_count': below_75,
+        })
+
+    ctx.update({
+        'batch_attendance_data':  bool(b_labels),
+        'batch_labels':           json.dumps(b_labels),
+        **{f'attend_week{i+1}': json.dumps(weekly_data[i]) for i in range(4)},
+        'batch_attendance_table': att_table,
+        'students_below_75':      students_below,
+        'at_risk_students':       sorted(at_risk, key=lambda x: x['pct'])[:10],
+        'overall_attendance_avg': _att_pct(Attendance.objects.filter(date__gte=mo_start)),
+    })
+
+    # Heatmap (batch × weekday)
+    week_start = today - timedelta(days=today.weekday())
+    day_names  = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    ctx['heatmap_data'] = [
+        {
+            'batch_name': b.name, 'batch_short': b.name[:9],
+            'days': [
+                {'day': d, 'pct': _att_pct(Attendance.objects.filter(batch=b, date=week_start + timedelta(days=i)))}
+                for i, d in enumerate(day_names)
+            ],
+        }
+        for b in active_batches[:6]
+    ]
+
+    # Exams & tasks
+    grade_map  = {'A+': 0, 'A': 1, 'B+': 2, 'B': 3, 'C': 4, 'D': 5, 'F': 6}
+    grade_dist = [0] * 7
+    for r in ExamResult.objects.exclude(grade=None):
+        grade_dist[grade_map.get(r.grade, 6)] += 1
+
+    ts = TaskSubmission.objects
+    ctx.update({
+        'exam_results_data':  ExamResult.objects.exists(),
+        'grade_distribution': json.dumps(grade_dist),
+        'task_submitted':     ts.filter(is_submitted=True).count(),
+        'task_overdue':       ts.filter(is_late=True, is_submitted=False).count(),
+        'task_pending':       ts.filter(is_submitted=False, is_late=False).count(),
+        'overdue_tasks':      ts.filter(is_late=True, is_submitted=False).count(),
+    })
+
+    # ── PERFORMANCE ───────────────────────────────────────────
+    # Fetch ALL trainers — no admin_profile filter so trainers without one still appear
+    trainers = list(Trainer.objects.select_related('user').prefetch_related('batches'))
+
+    def _ap(t):
+        """Safely return TrainerAdminProfile or None."""
+        try:
+            return t.admin_profile
+        except Exception:
+            return None
+
+    # Build a flat list of dicts so the template and charts get consistent data
+    trainer_rows = []
+    for t in trainers:
+        ap = _ap(t)
+        trainer_rows.append({
+            'trainer':       t,
+            'admin_profile': ap,
+            'name':          t.full_name or t.user.get_full_name() or t.user.username,
+            'rating':        float(ap.performance_rating) if ap and ap.performance_rating else 0,
+            'batches':       (ap.batches_assigned or 0) if ap else t.batches.count(),
+            'is_active':     ap.is_active if ap else True,
+            'employee_id':   ap.employee_id if ap else '—',
+            'bg_verified':   ap.background_verified if ap else False,
+        })
+
+    top_t = sorted([r for r in trainer_rows if r['rating'] > 0],
+                   key=lambda r: r['rating'], reverse=True)
+
+    # Counselors (already fetched above but may not include top_counselors key yet)
+    counselors_qs  = list(Counselor.objects.filter(is_active=True).select_related('user'))
+    top_counselors = sorted(counselors_qs, key=lambda c: c.conversion_rate, reverse=True)
+
+    ctx.update({
+        # Stats cards
+        'active_trainers':     len(trainers),
+        'active_counselors':   len(counselors_qs),
+        'active_telecallers':  TeleCallerProfile.objects.filter(is_active=True).count(),
+        'trainer_batches_total': sum(r['batches'] for r in trainer_rows),
+        'avg_trainer_rating':  (
+            round(sum(r['rating'] for r in top_t) / len(top_t), 2) if top_t else 'N/A'
+        ),
+
+        # Top performers cards — fall back to all trainers if none have ratings
+        'top_trainers':        (top_t or trainer_rows)[:5],
+
+        # Detail table
+        'trainer_detail_table': trainer_rows,
+        'trainer_perf_data':    bool(trainer_rows),
+
+        # Chart arrays
+        'trainer_labels':  json.dumps([r['name']    for r in trainer_rows[:8]]),
+        'trainer_ratings': json.dumps([r['rating']  for r in trainer_rows[:8]]),
+        'trainer_batches': json.dumps([r['batches'] for r in trainer_rows[:8]]),
+
+        # Counselors
+        'top_counselors':     top_counselors[:5],
+        'top_counselor_rate': round(top_counselors[0].conversion_rate, 1) if top_counselors else 0,
+        'top_counselor_name': (
+            top_counselors[0].user.get_full_name() or top_counselors[0].user.username
+            if top_counselors else '—'
+        ),
+        'counselor_perf_data':  bool(counselors_qs),
+        'counselor_labels':     json.dumps([c.user.get_full_name() or c.user.username for c in counselors_qs]),
+        'counselor_leads_data': json.dumps([c.total_leads_assigned for c in counselors_qs]),
+        'counselor_conv_data':  json.dumps([c.total_conversions     for c in counselors_qs]),
+    })
+
+    return render(request, 'bdm/reports/analytics_reports.html', ctx)
+
+
+
+ #user page edit,deactivate,password reset-aleena
+ 
+@login_required
+@role_required('admin')
+def edit_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == "POST":
+        user.username = request.POST.get("username")
+        user.email = request.POST.get("email")
+        user.first_name = request.POST.get("first_name")
+        user.last_name = request.POST.get("last_name")
+        user.role = request.POST.get("role")
+
+        user.save()
+        messages.success(request, "User updated successfully.")
+        return redirect("bdm:user_list")
+
+    return render(request, "bdm/user/edit_user.html", {
+        "user": user
+    })
+    
+@login_required
+@role_required('admin')
+def deactivate_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    user.is_active = False
+    user.save()
+
+    messages.success(request, "User deactivated successfully.")
+    return redirect("bdm:user_list")
