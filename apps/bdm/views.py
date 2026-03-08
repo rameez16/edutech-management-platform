@@ -784,7 +784,7 @@ def convert_lead_to_admission(request, pk):
         with transaction.atomic():
 
             # 1️⃣ Create User (safe username)
-            username = f"{lead.phone}"
+            username = f"{lead.name}"
             password = f"{lead.name}@1234"
 
             user = User.objects.create_user(
@@ -833,7 +833,7 @@ def convert_lead_to_admission(request, pk):
             feepayment = FeePayment.objects.create(
                 student=student,
                 payment_type=FeePayment.PaymentType.ADMISSION,
-                amount=lead.discussed_fee or Decimal("0.00"),
+                amount=lead.admission_fee_amount or Decimal("0.00"),
                 payment_method=FeePayment.PaymentMethod.UPI,
                 payment_status=FeePayment.PaymentStatus.COMPLETED,
                 transaction_id=f"TRN-{student.id}-{int(timezone.now().timestamp())}",
