@@ -1,0 +1,63 @@
+{% extends "bdm/layout/base.html" %}
+
+{% block content %}
+
+<h2>Substitute Teaching Requests</h2>
+
+<table border="1" cellpadding="10">
+
+<tr>
+<th>Batch</th>
+<th>Date</th>
+<th>Session</th>
+<th>Original Trainer</th>
+<th>Substitute Trainer</th>
+<th>Reason</th>
+<th>Action</th>
+</tr>
+
+{% for r in requests %}
+
+<tr>
+
+<td>{{ r.batch.name }}</td>
+
+<td>{{ r.date }}</td>
+
+<td>{{ r.lesson_session }}</td>
+
+<td>{{ r.original_trainer.full_name }}</td>
+
+<td>
+{% if r.substitute_trainer %}
+{{ r.substitute_trainer.full_name }}
+{% else %}
+<span style="color:red;">Pending</span>
+{% endif %}
+</td>
+
+<td>{{ r.reason_for_substitution }}</td>
+
+<td>
+
+{% if not r.substitute_trainer %}
+
+<a href="{% url 'bdm:assign_substitute_trainer' r.id %}">
+Assign Trainer
+</a>
+
+{% else %}
+
+Assigned
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}

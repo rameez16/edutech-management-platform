@@ -124,6 +124,10 @@ urlpatterns = [ path('',views.dashboard,name='bdm_dashboard'),
                 path('analytics/', views.analytics_report, name='analytics_report'),
                 path("users/<int:user_id>/edit/",views.edit_user,name="edit_user"),
                 path("users/<int:user_id>/deactivate/",views.deactivate_user,name="deactivate_user"),
+                
+                path("notifications/mark-all-read/",views.mark_all_notifications_read,name="mark_all_notifications_read"),
+                
+                path("substitute-requests/",views.substitute_request_list,name="substitute_request_list"),
                 ]
 
 
