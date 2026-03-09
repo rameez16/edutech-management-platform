@@ -1242,7 +1242,7 @@ def payment_portal(request):
     if admission.admission_fee_paid and admission.admission_fee_amount:
         admission_fee_paid_amount = admission.admission_fee_amount
 
-    other_paid_amount = (
+    paid_amount = (
         FeePayment.objects.filter(
             student=student,
             payment_status=FeePayment.PaymentStatus.COMPLETED
@@ -1250,7 +1250,6 @@ def payment_portal(request):
         or Decimal("0.00")
     )
 
-    paid_amount = admission_fee_paid_amount + other_paid_amount
     pending_amount = max(total_fee - paid_amount, Decimal("0.00"))
 
     # =========================
@@ -1259,7 +1258,7 @@ def payment_portal(request):
 
     if plan == "installment":
 
-        today = date(2026, 6, 25)  # simulate date
+        today = date(2026, 9, 25)  # simulate date
         start_date = admission.admission_date.date()
         count = 4
         template = "student/payment/installment_payment.html"
@@ -1346,7 +1345,7 @@ def payment_portal(request):
 
     if plan == "emi":
 
-        today = date(2026, 6, 25)  # simulate date
+        today = date(2026, 9, 25)  # simulate date
         start_date = admission.admission_date.date()
         count = 6
         template = "student/payment/emi_payment.html"
@@ -1433,7 +1432,7 @@ def payment_portal(request):
 
     if plan == "pdc":
 
-        today = date(2026, 6, 25)  # simulate date
+        today = date(2026, 9, 25)  # simulate date
         start_date = admission.admission_date.date()
         count = 5
         template = "student/payment/pdc_payment.html"
