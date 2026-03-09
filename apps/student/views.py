@@ -480,40 +480,40 @@ def announcement_view(request):
 @login_required
 def notification_view(request):
 
-    # ✅ SAFETY CHECK (extra protection)
-    if not request.user.is_authenticated:
-        return redirect("login")  # change if needed
+    # MARK AS READ
+    if request.method == "POST":
 
-    # ✅ MARK AS READ
-    read_id = request.GET.get("read")
-    page_number = request.GET.get("page")
+        notification_id = request.POST.get("notification_id")
 
-    if read_id:
         notification = Notification.objects.filter(
-            id=read_id,
-            recipient_id=request.user.id   # ✅ SAFER
+            id=notification_id,
+            recipient=request.user
         ).first()
 
         if notification:
-            notification.mark_as_read()
+            notification.is_read = True
+            notification.read_at = timezone.now()
+            notification.save()
 
-            if notification.link_url:
-                return redirect(notification.link_url)
+        return redirect("student:notification_view")
 
-    # ✅ FETCH NOTIFICATIONS
+    # SHOW ONLY UNREAD
     notifications_list = Notification.objects.filter(
-        recipient_id=request.user.id   # ✅ prevents AnonymousUser error
+        recipient=request.user,
+        is_read=False
     ).order_by("-created_at")
 
-    # ✅ PAGINATION (10 per page)
     paginator = Paginator(notifications_list, 10)
+
+    page_number = request.GET.get("page", 1)
+
     notifications = paginator.get_page(page_number)
 
-    return render(request, "student/dashboard/notification.html", {
-        "notifications": notifications
-    })
-
-
+    return render(
+        request,
+        "student/dashboard/notification.html",
+        {"notifications": notifications}
+    )
 
 
 @login_required
