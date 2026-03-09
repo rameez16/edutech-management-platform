@@ -1,0 +1,229 @@
+{% extends "bdm/layout/base.html" %}
+{% load static %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+:root {
+  --ds-gray-50: #f9fafb; --ds-gray-100: #f3f4f6; --ds-gray-200: #e5e7eb;
+  --ds-gray-400: #9ca3af; --ds-gray-500: #6b7280; --ds-gray-600: #4b5563;
+  --ds-gray-700: #374151; --ds-gray-900: #111827;
+  --ds-blue-50: #eff6ff; --ds-blue-100: #dbeafe;
+  --ds-blue-500: #3b82f6; --ds-blue-600: #2563eb; --ds-blue-700: #1d4ed8;
+  --r-md: 0.5rem; --r-lg: 0.75rem;
+}
+
+.eu-wrap {
+/*  max-width: 520px;*/
+  margin: 40px auto;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* Header */
+.eu-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 24px;
+}
+.eu-header-icon {
+  width: 40px; height: 40px;
+  background: var(--ds-blue-50); color: var(--ds-blue-600);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.eu-title { font-size: 1.125rem; font-weight: 700; color: var(--ds-gray-900); line-height: 1.2; }
+.eu-sub   { font-size: 0.75rem; color: var(--ds-gray-400); margin-top: 2px; }
+
+/* Card */
+.eu-card {
+  background: white;
+  border: 1px solid var(--ds-gray-200);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.eu-card-body { padding: 24px; }
+
+/* Fields */
+.eu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.eu-field       { display: flex; flex-direction: column; gap: 5px; }
+.eu-field.full  { grid-column: 1 / -1; }
+
+.eu-label {
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--ds-gray-600); letter-spacing: 0.02em;
+}
+
+.eu-input, .eu-select {
+  padding: 8px 11px;
+  font-size: 0.8125rem;
+  color: var(--ds-gray-900);
+  background: white;
+  border: 1px solid var(--ds-gray-200);
+  border-radius: var(--r-md);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+}
+.eu-input:focus, .eu-select:focus {
+  border-color: var(--ds-blue-500);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+
+/* Divider */
+.eu-divider {
+  height: 1px; background: var(--ds-gray-100);
+  margin: 20px 0;
+}
+
+/* Footer */
+.eu-footer {
+  padding: 16px 24px;
+  background: var(--ds-gray-50);
+  border-top: 1px solid var(--ds-gray-100);
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 10px;
+}
+
+.eu-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; font-size: 0.8125rem; font-weight: 500;
+  border-radius: var(--r-md); border: 1px solid var(--ds-gray-200);
+  background: white; color: var(--ds-gray-700);
+  cursor: pointer; transition: all 0.15s;
+  text-decoration: none; font-family: inherit; line-height: 1;
+}
+.eu-btn:hover { background: var(--ds-gray-50); border-color: var(--ds-gray-300); color: var(--ds-gray-900); }
+.eu-btn-primary {
+  background: var(--ds-blue-600); color: white;
+  border-color: var(--ds-blue-600);
+}
+.eu-btn-primary:hover { background: var(--ds-blue-700); border-color: var(--ds-blue-700); color: white; }
+.eu-btn i { font-size: 0.875rem; }
+
+/* Role pills */
+.eu-role-group {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.eu-role-option { display: none; }
+.eu-role-label {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  font-size: 0.8125rem; font-weight: 500;
+  border: 1px solid var(--ds-gray-200);
+  border-radius: var(--r-md);
+  color: var(--ds-gray-600);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.eu-role-label i { font-size: 0.875rem; }
+.eu-role-label:hover { border-color: var(--ds-blue-200); color: var(--ds-blue-600); background: var(--ds-blue-50); }
+.eu-role-option:checked + .eu-role-label {
+  background: var(--ds-blue-600); color: white;
+  border-color: var(--ds-blue-600);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="eu-wrap">
+
+  <!-- Header -->
+  <div class="eu-header">
+    <div class="eu-header-icon"><i class="bi bi-person-gear"></i></div>
+    <div>
+      <div class="eu-title">Edit User</div>
+      <div class="eu-sub">{{ user.username }} · Update account details</div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="eu-card">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="eu-card-body">
+
+        <!-- Name row -->
+        <div class="eu-grid">
+          <div class="eu-field">
+            <label class="eu-label">First Name</label>
+            <input class="eu-input" type="text" name="first_name"
+                   value="{{ user.first_name }}" placeholder="First name">
+          </div>
+          <div class="eu-field">
+            <label class="eu-label">Last Name</label>
+            <input class="eu-input" type="text" name="last_name"
+                   value="{{ user.last_name }}" placeholder="Last name">
+          </div>
+
+          <!-- Username -->
+          <div class="eu-field">
+            <label class="eu-label">Username <span style="color:#ef4444;">*</span></label>
+            <input class="eu-input" type="text" name="username"
+                   value="{{ user.username }}" required placeholder="username">
+          </div>
+
+          <!-- Email -->
+          <div class="eu-field">
+            <label class="eu-label">Email</label>
+            <input class="eu-input" type="email" name="email"
+                   value="{{ user.email }}" placeholder="email@example.com">
+          </div>
+        </div>
+
+        <div class="eu-divider"></div>
+
+        <!-- Role -->
+        <div class="eu-field">
+          <label class="eu-label">Role</label>
+          <div class="eu-role-group">
+            <input class="eu-role-option" type="radio" name="role" id="role_admin"
+                   value="admin" {% if user.role == "admin" %}checked{% endif %}>
+            <label class="eu-role-label" for="role_admin">
+              <i class="bi bi-shield-fill"></i> Admin
+            </label>
+
+            <input class="eu-role-option" type="radio" name="role" id="role_trainer"
+                   value="trainer" {% if user.role == "trainer" %}checked{% endif %}>
+            <label class="eu-role-label" for="role_trainer">
+              <i class="bi bi-person-workspace"></i> Trainer
+            </label>
+
+            <input class="eu-role-option" type="radio" name="role" id="role_student"
+                   value="student" {% if user.role == "student" %}checked{% endif %}>
+            <label class="eu-role-label" for="role_student">
+              <i class="bi bi-mortarboard-fill"></i> Student
+            </label>
+
+            <input class="eu-role-option" type="radio" name="role" id="role_counselor"
+                   value="counselor" {% if user.role == "counselor" %}checked{% endif %}>
+            <label class="eu-role-label" for="role_counselor">
+              <i class="bi bi-headset"></i> Counselor
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer actions -->
+      <div class="eu-footer">
+        <a href="{% url 'bdm:user_list' %}" class="eu-btn">
+          <i class="bi bi-x"></i> Cancel
+        </a>
+        <button type="submit" class="eu-btn eu-btn-primary">
+          <i class="bi bi-check-lg"></i> Update User
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
