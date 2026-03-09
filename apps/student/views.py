@@ -1205,7 +1205,6 @@ def _notify_bdm_payment(student, payment_plan_label, installment_number, amount)
             notification_type=Notification.NotificationType.GENERAL,
             title=f"{payment_plan_label} Submitted",
             message=f"{student.full_name} submitted {payment_plan_label} {detail}.",
-            link_url="/bdm/payments/"  # update to your BDM payments URL
         )
 
 
@@ -1817,6 +1816,7 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 @role_required("student")
 def upload(request):
+
     student = request.user.student
 
     REQUIRED_DOCS = {
@@ -1829,21 +1829,20 @@ def upload(request):
     onboarding, _ = OnboardingChecklist.objects.get_or_create(student=student)
 
     # =====================================
-    # Get latest document per type
+    # Get existing documents
     # =====================================
-    latest_docs_qs = (
-        StudentDocument.objects
-        .filter(student=student)
-        .order_by("document_type", "-id")
-        .distinct("document_type")
-    )
-    existing_docs = {doc.document_type: doc for doc in latest_docs_qs}
+    existing_docs = {
+        doc.document_type: doc
+        for doc in StudentDocument.objects.filter(student=student)
+    }
 
     # =====================================
     # If any doc rejected → allow re-upload
     # =====================================
-    if any(doc.verification_status == StudentDocument.VerificationStatus.REJECTED
-           for doc in existing_docs.values()):
+    if any(
+        doc.verification_status == StudentDocument.VerificationStatus.REJECTED
+        for doc in existing_docs.values()
+    ):
         onboarding.documents_uploaded = False
         onboarding.save(update_fields=["documents_uploaded"])
 
@@ -1855,6 +1854,7 @@ def upload(request):
         uploaded_any = False
 
         for key, label in REQUIRED_DOCS.items():
+
             file = request.FILES.get(key)
             if not file:
                 continue
@@ -1865,21 +1865,39 @@ def upload(request):
 
             last_doc = existing_docs.get(key)
 
-            # Block overwrite if already pending or verified
+            # =====================================
+            # Block overwrite if pending or verified
+            # =====================================
             if last_doc and last_doc.verification_status in (
                 StudentDocument.VerificationStatus.PENDING,
                 StudentDocument.VerificationStatus.VERIFIED,
             ):
                 continue
 
-            # Create new doc only if rejected or not exists
-            StudentDocument.objects.create(
-                student=student,
-                document_type=key,
-                document_file=file,
-                verification_status=StudentDocument.VerificationStatus.PENDING,
-                rejection_reason="",  # clear old reason
-            )
+            # =====================================
+            # Replace rejected document
+            # =====================================
+            if last_doc:
+
+                # delete old file
+                if last_doc.document_file:
+                    last_doc.document_file.delete(save=False)
+
+                last_doc.document_file = file
+                last_doc.verification_status = StudentDocument.VerificationStatus.PENDING
+                last_doc.rejection_reason = ""
+                last_doc.save()
+
+            else:
+                # create new document
+                StudentDocument.objects.create(
+                    student=student,
+                    document_type=key,
+                    document_file=file,
+                    verification_status=StudentDocument.VerificationStatus.PENDING,
+                    rejection_reason="",
+                )
+
             uploaded_any = True
 
         if not uploaded_any:
@@ -1889,9 +1907,9 @@ def upload(request):
         onboarding.documents_uploaded = True
         onboarding.save(update_fields=["documents_uploaded"])
 
-
-
-        # ✅ Notify BDM about document upload
+        # =====================================
+        # Notify BDM
+        # =====================================
         from django.contrib.auth import get_user_model
         User = get_user_model()
 
@@ -1901,13 +1919,13 @@ def upload(request):
                 notification_type=Notification.NotificationType.GENERAL,
                 title="Student Documents Submitted",
                 message=f"{student.full_name} uploaded documents for verification.",
-                link_url="/bdm/documents/"  # update to your BDM documents review URL
             )
 
         messages.success(
             request,
             "Documents uploaded successfully. Verification in progress."
         )
+
         return redirect(request.path)
 
     # =====================================
@@ -1917,7 +1935,7 @@ def upload(request):
 
     for key, doc in existing_docs.items():
 
-        # Rejected → always rejected, ensure rejection reason
+        # Rejected → always show rejected
         if doc.verification_status == StudentDocument.VerificationStatus.REJECTED:
             if not doc.rejection_reason:
                 doc.rejection_reason = "No reason provided"
@@ -1930,15 +1948,16 @@ def upload(request):
             display_docs[key] = doc
             continue
 
-        # Checklist verified → show actual status
         display_docs[key] = doc
 
     # =====================================
     # Check if submit button should be enabled
     # =====================================
     can_submit = True
+
     for key in REQUIRED_DOCS:
         doc = existing_docs.get(key)
+
         if not doc or doc.verification_status == StudentDocument.VerificationStatus.REJECTED:
             can_submit = False
             break
@@ -1951,9 +1970,8 @@ def upload(request):
             "onboarding": onboarding,
             "REQUIRED_DOCS": REQUIRED_DOCS,
             "can_submit": can_submit,
-        }
+        },
     )
-
 
 
 
@@ -2080,7 +2098,7 @@ def upload_signed_enrollment_letter(request):
                 notification_type=Notification.NotificationType.GENERAL,
                 title="Enrollment Letter Signed",
                 message=f"{student.full_name} uploaded a signed enrollment letter.",
-                link_url="/bdm/enrollment/"  # update to your BDM enrollment review URL
+                
             )
 
         return JsonResponse({
@@ -2313,7 +2331,7 @@ def do_task(request, task_id):
                     notification_type=Notification.NotificationType.GENERAL,
                     title="Task Submitted",
                     message=f"{student.full_name} submitted '{task.title}'.",
-                    link_url=f"/trainer/tasks/{task.id}/"
+                    
                 )
 
             messages.success(request, "Task submitted successfully.")
@@ -2689,7 +2707,6 @@ def submit_exam(request, exam_id):
                 notification_type=Notification.NotificationType.GENERAL,
                 title="Exam Submitted",
                 message=f"{student.full_name} submitted '{exam.title}' {'(Late)' if is_late else ''}.",
-                link_url=f"/trainer/exams/{exam.id}/"  # update to your trainer exam detail URL
             )
 
     return redirect('student:attend_exam', exam_id=exam_id)
@@ -2710,7 +2727,6 @@ def get_notifications(request):
             "title": n.title,
             "message": n.message,
             "type": n.notification_type,
-            "link_url": n.link_url,
             "created_at": n.created_at.strftime("%b %d, %I:%M %p"),
         }
         for n in notifications
