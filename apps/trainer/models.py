@@ -903,7 +903,7 @@ class SubstituteTeaching(models.Model):
         ordering = ['-date']
     
     def __str__(self):
-        return f"{self.batch.name} - {self.date} - {self.substitute_trainer.name} for {self.original_trainer.name}"
+        return f"{self.batch.name} - {self.date} - {self.substitute_trainer.full_name} for {self.original_trainer.full_name}"
     
     
 from django.db import models
