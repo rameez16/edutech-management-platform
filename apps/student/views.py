@@ -1644,6 +1644,173 @@ def _resolve_summary(installments, selected_summary):
 
 
 
+@role_required("student")
+def lessonplan(request):
+    student = request.user.student
+
+    # Get the batch for this student
+    batch = student.batches.first()  # Assuming one batch per student
+    if not batch:
+        return render(request, 'student/lessonplan/lessonplan.html', {'error': 'No batch assigned yet.'})
+
+    course = batch.course
+    course_name = course.name
+
+    # Get all modules for this course
+    modules = Module.objects.filter(course=course).prefetch_related('lessons')
+
+    # Prepare lessons dict keyed by module.id
+    lessons_by_module = {}
+    for module in modules:
+        lessons_by_module[module.id] = LessonPlan.objects.filter(module=module).order_by('session_number')
+
+    context = {
+        'course_name': course_name,
+        'modules': modules,
+        'lessons_by_module': lessons_by_module,
+    }
+    return render(request, 'student/lessonplan/lessonplan.html', context)
+
+
+
+
+
+
+
+@role_required("student")
+def syllabus(request):
+    student = request.user.student
+
+    batch = student.batches.filter(is_active=True).select_related("course").first()
+
+    course = None
+
+    if batch:
+        course = batch.course
+
+        #  Remove extra blank lines from tech_stack
+        if course.tech_stack:
+            course.tech_stack = "\n".join(
+                line.strip()
+                for line in course.tech_stack.splitlines()
+                if line.strip()
+            )
+
+        #  Remove extra blank lines from syllabus
+        if course.syllabus:
+            course.syllabus = "\n".join(
+                line.strip()
+                for line in course.syllabus.splitlines()
+                if line.strip()
+            )
+
+    return render(request, "student/coursesyllabus/syllabus.html", {
+        "course": course
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+@role_required("student")
+def batch_details(request):
+    student = request.user.student
+
+    batch = student.batches.filter(
+        is_active=True
+    ).select_related(
+        "course"
+    ).prefetch_related(
+        "trainers__user"
+    ).first()
+
+
+    schedules = []
+    if batch:
+        schedules = list(
+            batch.schedules.filter(is_active=True)
+            .select_related("trainer__user")
+            .order_by("day_of_week", "start_time")
+        )
+
+
+
+    modules_data       = []
+    completed_sessions = []
+    planned_sessions   = []
+    pending_sessions   = []
+    skipped_sessions   = []
+
+    if batch:
+        # One query — all sessions for this batch, with module info
+        # Chain: LessonSession → lesson_plan → module
+        all_sessions = list(
+            LessonSession.objects.filter(batch=batch)
+            .select_related("lesson_plan__module")
+            .order_by(
+                "lesson_plan__module__module_number",
+                "lesson_plan__session_number",
+            )
+        )
+
+        # All modules for this batch's course, in order
+        modules = Module.objects.filter(
+            course=batch.course
+        ).order_by("module_number")
+
+        # Build a dict per module — filter sessions in Python (no extra queries)
+        for module in modules:
+            module_sessions = [
+                s for s in all_sessions
+                if s.lesson_plan.module_id == module.id
+            ]
+
+            completed = [s for s in module_sessions if s.status == LessonSession.SessionStatus.COMPLETED]
+            planned   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.PLANNED]
+            pending   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.PENDING]
+            skipped   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.SKIPPED]
+
+            modules_data.append({
+                "module":          module,
+                "completed":       completed,
+                "planned":         planned,
+                "pending":         pending,
+                "skipped":         skipped,
+                "completed_count": len(completed),
+                "planned_count":   len(planned),
+                "pending_count":   len(pending),
+                "skipped_count":   len(skipped),
+                "total":           len(module_sessions),
+            })
+
+        # Flat lists for fallback (template uses these only when modules is empty)
+        completed_sessions = [s for s in all_sessions if s.status == LessonSession.SessionStatus.COMPLETED]
+        planned_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.PLANNED]
+        pending_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.PENDING]
+        skipped_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.SKIPPED]
+
+    return render(request, "student/batch/batch.html", {
+        "batch":              batch,
+        "schedules":          schedules,
+        "modules":            modules_data,       # list of dicts — one per module
+        "completed_sessions": completed_sessions,  # flat fallback
+        "planned_sessions":   planned_sessions,
+        "pending_sessions":   pending_sessions,
+        "skipped_sessions":   skipped_sessions,
+    })
+
+
+
+
+
+
 
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
@@ -1843,6 +2010,36 @@ def onboard(request):
 
 
 
+
+
+
+#when merging delete this view this is for just check logic correct or not
+
+@role_required("student")
+def download_enrollment_letter(request):
+    checklist = request.user.student.onboarding_checklist
+
+    if not checklist.enrollment_letter_generated:
+        messages.info(request, "Enrollment letter not generated yet.")
+        return redirect("student:onboarding")
+
+    content = (
+        "ENROLLMENT LETTER (TEMP)\n\n"
+        f"Student: {request.user.get_full_name()}\n\n"
+        "This is a temporary enrollment letter.\n"
+        "A PDF version will be added by BDM."
+    )
+
+    response = HttpResponse(content, content_type="application/octet-stream")
+    response["Content-Disposition"] = 'attachment; filename="enrollment_letter.txt"'
+    return response
+
+
+
+
+
+
+
 @role_required("student")
 def upload_signed_enrollment_letter(request):
 
@@ -1900,102 +2097,6 @@ def upload_signed_enrollment_letter(request):
 
 
 
-@role_required("student")
-def download_id_card(request):
-    checklist = request.user.student.onboarding_checklist
-
-    if not checklist.id_card_generated:
-        messages.info(request, "ID Card has not been generated by BDM yet.")
-        return redirect("student:onboarding")
-
-    try:
-        # Assuming student model has `id_card` FileField
-        id_card_file = request.user.student.id_card
-        if not id_card_file:
-            messages.info(request, "ID Card file is not available yet.")
-            return redirect("student:onboarding")
-        
-        # Optional: mark as issued when downloaded
-        checklist.id_card_issued = True
-        checklist.save()
-
-        return FileResponse(id_card_file.open('rb'), as_attachment=True)
-    except Exception as e:
-        messages.error(request, "ID Card not available: " + str(e))
-        return redirect("student:onboarding")
-
-
-
-
-
-
-
-@role_required("student")
-def lessonplan(request):
-    student = request.user.student
-
-    # Get the batch for this student
-    batch = student.batches.first()  # Assuming one batch per student
-    if not batch:
-        return render(request, 'student/lessonplan/lessonplan.html', {'error': 'No batch assigned yet.'})
-
-    course = batch.course
-    course_name = course.name
-
-    # Get all modules for this course
-    modules = Module.objects.filter(course=course).prefetch_related('lessons')
-
-    # Prepare lessons dict keyed by module.id
-    lessons_by_module = {}
-    for module in modules:
-        lessons_by_module[module.id] = LessonPlan.objects.filter(module=module).order_by('session_number')
-
-    context = {
-        'course_name': course_name,
-        'modules': modules,
-        'lessons_by_module': lessons_by_module,
-    }
-    return render(request, 'student/lessonplan/lessonplan.html', context)
-
-
-
-
-
-
-
-@role_required("student")
-def syllabus(request):
-    student = request.user.student
-
-    batch = student.batches.filter(is_active=True).select_related("course").first()
-
-    course = None
-
-    if batch:
-        course = batch.course
-
-        #  Remove extra blank lines from tech_stack
-        if course.tech_stack:
-            course.tech_stack = "\n".join(
-                line.strip()
-                for line in course.tech_stack.splitlines()
-                if line.strip()
-            )
-
-        #  Remove extra blank lines from syllabus
-        if course.syllabus:
-            course.syllabus = "\n".join(
-                line.strip()
-                for line in course.syllabus.splitlines()
-                if line.strip()
-            )
-
-    return render(request, "student/coursesyllabus/syllabus.html", {
-        "course": course
-    })
-
-
-
 
 
 
@@ -2029,116 +2130,36 @@ def view_id_card(request):
 
 
 
-#when merging delete this view this is for just check logic correct or not
+
 
 @role_required("student")
-def download_enrollment_letter(request):
+def download_id_card(request):
     checklist = request.user.student.onboarding_checklist
 
-    if not checklist.enrollment_letter_generated:
-        messages.info(request, "Enrollment letter not generated yet.")
+    if not checklist.id_card_generated:
+        messages.info(request, "ID Card has not been generated by BDM yet.")
         return redirect("student:onboarding")
 
-    content = (
-        "ENROLLMENT LETTER (TEMP)\n\n"
-        f"Student: {request.user.get_full_name()}\n\n"
-        "This is a temporary enrollment letter.\n"
-        "A PDF version will be added by BDM."
-    )
+    try:
+        # Assuming student model has `id_card` FileField
+        id_card_file = request.user.student.id_card
+        if not id_card_file:
+            messages.info(request, "ID Card file is not available yet.")
+            return redirect("student:onboarding")
+        
+        # Optional: mark as issued when downloaded
+        checklist.id_card_issued = True
+        checklist.save()
 
-    response = HttpResponse(content, content_type="application/octet-stream")
-    response["Content-Disposition"] = 'attachment; filename="enrollment_letter.txt"'
-    return response
-
-
-
-
-@role_required("student")
-def batch_details(request):
-    student = request.user.student
-
-    batch = student.batches.filter(
-        is_active=True
-    ).select_related(
-        "course"
-    ).prefetch_related(
-        "trainers__user"
-    ).first()
-
-
-    schedules = []
-    if batch:
-        schedules = list(
-            batch.schedules.filter(is_active=True)
-            .select_related("trainer__user")
-            .order_by("day_of_week", "start_time")
-        )
+        return FileResponse(id_card_file.open('rb'), as_attachment=True)
+    except Exception as e:
+        messages.error(request, "ID Card not available: " + str(e))
+        return redirect("student:onboarding")
 
 
 
-    modules_data       = []
-    completed_sessions = []
-    planned_sessions   = []
-    pending_sessions   = []
-    skipped_sessions   = []
 
-    if batch:
-        # One query — all sessions for this batch, with module info
-        # Chain: LessonSession → lesson_plan → module
-        all_sessions = list(
-            LessonSession.objects.filter(batch=batch)
-            .select_related("lesson_plan__module")
-            .order_by(
-                "lesson_plan__module__module_number",
-                "lesson_plan__session_number",
-            )
-        )
 
-        # All modules for this batch's course, in order
-        modules = Module.objects.filter(
-            course=batch.course
-        ).order_by("module_number")
-
-        # Build a dict per module — filter sessions in Python (no extra queries)
-        for module in modules:
-            module_sessions = [
-                s for s in all_sessions
-                if s.lesson_plan.module_id == module.id
-            ]
-
-            completed = [s for s in module_sessions if s.status == LessonSession.SessionStatus.COMPLETED]
-            planned   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.PLANNED]
-            pending   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.PENDING]
-            skipped   = [s for s in module_sessions if s.status == LessonSession.SessionStatus.SKIPPED]
-
-            modules_data.append({
-                "module":          module,
-                "completed":       completed,
-                "planned":         planned,
-                "pending":         pending,
-                "skipped":         skipped,
-                "completed_count": len(completed),
-                "planned_count":   len(planned),
-                "pending_count":   len(pending),
-                "skipped_count":   len(skipped),
-                "total":           len(module_sessions),
-            })
-
-        # Flat lists for fallback (template uses these only when modules is empty)
-        completed_sessions = [s for s in all_sessions if s.status == LessonSession.SessionStatus.COMPLETED]
-        planned_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.PLANNED]
-        pending_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.PENDING]
-        skipped_sessions   = [s for s in all_sessions if s.status == LessonSession.SessionStatus.SKIPPED]
-
-    return render(request, "student/batch/batch.html", {
-        "batch":              batch,
-        "schedules":          schedules,
-        "modules":            modules_data,       # list of dicts — one per module
-        "completed_sessions": completed_sessions,  # flat fallback
-        "planned_sessions":   planned_sessions,
-        "pending_sessions":   pending_sessions,
-        "skipped_sessions":   skipped_sessions,
-    })
 
 
 
