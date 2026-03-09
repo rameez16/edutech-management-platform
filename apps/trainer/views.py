@@ -7,12 +7,16 @@ from django.db.models import Max
 from decimal import Decimal
 import datetime
 from zoneinfo import ZoneInfo
+from datetime import date
 
 from apps.trainer.forms import TrainerProfileForm, TaskForm, EvaluationForm , CompletedSessionForm, SessionMaterialForm,TrainerIssueResolveForm,AnnouncementForm,ExamForm,TrainerLeaveForm
 
-from apps.bdm.models import Trainer, Batch, Student, StudentIssue, Announcement
-from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission, SessionMaterial,TrainerLeave, Exam, ExamSubmission, ExamResult
+from apps.bdm.models import Trainer, Batch, Student, StudentIssue, Announcement, Notification
+from apps.trainer.models import Module, Attendance, LessonSession, Task, TaskSubmission, SessionMaterial,TrainerLeave, Exam, ExamSubmission, ExamResult, SubstituteTeaching
 from apps.student.models import StudentFeedback, LeaveApplication
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 
@@ -172,6 +176,11 @@ def dashboard(request):
 
     announcement_count = announcement_notifications.count()
     
+    notifications = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False
+    ).order_by('-created_at')
+    
     context = {
         'page_title': 'Dashboard',
         "planned_sessions": planned_sessions,
@@ -200,6 +209,9 @@ def dashboard(request):
         
         "announcement_notifications": announcement_notifications,
         "announcement_count": announcement_count,
+        
+        'notifications': notifications,
+        'unread_count': notifications.count(),
     }
     return render(request, 'trainer/dashboard/overview.html', context)
 
@@ -605,6 +617,15 @@ def process_leave(request, leave_id):
             leave.approved_by = trainer
             leave.approval_date = timezone.now()
             leave.save()
+            
+            # Notify student
+            Notification.objects.create(
+                recipient=leave.student.user,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Leave Approved ✓",
+                message=f"Your leave from {leave.from_date} to {leave.to_date} has been approved.",
+                link_url=f"/student/leaves/{leave.id}/",
+            )
             messages.success(request, f"Leave approved for {leave.student.full_name}")
 
         elif action == "reject":
@@ -618,6 +639,16 @@ def process_leave(request, leave_id):
             leave.approved_by = trainer
             leave.approval_date = timezone.now()
             leave.save()
+            
+            # Notify student
+            Notification.objects.create(
+                recipient=leave.student.user,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Leave Rejected",
+                message=f"Your leave from {leave.start_date} to {leave.end_date} was rejected. Reason: {leave.rejection_reason}",
+                link_url=f"/student/leaves/{leave.id}/",
+            )
+            
             messages.success(request, f"Leave rejected for {leave.student.full_name}")
 
     return redirect("trainer:leave-dashboard")
@@ -688,6 +719,18 @@ def task_create(request):
             task.created_by = trainer
             task.batch = task.lesson_session.batch
             task.save()
+            
+            # Notify students
+            Notification.objects.bulk_create([
+                Notification(
+                    recipient=student.user,
+                    notification_type=Notification.NotificationType.GENERAL,
+                    title="New Task Assigned",
+                    message=f"Task '{task.title}' assigned for batch '{task.batch.name}'. Due: {task.due_date}.",
+                    link_url=f"/student/tasks/{task.id}/",
+                )
+                for student in task.batch.students.select_related("user").all()
+            ])
             messages.success(request, "Task created successfully.")
             return redirect("trainer:task-list")
     else:
@@ -829,6 +872,15 @@ def evaluate_submission(request, submission_id):
             submission.is_pass = marks >= submission.task.passing_marks
 
             submission.save()
+            
+            # Notify student
+            Notification.objects.create(
+                recipient=submission.student.user,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Task Evaluated",
+                message=f"Your submission for '{submission.task.title}' evaluated. Marks: {submission.marks_obtained}/{submission.task.total_marks}.",
+                link_url=f"/student/tasks/{submission.task.id}/",
+            )
 
             messages.success(request, "Submission evaluated successfully.")
             return redirect("trainer:task-submissions")
@@ -841,6 +893,15 @@ def evaluate_submission(request, submission_id):
             submission.feedback = feedback
             submission.revision_count += 1
             submission.save()
+            
+            # Notify student
+            Notification.objects.create(
+                recipient=submission.student.user,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Task Resubmission Requested",
+                message=f"Your submission for '{submission.task.title}' needs revision. Feedback: {submission.feedback}",
+                link_url=f"/student/tasks/{submission.task.id}/",
+            )
 
             messages.warning(request, "Resubmission requested.")
             return redirect("trainer:task-submissions")
@@ -1335,6 +1396,17 @@ def trainer_leave_apply(request):
             leave = form.save(commit=False)
             leave.trainer = trainer
             leave.save()
+            
+            # Notify BDM
+            for bdm_user in User.objects.filter(role="admin"):
+                Notification.objects.create(
+                    recipient=bdm_user,
+                    notification_type=Notification.NotificationType.GENERAL,
+                    title="Trainer Leave Application",
+                    message=f"{leave.trainer.full_name} applied for leave from {leave.start_date} to {leave.end_date}.",
+                    link_url=f"/bdm/trainer-leaves/{leave.id}/",
+                )
+
             messages.success(request, "Leave application submitted successfully!")
             return redirect("trainer:trainer-leave-dashboard")
     else:
@@ -1436,6 +1508,16 @@ def auto_complete_exam(exam):
         Exam.objects.filter(pk=exam.pk).update(is_completed=True, is_published=True)
         exam.is_completed = True
         exam.is_published = True
+        
+        # Notify BDM
+        for bdm_user in User.objects.filter(is_staff=True):
+            Notification.objects.create(
+                recipient=bdm_user,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Final Exam Completed",
+                message=f"Exam '{exam.title}' for batch '{exam.batch.name}' is completed. Results ready.",
+                link_url=f"/trainer/exams/{exam.id}/results/",
+            )
 
 
 def auto_mark_late_submissions(exam):
@@ -1610,6 +1692,18 @@ def final_exam_publish(request, exam_id):
     else:
         exam.is_published = True
         exam.save()
+        
+        # Notify students
+        Notification.objects.bulk_create([
+            Notification(
+                recipient=student.user,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Final Exam Published",
+                message=f"Exam '{exam.title}' is now live. Scheduled: {exam.scheduled_date} at {exam.exam_time}. Duration: {exam.duration_minutes} mins.",
+                link_url=f"/student/exams/{exam.id}/",
+            )
+            for student in exam.batch.students.select_related("user").all()
+        ])
         messages.success(request, f"Exam '{exam.title}' is now published and visible to students.")
 
     return redirect("trainer:exam-final-view", exam_id=exam.id)
@@ -1901,3 +1995,105 @@ def certificate_check_eligibility(request, batch_id, student_id):
         )
 
     return redirect("trainer:certificate-students-list", batch_id=batch.id)
+
+
+
+
+@login_required
+@require_POST
+def mark_notification_read(request, notif_id):
+    notif = get_object_or_404(Notification, id=notif_id, recipient=request.user)
+    notif.mark_as_read()
+    return redirect(request.POST.get('next', 'trainer:dashboard'))
+
+
+@login_required
+@require_POST
+def mark_all_notifications_read(request):
+    Notification.objects.filter(
+        recipient=request.user,
+        is_read=False
+    ).update(is_read=True, read_at=timezone.now())
+    return redirect('trainer:dashboard')
+
+
+@login_required
+def substitute_list(request):
+    trainer = request.user.trainer
+
+    already_requested_session_ids = SubstituteTeaching.objects.filter(
+        original_trainer=trainer
+    ).values_list("lesson_session_id", flat=True)
+
+    sessions = LessonSession.objects.filter(
+        trainer=trainer,
+        status=LessonSession.SessionStatus.PLANNED
+    ).exclude(
+        id__in=already_requested_session_ids
+    ).order_by("planned_date")
+
+    return render(request, "trainer/substitute/substitute_list.html", {
+        "sessions": sessions,
+    })
+
+
+@login_required
+def my_substitute_requests(request):
+    trainer = request.user.trainer
+
+    requests = SubstituteTeaching.objects.filter(
+        original_trainer=trainer
+    ).select_related("batch", "lesson_session", "substitute_trainer")
+
+    return render(request, "trainer/substitute/my_substitute_requests.html", {
+        "requests": requests,
+    })
+
+
+@login_required
+def request_substitute(request, session_id):
+    trainer = request.user.trainer
+    session = get_object_or_404(LessonSession, id=session_id)
+
+    if SubstituteTeaching.objects.filter(
+        lesson_session=session,
+        original_trainer=trainer
+    ).exists():
+        messages.warning(request, "Substitute already requested for this session.")
+        return redirect("trainer:substitute-list")
+
+    if request.method == "POST":
+        reason = request.POST.get("reason", "").strip()
+
+        if not reason:
+            messages.error(request, "Reason is required.")
+            return render(request, "trainer/substitute/request_substitute.html", {"session": session})
+
+        substitute = SubstituteTeaching.objects.create(
+            batch=session.batch,
+            lesson_session=session,
+            original_trainer=trainer,
+            substitute_trainer=trainer,
+            date=session.planned_date,
+            reason_for_substitution=reason,
+            notes="pending"
+        )
+
+        # Notify BDM
+        for bdm_user in User.objects.filter(is_staff=True):
+            Notification.objects.create(
+                recipient=bdm_user,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Substitute Request Raised",
+                message=(
+                    f"{trainer.full_name} requested a substitute for "
+                    f"batch '{session.batch.name}' on {session.planned_date}. "
+                    f"Reason: {reason}"
+                ),
+                link_url=f"/bdm/substitute/{substitute.id}/",
+            )
+
+        messages.success(request, "Substitute request submitted successfully.")
+        return redirect("trainer:my-substitute-requests")
+
+    return render(request, "trainer/substitute/request_substitute.html", {"session": session})

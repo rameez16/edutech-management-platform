@@ -19,6 +19,46 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
 
+    <!-- Custom Alertify Styles -->
+<style>
+    /* Base / Default */
+    .alertify-notifier .ajs-message {
+        background: linear-gradient(135deg, #1D4ED8, #0EA5E9);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+        font-family: 'DM Sans', -apple-system, sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.875rem 1.25rem;
+    }
+    /* Success */
+    .alertify-notifier .ajs-message.ajs-success {
+        background: linear-gradient(135deg, #2563EB, #0EA5E9);
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+    }
+    /* Error */
+    .alertify-notifier .ajs-message.ajs-error {
+        background: linear-gradient(135deg, #DC2626, #F87171);
+        box-shadow: 0 8px 24px rgba(220, 38, 38, 0.35);
+    }
+    /* Warning */
+    .alertify-notifier .ajs-message.ajs-warning {
+        background: linear-gradient(135deg, #D97706, #FBBF24);
+        box-shadow: 0 8px 24px rgba(217, 119, 6, 0.35);
+    }
+    /* Dismiss button */
+    .alertify-notifier .ajs-message .ajs-close {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .alertify-notifier .ajs-message .ajs-close:hover {
+        color: #fff;
+    }
+    /* Position */
+    .alertify-notifier.ajs-right { right: 1.5rem; }
+    .alertify-notifier.ajs-top   { top: 2rem; }
+</style>
 </head>
 
 <!-- Alertify JS -->

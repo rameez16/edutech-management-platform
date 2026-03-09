@@ -1,0 +1,96 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}My Substitute Requests{% endblock %}
+
+{% block content %}
+
+<div class="glass-card">
+
+    <!-- Header -->
+    <div class="trainermysubreq-header">
+        <div>
+            <h4>My Substitute Requests</h4>
+            <p class="trainermysubreq-subtitle">
+                Track your substitute request status
+            </p>
+        </div>
+
+        <a href="{% url 'trainer:substitute-list' %}" class="trainermysubreq-btn-back">
+            Back to Sessions
+        </a>
+    </div>
+
+    {% if requests %}
+
+    <div class="trainermysubreq-table-wrapper">
+
+        <table class="trainermysubreq-table">
+
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Session</th>
+                    <th>Date</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for req in requests %}
+                <tr>
+
+                    <td>{{ req.batch.name }}</td>
+
+                    <td>
+                        Session {{ req.lesson_session.lesson_plan.session_number }}
+                    </td>
+
+                    <td>
+                        {{ req.lesson_session.planned_date }}
+                    </td>
+
+                    <td>
+                        {{ req.reason_for_substitution }}
+                    </td>
+
+                    <td>
+
+                        {% if req.notes == "assigned" %}
+                        <span class="trainermysubreq-badge success">
+                            ✅ {{ req.substitute_trainer.full_name }}
+                        </span>
+
+                        {% elif req.notes == "rejected" %}
+                        <span class="trainermysubreq-badge danger">
+                            Rejected
+                        </span>
+
+                        {% else %}
+                        <span class="trainermysubreq-badge warning">
+                            Pending
+                        </span>
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <div class="trainermysubreq-empty">
+        <p>No substitute requests yet.</p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

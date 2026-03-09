@@ -2,86 +2,57 @@
 {% load static %}
 
 {% block content %}
+
 <link rel="stylesheet" href="{% static 'student/css/notification.css' %}">
 
 <div class="notifications-page">
 
-    <h2 class="page-title">Notifications</h2>
+<h2 class="page-title">🔔 Notifications</h2>
 
-    {% if notifications %}
-        {% for n in notifications %}
-            <div class="notification-card {% if not n.is_read %}unread{% endif %}"
-                 onclick="window.location.href='?page={{ notifications.number }}&read={{ n.id }}'">
+{% if notifications %}
 
-                <!-- ICON -->
-                <div class="notification-icon">
+{% for n in notifications %}
 
-                    {% if n.notification_type == 'payment_received' %}
-                        ✅
-                    {% elif n.notification_type == 'payment_reminder' %}
-                        💰
-                    {% elif n.notification_type == 'document_pending' %}
-                        📄
-                    {% elif n.notification_type == 'issue_assigned' %}
-                        ⚠️
-                    {% elif n.notification_type == 'followup_due' %}
-                        ⏰
-                    {% elif n.notification_type == 'lead_assigned' %}
-                        👤
-                    {% else %}
-                        🔔
-                    {% endif %}
+<form method="POST" class="notification-form">
+{% csrf_token %}
 
-                </div>
+<input type="hidden" name="notification_id" value="{{ n.id }}">
 
-                <!-- CONTENT -->
-                <div class="notification-content">
+<button type="submit" class="notification-card">
 
-                    <div class="notification-header">
-                        <h4>{{ n.title }}</h4>
-                        <span class="time">
-                            {{ n.created_at|timesince }} ago
-                        </span>
-                    </div>
+<div class="notification-icon">🔔</div>
 
-                    <p>{{ n.message }}</p>
+<div class="notification-content">
 
-                    {% if n.link_url %}
-                        <span class="view-details">View Details</span>
-                    {% endif %}
+<div class="notification-header">
 
-                </div>
+<h4 class="notification-title">{{ n.title }}</h4>
 
-                {% if not n.is_read %}
-                    <span class="new-badge">NEW</span>
-                {% endif %}
+<span class="notification-date">
+{{ n.created_at|date:"d M Y, h:i A" }}
+</span>
 
-            </div>
-        {% endfor %}
-    {% else %}
-        <div class="empty-state">
-            No notifications yet 🎉
-        </div>
-    {% endif %}
+</div>
 
-    <!-- ✅ PAGINATION -->
-    <div class="pagination">
+<p class="notification-message">
+{{ n.message }}
+</p>
 
-        {% if notifications.has_previous %}
-            <a href="?page=1" class="page-btn">First</a>
-            <a href="?page={{ notifications.previous_page_number }}" class="page-btn">Previous</a>
-        {% endif %}
+</div>
 
-        <span class="page-info">
-            Page {{ notifications.number }} of {{ notifications.paginator.num_pages }}
-        </span>
+</button>
 
-        {% if notifications.has_next %}
-            <a href="?page={{ notifications.next_page_number }}" class="page-btn">Next</a>
-            <a href="?page={{ notifications.paginator.num_pages }}" class="page-btn">Last</a>
-        {% endif %}
+</form>
 
-    </div>
+{% endfor %}
+
+{% else %}
+
+<div class="empty-state">
+🔕 No notifications
+</div>
+
+{% endif %}
 
 </div>
 

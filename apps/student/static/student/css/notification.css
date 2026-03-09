@@ -1,7 +1,7 @@
 /* ================= PAGE ================= */
 
 .notifications-page {
-    max-width: 950px;
+    max-width: 850px;
     margin: auto;
     padding: 35px 20px;
 }
@@ -14,163 +14,115 @@
     color: #222;
 }
 
+/* ================= FORM ================= */
+
+.notification-form{
+    margin-bottom:18px;
+}
+
 /* ================= CARD ================= */
 
-.notification-card {
-    background: rgba(255, 255, 255, 0.9);
+.notification-card{
+    width:100%;
+    border:none;
+    background: rgba(255,255,255,0.9);
     backdrop-filter: blur(10px);
-    border-radius: 18px;
-    padding: 18px 20px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: 0.25s ease;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border-radius:18px;
+    padding:18px 22px;
+    display:flex;
+    align-items:flex-start;
+    gap:15px;
+    cursor:pointer;
+    transition:0.25s ease;
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+    text-align:left;
 }
 
-.notification-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.08);
-}
-
-/* ================= UNREAD STYLE ================= */
-
-.notification-card.unread {
-    border-left: 5px solid #5b5bff;
-    background: rgba(248, 249, 255, 0.95);
+.notification-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 18px 35px rgba(0,0,0,0.08);
 }
 
 /* ================= ICON ================= */
 
-.notification-icon {
-    font-size: 24px;
-    margin-right: 16px;
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
-    background: #f3f4ff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.notification-icon{
+    font-size:22px;
+    width:45px;
+    height:45px;
+    border-radius:12px;
+    background:#f3f4ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 /* ================= CONTENT ================= */
 
-.notification-content {
-    flex: 1;
+.notification-content{
+    flex:1;
 }
 
-.notification-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* HEADER */
+
+.notification-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.notification-header h4 {
-    margin: 0;
-    font-size: 25px;
-    font-weight: 600;
-    color: #222;
+.notification-title{
+    font-size:18px;
+    font-weight:600;
+    margin:0;
+    color:#222;
 }
 
-.time {
-    font-size: 15px;
-    color: #888;
+.notification-date{
+    font-size:13px;
+    color:#777;
 }
 
-.notification-content p {
-    margin: 6px 0 4px;
-    font-size: 16px;
-    color: #555;
+/* MESSAGE */
+
+.notification-message{
+    margin-top:6px;
+    font-size:14px;
+    color:#555;
 }
 
-.view-details {
-    font-size: 15px;
-    font-weight: 600;
-    color: #5b5bff;
-}
+/* ================= EMPTY ================= */
 
-/* ================= NEW BADGE ================= */
-
-.new-badge {
-    background: linear-gradient(135deg, #5b5bff, #7a7aff);
-    color: white;
-    font-size: 10px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-weight: 600;
-    margin-left: 10px;
-}
-
-/* ================= EMPTY STATE ================= */
-
-.empty-state {
-    background: white;
-    border-radius: 14px;
-    padding: 25px;
-    text-align: center;
-    font-weight: 600;
-    color: #666;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-}
-
-/* ================= PAGINATION ================= */
-
-.pagination {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.page-btn {
-    display: inline-block;
-    padding: 9px 16px;
-    margin: 5px;
-    background: white;
-    border-radius: 10px;
-    text-decoration: none;
-    font-size: 14px;
-    color: #5b5bff;
-    font-weight: 600;
-    border: 1px solid #eee;
-    transition: 0.2s ease;
-    box-shadow: 0 5px 12px rgba(0,0,0,0.04);
-}
-
-.page-btn:hover {
-    background: #5b5bff;
-    color: white;
-    transform: translateY(-1px);
-}
-
-.page-info {
-    display: inline-block;
-    margin: 0 12px;
-    font-weight: 600;
-    color: #444;
+.empty-state{
+    background:white;
+    border-radius:14px;
+    padding:25px;
+    text-align:center;
+    font-weight:600;
+    color:#666;
+    box-shadow:0 8px 20px rgba(0,0,0,0.05);
 }
 
 /* ================= MOBILE ================= */
 
-@media (max-width: 768px) {
+@media (max-width:768px){
 
-    .notification-card {
-        padding: 16px;
+    .notification-header{
+        flex-direction:column;
+        align-items:flex-start;
     }
 
-    .notification-header {
-        flex-direction: column;
-        align-items: flex-start;
+    .notification-date{
+        margin-top:4px;
     }
 
-    .time {
-        margin-top: 4px;
+    .notification-card{
+        padding:16px;
     }
 
-    .notification-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+    .notification-icon{
+        width:40px;
+        height:40px;
+        font-size:20px;
     }
+
 }
