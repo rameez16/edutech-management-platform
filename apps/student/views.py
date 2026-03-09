@@ -1242,7 +1242,7 @@ def payment_portal(request):
     if admission.admission_fee_paid and admission.admission_fee_amount:
         admission_fee_paid_amount = admission.admission_fee_amount
 
-    other_paid_amount = (
+    paid_amount = (
         FeePayment.objects.filter(
             student=student,
             payment_status=FeePayment.PaymentStatus.COMPLETED
@@ -1250,7 +1250,6 @@ def payment_portal(request):
         or Decimal("0.00")
     )
 
-    paid_amount = admission_fee_paid_amount + other_paid_amount
     pending_amount = max(total_fee - paid_amount, Decimal("0.00"))
 
     # =========================
