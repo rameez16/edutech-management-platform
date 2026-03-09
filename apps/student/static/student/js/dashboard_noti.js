@@ -115,13 +115,7 @@ async function dismissNotif(e, id) {
     }
 }
 
-function handleNotifClick(e, url, id) {
-    if (e.target.classList.contains('notif-dismiss')) return;
-    dismissNotif(e, id);
-    if (url && url !== 'None' && url !== '') {
-        setTimeout(() => window.location.href = url, 370);
-    }
-}
+
 
 async function markAllRead() {
     const items = document.querySelectorAll('.notif-item');
