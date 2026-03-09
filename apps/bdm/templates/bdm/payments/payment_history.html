@@ -35,6 +35,12 @@
     --red-50:  #fef2f2;
     --red-700: #b91c1c;
 
+    --purple-50:  #f5f3ff;
+    --purple-700: #6d28d9;
+
+    --teal-50:  #f0fdfa;
+    --teal-700: #0f766e;
+
     --shadow-sm: 0 1px 3px rgba(30,60,120,.06), 0 1px 2px rgba(30,60,120,.04);
     --shadow-md: 0 4px 16px rgba(30,60,120,.08), 0 1px 4px rgba(30,60,120,.04);
     --shadow-lg: 0 8px 32px rgba(30,60,120,.10), 0 2px 8px rgba(30,60,120,.06);
@@ -73,6 +79,10 @@
   .ph-section:nth-child(4) { animation-delay: .19s; }
   .ph-section:nth-child(5) { animation-delay: .24s; }
   .ph-section:nth-child(6) { animation-delay: .29s; }
+  .ph-section:nth-child(7) { animation-delay: .34s; }
+  .ph-section:nth-child(8) { animation-delay: .39s; }
+  .ph-section:nth-child(9) { animation-delay: .44s; }
+  .ph-section:nth-child(10){ animation-delay: .49s; }
 
   /* ─── Student header card ───────────────────────── */
   .ph-header-card {
@@ -99,9 +109,7 @@
     flex-shrink: 0;
   }
 
-  .ph-avatar svg {
-    color: var(--blue-500);
-  }
+  .ph-avatar svg { color: var(--blue-500); }
 
   .ph-student-name {
     font-family: 'Sora', sans-serif;
@@ -167,9 +175,7 @@
     flex-shrink: 0;
   }
 
-  .ph-card-body {
-    padding: 1.25rem 1.5rem;
-  }
+  .ph-card-body { padding: 1.25rem 1.5rem; }
 
   /* ─── Table ─────────────────────────────────────── */
   .ph-table {
@@ -194,9 +200,7 @@
   .ph-table thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
   .ph-table thead th:last-child  { border-radius: 0 var(--radius-sm) 0 0; }
 
-  .ph-table tbody tr {
-    transition: background .12s;
-  }
+  .ph-table tbody tr { transition: background .12s; }
   .ph-table tbody tr:hover { background: #f4f8ff; }
 
   .ph-table tbody td {
@@ -253,14 +257,18 @@
     border-radius: 50%;
     flex-shrink: 0;
   }
-  .ph-badge.success { background: var(--green-50);  color: var(--green-700); }
+  .ph-badge.success { background: var(--green-50);   color: var(--green-700); }
   .ph-badge.success::before { background: #22c55e; }
-  .ph-badge.info    { background: var(--blue-50);   color: var(--blue-700);  }
+  .ph-badge.info    { background: var(--blue-50);    color: var(--blue-700);  }
   .ph-badge.info::before    { background: var(--blue-500); }
-  .ph-badge.warning { background: var(--amber-50);  color: var(--amber-700); }
+  .ph-badge.warning { background: var(--amber-50);   color: var(--amber-700); }
   .ph-badge.warning::before { background: #f59e0b; }
-  .ph-badge.danger  { background: var(--red-50);    color: var(--red-700);   }
+  .ph-badge.danger  { background: var(--red-50);     color: var(--red-700);   }
   .ph-badge.danger::before  { background: #ef4444; }
+  .ph-badge.purple  { background: var(--purple-50);  color: var(--purple-700);}
+  .ph-badge.purple::before  { background: #8b5cf6; }
+  .ph-badge.teal    { background: var(--teal-50);    color: var(--teal-700);  }
+  .ph-badge.teal::before    { background: #14b8a6; }
 
   /* ─── Inline status form ────────────────────────── */
   .ph-status-form {
@@ -308,12 +316,15 @@
     box-shadow: 0 2px 6px rgba(59,130,246,.28);
     white-space: nowrap;
     flex-shrink: 0;
+    text-decoration: none;
   }
 
   .btn-update:hover {
     background: var(--blue-600);
     box-shadow: 0 3px 10px rgba(59,130,246,.36);
     transform: translateY(-1px);
+    color: var(--white);
+    text-decoration: none;
   }
 
   .btn-update:active { transform: translateY(0); }
@@ -434,6 +445,22 @@
     font-weight: 500;
   }
 
+  /* ─── Course status banner ──────────────────────── */
+  .ph-course-status-banner {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .85rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-size: .875rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+  }
+  .ph-course-status-banner.completed { background: var(--green-50);  color: var(--green-700); border: 1.5px solid #bbf7d0; }
+  .ph-course-status-banner.pending   { background: var(--amber-50);  color: var(--amber-700); border: 1.5px solid #fde68a; }
+  .ph-course-status-banner.progress  { background: var(--blue-50);   color: var(--blue-700);  border: 1.5px solid var(--blue-100); }
+  .ph-course-status-banner.unpaid    { background: var(--red-50);    color: var(--red-700);   border: 1.5px solid #fecaca; }
+
   /* ─── Responsive ────────────────────────────────── */
   @media (max-width: 680px) {
     .ph-wrapper        { padding: 1.25rem .75rem 3rem; }
@@ -447,19 +474,15 @@
 
 
 <div class="ph-wrapper">
-<!-- ── BACK BUTTON ─────────────────────────────── -->
-  <div class="ph-section" style="margin-bottom: 1rem;">
-    <a href="{% url 'bdm:course_fee' %}" class="btn-update" style="background: #6b7280;">&larr; Back to Previous Page</a>
 
-    <!-- Back to Dashboard -->
-  <a href="{% url 'bdm:payments_dashboard' %}" 
-     class="btn-update" 
-     style="background: #2563eb;">
-     ⬅ Back to Dashboard
-  </a>
+  <!-- ── BACK BUTTONS ───────────────────────────────── -->
+  <div class="ph-section" style="margin-bottom: 1rem; display:flex; gap:.6rem; flex-wrap:wrap;">
+    <a href="{% url 'bdm:course_fee' %}" class="btn-update" style="background:#6b7280;">&larr; Back to Previous Page</a>
+    <a href="{% url 'bdm:payments_dashboard' %}" class="btn-update" style="background:#2563eb;">⬅ Back to Dashboard</a>
   </div>
 
-  <!-- ── STUDENT HEADER ──────────────────────────── -->
+
+  <!-- ── STUDENT HEADER ─────────────────────────────── -->
   <div class="ph-header-card ph-section">
     <div class="ph-avatar">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -472,18 +495,30 @@
       <div class="ph-meta">
         <span class="ph-meta-item">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          <strong>{{ course.name }}</strong>
+          {% if course %}<strong>{{ course.name }}</strong>{% else %}<span style="color:var(--text-muted);">No course assigned</span>{% endif %}
         </span>
         <span class="ph-meta-item">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           Total Fee: <strong>₹ {{ course_fee }}</strong>
+        </span>
+        <span class="ph-meta-item">
+          Course Status:
+          {% if course_status == "COMPLETED" %}
+            <span class="ph-badge success">{{ course_status }}</span>
+          {% elif course_status == "PENDING" %}
+            <span class="ph-badge warning">{{ course_status }}</span>
+          {% elif course_status == "IN PROGRESS" %}
+            <span class="ph-badge info">{{ course_status }}</span>
+          {% else %}
+            <span class="ph-badge danger">{{ course_status }}</span>
+          {% endif %}
         </span>
       </div>
     </div>
   </div>
 
 
-  <!-- ── BOOKING FEE ──────────────────────────────── -->
+  <!-- ── BOOKING FEE ────────────────────────────────── -->
   {% if booking_payments %}
   <div class="ph-card ph-section">
     <div class="ph-card-header">
@@ -501,6 +536,7 @@
               <th>Method</th>
               <th>Documents</th>
               <th>Due / Payment Date</th>
+              <th>Status</th>
               <th>Update Status</th>
               <th>View</th>
             </tr>
@@ -522,7 +558,18 @@
                   <span style="color:var(--text-muted);font-size:.8rem;">—</span>
                 {% endif %}
               </td>
-              <td>{{ payment.payment_date }}</td>
+              <td>{{ payment.payment_date|default:"—" }}</td>
+              <td>
+                {% if payment.payment_status == "COMPLETED" %}
+                  <span class="ph-badge success">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "PENDING" %}
+                  <span class="ph-badge warning">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "FAILED" %}
+                  <span class="ph-badge danger">{{ payment.get_payment_status_display }}</span>
+                {% else %}
+                  <span class="ph-badge info">{{ payment.get_payment_status_display }}</span>
+                {% endif %}
+              </td>
               <td>
                 <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
                   {% csrf_token %}
@@ -534,13 +581,12 @@
                   </select>
                   <button type="submit" class="btn-update">Verify</button>
                 </form>
-                
               </td>
               <td>
-  <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
-    View
-  </a>
-</td>
+                <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+                  View
+                </a>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -551,7 +597,7 @@
   {% endif %}
 
 
-  <!-- ── ADMISSION FEE ────────────────────────────── -->
+  <!-- ── ADMISSION FEE ──────────────────────────────── -->
   <div class="ph-card ph-section">
     <div class="ph-card-header">
       <span class="ph-card-title">
@@ -566,7 +612,6 @@
         <span class="ph-badge danger">{{ admission_status }}</span>
       {% endif %}
     </div>
-
     <div class="ph-card-body" style="padding:0;">
       {% if admission_payments %}
       <div class="table-responsive">
@@ -577,8 +622,9 @@
               <th>Method</th>
               <th>Documents</th>
               <th>Payment Date</th>
+              <th>Status</th>
               <th>Update Status</th>
-               <th>View</th> 
+              <th>View</th>
             </tr>
           </thead>
           <tbody>
@@ -598,7 +644,18 @@
                   <span style="color:var(--text-muted);font-size:.8rem;">—</span>
                 {% endif %}
               </td>
-              <td>{{ payment.payment_date }}</td>
+              <td>{{ payment.payment_date|default:"—" }}</td>
+              <td>
+                {% if payment.payment_status == "COMPLETED" %}
+                  <span class="ph-badge success">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "PENDING" %}
+                  <span class="ph-badge warning">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "FAILED" %}
+                  <span class="ph-badge danger">{{ payment.get_payment_status_display }}</span>
+                {% else %}
+                  <span class="ph-badge info">{{ payment.get_payment_status_display }}</span>
+                {% endif %}
+              </td>
               <td>
                 <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
                   {% csrf_token %}
@@ -612,10 +669,10 @@
                 </form>
               </td>
               <td>
-  <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
-    View
-  </a>
-</td>
+                <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+                  View
+                </a>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -633,14 +690,15 @@
   </div>
 
 
-  <!-- ── EMI / INSTALLMENTS ───────────────────────── -->
+  <!-- ── INSTALLMENTS ───────────────────────────────── -->
   {% if installments %}
   <div class="ph-card ph-section">
     <div class="ph-card-header">
       <span class="ph-card-title">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        EMI / Installments
+        Installments
       </span>
+      <span class="ph-badge info">{{ installments|length }} installment{{ installments|length|pluralize }}</span>
     </div>
     <div class="ph-card-body" style="padding:0;">
       <div class="table-responsive">
@@ -653,8 +711,9 @@
               <th>Due Date</th>
               <th>Payment Date</th>
               <th>Documents</th>
+              <th>Status</th>
               <th>Update Status</th>
-               <th>View</th> 
+              <th>View</th>
             </tr>
           </thead>
           <tbody>
@@ -665,8 +724,8 @@
               </td>
               <td class="amount-cell"><span class="cur">₹</span>{{ payment.amount }}</td>
               <td>{{ payment.get_payment_method_display }}</td>
-              <td>{{ payment.due_date }}</td>
-              <td>{{ payment.payment_date }}</td>
+              <td>{{ payment.due_date|default:"—" }}</td>
+              <td>{{ payment.payment_date|default:"—" }}</td>
               <td>
                 {% if payment.documents.all %}
                   {% for doc in payment.documents.all %}
@@ -677,6 +736,17 @@
                   {% endfor %}
                 {% else %}
                   <span style="color:var(--text-muted);font-size:.8rem;">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if payment.payment_status == "COMPLETED" %}
+                  <span class="ph-badge success">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "PENDING" %}
+                  <span class="ph-badge warning">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "FAILED" %}
+                  <span class="ph-badge danger">{{ payment.get_payment_status_display }}</span>
+                {% else %}
+                  <span class="ph-badge info">{{ payment.get_payment_status_display }}</span>
                 {% endif %}
               </td>
               <td>
@@ -692,10 +762,10 @@
                 </form>
               </td>
               <td>
-  <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
-    View
-  </a>
-</td>
+                <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+                  View
+                </a>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -706,7 +776,175 @@
   {% endif %}
 
 
-  <!-- ── FULL PAYMENT ──────────────────────────────── -->
+  <!-- ── EMI PAYMENTS ───────────────────────────────── -->
+  {% if emi_payments %}
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        EMI Payments
+      </span>
+      <span class="ph-badge purple">{{ emi_payments|length }} EMI{{ emi_payments|length|pluralize }}</span>
+    </div>
+    <div class="ph-card-body" style="padding:0;">
+      <div class="table-responsive">
+        <table class="ph-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Due Date</th>
+              <th>Payment Date</th>
+              <th>Documents</th>
+              <th>Status</th>
+              <th>Update Status</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in emi_payments %}
+            <tr>
+              <td style="font-weight:600;color:var(--text-primary);">
+                {{ payment.installment_number }}<span style="color:var(--text-muted);font-weight:400;">/{{ payment.total_installments }}</span>
+              </td>
+              <td class="amount-cell"><span class="cur">₹</span>{{ payment.amount }}</td>
+              <td>{{ payment.get_payment_method_display }}</td>
+              <td>{{ payment.due_date|default:"—" }}</td>
+              <td>{{ payment.payment_date|default:"—" }}</td>
+              <td>
+                {% if payment.documents.all %}
+                  {% for doc in payment.documents.all %}
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="ph-doc-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {{ doc.get_document_type_display }}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:var(--text-muted);font-size:.8rem;">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if payment.payment_status == "COMPLETED" %}
+                  <span class="ph-badge success">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "PENDING" %}
+                  <span class="ph-badge warning">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "FAILED" %}
+                  <span class="ph-badge danger">{{ payment.get_payment_status_display }}</span>
+                {% else %}
+                  <span class="ph-badge info">{{ payment.get_payment_status_display }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                  <select name="status" class="form-select">
+                    {% for key, value in payment_status_choices %}
+                      <option value="{{ key }}" {% if payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-update">Verify</button>
+                </form>
+              </td>
+              <td>
+                <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+                  View
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ── PDC PAYMENTS ───────────────────────────────── -->
+  {% if pdc_payments %}
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        PDC (Post-Dated Cheques)
+      </span>
+      <span class="ph-badge teal">{{ pdc_payments|length }} cheque{{ pdc_payments|length|pluralize }}</span>
+    </div>
+    <div class="ph-card-body" style="padding:0;">
+      <div class="table-responsive">
+        <table class="ph-table">
+          <thead>
+            <tr>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Documents</th>
+              <th>Due Date</th>
+              <th>Payment Date</th>
+              <th>Status</th>
+              <th>Update Status</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in pdc_payments %}
+            <tr>
+              <td class="amount-cell"><span class="cur">₹</span>{{ payment.amount }}</td>
+              <td>{{ payment.get_payment_method_display }}</td>
+              <td>
+                {% if payment.documents.all %}
+                  {% for doc in payment.documents.all %}
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="ph-doc-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {{ doc.get_document_type_display }}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:var(--text-muted);font-size:.8rem;">—</span>
+                {% endif %}
+              </td>
+              <td>{{ payment.due_date|default:"—" }}</td>
+              <td>{{ payment.payment_date|default:"—" }}</td>
+              <td>
+                {% if payment.payment_status == "COMPLETED" %}
+                  <span class="ph-badge success">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "PENDING" %}
+                  <span class="ph-badge warning">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "FAILED" %}
+                  <span class="ph-badge danger">{{ payment.get_payment_status_display }}</span>
+                {% else %}
+                  <span class="ph-badge info">{{ payment.get_payment_status_display }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                  <select name="status" class="form-select">
+                    {% for key, value in payment_status_choices %}
+                      <option value="{{ key }}" {% if payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-update">Verify</button>
+                </form>
+              </td>
+              <td>
+                <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+                  View
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ── FULL PAYMENT ───────────────────────────────── -->
   {% if full_payment %}
   <div class="ph-card ph-section">
     <div class="ph-card-header">
@@ -714,34 +952,213 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         Full Payment
       </span>
+      {% if full_payment.payment_status == "COMPLETED" %}
+        <span class="ph-badge success">{{ full_payment.get_payment_status_display }}</span>
+      {% elif full_payment.payment_status == "PENDING" %}
+        <span class="ph-badge warning">{{ full_payment.get_payment_status_display }}</span>
+      {% else %}
+        <span class="ph-badge danger">{{ full_payment.get_payment_status_display }}</span>
+      {% endif %}
     </div>
     <div class="ph-card-body">
       <div class="ph-full-payment-box">
         <div class="fp-detail">
           <div><strong>Amount:</strong> ₹ {{ full_payment.amount }}</div>
-          <div><strong>Status:</strong> {{ full_payment.get_payment_status_display }}</div>
-        </div>
-        <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
-          {% csrf_token %}
-          <input type="hidden" name="payment_id" value="{{ full_payment.id }}">
-          <select name="status" class="form-select">
-            {% for key, value in payment_status_choices %}
-              <option value="{{ key }}" {% if full_payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+          <div><strong>Method:</strong> {{ full_payment.get_payment_method_display }}</div>
+          <div><strong>Payment Date:</strong> {{ full_payment.payment_date|default:"—" }}</div>
+          {% if full_payment.documents.all %}
+          <div style="margin-top:.4rem;">
+            {% for doc in full_payment.documents.all %}
+              <a href="{{ doc.document_file.url }}" target="_blank" class="ph-doc-link">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                {{ doc.get_document_type_display }}
+              </a>
             {% endfor %}
-          </select>
-          <button type="submit" class="btn-update">Verify</button>
-        </form>
-        <!-- VIEW button -->
-      <a href="{% url 'bdm:payment_detail' full_payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
-        View
-      </a>
+          </div>
+          {% endif %}
+        </div>
+        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+          <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+            {% csrf_token %}
+            <input type="hidden" name="payment_id" value="{{ full_payment.id }}">
+            <select name="status" class="form-select">
+              {% for key, value in payment_status_choices %}
+                <option value="{{ key }}" {% if full_payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn-update">Verify</button>
+          </form>
+          <a href="{% url 'bdm:payment_detail' full_payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+            View
+          </a>
+        </div>
       </div>
     </div>
   </div>
   {% endif %}
 
 
-  <!-- ── COURSE FEE SUMMARY ───────────────────────── -->
+  <!-- ── LATE FEES ──────────────────────────────────── -->
+  {% if late_fees %}
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Late Fees
+      </span>
+      <span class="ph-badge danger">{{ late_fees|length }} charge{{ late_fees|length|pluralize }}</span>
+    </div>
+    <div class="ph-card-body" style="padding:0;">
+      <div class="table-responsive">
+        <table class="ph-table">
+          <thead>
+            <tr>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Documents</th>
+              <th>Payment Date</th>
+              <th>Status</th>
+              <th>Update Status</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in late_fees %}
+            <tr>
+              <td class="amount-cell"><span class="cur">₹</span>{{ payment.amount }}</td>
+              <td>{{ payment.get_payment_method_display }}</td>
+              <td>
+                {% if payment.documents.all %}
+                  {% for doc in payment.documents.all %}
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="ph-doc-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {{ doc.get_document_type_display }}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:var(--text-muted);font-size:.8rem;">—</span>
+                {% endif %}
+              </td>
+              <td>{{ payment.payment_date|default:"—" }}</td>
+              <td>
+                {% if payment.payment_status == "COMPLETED" %}
+                  <span class="ph-badge success">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "PENDING" %}
+                  <span class="ph-badge warning">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "FAILED" %}
+                  <span class="ph-badge danger">{{ payment.get_payment_status_display }}</span>
+                {% else %}
+                  <span class="ph-badge info">{{ payment.get_payment_status_display }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                  <select name="status" class="form-select">
+                    {% for key, value in payment_status_choices %}
+                      <option value="{{ key }}" {% if payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-update">Verify</button>
+                </form>
+              </td>
+              <td>
+                <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+                  View
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ── OTHER PAYMENTS ─────────────────────────────── -->
+  {% if other_payments %}
+  <div class="ph-card ph-section">
+    <div class="ph-card-header">
+      <span class="ph-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        Other Payments
+      </span>
+      <span class="ph-badge info">{{ other_payments|length }} payment{{ other_payments|length|pluralize }}</span>
+    </div>
+    <div class="ph-card-body" style="padding:0;">
+      <div class="table-responsive">
+        <table class="ph-table">
+          <thead>
+            <tr>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Documents</th>
+              <th>Payment Date</th>
+              <th>Status</th>
+              <th>Update Status</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in other_payments %}
+            <tr>
+              <td class="amount-cell"><span class="cur">₹</span>{{ payment.amount }}</td>
+              <td>{{ payment.get_payment_method_display }}</td>
+              <td>
+                {% if payment.documents.all %}
+                  {% for doc in payment.documents.all %}
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="ph-doc-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {{ doc.get_document_type_display }}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:var(--text-muted);font-size:.8rem;">—</span>
+                {% endif %}
+              </td>
+              <td>{{ payment.payment_date|default:"—" }}</td>
+              <td>
+                {% if payment.payment_status == "COMPLETED" %}
+                  <span class="ph-badge success">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "PENDING" %}
+                  <span class="ph-badge warning">{{ payment.get_payment_status_display }}</span>
+                {% elif payment.payment_status == "FAILED" %}
+                  <span class="ph-badge danger">{{ payment.get_payment_status_display }}</span>
+                {% else %}
+                  <span class="ph-badge info">{{ payment.get_payment_status_display }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="POST" action="{% url 'bdm:payment_history' student.id %}" class="ph-status-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                  <select name="status" class="form-select">
+                    {% for key, value in payment_status_choices %}
+                      <option value="{{ key }}" {% if payment.payment_status == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-update">Verify</button>
+                </form>
+              </td>
+              <td>
+                <a href="{% url 'bdm:payment_detail' payment.id %}?next=history&student_id={{ student.id }}" class="btn-update" style="background:#10b981;">
+                  View
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+  <!-- ── COURSE FEE SUMMARY ─────────────────────────── -->
   <div class="ph-card ph-section">
     <div class="ph-card-header">
       <span class="ph-card-title">
@@ -777,6 +1194,29 @@
           <span>100%</span>
         </div>
       </div>
+      {% endif %}
+
+      <!-- Course status banner -->
+      {% if course_status == "COMPLETED" %}
+        <div class="ph-course-status-banner completed">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Course fee fully paid — all payments completed.
+        </div>
+      {% elif course_status == "PENDING" %}
+        <div class="ph-course-status-banner pending">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Some payments are pending verification.
+        </div>
+      {% elif course_status == "IN PROGRESS" %}
+        <div class="ph-course-status-banner progress">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Partial payments received — balance remaining: ₹{{ balance }}.
+        </div>
+      {% else %}
+        <div class="ph-course-status-banner unpaid">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          No course fee payments recorded yet.
+        </div>
       {% endif %}
 
     </div>
