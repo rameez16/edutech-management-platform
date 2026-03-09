@@ -1258,7 +1258,7 @@ def payment_portal(request):
 
     if plan == "installment":
 
-        today = date(2026, 6, 25)  # simulate date
+        today = date(2026, 9, 25)  # simulate date
         start_date = admission.admission_date.date()
         count = 4
         template = "student/payment/installment_payment.html"
@@ -1345,7 +1345,7 @@ def payment_portal(request):
 
     if plan == "emi":
 
-        today = date(2026, 6, 25)  # simulate date
+        today = date(2026, 9, 25)  # simulate date
         start_date = admission.admission_date.date()
         count = 6
         template = "student/payment/emi_payment.html"
@@ -1432,7 +1432,7 @@ def payment_portal(request):
 
     if plan == "pdc":
 
-        today = date(2026, 6, 25)  # simulate date
+        today = date(2026, 9, 25)  # simulate date
         start_date = admission.admission_date.date()
         count = 5
         template = "student/payment/pdc_payment.html"
