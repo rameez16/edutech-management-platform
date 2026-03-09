@@ -19,6 +19,8 @@ urlpatterns = [path('stud_profile/', views.stud_profile, name='stud_profile'),
                
                
                
+
+               
 #Niranjana & Rinta
                path('payment_portal/',views.payment_portal,name='payment_portal'),
                

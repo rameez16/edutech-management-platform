@@ -19,13 +19,52 @@
         </div>
 
         <!-- Notifications -->
-        <button class="nav-btn" id="notification-btn" title="Notifications">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            <span class="notification-dot"></span>
-        </button>
+        <div class="notif-wrapper" id="notif-wrapper">
+    <button class="nav-btn" id="notification-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        {% if unread_count > 0 %}
+            <span class="notif-badge">{{ unread_count }}</span>
+        {% endif %}
+    </button>
+
+    <div class="notif-dropdown" id="notif-dropdown">
+        <div class="notif-header">
+            <span>Notifications</span>
+            {% if unread_count > 0 %}
+            <form method="post" action="{% url 'trainer:mark-all-notif-read' %}">
+                {% csrf_token %}
+                <button type="submit" class="notif-mark-all-btn">Mark all read</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <ul class="notif-list">
+            {% for notif in notifications %}
+            <li class="notif-item">
+                <div class="notif-body">
+                    {% if notif.link_url %}
+                        <a href="{{ notif.link_url }}" class="notif-title">{{ notif.title }}</a>
+                    {% else %}
+                        <span class="notif-title">{{ notif.title }}</span>
+                    {% endif %}
+                    <p class="notif-message">{{ notif.message|truncatechars:80 }}</p>
+                    <small class="notif-time">{{ notif.created_at|timesince }} ago</small>
+                </div>
+                <form method="post" action="{% url 'trainer:mark-notif-read' notif.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button type="submit" class="notif-dismiss-btn">✕</button>
+                </form>
+            </li>
+            {% empty %}
+            <li class="notif-empty">You're all caught up! 🎉</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
         <!-- Theme Toggle -->
         <button class="nav-btn" id="theme-toggle" title="Toggle Theme">

@@ -29,7 +29,7 @@ from apps.student.models import FeePayment ,LeaveApplication ,StudentFeedback
 from apps.bdm.models import Student ,PaymentDocument ,StudentIssue ,Announcement ,BatchSchedule ,Counselor
 
 from apps.trainer.models import Module,TrainerLeave,Exam ,ExamResult,Certificate,Attendance
-from apps.trainer.models import Module,TaskSubmission
+from apps.trainer.models import Module,TaskSubmission,SubstituteTeaching
 
 from django.db.models import Exists, OuterRef
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
@@ -1309,6 +1309,18 @@ def payment_detail(request, pk):
         if new_status in dict(FeePayment.PaymentStatus.choices).keys():
             payment.payment_status = new_status
             payment.save()
+            
+                    # ================= CREATE NOTIFICATION =================
+        if new_status == FeePayment.PaymentStatus.COMPLETED:
+
+            Notification.objects.create(
+                recipient=student.user,
+                notification_type=Notification.NotificationType.PAYMENT_RECEIVED,
+                title="Payment Verified ✅",
+                message=f"Your payment of ₹{payment.amount} for {course.name if course else 'course'} has been verified.",
+                
+            )
+
         return redirect("bdm:payment_detail", pk=payment.pk)
 
     # ─────────────────────────────
@@ -1506,6 +1518,18 @@ def payment_history(request, student_id):
             payment.payment_status = new_status
             payment.save()
             messages.success(request, f"Payment status updated to {payment.get_payment_status_display()}.")
+            
+            # ================= CREATE NOTIFICATION =================
+        if new_status == FeePayment.PaymentStatus.COMPLETED:
+
+            Notification.objects.create(
+                recipient=student.user,
+                notification_type=Notification.NotificationType.PAYMENT_RECEIVED,
+                title="Payment Verified ✅",
+                message=f"Your payment of ₹{payment.amount} has been verified successfully.",
+                
+            )
+
         else:
             messages.error(request, "Invalid status selected.")
 
@@ -2092,6 +2116,14 @@ def student_issue_detail(request, pk):
             issue.status = StudentIssue.Status.IN_PROGRESS
             issue.save()
 
+             # Create notification for trainer
+            Notification.objects.create(
+                recipient=trainer,
+                notification_type=Notification.NotificationType.ISSUE_ASSIGNED,
+                title="New Issue Assigned",
+                message=f"A student issue has been assigned to you: {issue.subject}",
+                
+            )
             messages.success(request, "Issue assigned successfully.")
             return redirect('bdm:student_issue_detail', pk=issue.pk)
 
@@ -2378,7 +2410,8 @@ def dashboard(request):
 
     # ── NOTIFICATIONS / RECENT ACTIVITY ─────────────────────────
     recent_notifications = Notification.objects.filter(
-        recipient=request.user
+        recipient=request.user,
+        is_read=False
     ).order_by('-created_at')[:10]
 
     # Recent fee payments (admission fee received events)
@@ -2604,6 +2637,7 @@ def trainer_leave_detail(request, pk):
         "leave": leave
     })
     
+
 @require_POST
 def update_trainer_leave_status(request, pk):
     leave = get_object_or_404(TrainerLeave, pk=pk)
@@ -2615,12 +2649,31 @@ def update_trainer_leave_status(request, pk):
     action = request.POST.get("action")  # 'approve' or 'reject'
     remarks = request.POST.get("remarks")
 
+    trainer_user = leave.trainer.user   # assuming Trainer has OneToOne with User
+
     if action == "approve":
         leave.status = TrainerLeave.LeaveStatus.APPROVED
         messages.success(request, "Leave approved successfully.")
+
+        Notification.objects.create(
+            recipient=trainer_user,
+            notification_type=Notification.NotificationType.GENERAL,
+            title="Leave Approved",
+            message=f"Your leave request from {leave.start_date} to {leave.end_date} has been approved.",
+            # link_url=f"/trainer/leaves/{leave.id}/"
+        )
+
     elif action == "reject":
         leave.status = TrainerLeave.LeaveStatus.REJECTED
         messages.success(request, "Leave rejected.")
+
+        Notification.objects.create(
+            recipient=trainer_user,
+            notification_type=Notification.NotificationType.GENERAL,
+            title="Leave Rejected",
+            message=f"Your leave request from {leave.start_date} to {leave.end_date} has been rejected.",
+            link_url=f"/trainer/leaves/{leave.id}/"
+        )
 
     leave.bdm_remarks = remarks
     leave.decision_at = timezone.now()
@@ -2772,6 +2825,13 @@ def issue_certificate_single(request, result_id):
     )
 
     buffer.close()
+    Notification.objects.create(
+        recipient=student.user,
+        notification_type=Notification.NotificationType.GENERAL,
+        title="Certificate Issued 🎓",
+        message=f"Your certificate for the course '{batch.name}' has been issued.",
+        # link_url=f"/student/certificates/{certificate.id}/"
+    )
     messages.success(request, "Certificate issued successfully!")
     return redirect("bdm:exam_results", pk=exam.id)
 
@@ -3172,3 +3232,33 @@ def deactivate_user(request, user_id):
 
     messages.success(request, "User deactivated successfully.")
     return redirect("bdm:user_list")
+
+
+#notitfication mark as read
+@login_required
+def mark_all_notifications_read(request):
+
+    Notification.objects.filter(
+        recipient=request.user,
+        is_read=False
+    ).update(is_read=True)
+
+    next_url = request.GET.get('next', '/')
+    return redirect(next_url)
+
+#substitute teaching -aleena
+
+def substitute_request_list(request):
+
+    requests = SubstituteTeaching.objects.select_related(
+        "batch",
+        "lesson_session",
+        "original_trainer",
+        "substitute_trainer"
+    ).order_by("-date")
+
+    context = {
+        "requests": requests
+    }
+
+    return render(request, "bdm/substitute/substitute_request_list.html", context)

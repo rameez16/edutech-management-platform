@@ -568,7 +568,8 @@
                                 <span class="notif-unread-pill">{{ unread_notif_count }}</span>
                                 {% endif %}
                             </h4>
-                            <a href="#">Mark all read</a>
+                            <a href="{% url 'bdm:mark_all_notifications_read' %}?next={{ request.path }}">Mark all read</a>
+                            
                         </div>
                         <div class="notification-list">
                             {% for notification in recent_notifications|slice:":8" %}
@@ -711,7 +712,11 @@
                             <div class="sidebar-link-icon"><i class="bi bi-calendar-x-fill"></i></div>
                             <span class="sidebar-link-text">Trainer Leave</span>
                         </a>
-
+                        <a href="{% url 'bdm:substitute_request_list' %}"
+                           class="sidebar-link {% if 'substitute' in request.resolver_match.url_name %}active{% endif %}">
+                            <div class="sidebar-link-icon"><i class="bi bi-person-check-fill"></i></div>
+                            <span class="sidebar-link-text">Substitute request</span>
+                        </a>
 
                         <a href="{% url 'bdm:payments_dashboard' %}"
                            class="sidebar-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
@@ -856,6 +861,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* Clicks INSIDE the panels don't close them */
     notifPanel?.addEventListener('click', e => e.stopPropagation());
+    
     userPanel?.addEventListener('click',  e => e.stopPropagation());
 
     /* Click anywhere outside → close everything */

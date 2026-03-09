@@ -1,0 +1,80 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Request Substitute{% endblock %}
+
+{% block content %}
+
+<div class="glass-card">
+
+    <!-- Header -->
+    <div class="trainerreqsubs-header">
+
+        <a href="{% url 'trainer:substitute-list' %}" class="trainerreqsubs-back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </a>
+
+        <h4>Request Substitute</h4>
+
+    </div>
+
+    <!-- Session Info -->
+    <div class="trainerreqsubs-session-info">
+
+        <div class="trainerreqsubs-info-item">
+            <span>Batch</span>
+            <strong>{{ session.batch.name }}</strong>
+        </div>
+
+        <div class="trainerreqsubs-info-item">
+            <span>Session</span>
+            <strong>Session {{ session.lesson_plan.session_number }}</strong>
+        </div>
+
+        <div class="trainerreqsubs-info-item">
+            <span>Planned Date</span>
+            <strong>{{ session.planned_date }}</strong>
+        </div>
+
+    </div>
+
+    <!-- Form -->
+    <form method="POST" class="trainerreqsubs-form">
+
+        {% csrf_token %}
+
+        <div class="trainerreqsubs-form-group">
+
+            <label>
+                Reason for Substitute Request <span class="trainerreqsubs-required">*</span>
+            </label>
+
+            <textarea
+                name="reason"
+                rows="4"
+                placeholder="Explain why you need a substitute..."
+                required
+            ></textarea>
+
+        </div>
+
+        <div class="trainerreqsubs-form-actions">
+
+            <button type="submit" class="trainerreqsubs-btn-submit">
+                Submit Request
+            </button>
+
+            <a href="{% url 'trainer:substitute-list' %}" class="trainerreqsubs-btn-cancel">
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

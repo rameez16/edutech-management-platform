@@ -54,11 +54,11 @@ urlpatterns = [
     path('assigned-issues/<int:pk>/', views.trainer_issue_detail_view, name='trainer_issue_detail'),
     
     # announcements
-    path("announcements/", views.all_announcements, name="all_announcements"),
-    path("announcements/create/", views.create_announcement, name="create_announcement"),
-    path("announcements/<int:announcement_id>/view/", views.view_announcement, name="view_announcement"),
-    path("announcements/<int:announcement_id>/edit/", views.edit_announcement, name="edit_announcement"),
-    path("announcements/<int:announcement_id>/delete/",views.delete_announcement,name="delete_announcement"),
+    path("trainerannouncements/", views.all_announcements, name="all_announcements"),
+    path("trainerannouncements/create/", views.create_announcement, name="create_announcement"),
+    path("trainerannouncements/<int:announcement_id>/view/", views.view_announcement, name="view_announcement"),
+    path("trainerannouncements/<int:announcement_id>/edit/", views.edit_announcement, name="edit_announcement"),
+    path("trainerannouncements/<int:announcement_id>/delete/",views.delete_announcement,name="delete_announcement"),
     
     # exam 
     path("exams/final/", views.final_exam_batchlist, name="exam-final-batchlist"),
@@ -86,6 +86,15 @@ urlpatterns = [
     # certificates 
     path("certificates/", views.certificate_batch_list, name="certificate-batch-list"),
     path("certificates/<int:batch_id>/students/", views.certificate_students_list, name="certificate-students-list"),
-    path("certificates/<int:batch_id>/check/<int:student_id>/", views.certificate_check_eligibility, name="certificate-check-eligibility")
+    path("certificates/<int:batch_id>/check/<int:student_id>/", views.certificate_check_eligibility, name="certificate-check-eligibility"),
     
+    #notifications
+    path('trainernotifications/mark-read/<int:notif_id>/', views.mark_notification_read, name='mark-notif-read'),
+    path('trainernotifications/mark-all-read/', views.mark_all_notifications_read, name='mark-all-notif-read'),
+    
+    #substitute trainer
+    path("substitute/", views.substitute_list, name="substitute-list"),
+    path("substitute/requests/", views.my_substitute_requests, name="my-substitute-requests"),
+    path("substitute/request/<int:session_id>/", views.request_substitute, name="request-substitute"),
+   
 ]

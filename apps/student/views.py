@@ -480,40 +480,40 @@ def announcement_view(request):
 @login_required
 def notification_view(request):
 
-    # ✅ SAFETY CHECK (extra protection)
-    if not request.user.is_authenticated:
-        return redirect("login")  # change if needed
+    # MARK AS READ
+    if request.method == "POST":
 
-    # ✅ MARK AS READ
-    read_id = request.GET.get("read")
-    page_number = request.GET.get("page")
+        notification_id = request.POST.get("notification_id")
 
-    if read_id:
         notification = Notification.objects.filter(
-            id=read_id,
-            recipient_id=request.user.id   # ✅ SAFER
+            id=notification_id,
+            recipient=request.user
         ).first()
 
         if notification:
-            notification.mark_as_read()
+            notification.is_read = True
+            notification.read_at = timezone.now()
+            notification.save()
 
-            if notification.link_url:
-                return redirect(notification.link_url)
+        return redirect("student:notification_view")
 
-    # ✅ FETCH NOTIFICATIONS
+    # SHOW ONLY UNREAD
     notifications_list = Notification.objects.filter(
-        recipient_id=request.user.id   # ✅ prevents AnonymousUser error
+        recipient=request.user,
+        is_read=False
     ).order_by("-created_at")
 
-    # ✅ PAGINATION (10 per page)
     paginator = Paginator(notifications_list, 10)
+
+    page_number = request.GET.get("page", 1)
+
     notifications = paginator.get_page(page_number)
 
-    return render(request, "student/dashboard/notification.html", {
-        "notifications": notifications
-    })
-
-
+    return render(
+        request,
+        "student/dashboard/notification.html",
+        {"notifications": notifications}
+    )
 
 
 @login_required
@@ -1205,7 +1205,6 @@ def _notify_bdm_payment(student, payment_plan_label, installment_number, amount)
             notification_type=Notification.NotificationType.GENERAL,
             title=f"{payment_plan_label} Submitted",
             message=f"{student.full_name} submitted {payment_plan_label} {detail}.",
-            link_url="/bdm/payments/"  # update to your BDM payments URL
         )
 
 
@@ -1644,292 +1643,6 @@ def _resolve_summary(installments, selected_summary):
 
 
 
-
-
-MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-
-@role_required("student")
-def upload(request):
-    student = request.user.student
-
-    REQUIRED_DOCS = {
-        "photo": "Photograph",
-        "education": "Educational Certificate",
-        "aadhaar": "Aadhaar",
-        "resume": "Resume / CV",
-    }
-
-    onboarding, _ = OnboardingChecklist.objects.get_or_create(student=student)
-
-    # =====================================
-    # Get latest document per type
-    # =====================================
-    latest_docs_qs = (
-        StudentDocument.objects
-        .filter(student=student)
-        .order_by("document_type", "-id")
-        .distinct("document_type")
-    )
-    existing_docs = {doc.document_type: doc for doc in latest_docs_qs}
-
-    # =====================================
-    # If any doc rejected → allow re-upload
-    # =====================================
-    if any(doc.verification_status == StudentDocument.VerificationStatus.REJECTED
-           for doc in existing_docs.values()):
-        onboarding.documents_uploaded = False
-        onboarding.save(update_fields=["documents_uploaded"])
-
-    # =====================================
-    # POST: Upload logic
-    # =====================================
-    if request.method == "POST":
-
-        uploaded_any = False
-
-        for key, label in REQUIRED_DOCS.items():
-            file = request.FILES.get(key)
-            if not file:
-                continue
-
-            if file.size > MAX_FILE_SIZE:
-                messages.error(request, f"{label} exceeds 5MB")
-                return redirect(request.path)
-
-            last_doc = existing_docs.get(key)
-
-            # Block overwrite if already pending or verified
-            if last_doc and last_doc.verification_status in (
-                StudentDocument.VerificationStatus.PENDING,
-                StudentDocument.VerificationStatus.VERIFIED,
-            ):
-                continue
-
-            # Create new doc only if rejected or not exists
-            StudentDocument.objects.create(
-                student=student,
-                document_type=key,
-                document_file=file,
-                verification_status=StudentDocument.VerificationStatus.PENDING,
-                rejection_reason="",  # clear old reason
-            )
-            uploaded_any = True
-
-        if not uploaded_any:
-            messages.error(request, "No new documents uploaded.")
-            return redirect(request.path)
-
-        onboarding.documents_uploaded = True
-        onboarding.save(update_fields=["documents_uploaded"])
-
-
-
-        # ✅ Notify BDM about document upload
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-
-        for bdm in User.objects.filter(role="admin"):
-            Notification.objects.create(
-                recipient=bdm,
-                notification_type=Notification.NotificationType.GENERAL,
-                title="Student Documents Submitted",
-                message=f"{student.full_name} uploaded documents for verification.",
-                link_url="/bdm/documents/"  # update to your BDM documents review URL
-            )
-
-        messages.success(
-            request,
-            "Documents uploaded successfully. Verification in progress."
-        )
-        return redirect(request.path)
-
-    # =====================================
-    # Prepare documents for template display
-    # =====================================
-    display_docs = {}
-
-    for key, doc in existing_docs.items():
-
-        # Rejected → always rejected, ensure rejection reason
-        if doc.verification_status == StudentDocument.VerificationStatus.REJECTED:
-            if not doc.rejection_reason:
-                doc.rejection_reason = "No reason provided"
-            display_docs[key] = doc
-            continue
-
-        # Checklist not verified → force pending in UI
-        if not onboarding.documents_verified:
-            doc.verification_status = StudentDocument.VerificationStatus.PENDING
-            display_docs[key] = doc
-            continue
-
-        # Checklist verified → show actual status
-        display_docs[key] = doc
-
-    # =====================================
-    # Check if submit button should be enabled
-    # =====================================
-    can_submit = True
-    for key in REQUIRED_DOCS:
-        doc = existing_docs.get(key)
-        if not doc or doc.verification_status == StudentDocument.VerificationStatus.REJECTED:
-            can_submit = False
-            break
-
-    return render(
-        request,
-        "student/onboarding/uploaddoc.html",
-        {
-            "docs": display_docs,
-            "onboarding": onboarding,
-            "REQUIRED_DOCS": REQUIRED_DOCS,
-            "can_submit": can_submit,
-        }
-    )
-
-
-
-
-
-
-@role_required("student")
-def onboard(request):
-    student = request.user.student
-    checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
-
-    agreement, _ = EnrollmentAgreement.objects.get_or_create(
-        student=student,
-        defaults={
-            "agreement_number": f"AGR-{student.id}",
-            "agreement_date": timezone.now().date(),
-            "course_fee_agreed": 0,
-        }
-    )
-
-    form = EnrollmentAgreementForm(instance=agreement)
-
-    # GET CHOICES PROPERLY
-    payment_plan_choices = form.fields["payment_plan"].choices
-
-    # Step logic
-    completed_steps = 0
-    if checklist.documents_verified:
-        completed_steps += 1
-
-    enrollment_generated = checklist.enrollment_letter_generated
-    enrollment_signed = checklist.enrollment_letter_signed
-    if enrollment_signed:
-        completed_steps += 1
-
-    if getattr(checklist, "id_card_issued", False):
-        completed_steps += 1
-
-    progress_percentage = (completed_steps / 3) * 100
-
-    context = {
-        "completed_steps": completed_steps,
-        "progress_percentage": progress_percentage,
-        "all_docs_verified": checklist.documents_verified,
-        "enrollment_generated": enrollment_generated,
-        "enrollment_signed": enrollment_signed,
-        "agreement": agreement,
-        "checklist": checklist,
-        "form": form,
-        "payment_plan_choices": payment_plan_choices,
-    }
-
-    return render(request, "student/onboarding/onboarding.html", context)
-
-
-
-
-@role_required("student")
-def upload_signed_enrollment_letter(request):
-
-    if request.method != "POST":
-        return JsonResponse({"success": False}, status=400)
-
-    student = request.user.student
-    checklist = student.onboarding_checklist
-
-    agreement, _ = EnrollmentAgreement.objects.get_or_create(
-        student=student
-    )
-
-    # ─────────────────────────────
-    # SIGNED LETTER UPLOAD ONLY
-    # ─────────────────────────────
-    signed_file = request.FILES.get("signed_letter")
-
-    if signed_file:
-        agreement.agreement_file = signed_file
-        agreement.is_signed = True
-        agreement.signed_at = timezone.now()
-        agreement.signature_ip = request.META.get("REMOTE_ADDR")
-        agreement.save()
-
-        checklist.enrollment_letter_signed = True
-        checklist.save(update_fields=["enrollment_letter_signed"])
-
-
-
-        # ✅ Notify BDM about signed enrollment letter
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-
-        for bdm in User.objects.filter(role="admin"):
-            Notification.objects.create(
-                recipient=bdm,
-                notification_type=Notification.NotificationType.GENERAL,
-                title="Enrollment Letter Signed",
-                message=f"{student.full_name} uploaded a signed enrollment letter.",
-                link_url="/bdm/enrollment/"  # update to your BDM enrollment review URL
-            )
-
-        return JsonResponse({
-            "success": True,
-            "type": "file_uploaded"
-        })
-
-    return JsonResponse({
-        "success": False,
-        "message": "No file uploaded"
-    }, status=400)
-
-
-
-
-
-@role_required("student")
-def download_id_card(request):
-    checklist = request.user.student.onboarding_checklist
-
-    if not checklist.id_card_generated:
-        messages.info(request, "ID Card has not been generated by BDM yet.")
-        return redirect("student:onboarding")
-
-    try:
-        # Assuming student model has `id_card` FileField
-        id_card_file = request.user.student.id_card
-        if not id_card_file:
-            messages.info(request, "ID Card file is not available yet.")
-            return redirect("student:onboarding")
-        
-        # Optional: mark as issued when downloaded
-        checklist.id_card_issued = True
-        checklist.save()
-
-        return FileResponse(id_card_file.open('rb'), as_attachment=True)
-    except Exception as e:
-        messages.error(request, "ID Card not available: " + str(e))
-        return redirect("student:onboarding")
-
-
-
-
-
-
-
 @role_required("student")
 def lessonplan(request):
     student = request.user.student
@@ -2000,55 +1713,7 @@ def syllabus(request):
 
 
 
-@role_required("student")
-def view_id_card(request):
-    student = request.user.student
 
-    # Try to get the student's photo document
-    try:
-        photo = student.documents.get(document_type=StudentDocument.DocumentType.PHOTO)
-    except StudentDocument.DoesNotExist:
-        photo = None
-
-    try:
-        id_card = student.id_card  # may not exist
-        context = {
-            "id_card": id_card,
-            "photo": photo,
-            "available": True
-        }
-    except student.id_card.RelatedObjectDoesNotExist:
-        context = {
-            "photo": photo,
-            "available": False
-        }
-
-    return render(request, "student/onboarding/view_id_card.html", context)
-
-
-
-
-
-#when merging delete this view this is for just check logic correct or not
-
-@role_required("student")
-def download_enrollment_letter(request):
-    checklist = request.user.student.onboarding_checklist
-
-    if not checklist.enrollment_letter_generated:
-        messages.info(request, "Enrollment letter not generated yet.")
-        return redirect("student:onboarding")
-
-    content = (
-        "ENROLLMENT LETTER (TEMP)\n\n"
-        f"Student: {request.user.get_full_name()}\n\n"
-        "This is a temporary enrollment letter.\n"
-        "A PDF version will be added by BDM."
-    )
-
-    response = HttpResponse(content, content_type="application/octet-stream")
-    response["Content-Disposition"] = 'attachment; filename="enrollment_letter.txt"'
-    return response
 
 
 
@@ -2139,6 +1804,380 @@ def batch_details(request):
         "pending_sessions":   pending_sessions,
         "skipped_sessions":   skipped_sessions,
     })
+
+
+
+
+
+
+
+
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+@role_required("student")
+def upload(request):
+
+    student = request.user.student
+
+    REQUIRED_DOCS = {
+        "photo": "Photograph",
+        "education": "Educational Certificate",
+        "aadhaar": "Aadhaar",
+        "resume": "Resume / CV",
+    }
+
+    onboarding, _ = OnboardingChecklist.objects.get_or_create(student=student)
+
+    # =====================================
+    # Get existing documents
+    # =====================================
+    existing_docs = {
+        doc.document_type: doc
+        for doc in StudentDocument.objects.filter(student=student)
+    }
+
+    # =====================================
+    # If any doc rejected → allow re-upload
+    # =====================================
+    if any(
+        doc.verification_status == StudentDocument.VerificationStatus.REJECTED
+        for doc in existing_docs.values()
+    ):
+        onboarding.documents_uploaded = False
+        onboarding.save(update_fields=["documents_uploaded"])
+
+    # =====================================
+    # POST: Upload logic
+    # =====================================
+    if request.method == "POST":
+
+        uploaded_any = False
+
+        for key, label in REQUIRED_DOCS.items():
+
+            file = request.FILES.get(key)
+            if not file:
+                continue
+
+            if file.size > MAX_FILE_SIZE:
+                messages.error(request, f"{label} exceeds 5MB")
+                return redirect(request.path)
+
+            last_doc = existing_docs.get(key)
+
+            # =====================================
+            # Block overwrite if pending or verified
+            # =====================================
+            if last_doc and last_doc.verification_status in (
+                StudentDocument.VerificationStatus.PENDING,
+                StudentDocument.VerificationStatus.VERIFIED,
+            ):
+                continue
+
+            # =====================================
+            # Replace rejected document
+            # =====================================
+            if last_doc:
+
+                # delete old file
+                if last_doc.document_file:
+                    last_doc.document_file.delete(save=False)
+
+                last_doc.document_file = file
+                last_doc.verification_status = StudentDocument.VerificationStatus.PENDING
+                last_doc.rejection_reason = ""
+                last_doc.save()
+
+            else:
+                # create new document
+                StudentDocument.objects.create(
+                    student=student,
+                    document_type=key,
+                    document_file=file,
+                    verification_status=StudentDocument.VerificationStatus.PENDING,
+                    rejection_reason="",
+                )
+
+            uploaded_any = True
+
+        if not uploaded_any:
+            messages.error(request, "No new documents uploaded.")
+            return redirect(request.path)
+
+        onboarding.documents_uploaded = True
+        onboarding.save(update_fields=["documents_uploaded"])
+
+        # =====================================
+        # Notify BDM
+        # =====================================
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        for bdm in User.objects.filter(role="admin"):
+            Notification.objects.create(
+                recipient=bdm,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Student Documents Submitted",
+                message=f"{student.full_name} uploaded documents for verification.",
+            )
+
+        messages.success(
+            request,
+            "Documents uploaded successfully. Verification in progress."
+        )
+
+        return redirect(request.path)
+
+    # =====================================
+    # Prepare documents for template display
+    # =====================================
+    display_docs = {}
+
+    for key, doc in existing_docs.items():
+
+        # Rejected → always show rejected
+        if doc.verification_status == StudentDocument.VerificationStatus.REJECTED:
+            if not doc.rejection_reason:
+                doc.rejection_reason = "No reason provided"
+            display_docs[key] = doc
+            continue
+
+        # Checklist not verified → force pending in UI
+        if not onboarding.documents_verified:
+            doc.verification_status = StudentDocument.VerificationStatus.PENDING
+            display_docs[key] = doc
+            continue
+
+        display_docs[key] = doc
+
+    # =====================================
+    # Check if submit button should be enabled
+    # =====================================
+    can_submit = True
+
+    for key in REQUIRED_DOCS:
+        doc = existing_docs.get(key)
+
+        if not doc or doc.verification_status == StudentDocument.VerificationStatus.REJECTED:
+            can_submit = False
+            break
+
+    return render(
+        request,
+        "student/onboarding/uploaddoc.html",
+        {
+            "docs": display_docs,
+            "onboarding": onboarding,
+            "REQUIRED_DOCS": REQUIRED_DOCS,
+            "can_submit": can_submit,
+        },
+    )
+
+
+
+
+
+@role_required("student")
+def onboard(request):
+    student = request.user.student
+    checklist, _ = OnboardingChecklist.objects.get_or_create(student=student)
+
+    agreement, _ = EnrollmentAgreement.objects.get_or_create(
+        student=student,
+        defaults={
+            "agreement_number": f"AGR-{student.id}",
+            "agreement_date": timezone.now().date(),
+            "course_fee_agreed": 0,
+        }
+    )
+
+    form = EnrollmentAgreementForm(instance=agreement)
+
+    # GET CHOICES PROPERLY
+    payment_plan_choices = form.fields["payment_plan"].choices
+
+    # Step logic
+    completed_steps = 0
+    if checklist.documents_verified:
+        completed_steps += 1
+
+    enrollment_generated = checklist.enrollment_letter_generated
+    enrollment_signed = checklist.enrollment_letter_signed
+    if enrollment_signed:
+        completed_steps += 1
+
+    if getattr(checklist, "id_card_issued", False):
+        completed_steps += 1
+
+    progress_percentage = (completed_steps / 3) * 100
+
+    context = {
+        "completed_steps": completed_steps,
+        "progress_percentage": progress_percentage,
+        "all_docs_verified": checklist.documents_verified,
+        "enrollment_generated": enrollment_generated,
+        "enrollment_signed": enrollment_signed,
+        "agreement": agreement,
+        "checklist": checklist,
+        "form": form,
+        "payment_plan_choices": payment_plan_choices,
+    }
+
+    return render(request, "student/onboarding/onboarding.html", context)
+
+
+
+
+
+
+
+#when merging delete this view this is for just check logic correct or not
+
+@role_required("student")
+def download_enrollment_letter(request):
+    checklist = request.user.student.onboarding_checklist
+
+    if not checklist.enrollment_letter_generated:
+        messages.info(request, "Enrollment letter not generated yet.")
+        return redirect("student:onboarding")
+
+    content = (
+        "ENROLLMENT LETTER (TEMP)\n\n"
+        f"Student: {request.user.get_full_name()}\n\n"
+        "This is a temporary enrollment letter.\n"
+        "A PDF version will be added by BDM."
+    )
+
+    response = HttpResponse(content, content_type="application/octet-stream")
+    response["Content-Disposition"] = 'attachment; filename="enrollment_letter.txt"'
+    return response
+
+
+
+
+
+
+
+@role_required("student")
+def upload_signed_enrollment_letter(request):
+
+    if request.method != "POST":
+        return JsonResponse({"success": False}, status=400)
+
+    student = request.user.student
+    checklist = student.onboarding_checklist
+
+    agreement, _ = EnrollmentAgreement.objects.get_or_create(
+        student=student
+    )
+
+    # ─────────────────────────────
+    # SIGNED LETTER UPLOAD ONLY
+    # ─────────────────────────────
+    signed_file = request.FILES.get("signed_letter")
+
+    if signed_file:
+        agreement.agreement_file = signed_file
+        agreement.is_signed = True
+        agreement.signed_at = timezone.now()
+        agreement.signature_ip = request.META.get("REMOTE_ADDR")
+        agreement.save()
+
+        checklist.enrollment_letter_signed = True
+        checklist.save(update_fields=["enrollment_letter_signed"])
+
+
+
+        # ✅ Notify BDM about signed enrollment letter
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        for bdm in User.objects.filter(role="admin"):
+            Notification.objects.create(
+                recipient=bdm,
+                notification_type=Notification.NotificationType.GENERAL,
+                title="Enrollment Letter Signed",
+                message=f"{student.full_name} uploaded a signed enrollment letter.",
+                
+            )
+
+        return JsonResponse({
+            "success": True,
+            "type": "file_uploaded"
+        })
+
+    return JsonResponse({
+        "success": False,
+        "message": "No file uploaded"
+    }, status=400)
+
+
+
+
+
+
+
+
+
+@role_required("student")
+def view_id_card(request):
+    student = request.user.student
+
+    # Try to get the student's photo document
+    try:
+        photo = student.documents.get(document_type=StudentDocument.DocumentType.PHOTO)
+    except StudentDocument.DoesNotExist:
+        photo = None
+
+    try:
+        id_card = student.id_card  # may not exist
+        context = {
+            "id_card": id_card,
+            "photo": photo,
+            "available": True
+        }
+    except student.id_card.RelatedObjectDoesNotExist:
+        context = {
+            "photo": photo,
+            "available": False
+        }
+
+    return render(request, "student/onboarding/view_id_card.html", context)
+
+
+
+
+
+
+
+@role_required("student")
+def download_id_card(request):
+    checklist = request.user.student.onboarding_checklist
+
+    if not checklist.id_card_generated:
+        messages.info(request, "ID Card has not been generated by BDM yet.")
+        return redirect("student:onboarding")
+
+    try:
+        # Assuming student model has `id_card` FileField
+        id_card_file = request.user.student.id_card
+        if not id_card_file:
+            messages.info(request, "ID Card file is not available yet.")
+            return redirect("student:onboarding")
+        
+        # Optional: mark as issued when downloaded
+        checklist.id_card_issued = True
+        checklist.save()
+
+        return FileResponse(id_card_file.open('rb'), as_attachment=True)
+    except Exception as e:
+        messages.error(request, "ID Card not available: " + str(e))
+        return redirect("student:onboarding")
+
+
+
+
+
 
 
 
@@ -2292,7 +2331,7 @@ def do_task(request, task_id):
                     notification_type=Notification.NotificationType.GENERAL,
                     title="Task Submitted",
                     message=f"{student.full_name} submitted '{task.title}'.",
-                    link_url=f"/trainer/tasks/{task.id}/"
+                    
                 )
 
             messages.success(request, "Task submitted successfully.")
@@ -2668,7 +2707,6 @@ def submit_exam(request, exam_id):
                 notification_type=Notification.NotificationType.GENERAL,
                 title="Exam Submitted",
                 message=f"{student.full_name} submitted '{exam.title}' {'(Late)' if is_late else ''}.",
-                link_url=f"/trainer/exams/{exam.id}/"  # update to your trainer exam detail URL
             )
 
     return redirect('student:attend_exam', exam_id=exam_id)
@@ -2689,7 +2727,6 @@ def get_notifications(request):
             "title": n.title,
             "message": n.message,
             "type": n.notification_type,
-            "link_url": n.link_url,
             "created_at": n.created_at.strftime("%b %d, %I:%M %p"),
         }
         for n in notifications
