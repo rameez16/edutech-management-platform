@@ -233,6 +233,10 @@ a {
     top: 0;
     width: var(--sidebar-width);
     height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -295,6 +299,8 @@ a {
 .nav-menu {
     list-style: none;
     flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
 .nav-menu ul {
@@ -355,6 +361,27 @@ a {
 .nav-link.active .nav-icon,
 .nav-link:hover .nav-icon {
     opacity: 1;
+}
+
+
+.nav-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+.nav-menu::-webkit-scrollbar {
+    width: 3px;   /* reduced from 6px */
+}
+
+.nav-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.nav-menu::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 10px;
+}
+
+.nav-menu::-webkit-scrollbar-thumb:hover {
+    background: var(--emerald-light);
 }
 
 .nav-badge {
@@ -4354,7 +4381,7 @@ textarea.form-control {
 }
 
 .task-table td {
-    padding: 12px 12px;
+    padding: 12px 6px;
     border-bottom: 1px solid var(--glass-border);
     font-weight: 500;
 }
@@ -9161,4 +9188,522 @@ input#tab-skipped:checked ~ .lesson-session-tab-labels label[for="tab-skipped"] 
 
 .certificate-detail-btn-back:hover {
     background-color: #cbd5e1;
+}
+
+
+
+
+/* Wrapper */
+.notif-wrapper {
+    position: relative;
+}
+
+/* Badge */
+.notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    pointer-events: none;
+}
+
+/* Dropdown panel */
+.notif-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 330px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.13);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.notif-dropdown.open {
+    display: block;
+}
+
+/* Header */
+.notif-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.notif-mark-all-btn {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #3b82f6;
+    cursor: pointer;
+    padding: 0;
+}
+
+.notif-mark-all-btn:hover {
+    text-decoration: underline;
+}
+
+/* List */
+.notif-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+/* Each item */
+.notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #f3f4f6);
+    transition: background 0.15s;
+}
+
+.notif-item:last-child {
+    border-bottom: none;
+}
+
+.notif-item:hover {
+    background: var(--hover-bg, #f9fafb);
+}
+
+/* Body */
+.notif-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.notif-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary, #111827);
+    text-decoration: none;
+}
+
+.notif-title:hover {
+    text-decoration: underline;
+}
+
+.notif-message {
+    font-size: 12px;
+    color: var(--text-muted, #6b7280);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notif-time {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* Dismiss button */
+.notif-dismiss-btn {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    line-height: 1;
+}
+
+.notif-dismiss-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* Empty state */
+.notif-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 13px;
+    list-style: none;
+}
+
+
+
+/* ==========================================
+   TRAINER SUBSTITUTE LIST
+============================================= */
+
+.trainersublist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.trainersublist-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.trainersublist-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ==========================================
+   TABLE
+============================================= */
+
+.trainersublist-table-wrapper {
+    overflow-x: auto;
+}
+
+.trainersublist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.trainersublist-table thead {
+    background: rgba(255,255,255,0.1);
+}
+
+.trainersublist-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.trainersublist-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 500;
+}
+
+.trainersublist-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: 0.3s;
+}
+
+/* ==========================================
+   BUTTONS
+============================================= */
+
+.trainersublist-btn-request {
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #4CAF50;
+    color: white;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.trainersublist-btn-request:hover {
+    background: #43a047;
+}
+
+.trainersublist-btn-view {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #17a2b8;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.trainersublist-btn-view:hover {
+    background: #138496;
+}
+
+/* ==========================================
+   EMPTY STATE
+============================================= */
+
+.trainersublist-empty {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-secondary);
+}
+
+/* ==========================================
+   TRAINER MY SUBSTITUTE REQUESTS
+============================================= */
+
+.trainermysubreq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.trainermysubreq-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.trainermysubreq-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ==========================================
+   TABLE
+============================================= */
+
+.trainermysubreq-table-wrapper {
+    overflow-x: auto;
+}
+
+.trainermysubreq-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.trainermysubreq-table thead {
+    background: rgba(255,255,255,0.1);
+}
+
+.trainermysubreq-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.trainermysubreq-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 500;
+}
+
+.trainermysubreq-table tbody tr:hover {
+    background: var(--glass-hover);
+    transition: background 0.3s ease;
+}
+
+/* ==========================================
+   BADGES
+============================================= */
+
+.trainermysubreq-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.trainermysubreq-badge.success {
+    background: #28a745;
+    color: #fff;
+}
+
+.trainermysubreq-badge.danger {
+    background: #dc3545;
+    color: #fff;
+}
+
+.trainermysubreq-badge.warning {
+    background: #ffc107;
+    color: #000;
+}
+
+/* ==========================================
+   BUTTON
+============================================= */
+
+.trainermysubreq-btn-back {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #17a2b8;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.trainermysubreq-btn-back:hover {
+    background: #138496;
+}
+
+/* ==========================================
+   EMPTY STATE
+============================================= */
+
+.trainermysubreq-empty {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-secondary);
+}
+/* ==========================================
+   TRAINER REQUEST SUBSTITUTE FORM
+============================================= */
+
+.trainerreqsubs-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.trainerreqsubs-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Back button */
+
+.trainerreqsubs-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 6px;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.trainerreqsubs-back-btn:hover {
+    background: rgba(0,0,0,0.05);
+    transform: translateX(-2px);
+}
+
+/* ==========================================
+   SESSION INFO
+============================================= */
+
+.trainerreqsubs-session-info {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.trainerreqsubs-info-item span {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 3px;
+}
+
+.trainerreqsubs-info-item strong {
+    font-size: 0.9rem;
+}
+
+/* ==========================================
+   FORM
+============================================= */
+
+.trainerreqsubs-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.trainerreqsubs-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.trainerreqsubs-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.trainerreqsubs-required {
+    color: var(--danger);
+}
+
+.trainerreqsubs-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    resize: vertical;
+}
+
+.trainerreqsubs-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* ==========================================
+   BUTTONS
+============================================= */
+
+.trainerreqsubs-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.trainerreqsubs-btn-submit {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.trainerreqsubs-btn-submit:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.trainerreqsubs-btn-cancel {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: var(--danger);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.trainerreqsubs-btn-cancel:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }

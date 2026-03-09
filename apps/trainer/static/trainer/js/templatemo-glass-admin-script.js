@@ -499,3 +499,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+const notifBtn = document.getElementById('notification-btn');
+const notifDropdown = document.getElementById('notif-dropdown');
+
+if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notifDropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', () => {
+        notifDropdown.classList.remove('open');
+    });
+
+    notifDropdown.addEventListener('click', (e) => e.stopPropagation());
+}

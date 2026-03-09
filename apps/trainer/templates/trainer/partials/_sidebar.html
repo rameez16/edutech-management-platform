@@ -154,6 +154,23 @@
             </a>
         </li>
 
+        <li class="nav-item">
+            <a href="{% url 'trainer:substitute-list' %}" 
+            class="nav-link {% if request.resolver_match.url_name == 'my-substitute-requests' or request.resolver_match.url_name == 'substitute-list' or request.resolver_match.url_name == 'request-substitute' %}active{% endif %}">
+
+                <!-- Substitute Trainer Icon -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="8" cy="7" r="4"/>
+                    <circle cx="16" cy="7" r="4"/>
+                    <path d="M2 21c0-3 3-5 6-5"/>
+                    <path d="M22 21c0-3-3-5-6-5"/>
+                    <polyline points="9 14 12 17 15 14"/>
+                </svg>
+
+                <span>Substitute Trainer</span>
+            </a>
+        </li>
+
     </ul>
 </aside>
 

@@ -1,0 +1,72 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Substitute Management{% endblock %}
+
+{% block content %}
+
+<div class="glass-card">
+
+    <!-- Header -->
+    <div class="trainersublist-header">
+        <div>
+            <h4>Substitute Management</h4>
+            <p class="trainersublist-subtitle">Request substitutes for your planned sessions</p>
+        </div>
+
+        <a href="{% url 'trainer:my-substitute-requests' %}" class="trainersublist-btn-view">
+            My Requests
+        </a>
+    </div>
+
+    {% if sessions %}
+
+    <div class="trainersublist-table-wrapper">
+        <table class="trainersublist-table">
+
+            <thead>
+                <tr>
+                    <th>Batch</th>
+                    <th>Session</th>
+                    <th>Planned Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for session in sessions %}
+                <tr>
+                    <td>{{ session.batch.name }}</td>
+
+                    <td>
+                        Session {{ session.lesson_plan.session_number }}
+                    </td>
+
+                    <td>
+                        {{ session.planned_date }}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'trainer:request-substitute' session.id %}"
+                           class="trainersublist-btn-request">
+                            Request Substitute
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    {% else %}
+
+    <div class="trainersublist-empty">
+        <p>No planned sessions available.</p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
